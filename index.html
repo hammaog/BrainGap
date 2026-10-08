@@ -85,7 +85,7 @@ const RUNS = [
     "champion": "Jax", "role": "Toplane", "difficulty": "Smaragd",
     "markers": [
       { "x": 60, "y": 9, "type": "hero", "isPlayer": true, "label": "Jax" },
-      { "x": 70, "y": 9, "type": "enemy", "label": "Renekton" },
+      { "x": 70, "y": 9, "type": "enemy", "label": "Renekton", "champion": "Renekton" },
       { "x": 80, "y": 8, "type": "objective", "label": "Turm" },
       { "x": 84, "y": 72, "type": "fog", "label": "Gegnerischer Jungler zuletzt Bot gesehen" }
     ],
@@ -102,8 +102,8 @@ const RUNS = [
     "champion": "Jax", "role": "Toplane", "difficulty": "Smaragd",
     "markers": [
       { "x": 9, "y": 56, "type": "hero", "isPlayer": true, "label": "Jax" },
-      { "x": 9, "y": 44, "type": "enemy", "label": "Renekton" },
-      { "x": 24, "y": 66, "type": "hero", "label": "Viego (Gank)" },
+      { "x": 9, "y": 44, "type": "enemy", "label": "Renekton", "champion": "Renekton" },
+      { "x": 24, "y": 66, "type": "hero", "label": "Viego (Gank)", "champion": "Viego" },
       { "x": 7, "y": 22, "type": "objective", "label": "Gegner-Turm" }
     ],
     "coachHint": "Ein Gank gelingt, wenn der Gegner weit vom Turm steht. Welche Wellenposition lockt ihn heraus?",
@@ -120,8 +120,8 @@ const RUNS = [
     "markers": [
       { "x": 62, "y": 9, "type": "hero", "isPlayer": true, "label": "Jax" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
-      { "x": 72, "y": 82, "type": "hero", "label": "Team" },
-      { "x": 80, "y": 64, "type": "enemy", "label": "Gegner" }
+      { "x": 72, "y": 82, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 80, "y": 64, "type": "enemy", "label": "Gegner", "champion": "Caitlyn" }
     ],
     "coachHint": "Dein Teleport ist deine stärkste Waffe. Wann ist der beste Moment, ihn einzusetzen, nachdem du Druck aufgebaut hast?",
     "context": "Du bist Jax (Top) und dein Teleport ist ready. Deine Welle steht groß vor dem gegnerischen Turm. Der Drache spawnt in etwa 30 Sekunden und dein Team sammelt sich dort. Renekton ist auf der Karte nicht zu sehen.",
@@ -137,8 +137,8 @@ const RUNS = [
     "markers": [
       { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Jax" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 42, "y": 40, "type": "hero", "label": "Team" },
-      { "x": 46, "y": 46, "type": "enemy", "label": "Gegner" }
+      { "x": 42, "y": 40, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 46, "y": 46, "type": "enemy", "label": "Gegner", "champion": "Zed" }
     ],
     "coachHint": "Wenn du im Teamkampf nicht gebraucht wirst: Wie zwingst du die Gegner, zwei Dinge gleichzeitig zu verteidigen?",
     "context": "Du bist Jax (Top). Euer Team sammelt sich für einen Baron-Versuch, die Gegner haben die Vision bemerkt und stehen im Fluss. Dein Teleport ist ready und deine Welle schiebt auf den gegnerischen Turm zu.",
@@ -154,8 +154,8 @@ const RUNS = [
     "markers": [
       { "x": 22, "y": 10, "type": "hero", "isPlayer": true, "label": "Jax" },
       { "x": 85, "y": 75, "type": "objective", "label": "Elder Drake" },
-      { "x": 72, "y": 80, "type": "hero", "label": "Team" },
-      { "x": 78, "y": 62, "type": "enemy", "label": "Gegner" }
+      { "x": 72, "y": 80, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 78, "y": 62, "type": "enemy", "label": "Gegner", "champion": "Caitlyn" }
     ],
     "coachHint": "Zeitfenster entscheiden Spiele. Was ändert sich für den Gegner, wenn seine Ultimates noch nicht bereit sind?",
     "context": "Du bist Jax (Top). Dein Team besitzt die Drachenseele und der Elder Drake spawnt in etwa 20 Sekunden. Die Ultimates der Gegner sind noch rund 45 Sekunden auf Abklingzeit. Dein Teleport ist ready und dein Team hat Vision am Drachen.",
@@ -172,9 +172,9 @@ const RUNS = [
     "champion": "Lee Sin", "role": "Jungle", "difficulty": "Diamant",
     "markers": [
       { "x": 45, "y": 55, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
-      { "x": 80, "y": 42, "type": "enemy", "label": "Nocturne" },
-      { "x": 86, "y": 86, "type": "enemy", "label": "ADC (kein Flash)" },
-      { "x": 10, "y": 60, "type": "hero", "label": "Top (gepusht)" }
+      { "x": 80, "y": 42, "type": "enemy", "label": "Nocturne", "champion": "Nocturne" },
+      { "x": 86, "y": 86, "type": "enemy", "label": "ADC (kein Flash)", "champion": "Caitlyn" },
+      { "x": 10, "y": 60, "type": "hero", "label": "Top (gepusht)", "champion": "Ornn" }
     ],
     "coachHint": "Nocturne ist weit weg. Welche Fenster öffnen sich dadurch für dich auf der anderen Seite der Karte?",
     "context": "Du bist Lee Sin (Jungle). Du hast drei Camps geklärt und siehst für eine Sekunde den gegnerischen Nocturne an seinem Gromp. Der gegnerische ADC hat seinen Flash verbraucht. Deine Midlane hat Prio, dein Top wird in den Turm gedrückt.",
@@ -190,7 +190,7 @@ const RUNS = [
     "markers": [
       { "x": 62, "y": 66, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
-      { "x": 80, "y": 88, "type": "hero", "label": "Botlane" },
+      { "x": 80, "y": 88, "type": "hero", "label": "Botlane", "champion": "Ashe" },
       { "x": 22, "y": 24, "type": "fog", "label": "Nocturne zuletzt Top gesehen" }
     ],
     "coachHint": "Wenn du weißt, wo der gegnerische Jungler ist, wie sicher kannst du ein Objective auf der anderen Seite spielen?",
@@ -206,10 +206,10 @@ const RUNS = [
     "champion": "Lee Sin", "role": "Jungle", "difficulty": "Diamant",
     "markers": [
       { "x": 45, "y": 50, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
-      { "x": 80, "y": 70, "type": "enemy", "label": "Nocturne" },
+      { "x": 80, "y": 70, "type": "enemy", "label": "Nocturne", "champion": "Nocturne" },
       { "x": 86, "y": 78, "type": "objective", "label": "Drache" },
       { "x": 22, "y": 12, "type": "objective", "label": "Top-Turm" },
-      { "x": 28, "y": 9, "type": "hero", "label": "Top" }
+      { "x": 28, "y": 9, "type": "hero", "label": "Top", "champion": "Ornn" }
     ],
     "coachHint": "Du kannst nicht überall sein. Wenn der Gegner auf einer Seite Zeit investiert, welche Seite ist dann offen?",
     "context": "Du bist Lee Sin (Jungle). Nocturne und die gegnerische Botlane starten den Drachen auf der Bot-Seite, dein Team ist nicht rechtzeitig dort. Euer Top hat die Welle gepusht und sein Gegenspieler ist zur Base gegangen. Auf der Top-Seite haben die Gegner keine Vision.",
@@ -224,9 +224,9 @@ const RUNS = [
     "champion": "Lee Sin", "role": "Jungle", "difficulty": "Diamant",
     "markers": [
       { "x": 46, "y": 48, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
-      { "x": 60, "y": 60, "type": "enemy", "label": "Ezreal (allein)" },
+      { "x": 60, "y": 60, "type": "enemy", "label": "Ezreal (allein)", "champion": "Ezreal" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 42, "y": 42, "type": "hero", "label": "Team" }
+      { "x": 42, "y": 42, "type": "hero", "label": "Team", "champion": "Ornn" }
     ],
     "coachHint": "Ein Pick vor dem Objective macht den Kampf leichter. Was musst du haben, bevor du eingehst?",
     "context": "Du bist Lee Sin (Jungle). Der gegnerische Ezreal steht allein am Rand des Flusses, sein Team ist beim Baron-Eingang. Euer Team hat Vision im gegnerischen Dschungel und der Baron ist verfügbar.",
@@ -241,10 +241,10 @@ const RUNS = [
     "champion": "Lee Sin", "role": "Jungle", "difficulty": "Diamant",
     "markers": [
       { "x": 55, "y": 50, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
-      { "x": 55, "y": 58, "type": "hero", "label": "Team" },
+      { "x": 55, "y": 58, "type": "hero", "label": "Team", "champion": "Ornn" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 40, "y": 38, "type": "enemy", "label": "Gegner" },
-      { "x": 46, "y": 44, "type": "enemy", "label": "Nocturne (Ult)" }
+      { "x": 40, "y": 38, "type": "enemy", "label": "Gegner", "champion": "Zed" },
+      { "x": 46, "y": 44, "type": "enemy", "label": "Nocturne (Ult)", "champion": "Nocturne" }
     ],
     "coachHint": "Beim Baron-Dance verliert, wer zuerst ohne Vision hineingeht. Wie kannst du dem Gegner die Initiative aufzwingen?",
     "context": "Du bist Lee Sin (Jungle). Baron ist verfügbar und beide Teams tanzen im Fluss. Dein Team hat Kontrollwards im Inventar, aber keine Vision im Baron-Pit. Der gegnerische Nocturne hat seine Ultimate bereit.",
@@ -261,7 +261,7 @@ const RUNS = [
     "champion": "Ahri", "role": "Midlane", "difficulty": "Gold",
     "markers": [
       { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Ahri" },
-      { "x": 66, "y": 34, "type": "enemy", "label": "Katarina" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Katarina", "champion": "Katarina" },
       { "x": 60, "y": 56, "type": "objective", "label": "Fluss-Busch" },
       { "x": 20, "y": 25, "type": "fog", "label": "Vi zuletzt Top gesehen" }
     ],
@@ -278,9 +278,9 @@ const RUNS = [
     "champion": "Ahri", "role": "Midlane", "difficulty": "Gold",
     "markers": [
       { "x": 64, "y": 36, "type": "hero", "isPlayer": true, "label": "Ahri" },
-      { "x": 70, "y": 30, "type": "enemy", "label": "Katarina" },
-      { "x": 74, "y": 91, "type": "hero", "label": "Botlane" },
-      { "x": 86, "y": 86, "type": "enemy", "label": "Gegner Bot" },
+      { "x": 70, "y": 30, "type": "enemy", "label": "Katarina", "champion": "Katarina" },
+      { "x": 74, "y": 91, "type": "hero", "label": "Botlane", "champion": "Ashe" },
+      { "x": 86, "y": 86, "type": "enemy", "label": "Gegner Bot", "champion": "Caitlyn" },
       { "x": 20, "y": 25, "type": "fog", "label": "Vi zuletzt Top gesehen" }
     ],
     "coachHint": "Du hast Prio in der Mitte. Wo auf der Karte wird gerade am dringendsten Hilfe benötigt?",
@@ -297,7 +297,7 @@ const RUNS = [
     "markers": [
       { "x": 60, "y": 42, "type": "hero", "isPlayer": true, "label": "Ahri" },
       { "x": 74, "y": 26, "type": "objective", "label": "Innerer Turm" },
-      { "x": 86, "y": 70, "type": "hero", "label": "Jungler" }
+      { "x": 86, "y": 70, "type": "hero", "label": "Jungler", "champion": "Sejuani" }
     ],
     "coachHint": "Ein toter Gegner ist ein Zeitfenster. Was kannst du in dieser Zeit am meisten Wert holen?",
     "context": "Du bist Ahri (Mid). Euer Team hat den äußeren Mid-Turm zerstört und Katarina ist gestorben, sie hat noch etwa 20 Sekunden Respawnzeit. Deine Welle schiebt auf den inneren Turm zu, dein Jungler ist auf der Bot-Seite.",
@@ -313,8 +313,8 @@ const RUNS = [
     "markers": [
       { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Ahri" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
-      { "x": 74, "y": 82, "type": "hero", "label": "Team" },
-      { "x": 80, "y": 66, "type": "enemy", "label": "Gegner" }
+      { "x": 74, "y": 82, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 80, "y": 66, "type": "enemy", "label": "Gegner", "champion": "Caitlyn" }
     ],
     "coachHint": "Eine große Welle kostet Zeit, bringt aber Gold. Wie kommst du rechtzeitig zum Team, ohne sie zu verlieren?",
     "context": "Du bist Ahri (Mid). Die Gegner sammeln sich auf der Bot-Seite für den Drachen und Katarina ist nicht auf der Karte zu sehen. Deine Welle ist groß, dein Team wartet auf dich.",
@@ -329,9 +329,9 @@ const RUNS = [
     "champion": "Ahri", "role": "Midlane", "difficulty": "Gold",
     "markers": [
       { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Ahri" },
-      { "x": 42, "y": 45, "type": "hero", "label": "Team" },
+      { "x": 42, "y": 45, "type": "hero", "label": "Team", "champion": "Ornn" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 70, "y": 40, "type": "enemy", "label": "Gegner (3)" }
+      { "x": 70, "y": 40, "type": "enemy", "label": "Gegner (3)", "champion": "Zed" }
     ],
     "coachHint": "Tote Gegner sind ein Zeitfenster, das sich von selbst schließt. Welches Objective ist jetzt am wertvollsten?",
     "context": "Du bist Ahri (Mid). Euer Team führt bei den Türmen und der Baron ist verfügbar. Katarina und der gegnerische Support sind gestorben und haben noch rund 40 Sekunden Respawnzeit.",
@@ -348,9 +348,9 @@ const RUNS = [
     "champion": "Jinx", "role": "Botlane", "difficulty": "Eisen",
     "markers": [
       { "x": 56, "y": 92, "type": "hero", "isPlayer": true, "label": "Jinx" },
-      { "x": 48, "y": 92, "type": "hero", "label": "Lulu" },
-      { "x": 68, "y": 92, "type": "enemy", "label": "Caitlyn" },
-      { "x": 74, "y": 92, "type": "enemy", "label": "Leona" },
+      { "x": 48, "y": 92, "type": "hero", "label": "Lulu", "champion": "Lulu" },
+      { "x": 68, "y": 92, "type": "enemy", "label": "Caitlyn", "champion": "Caitlyn" },
+      { "x": 74, "y": 92, "type": "enemy", "label": "Leona", "champion": "Leona" },
       { "x": 62, "y": 78, "type": "objective", "label": "Fluss-Busch" }
     ],
     "coachHint": "Deine Vasallen schützen dich. Wo stehst du am sichersten, wenn Caitlyn mit ihrer Reichweite angreift?",
@@ -366,10 +366,10 @@ const RUNS = [
     "champion": "Jinx", "role": "Botlane", "difficulty": "Eisen",
     "markers": [
       { "x": 62, "y": 82, "type": "hero", "isPlayer": true, "label": "Jinx" },
-      { "x": 56, "y": 84, "type": "hero", "label": "Lulu" },
+      { "x": 56, "y": 84, "type": "hero", "label": "Lulu", "champion": "Lulu" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
-      { "x": 74, "y": 90, "type": "enemy", "label": "Gegner Bot" },
-      { "x": 28, "y": 20, "type": "hero", "label": "Jungler" }
+      { "x": 74, "y": 90, "type": "enemy", "label": "Gegner Bot", "champion": "Caitlyn" },
+      { "x": 28, "y": 20, "type": "hero", "label": "Jungler", "champion": "Sejuani" }
     ],
     "coachHint": "Ein Objective ohne Vision und Jungler ist ein Glücksspiel. Was fehlt euch, bevor ihr den Drachen startet?",
     "context": "Du bist Jinx (Bot) mit Lulu. Level 6, der erste Drache ist verfügbar und noch niemand hat ihn angefangen. Euer Jungler ist auf der Top-Seite unterwegs, die gegnerische Botlane steht bei ihrem Turm und niemand hat Vision am Drachen.",
@@ -384,8 +384,8 @@ const RUNS = [
     "champion": "Jinx", "role": "Botlane", "difficulty": "Eisen",
     "markers": [
       { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Jinx" },
-      { "x": 50, "y": 50, "type": "hero", "label": "Team" },
-      { "x": 46, "y": 42, "type": "enemy", "label": "Gegner" },
+      { "x": 50, "y": 50, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 46, "y": 42, "type": "enemy", "label": "Gegner", "champion": "Zed" },
       { "x": 86, "y": 90, "type": "objective", "label": "Gegner-Turm" }
     ],
     "coachHint": "Eine Welle ist Gold und Druck. Wie kommst du zum Team, ohne sie zu verschenken?",
@@ -401,8 +401,8 @@ const RUNS = [
     "champion": "Jinx", "role": "Botlane", "difficulty": "Eisen",
     "markers": [
       { "x": 62, "y": 70, "type": "hero", "isPlayer": true, "label": "Jinx" },
-      { "x": 50, "y": 52, "type": "hero", "label": "Team" },
-      { "x": 44, "y": 42, "type": "enemy", "label": "Gegner (5)" }
+      { "x": 50, "y": 52, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 44, "y": 42, "type": "enemy", "label": "Gegner (5)", "champion": "Zed" }
     ],
     "coachHint": "Als ADC bist du Schadensquelle, nicht Frontlinie. Wo musst du stehen, damit du lange schießen kannst?",
     "context": "Du bist Jinx (Bot). Ein 5v5-Teamkampf bricht in der Mitte aus. Du stehst hinter deinem Team, euer Tank geht nach vorn und die gegnerische Frontlinie kommt langsam auf euch zu.",
@@ -417,9 +417,9 @@ const RUNS = [
     "champion": "Jinx", "role": "Botlane", "difficulty": "Eisen",
     "markers": [
       { "x": 55, "y": 60, "type": "hero", "isPlayer": true, "label": "Jinx" },
-      { "x": 50, "y": 52, "type": "hero", "label": "Team" },
+      { "x": 50, "y": 52, "type": "hero", "label": "Team", "champion": "Ornn" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 80, "y": 30, "type": "enemy", "label": "Gegner (2)" }
+      { "x": 80, "y": 30, "type": "enemy", "label": "Gegner (2)", "champion": "Caitlyn" }
     ],
     "coachHint": "Ein gewonnener Teamkampf ist ein Zeitfenster. Was ist das wertvollste Ziel, das ihr gerade nehmen könnt?",
     "context": "Du bist Jinx (Bot). Euer Team hat einen Teamkampf gewonnen und drei Gegner sind tot. Du hast 1800 Gold im Inventar, deine Ultimate ist ready und der Baron ist verfügbar.",
@@ -436,7 +436,7 @@ const RUNS = [
     "champion": "Jax", "role": "Toplane", "difficulty": "Bronze",
     "markers": [
       { "x": 10, "y": 56, "type": "hero", "isPlayer": true, "label": "Jax" },
-      { "x": 10, "y": 44, "type": "enemy", "label": "Garen" },
+      { "x": 10, "y": 44, "type": "enemy", "label": "Garen", "champion": "Garen" },
       { "x": 7, "y": 64, "type": "objective", "label": "Eigener Turm" }
     ],
     "coachHint": "Was kann Jax tun, wenn Garen mit Autoangriffen auf ihn zuläuft? Denk an Counter Strike.",
@@ -452,7 +452,7 @@ const RUNS = [
     "champion": "Jax", "role": "Toplane", "difficulty": "Bronze",
     "markers": [
       { "x": 14, "y": 50, "type": "hero", "isPlayer": true, "label": "Jax" },
-      { "x": 10, "y": 30, "type": "enemy", "label": "Garen" },
+      { "x": 10, "y": 30, "type": "enemy", "label": "Garen", "champion": "Garen" },
       { "x": 7, "y": 20, "type": "objective", "label": "Gegner-Turm" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache (Team)" }
     ],
@@ -469,7 +469,7 @@ const RUNS = [
     "champion": "Jax", "role": "Toplane", "difficulty": "Bronze",
     "markers": [
       { "x": 58, "y": 9, "type": "hero", "isPlayer": true, "label": "Jax" },
-      { "x": 70, "y": 9, "type": "enemy", "label": "Garen" },
+      { "x": 70, "y": 9, "type": "enemy", "label": "Garen", "champion": "Garen" },
       { "x": 78, "y": 8, "type": "objective", "label": "Gegner-Turm" }
     ],
     "coachHint": "Ein Power-Spike hält nicht ewig. Was passiert, wenn Garen sein Item bekommt?",
@@ -486,8 +486,8 @@ const RUNS = [
     "markers": [
       { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Jax" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 42, "y": 40, "type": "hero", "label": "Team" },
-      { "x": 46, "y": 46, "type": "enemy", "label": "Gegner" }
+      { "x": 42, "y": 40, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 46, "y": 46, "type": "enemy", "label": "Gegner", "champion": "Zed" }
     ],
     "coachHint": "Der Baron wird bald gestartet. Wann ist deine Welle fertig, und wann musst du beim Team sein?",
     "context": "Du bist Jax (Top). Der Baron ist verfügbar und euer Team sammelt sich dort. Deine Welle steht groß vor dem gegnerischen Turm, die Gegner stehen noch außerhalb der Baron-Grube.",
@@ -502,8 +502,8 @@ const RUNS = [
     "champion": "Jax", "role": "Toplane", "difficulty": "Bronze",
     "markers": [
       { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Jax" },
-      { "x": 42, "y": 45, "type": "hero", "label": "Team" },
-      { "x": 55, "y": 40, "type": "enemy", "label": "Gegner (5)" },
+      { "x": 42, "y": 45, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 55, "y": 40, "type": "enemy", "label": "Gegner (5)", "champion": "Zed" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" }
     ],
     "coachHint": "Wer zuerst seine Fähigkeiten verbrennt, verliert den Kampf. Worauf wartest du als Jax?",
@@ -521,9 +521,9 @@ const RUNS = [
     "champion": "Thresh", "role": "Support", "difficulty": "Silber",
     "markers": [
       { "x": 68, "y": 92, "type": "hero", "isPlayer": true, "label": "Thresh" },
-      { "x": 62, "y": 92, "type": "hero", "label": "Ashe (ADC)" },
-      { "x": 80, "y": 92, "type": "enemy", "label": "Lux" },
-      { "x": 86, "y": 92, "type": "enemy", "label": "Caitlyn" }
+      { "x": 62, "y": 92, "type": "hero", "label": "Ashe (ADC)", "champion": "Ashe" },
+      { "x": 80, "y": 92, "type": "enemy", "label": "Lux", "champion": "Lux" },
+      { "x": 86, "y": 92, "type": "enemy", "label": "Caitlyn", "champion": "Caitlyn" }
     ],
     "coachHint": "Der Haken ist nur gut, wenn er sein Ziel erreicht. Was steht in der Schusslinie?",
     "context": "Du bist Thresh (Support) mit Ashe gegen Lux und Caitlyn. Level 2. Zwischen dir und Lux stehen Vasallen in der Schusslinie, Lux hat ihre Bindung ready.",
@@ -538,7 +538,7 @@ const RUNS = [
     "champion": "Thresh", "role": "Support", "difficulty": "Silber",
     "markers": [
       { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Thresh" },
-      { "x": 60, "y": 88, "type": "hero", "label": "Ashe (ADC)" },
+      { "x": 60, "y": 88, "type": "hero", "label": "Ashe (ADC)", "champion": "Ashe" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" }
     ],
     "coachHint": "Wenn die Gegner weg sind, ist das dein Zeitfenster. Was braucht ihr, bevor ihr den Drachen startet?",
@@ -554,9 +554,9 @@ const RUNS = [
     "champion": "Thresh", "role": "Support", "difficulty": "Silber",
     "markers": [
       { "x": 60, "y": 62, "type": "hero", "isPlayer": true, "label": "Thresh" },
-      { "x": 74, "y": 88, "type": "hero", "label": "Ashe (ADC)" },
-      { "x": 60, "y": 40, "type": "hero", "label": "Ahri (Mid)" },
-      { "x": 66, "y": 34, "type": "enemy", "label": "Nocturne" }
+      { "x": 74, "y": 88, "type": "hero", "label": "Ashe (ADC)", "champion": "Ashe" },
+      { "x": 60, "y": 40, "type": "hero", "label": "Ahri (Mid)", "champion": "Ahri" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Nocturne", "champion": "Nocturne" }
     ],
     "coachHint": "Eine Rotation lohnt sich, wenn deine Lane sicher ist. Was lässt du zurück, und was gewinnst du?",
     "context": "Du bist Thresh (Support) mit Ashe. Eure Botlane hat die Welle in den gegnerischen Turm geschoben und die Gegner sind zurückgesetzt. Dein Mid (Ahri) pingt um Hilfe, weil Nocturne in der Mitte aufgetaucht ist.",
@@ -572,8 +572,8 @@ const RUNS = [
     "markers": [
       { "x": 36, "y": 36, "type": "hero", "isPlayer": true, "label": "Thresh" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 42, "y": 42, "type": "hero", "label": "Team" },
-      { "x": 48, "y": 40, "type": "enemy", "label": "Gegner" }
+      { "x": 42, "y": 42, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 48, "y": 40, "type": "enemy", "label": "Gegner", "champion": "Zed" }
     ],
     "coachHint": "Vision gewinnt Objectives. Wann ist dein Haken am wertvollsten?",
     "context": "Du bist Thresh (Support). Der Baron ist verfügbar und euer Team sammelt sich am Eingang. Ihr habt keine Vision im Baron-Bereich, die Gegner stehen im Fluss.",
@@ -588,8 +588,8 @@ const RUNS = [
     "champion": "Thresh", "role": "Support", "difficulty": "Silber",
     "markers": [
       { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Thresh" },
-      { "x": 46, "y": 50, "type": "hero", "label": "Ashe (ADC)" },
-      { "x": 58, "y": 42, "type": "enemy", "label": "Assassine" },
+      { "x": 46, "y": 50, "type": "hero", "label": "Ashe (ADC)", "champion": "Ashe" },
+      { "x": 58, "y": 42, "type": "enemy", "label": "Assassine", "champion": "Zed" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" }
     ],
     "coachHint": "Dein ADC macht den Schaden. Wann schützt du sie, und wann gehst du ein?",
@@ -607,8 +607,8 @@ const RUNS = [
     "champion": "Lee Sin", "role": "Jungle", "difficulty": "Platin",
     "markers": [
       { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
-      { "x": 62, "y": 38, "type": "hero", "label": "Ahri" },
-      { "x": 70, "y": 30, "type": "enemy", "label": "Syndra" },
+      { "x": 62, "y": 38, "type": "hero", "label": "Ahri", "champion": "Ahri" },
+      { "x": 70, "y": 30, "type": "enemy", "label": "Syndra", "champion": "Syndra" },
       { "x": 60, "y": 56, "type": "objective", "label": "Fluss-Busch" }
     ],
     "coachHint": "Ein Gank klappt, wenn der Gegner vorlaufen musste. In welche Richtung schiebt die Welle?",
@@ -641,8 +641,8 @@ const RUNS = [
     "champion": "Lee Sin", "role": "Jungle", "difficulty": "Platin",
     "markers": [
       { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
-      { "x": 60, "y": 60, "type": "hero", "label": "Team" },
-      { "x": 70, "y": 40, "type": "enemy", "label": "Gegner" }
+      { "x": 60, "y": 60, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 70, "y": 40, "type": "enemy", "label": "Gegner", "champion": "Zed" }
     ],
     "coachHint": "Lee Sin ist in der Mitte des Spiels stark, danach fällt er ab. Wie nutzt du das?",
     "context": "Du bist Lee Sin (Jungle). Level 10. Das gegnerische Team hat starke Scaling-Carries, euer Team hat leichte Mid-Prio. Die Gegner haben keine Vision auf eurer Seite.",
@@ -658,8 +658,8 @@ const RUNS = [
     "markers": [
       { "x": 35, "y": 32, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 42, "y": 42, "type": "hero", "label": "Team" },
-      { "x": 48, "y": 38, "type": "enemy", "label": "Nocturne" }
+      { "x": 42, "y": 42, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 48, "y": 38, "type": "enemy", "label": "Nocturne", "champion": "Nocturne" }
     ],
     "coachHint": "Ein Steal entscheidet sich im Smite-Timing. Was musst du vorher sichern?",
     "context": "Du bist Lee Sin (Jungle). Euer Team schlägt den Baron, er hat noch etwa 25 % Leben. Nocturne steht mit bereiter Ultimate in der Nähe und könnte stehlen. Dein Smite ist ready.",
@@ -674,9 +674,9 @@ const RUNS = [
     "champion": "Lee Sin", "role": "Jungle", "difficulty": "Platin",
     "markers": [
       { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
-      { "x": 46, "y": 50, "type": "hero", "label": "Team" },
-      { "x": 60, "y": 40, "type": "enemy", "label": "Jinx (Carry)" },
-      { "x": 58, "y": 46, "type": "enemy", "label": "Tank" }
+      { "x": 46, "y": 50, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 60, "y": 40, "type": "enemy", "label": "Jinx (Carry)", "champion": "Jinx" },
+      { "x": 58, "y": 46, "type": "enemy", "label": "Tank", "champion": "Malphite" }
     ],
     "coachHint": "Der Kick ist dein stärkster Engage. Wen willst du wohin schicken?",
     "context": "Du bist Lee Sin (Jungle). Ein 5v5-Teamkampf beginnt. Der gegnerische Carry (Jinx) steht hinter ihrem Tank, dein Team wartet auf deinen Engage. Dragon's Rage (R) ist ready.",
@@ -693,7 +693,7 @@ const RUNS = [
     "champion": "Ahri", "role": "Midlane", "difficulty": "Master+",
     "markers": [
       { "x": 58, "y": 42, "type": "hero", "isPlayer": true, "label": "Ahri" },
-      { "x": 64, "y": 36, "type": "enemy", "label": "Viktor" },
+      { "x": 64, "y": 36, "type": "enemy", "label": "Viktor", "champion": "Viktor" },
       { "x": 20, "y": 25, "type": "fog", "label": "Gegnerischer Jungler zuletzt vor 25 s Topside gesehen" }
     ],
     "coachHint": "Wann ist eine Welle für einen Recall am besten gesetzt?",
@@ -709,8 +709,8 @@ const RUNS = [
     "champion": "Ahri", "role": "Midlane", "difficulty": "Master+",
     "markers": [
       { "x": 62, "y": 38, "type": "hero", "isPlayer": true, "label": "Ahri" },
-      { "x": 68, "y": 32, "type": "enemy", "label": "Viktor" },
-      { "x": 50, "y": 56, "type": "hero", "label": "Lee Sin (Jungler)" }
+      { "x": 68, "y": 32, "type": "enemy", "label": "Viktor", "champion": "Viktor" },
+      { "x": 50, "y": 56, "type": "hero", "label": "Lee Sin (Jungler)", "champion": "Lee Sin" }
     ],
     "coachHint": "Summoner-Cooldowns sind Zeitfenster. Wie lange hat Viktor noch keinen Flash?",
     "context": "Du bist Ahri (Mid). Viktor hat vor 30 Sekunden seinen Flash verbraucht. Deine Welle ist größer als seine, dein Jungler (Lee Sin) ist in der Nähe.",
@@ -726,8 +726,8 @@ const RUNS = [
     "markers": [
       { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Ahri" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron (ab 20:00)" },
-      { "x": 42, "y": 40, "type": "hero", "label": "Team" },
-      { "x": 45, "y": 34, "type": "enemy", "label": "Gegner" }
+      { "x": 42, "y": 40, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 45, "y": 34, "type": "enemy", "label": "Gegner", "champion": "Zed" }
     ],
     "coachHint": "Wer vor dem Spawn die Vision kontrolliert, entscheidet den Kampf um Baron. Wo setzt du an?",
     "context": "Du bist Ahri (Mid). Der Baron spawnt in etwa viereinhalb Minuten. Dein Team hat Wards im eigenen Dschungel, die Gegner haben Vision im Baron-Bereich. Deine Welle ist gecrasht.",
@@ -743,8 +743,8 @@ const RUNS = [
     "markers": [
       { "x": 46, "y": 48, "type": "hero", "isPlayer": true, "label": "Ahri" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 42, "y": 42, "type": "hero", "label": "Team" },
-      { "x": 50, "y": 38, "type": "enemy", "label": "Gegner (3 ohne Flash)" }
+      { "x": 42, "y": 42, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 50, "y": 38, "type": "enemy", "label": "Gegner (3 ohne Flash)", "champion": "Zed" }
     ],
     "coachHint": "Wie viele Flashes der Gegner sind noch unten? Das ist dein Zeitfenster.",
     "context": "Du bist Ahri (Mid). Die Gegner haben vor 60 Sekunden einen Kampf verloren, drei von ihnen haben keinen Flash mehr. Der Baron ist verfügbar, dein Team ist bereit.",
@@ -759,9 +759,9 @@ const RUNS = [
     "champion": "Ahri", "role": "Midlane", "difficulty": "Master+",
     "markers": [
       { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Ahri" },
-      { "x": 46, "y": 50, "type": "hero", "label": "Team" },
+      { "x": 46, "y": 50, "type": "hero", "label": "Team", "champion": "Ornn" },
       { "x": 88, "y": 12, "type": "objective", "label": "Inhibitor" },
-      { "x": 70, "y": 30, "type": "enemy", "label": "Gegner (4 tot)" }
+      { "x": 70, "y": 30, "type": "enemy", "label": "Gegner (4 tot)", "champion": "Zed" }
     ],
     "coachHint": "Respawnzeiten werden spät im Spiel lang. Was bringt dir die meiste Zeit?",
     "context": "Du bist Ahri (Mid). Euer Team hat den Kampf gewonnen, vier Gegner sind tot und haben noch rund 45 Sekunden Respawnzeit. Der gegnerische Mid-Inhibitor steht noch.",
@@ -809,7 +809,7 @@ const RUNS = [
     "champion": "Ashe", "role": "Botlane", "difficulty": "Eisen",
     "markers": [
       { "x": 70, "y": 92, "type": "hero", "isPlayer": true, "label": "Ashe" },
-      { "x": 80, "y": 70, "type": "enemy", "label": "Gegner (10 % Leben)" }
+      { "x": 80, "y": 70, "type": "enemy", "label": "Gegner (10 % Leben)", "champion": "Caitlyn" }
     ],
     "coachHint": "Ein Kill ist weniger wert als eine sichere Welle. Wohin läuft der Gegner, und was riskierst du?",
     "context": "Du bist Ashe (Bot). Level 8. Ein Gegner flieht mit 10 % Leben in den gegnerischen Dschungel. Deine Welle trifft bald euren Turm und euer Support ist nicht in der Nähe.",
@@ -824,8 +824,8 @@ const RUNS = [
     "champion": "Camille", "role": "Toplane", "difficulty": "Gold",
     "markers": [
       { "x": 10, "y": 50, "type": "hero", "isPlayer": true, "label": "Camille" },
-      { "x": 10, "y": 38, "type": "enemy", "label": "Renekton" },
-      { "x": 22, "y": 64, "type": "hero", "label": "Sejuani (10 s)" }
+      { "x": 10, "y": 38, "type": "enemy", "label": "Renekton", "champion": "Renekton" },
+      { "x": 22, "y": 64, "type": "hero", "label": "Sejuani (10 s)", "champion": "Sejuani" }
     ],
     "coachHint": "Ein Gank klappt, wenn der Gegner nicht fliehen kann. Wie nutzt du, dass sein Flash weg ist?",
     "context": "Du bist Camille (Top) gegen Renekton. Er hat seinen Flash verbraucht und deine Welle ist größer als seine. Dein Jungler (Sejuani) ist etwa 10 Sekunden entfernt und hat dich gepingt.",
@@ -840,7 +840,7 @@ const RUNS = [
     "champion": "Thresh", "role": "Support", "difficulty": "Gold",
     "markers": [
       { "x": 74, "y": 88, "type": "hero", "isPlayer": true, "label": "Thresh" },
-      { "x": 68, "y": 92, "type": "hero", "label": "ADC" },
+      { "x": 68, "y": 92, "type": "hero", "label": "ADC", "champion": "Ashe" },
       { "x": 86, "y": 92, "type": "objective", "label": "Gegner-Turm" },
       { "x": 30, "y": 25, "type": "fog", "label": "Vi zuletzt Top gesehen" }
     ],
@@ -857,9 +857,9 @@ const RUNS = [
     "champion": "Viego", "role": "Jungle", "difficulty": "Gold",
     "markers": [
       { "x": 50, "y": 60, "type": "hero", "isPlayer": true, "label": "Viego" },
-      { "x": 22, "y": 30, "type": "enemy", "label": "Nocturne" },
+      { "x": 22, "y": 30, "type": "enemy", "label": "Nocturne", "champion": "Nocturne" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
-      { "x": 80, "y": 88, "type": "hero", "label": "Botlane" }
+      { "x": 80, "y": 88, "type": "hero", "label": "Botlane", "champion": "Ashe" }
     ],
     "coachHint": "Du kannst nicht alles verteidigen. Welche Seite ist für dich mehr wert?",
     "context": "Du bist Viego (Jungle). Nocturne klärt gerade eure Top-Seite und die Gegner haben dort Prio. Der Drache wird in etwa 40 Sekunden wieder verfügbar, deine Botlane hat Prio und Vision.",
@@ -892,8 +892,8 @@ const RUNS = [
     "markers": [
       { "x": 78, "y": 82, "type": "hero", "isPlayer": true, "label": "Rakan" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
-      { "x": 74, "y": 64, "type": "enemy", "label": "Gegner" },
-      { "x": 70, "y": 86, "type": "hero", "label": "Team" }
+      { "x": 74, "y": 64, "type": "enemy", "label": "Gegner", "champion": "Nocturne" },
+      { "x": 70, "y": 86, "type": "hero", "label": "Team", "champion": "Ornn" }
     ],
     "coachHint": "Vision kämpft man mit Vision. Was musst du entfernen, bevor du eigene setzt?",
     "context": "Du bist Rakan (Support). Der Drache spawnt in etwa 45 Sekunden. Die Gegner stehen im Fluss und haben Wards im Drachen-Bereich. Du hast zwei Kontrollwards und deine Orakel-Linse ist ready.",
@@ -908,9 +908,9 @@ const RUNS = [
     "champion": "Sivir", "role": "Botlane", "difficulty": "Smaragd",
     "markers": [
       { "x": 50, "y": 52, "type": "hero", "isPlayer": true, "label": "Sivir" },
-      { "x": 42, "y": 45, "type": "hero", "label": "Team" },
+      { "x": 42, "y": 45, "type": "hero", "label": "Team", "champion": "Ornn" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 10, "y": 30, "type": "enemy", "label": "Jax (Splitpush)" }
+      { "x": 10, "y": 30, "type": "enemy", "label": "Jax (Splitpush)", "champion": "Jax" }
     ],
     "coachHint": "Ein gewonnener Kampf ist ein Fenster. Tausche, wenn der Gegner nicht überall sein kann.",
     "context": "Du bist Sivir (Bot). Euer Team hat einen Kampf in der Mitte gewonnen und drei Gegner sind tot. Der gegnerische Jax drückt allein eure Top-Seite und der Baron ist verfügbar.",
@@ -925,7 +925,7 @@ const RUNS = [
     "champion": "Ornn", "role": "Toplane", "difficulty": "Diamant",
     "markers": [
       { "x": 9, "y": 56, "type": "hero", "isPlayer": true, "label": "Ornn" },
-      { "x": 9, "y": 44, "type": "enemy", "label": "Fiora" },
+      { "x": 9, "y": 44, "type": "enemy", "label": "Fiora", "champion": "Fiora" },
       { "x": 20, "y": 28, "type": "fog", "label": "Nocturne vor etwa 20 s auf der Top-Seite gesehen" }
     ],
     "coachHint": "Wenn der gegnerische Jungler in der Nähe war, wie vorsichtig musst du sein?",
@@ -941,8 +941,8 @@ const RUNS = [
     "champion": "Orianna", "role": "Midlane", "difficulty": "Diamant",
     "markers": [
       { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Orianna" },
-      { "x": 66, "y": 34, "type": "enemy", "label": "Azir" },
-      { "x": 80, "y": 88, "type": "hero", "label": "Botlane" }
+      { "x": 66, "y": 34, "type": "enemy", "label": "Azir", "champion": "Azir" },
+      { "x": 80, "y": 88, "type": "hero", "label": "Botlane", "champion": "Ashe" }
     ],
     "coachHint": "Eine Welle liegen zu lassen kostet Gold und Turmdruck. Wie kannst du roamen und trotzdem sicher sein?",
     "context": "Du bist Orianna (Mid) gegen Azir. Level 8. Azirs Welle ist größer als deine und schiebt auf deinen Turm zu. Dein Support pingt für einen Roam auf die Botlane und dein Jungler gankt gerade Top.",
@@ -957,10 +957,10 @@ const RUNS = [
     "champion": "Jhin", "role": "Botlane", "difficulty": "Diamant",
     "markers": [
       { "x": 70, "y": 70, "type": "hero", "isPlayer": true, "label": "Jhin" },
-      { "x": 42, "y": 40, "type": "hero", "label": "Team" },
+      { "x": 42, "y": 40, "type": "hero", "label": "Team", "champion": "Ornn" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
-      { "x": 80, "y": 66, "type": "enemy", "label": "Gegner" }
+      { "x": 80, "y": 66, "type": "enemy", "label": "Gegner", "champion": "Caitlyn" }
     ],
     "coachHint": "Wenn der Gegner an einem Objective gebunden ist, welches andere gehört dann dir?",
     "context": "Du bist Jhin (Bot). Nocturne und die gegnerische Botlane starten den Drachen. Euer Team steht in der Mitte, der Baron ist verfügbar und die Top-Seite der Gegner ist ohne Vision.",
@@ -975,7 +975,7 @@ const RUNS = [
     "champion": "Lulu", "role": "Support", "difficulty": "Bronze",
     "markers": [
       { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Lulu" },
-      { "x": 60, "y": 88, "type": "hero", "label": "Jinx (ADC)" },
+      { "x": 60, "y": 88, "type": "hero", "label": "Jinx (ADC)", "champion": "Jinx" },
       { "x": 56, "y": 70, "type": "objective", "label": "Fluss-Busch" },
       { "x": 30, "y": 25, "type": "fog", "label": "Gegnerischer Jungler noch nicht gesehen" }
     ],
@@ -992,7 +992,7 @@ const RUNS = [
     "champion": "Nautilus", "role": "Support", "difficulty": "Platin",
     "markers": [
       { "x": 74, "y": 84, "type": "hero", "isPlayer": true, "label": "Nautilus" },
-      { "x": 68, "y": 86, "type": "hero", "label": "Ezreal (ADC)" },
+      { "x": 68, "y": 86, "type": "hero", "label": "Ezreal (ADC)", "champion": "Ezreal" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
       { "x": 70, "y": 58, "type": "fog", "label": "Gegnerischer Jungler zuletzt Mid gesehen" }
     ],
@@ -1009,8 +1009,8 @@ const RUNS = [
     "champion": "Karma", "role": "Support", "difficulty": "Master+",
     "markers": [
       { "x": 72, "y": 86, "type": "hero", "isPlayer": true, "label": "Karma" },
-      { "x": 66, "y": 88, "type": "hero", "label": "Zeri (ADC)" },
-      { "x": 84, "y": 90, "type": "enemy", "label": "Gegner-ADC" },
+      { "x": 66, "y": 88, "type": "hero", "label": "Zeri (ADC)", "champion": "Zeri" },
+      { "x": 84, "y": 90, "type": "enemy", "label": "Gegner-ADC", "champion": "Caitlyn" },
       { "x": 26, "y": 18, "type": "fog", "label": "Gegnerischer Jungler zuletzt Topside gesehen" }
     ],
     "coachHint": "Wenn der gegnerische Support fehlt und der Jungler weit weg ist: Wer hat jetzt die Lane?",
@@ -1026,8 +1026,8 @@ const RUNS = [
     "champion": "Amumu", "role": "Jungle", "difficulty": "Eisen",
     "markers": [
       { "x": 46, "y": 52, "type": "hero", "isPlayer": true, "label": "Amumu" },
-      { "x": 60, "y": 40, "type": "hero", "label": "Lux" },
-      { "x": 68, "y": 32, "type": "enemy", "label": "Zed" },
+      { "x": 60, "y": 40, "type": "hero", "label": "Lux", "champion": "Lux" },
+      { "x": 68, "y": 32, "type": "enemy", "label": "Zed", "champion": "Zed" },
       { "x": 72, "y": 26, "type": "objective", "label": "Gegner-Turm" }
     ],
     "coachHint": "Ein Gank klappt, wenn der Gegner nicht am Turm steht. Wann muss Zed vorlaufen?",
@@ -1043,7 +1043,7 @@ const RUNS = [
     "champion": "Annie", "role": "Midlane", "difficulty": "Eisen",
     "markers": [
       { "x": 62, "y": 38, "type": "hero", "isPlayer": true, "label": "Annie" },
-      { "x": 68, "y": 32, "type": "enemy", "label": "Zed" },
+      { "x": 68, "y": 32, "type": "enemy", "label": "Zed", "champion": "Zed" },
       { "x": 22, "y": 24, "type": "fog", "label": "Gegnerischer Jungler nicht gesehen" }
     ],
     "coachHint": "Mit wenig Mana und Leben bist du leicht zu töten. Was tust du mit deinem Gold?",
@@ -1075,8 +1075,8 @@ const RUNS = [
     "champion": "Caitlyn", "role": "Botlane", "difficulty": "Bronze",
     "markers": [
       { "x": 72, "y": 86, "type": "hero", "isPlayer": true, "label": "Caitlyn" },
-      { "x": 80, "y": 90, "type": "enemy", "label": "Leona" },
-      { "x": 86, "y": 88, "type": "enemy", "label": "Jinx" },
+      { "x": 80, "y": 90, "type": "enemy", "label": "Leona", "champion": "Leona" },
+      { "x": 86, "y": 88, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
       { "x": 66, "y": 90, "type": "objective", "label": "Eigener Turm" }
     ],
     "coachHint": "Ohne Support bist du in der Unterzahl. Wo bist du am sichersten?",
@@ -1092,8 +1092,8 @@ const RUNS = [
     "champion": "Veigar", "role": "Midlane", "difficulty": "Bronze",
     "markers": [
       { "x": 56, "y": 70, "type": "hero", "isPlayer": true, "label": "Veigar" },
-      { "x": 70, "y": 74, "type": "enemy", "label": "Ornn" },
-      { "x": 76, "y": 80, "type": "enemy", "label": "Jinx" },
+      { "x": 70, "y": 74, "type": "enemy", "label": "Ornn", "champion": "Ornn" },
+      { "x": 76, "y": 80, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" }
     ],
     "coachHint": "Wer macht in einem Teamkampf den meisten Schaden? Wer ist leicht zu erreichen?",
@@ -1125,7 +1125,7 @@ const RUNS = [
     "champion": "Malphite", "role": "Toplane", "difficulty": "Silber",
     "markers": [
       { "x": 9, "y": 60, "type": "hero", "isPlayer": true, "label": "Malphite" },
-      { "x": 9, "y": 48, "type": "enemy", "label": "Fiora" },
+      { "x": 9, "y": 48, "type": "enemy", "label": "Fiora", "champion": "Fiora" },
       { "x": 7, "y": 66, "type": "objective", "label": "Eigener Turm" },
       { "x": 30, "y": 25, "type": "fog", "label": "Gegnerischer Jungler nicht gesehen" }
     ],
@@ -1143,7 +1143,7 @@ const RUNS = [
     "markers": [
       { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Orianna" },
       { "x": 70, "y": 56, "type": "fog", "label": "Azir von der Karte verschwunden" },
-      { "x": 74, "y": 90, "type": "hero", "label": "Botlane" }
+      { "x": 74, "y": 90, "type": "hero", "label": "Botlane", "champion": "Ashe" }
     ],
     "coachHint": "Wenn dein Gegner fehlt, hast du Zeit. Was gewinnst du, und wen warnst du?",
     "context": "Du bist Orianna (Mid). Dein Gegner Azir ist von der Karte verschwunden und deine Botlane steht bei ihrem Turm.",
@@ -1158,7 +1158,7 @@ const RUNS = [
     "champion": "Soraka", "role": "Support", "difficulty": "Silber",
     "markers": [
       { "x": 74, "y": 86, "type": "hero", "isPlayer": true, "label": "Soraka" },
-      { "x": 66, "y": 88, "type": "hero", "label": "Ashe (ADC)" },
+      { "x": 66, "y": 88, "type": "hero", "label": "Ashe (ADC)", "champion": "Ashe" },
       { "x": 56, "y": 70, "type": "objective", "label": "Fluss-Busch" }
     ],
     "coachHint": "Wards bringen nur etwas, wenn du sie vor dem Recall setzt. Was kommt zuerst?",
@@ -1176,8 +1176,8 @@ const RUNS = [
       { "x": 14, "y": 40, "type": "hero", "isPlayer": true, "label": "Sett" },
       { "x": 7, "y": 22, "type": "objective", "label": "Gegner-Turm" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
-      { "x": 80, "y": 68, "type": "enemy", "label": "Gegner (4)" },
-      { "x": 74, "y": 84, "type": "hero", "label": "Team (2)" }
+      { "x": 80, "y": 68, "type": "enemy", "label": "Gegner (4)", "champion": "Caitlyn" },
+      { "x": 74, "y": 84, "type": "hero", "label": "Team (2)", "champion": "Ornn" }
     ],
     "coachHint": "Du kannst nicht jeden Kampf retten. Was ist auf der anderen Seite der Karte frei?",
     "context": "Du bist Sett (Top). Dein Team verliert den Kampf am Drachen 2v4 und deine Welle ist groß. Der gegnerische Top-Turm steht ohne Verteidiger.",
@@ -1208,7 +1208,7 @@ const RUNS = [
     "markers": [
       { "x": 40, "y": 9, "type": "hero", "isPlayer": true, "label": "Gwen" },
       { "x": 76, "y": 8, "type": "objective", "label": "Gegner-Turm" },
-      { "x": 50, "y": 46, "type": "hero", "label": "Team" },
+      { "x": 50, "y": 46, "type": "hero", "label": "Team", "champion": "Ornn" },
       { "x": 58, "y": 42, "type": "fog", "label": "Gegner zuletzt in der Mitte gesehen" }
     ],
     "coachHint": "Ein Splitpush ist nur so gut wie deine Info. Wo sind die Gegner?",
@@ -1225,8 +1225,8 @@ const RUNS = [
     "markers": [
       { "x": 80, "y": 70, "type": "hero", "isPlayer": true, "label": "Graves" },
       { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
-      { "x": 78, "y": 66, "type": "enemy", "label": "Nocturne" },
-      { "x": 74, "y": 64, "type": "hero", "label": "Team" }
+      { "x": 78, "y": 66, "type": "enemy", "label": "Nocturne", "champion": "Nocturne" },
+      { "x": 74, "y": 64, "type": "hero", "label": "Team", "champion": "Ornn" }
     ],
     "coachHint": "Ein Steal gelingt nur mit dem richtigen Smite-Zeitpunkt. Wann stirbt der Drache?",
     "context": "Du bist Graves (Jungle). Das gegnerische Team schlägt den Drachen, er hat noch etwa 20 % Leben. Nocturne steht mit bereitem Smite in der Grube, dein Smite ist ebenfalls ready.",
@@ -1241,8 +1241,8 @@ const RUNS = [
     "champion": "Cassiopeia", "role": "Midlane", "difficulty": "Platin",
     "markers": [
       { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Cassiopeia" },
-      { "x": 66, "y": 34, "type": "enemy", "label": "Lux" },
-      { "x": 54, "y": 48, "type": "hero", "label": "Elise (Jungler)" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Lux", "champion": "Lux" },
+      { "x": 54, "y": 48, "type": "hero", "label": "Elise (Jungler)", "champion": "Elise" },
       { "x": 70, "y": 28, "type": "objective", "label": "Gegner-Turm" }
     ],
     "coachHint": "Wenn die Welle zurückbounct, muss der Gegner vorlaufen. Wann kommt dein Jungler?",
@@ -1258,7 +1258,7 @@ const RUNS = [
     "champion": "Lucian", "role": "Botlane", "difficulty": "Platin",
     "markers": [
       { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Lucian" },
-      { "x": 60, "y": 84, "type": "hero", "label": "Nautilus (Support)" },
+      { "x": 60, "y": 84, "type": "hero", "label": "Nautilus (Support)", "champion": "Nautilus" },
       { "x": 92, "y": 64, "type": "objective", "label": "Gegner-Turm" }
     ],
     "coachHint": "Allein unter dem Turm ist riskant. Wer kann dir helfen?",
@@ -1275,7 +1275,7 @@ const RUNS = [
     "markers": [
       { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Aphelios" },
       { "x": 92, "y": 64, "type": "objective", "label": "Gegner-Turm" },
-      { "x": 20, "y": 22, "type": "enemy", "label": "Gegner (3)" },
+      { "x": 20, "y": 22, "type": "enemy", "label": "Gegner (3)", "champion": "Darius" },
       { "x": 10, "y": 30, "type": "objective", "label": "Eigener Top-Turm" }
     ],
     "coachHint": "Wenn der Gegner an einer Stelle bindet, wo ist er dann nicht?",
@@ -1291,9 +1291,9 @@ const RUNS = [
     "champion": "Syndra", "role": "Midlane", "difficulty": "Smaragd",
     "markers": [
       { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Syndra" },
-      { "x": 36, "y": 40, "type": "hero", "label": "Team" },
+      { "x": 36, "y": 40, "type": "hero", "label": "Team", "champion": "Ornn" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 46, "y": 34, "type": "enemy", "label": "Malphite" }
+      { "x": 46, "y": 34, "type": "enemy", "label": "Malphite", "champion": "Malphite" }
     ],
     "coachHint": "Ein Engage-Tank verbraucht seine Ultimate. Wann gehst du in den Kampf?",
     "context": "Du bist Syndra (Mid). Ein 5v5 vor dem Baron steht bevor. Die Gegner haben einen Engage-Tank (Malphite) mit bereiter Ultimate, dein Team steht hinter einer Wand.",
@@ -1309,8 +1309,8 @@ const RUNS = [
     "markers": [
       { "x": 34, "y": 40, "type": "hero", "isPlayer": true, "label": "Kindred" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 42, "y": 44, "type": "hero", "label": "Team" },
-      { "x": 48, "y": 36, "type": "enemy", "label": "Gegner" }
+      { "x": 42, "y": 44, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 48, "y": 36, "type": "enemy", "label": "Gegner", "champion": "Zed" }
     ],
     "coachHint": "Ein Baron-Start kann ein Köder sein. Wer hat den Vorteil, wenn die Gegner angreifen?",
     "context": "Du bist Kindred (Jungle). Die Gegner haben Vision im Fluss und warten auf euren Baron-Start. Euer Team hat Smite und die Ultimates sind bereit.",
@@ -1326,8 +1326,8 @@ const RUNS = [
     "markers": [
       { "x": 46, "y": 48, "type": "hero", "isPlayer": true, "label": "Viktor" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 40, "y": 38, "type": "hero", "label": "Team" },
-      { "x": 52, "y": 40, "type": "enemy", "label": "Gegner" }
+      { "x": 40, "y": 38, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 52, "y": 40, "type": "enemy", "label": "Gegner", "champion": "Zed" }
     ],
     "coachHint": "Ein Baron-Bait lockt die Gegner. Wo kämpft ihr am liebsten?",
     "context": "Du bist Viktor (Mid). Die Gegner haben ihre Ultimates verbraucht und stehen im Fluss ohne Vision im Baron-Eingang. Euer Jungler hat Smite und ihr kontrolliert die Enge.",
@@ -1358,8 +1358,8 @@ const RUNS = [
     "champion": "Fiora", "role": "Toplane", "difficulty": "Diamant",
     "markers": [
       { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Fiora" },
-      { "x": 46, "y": 48, "type": "hero", "label": "Team" },
-      { "x": 52, "y": 44, "type": "enemy", "label": "Gegner (5)" },
+      { "x": 46, "y": 48, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 52, "y": 44, "type": "enemy", "label": "Gegner (5)", "champion": "Zed" },
       { "x": 76, "y": 8, "type": "objective", "label": "Gegner-Turm" }
     ],
     "coachHint": "Splitpush bindet Gegner, aber nur, wenn er lange genug läuft. Wann musst du kommen?",
@@ -1376,8 +1376,8 @@ const RUNS = [
     "markers": [
       { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Irelia" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 42, "y": 40, "type": "hero", "label": "Team" },
-      { "x": 50, "y": 38, "type": "enemy", "label": "Gegner" }
+      { "x": 42, "y": 40, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 50, "y": 38, "type": "enemy", "label": "Gegner", "champion": "Zed" }
     ],
     "coachHint": "Ein Flank wirkt, wenn die Gegner auf den Köder reagieren. Wo wartest du?",
     "context": "Du bist Irelia (Top). Die Gegner haben Vision im Fluss und warten auf euren Baron-Start. Dein Teleport ist ready und deine Welle ist gecrasht.",
@@ -1394,7 +1394,7 @@ const RUNS = [
       { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Ornn" },
       { "x": 76, "y": 8, "type": "objective", "label": "Gegner-Turm" },
       { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
-      { "x": 60, "y": 9, "type": "enemy", "label": "Aatrox" }
+      { "x": 60, "y": 9, "type": "enemy", "label": "Aatrox", "champion": "Aatrox" }
     ],
     "coachHint": "Wenn der Gegner seinen Teleport verbraucht hat, was kannst du dir erlauben?",
     "context": "Du bist Ornn (Top). Aatrox hat gerade seinen Teleport verbraucht. Deine Welle ist in seinem Turm gecrasht und bounct nun zu dir zurück. Euer Team will in etwa 40 Sekunden den Baron starten.",
@@ -1410,8 +1410,8 @@ const RUNS = [
     "markers": [
       { "x": 74, "y": 66, "type": "hero", "isPlayer": true, "label": "Azir" },
       { "x": 85, "y": 75, "type": "objective", "label": "Elder Drake" },
-      { "x": 78, "y": 70, "type": "hero", "label": "Team" },
-      { "x": 68, "y": 60, "type": "enemy", "label": "Lee Sin" }
+      { "x": 78, "y": 70, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 68, "y": 60, "type": "enemy", "label": "Lee Sin", "champion": "Lee Sin" }
     ],
     "coachHint": "Wer den Eingang kontrolliert, entscheidet über den Steal. Wo stehst du?",
     "context": "Du bist Azir (Mid). Euer Team schlägt den Elder Drake, er hat noch etwa 15 % Leben. Der gegnerische Lee Sin wartet in der Nähe mit Smite auf einen Steal.",
@@ -1773,7 +1773,18 @@ const CHAMP_BG = { 'Jax': '#313244', 'Ahri': '#5b3a6b', 'Lee Sin': '#7a3b2e', 'J
 // Data Dragon (Riot): Champion-Porträts und Summoner's Rift
 const DDRAGON = 'https://ddragon.leagueoflegends.com/cdn/14.20.1/img';
 const MAP_URL = `${DDRAGON}/map/map11.png`;
-const champImg = name => `${DDRAGON}/champion/${name.replace(/[^A-Za-z]/g, '')}.png`;   // "Lee Sin" -> "LeeSin"
+// Data-Dragon-Normalizer: Leerzeichen und Sonderzeichen entfernen, Sonderfälle abbilden (Kai'Sa -> Kaisa, Wukong -> MonkeyKing, ...)
+const DD_SPECIAL = { wukong: 'MonkeyKing', monkeyking: 'MonkeyKing', kaisa: 'Kaisa', khazix: 'Khazix', chogath: 'Chogath', velkoz: 'Velkoz', leblanc: 'Leblanc',
+  reksai: 'RekSai', kogmaw: 'KogMaw', belveth: 'Belveth', ksante: 'KSante', renataglasc: 'Renata', nunuwillump: 'Nunu', nunu: 'Nunu', drmundo: 'DrMundo',
+  jarvaniv: 'JarvanIV', aurelionsol: 'AurelionSol', leesin: 'LeeSin', missfortune: 'MissFortune', masteryi: 'MasterYi', tahmkench: 'TahmKench',
+  twistedfate: 'TwistedFate', xinzhao: 'XinZhao', fiddlesticks: 'Fiddlesticks' };
+const ddName = name => {
+  const key = name.toLowerCase().replace(/[^a-z]/g, '');
+  if (DD_SPECIAL[key]) return DD_SPECIAL[key];
+  const clean = name.replace(/[^A-Za-z]/g, '');
+  return clean.charAt(0).toUpperCase() + clean.slice(1);   // Dateinamen sind case-sensitiv: "yasuo" -> "Yasuo"
+};
+const champImg = name => `${DDRAGON}/champion/${ddName(name)}.png`;
 
 // Rundes Champion-Porträt. Lädt das Bild nicht, bleibt ein User-Icon sichtbar.
 const ChampAvatar = ({ name, className = 'w-10 h-10', iconSize = 20, ring = 'border border-[#C89B3C]/60', fallbackIcon = 'user', initial = null }) => {
@@ -1821,24 +1832,40 @@ const MARKER_EXTRA = ['Zed', 'Aatrox', 'Fiora', 'Lux', 'Leona', 'Caitlyn', 'Jinx
 const KNOWN_CHAMPS = [...new Set([...RUNS.map(r => r.champion), ...MARKER_EXTRA])].sort((a, b) => b.length - a.length);
 const markerChampion = label => { const l = label.toLowerCase(); return KNOWN_CHAMPS.find(c => l.startsWith(c.toLowerCase()) && !/[a-z]/.test(l[c.length] || '')); };
 
-// Runder Marker für Verbündete (cyan) und Gegner (rot): Champion-Porträt, sonst Anfangsbuchstabe
-function PortraitMarker({ m, sc, showLabels }) {
-  const champ = markerChampion(m.label);
+// Runder Marker als SVG-Porträt: <image> mit href und xlinkHref, runder clipPath und Anfangsbuchstabe als Fallback (greift erst bei echtem Ladefehler)
+function SvgPortrait({ m, champion, cx, cy, r, sc, showLabels }) {
+  const uid = React.useId().replace(/:/g, '');
+  const [failed, setFailed] = useState(false);
   const enemy = m.type === 'enemy';
-  const ring = enemy ? 'border-2 border-[#E84057] shadow-[0_0_8px_rgba(232,64,87,.8)]' : 'border-2 border-[#0AC8B9] shadow-[0_0_8px_rgba(10,200,185,.8)]';
-  const size = showLabels ? 'w-7 h-7' : 'w-6 h-6';
-  const initial = (champ || m.label).trim()[0].toUpperCase();
+  const col = enemy ? '#E84057' : '#0AC8B9';
+  const url = champion ? champImg(champion) : null;
+  const initial = (champion || m.label).trim()[0].toUpperCase();
+  const count = (m.label.match(/\((\d)[\s)]/) || [])[1];     // Gruppen wie "Gegner (5)" bekommen ein Zähl-Badge
   return (
-    <div className="absolute z-[5]" style={{ left: `${m.x}%`, top: `${m.y}%`, transform: `translate(-50%, -50%) scale(${sc})` }}>
-      {champ
-        ? <ChampAvatar name={champ} className={size} initial={initial} ring={ring} />
-        : <span className={`flex items-center justify-center rounded-full text-[10px] font-extrabold text-white ${size} ${ring}`}
-                style={{ background: enemy ? 'rgba(232,64,87,.55)' : 'rgba(10,200,185,.45)' }}>{initial}</span>}
-      {showLabels && <span className="absolute left-1/2 top-full mt-0.5 -translate-x-1/2 whitespace-nowrap rounded bg-black/60 px-1 text-[9px] font-semibold text-slate-100">{m.label}</span>}
-    </div>
+    <g>
+      <title>{m.label}</title>
+      <defs><clipPath id={`clip-${uid}`}><circle cx={cx} cy={cy} r={r} /></clipPath></defs>
+      <circle cx={cx} cy={cy} r={r * 1.45} fill={col} fillOpacity=".16" className="motion-safe:animate-pulse" />
+      <circle cx={cx} cy={cy} r={r} fill={enemy ? '#4a1620' : '#0b3b3a'} />
+      <text x={cx} y={cy + r * 0.38} textAnchor="middle" fontSize={r * 1.1} fontWeight="800" fill="#fff">{initial}</text>
+      {url && !failed && (
+        <image href={url} xlinkHref={url} x={cx - r} y={cy - r} width={r * 2} height={r * 2} preserveAspectRatio="xMidYMid slice"
+               clipPath={`url(#clip-${uid})`} onError={() => setFailed(true)} />
+      )}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={col} strokeWidth={Math.max(1.2, r * 0.18)} />
+      {count && (
+        <>
+          <circle cx={cx + r * 0.8} cy={cy - r * 0.8} r={r * 0.45} fill="#010A13" stroke={col} strokeWidth=".8" />
+          <text x={cx + r * 0.8} y={cy - r * 0.8 + r * 0.17} textAnchor="middle" fontSize={r * 0.55} fontWeight="800" fill="#fff">{count}</text>
+        </>
+      )}
+      {showLabels && (
+        <text x={cx} y={cy + r + 7 * sc} textAnchor="middle" fontSize={6.5 * sc} fontWeight="600" fill="#e2e8f0" stroke="#010A13" strokeWidth={2.2 * sc}
+              paintOrder="stroke" fontFamily="system-ui,sans-serif">{m.label}</text>
+      )}
+    </g>
   );
 }
-
 // Taktik-Karte: Mock-Map (Fallback) -> echte Map als Hintergrund -> Marker-Overlay -> Spieler-Porträt, alles in einer zoombaren "Welt".
 // Marker-Koordinaten in Prozent (0-100) beziehen sich auf das quadratische Kartenfeld.
 const MARKER_COLOR = { hero: '#3b82f6', enemy: '#ef4444', objective: '#C89B3C', fog: '#94a3b8' };
@@ -1847,6 +1874,7 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
   const view = focus && !full ? focus : { x0: 0, y0: 0, size: 100 };
   const z = 100 / view.size;
   const sc = Math.pow(1 / z, 0.65);                         // Marker wachsen beim Zoom nur dezent mit
+  const R = (showLabels ? 8 : 12.5) * sc;   // Radius der Porträt-Marker
   const k = (showLabels ? 1 : 1.5) * sc;                    // in der Vorschau größere Marker, damit sie ohne Zoom auffallen
   const reduce = typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const at = m => ({ x: 110 + m.x * 1.8, y: 10 + m.y * 1.8 });
@@ -1930,9 +1958,13 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
                 </g>
               );
             })}
+            {markers.filter(m => !m.isPlayer && (m.type === 'hero' || m.type === 'enemy')).map((m, i) => {
+              const pt = at(m);
+              const champ = m.champion === null ? null : (m.champion || markerChampion(m.label));
+              return <SvgPortrait key={`p${i}`} m={m} champion={champ} cx={pt.x} cy={pt.y} r={R} sc={sc} showLabels={showLabels} />;
+            })}
             {fxLayer}
           </svg>
-          {markers.filter(m => !m.isPlayer && (m.type === 'hero' || m.type === 'enemy')).map((m, i) => <PortraitMarker key={i} m={m} sc={sc} showLabels={showLabels} />)}
           {player && (
             <div className="absolute z-10 flex flex-col items-center" style={{ left: `${player.x}%`, top: `${player.y}%`, transform: `translate(-50%, -50%) scale(${sc})` }}>
               <div className="relative">
@@ -2236,6 +2268,8 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
   const [leave, setLeave] = useState(false);   // Bestätigung zum Abbrechen
   const [full, setFull] = useState(false);     // Gesamtkarte statt Fokus-Ausschnitt
   const paused = mapOpen || full;               // Taktik-Analyse: Timer steht
+  const openMap = () => { pausedRef.current = true; setMapOpen(true); };                 // Ref sofort setzen, bevor der nächste Tick kommt
+  const toggleFull = () => { if (!full) pausedRef.current = true; setFull(!full); };
   const [showMom, setShowMom] = useState(true);   // Momentum-Banner am Phasenstart
   const [msgs, setMsgs] = useState([{ from: 'coach', t: 'Ich gebe dir Hinweise, aber nie die Lösung. Was willst du wissen?' }]);
   const [draft, setDraft] = useState('');
@@ -2244,12 +2278,23 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
   const replyTimer = useRef(null);
 
   // Timer: pausiert, solange der Coach offen ist
+  // Timer: ein Intervall pro Szenario. Der Pause-Status liegt in einer Ref (wird in jedem Render und in den Handlern sofort gesetzt), die Restzeit
+  // wird nur im aktiven Zustand verbraucht. Solange Karte, Gesamtansicht, Coach oder Abbruch-Dialog offen sind, verliert der Timer keinen Tick.
+  const pausedRef = useRef(false);
+  pausedRef.current = !!pick || coach || leave || mapOpen || full;
+  const remainingRef = useRef(limit * 1000);
   useEffect(() => {
-    if (pick || coach || leave || mapOpen || full) return;   // Timer pausiert bei Coach, Abbruch-Dialog und Karten-Analyse
-    if (left <= 0) { setPick({ timeout: true }); return; }
-    const t = setTimeout(() => setLeft(l => l - 1), 1000);
-    return () => clearTimeout(t);
-  }, [left, pick, coach, leave, mapOpen, full]);
+    let last = performance.now();
+    const id = setInterval(() => {
+      const now = performance.now(), dt = now - last;
+      last = now;
+      if (pausedRef.current) return;
+      remainingRef.current = Math.max(0, remainingRef.current - dt);
+      setLeft(Math.ceil(remainingRef.current / 1000));
+      if (remainingRef.current <= 0) { pausedRef.current = true; setPick({ timeout: true }); }
+    }, 100);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => () => clearTimeout(replyTimer.current), []);
   useEffect(() => { if (pick) setMapOpen(false); }, [pick]);
@@ -2268,7 +2313,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
   }, [mapOpen]);
   useEffect(() => { if (coach) endRef.current && endRef.current.scrollIntoView({ block: 'end' }); }, [msgs, typing, coach]);
 
-  const choose = opt => { if (!pick) { playHextechSound('lock_in'); setPick({ opt }); setCoach(false); } };
+  const choose = opt => { if (!pick) { pausedRef.current = true; playHextechSound('lock_in'); setPick({ opt }); setCoach(false); } };
   const urgent = left <= 5;
 
   // Dummy-KI: antwortet nach 1,5 s immer mit dem coachHint des aktuellen Szenarios
@@ -2336,11 +2381,11 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
         {paused && (
           <div role="status" className="shrink-0 rounded-md border border-[#C89B3C]/50 bg-[#C89B3C]/10 px-2 py-1 text-center text-xs font-semibold text-[#C89B3C]">⏸️ Taktik-Analyse (Timer pausiert)</div>
         )}
-        <div role="button" tabIndex={0} onClick={() => setMapOpen(true)} aria-label="Minimap vergrößern"
-          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMapOpen(true); } }}
+        <div role="button" tabIndex={0} onClick={openMap} aria-label="Minimap vergrößern"
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMap(); } }}
           className="relative h-36 shrink-0 rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13] cursor-pointer transition hover:border-[#0AC8B9]">
           <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} result={pick ? (ok ? 'good' : 'bad') : null} fx={fx}
-                   focus={focus} full={full} onToggleView={() => setFull(f => !f)} />
+                   focus={focus} full={full} onToggleView={toggleFull} />
           <span className="pointer-events-none absolute top-1.5 right-1.5 rounded-md bg-black/40 p-1 text-white/80"><Icon n="zoom" size={16} /></span>
         </div>
 
@@ -2447,7 +2492,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
           </div>
           <div role="status" className="rounded-md border border-[#C89B3C]/50 bg-[#C89B3C]/10 px-2 py-1 text-center text-xs font-semibold text-[#C89B3C]">⏸️ Taktik-Analyse (Timer pausiert)</div>
           <div className="w-full max-w-[380px] aspect-square mx-auto rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13]">
-            <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} showLabels focus={focus} full={full} onToggleView={() => setFull(f => !f)} />
+            <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} showLabels focus={focus} full={full} onToggleView={toggleFull} />
           </div>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
             {[['hero', 'Du / Team'], ['enemy', 'Gegner'], ['objective', 'Objective'], ['fog', 'Ungesichtet']].map(([t, l]) => (
@@ -2682,7 +2727,7 @@ function adaptScenario(sc, champ) {
   const from = new RegExp(escapeRe(sc.champion), 'g');
   const sub = t => t.replace(from, champ);
   const out = { ...sc, id: `${sc.id}~${normName(champ)}`, champion: champ, context: sub(sc.context), coachHint: sub(sc.coachHint),
-    markers: sc.markers.map(m => ({ ...m, label: sub(m.label) })),
+    markers: sc.markers.map(m => ({ ...m, label: sub(m.label), ...(m.champion && normName(m.champion) === normName(champ) ? { champion: null } : {}) })),
     options: sc.options.map(o => ({ ...o, label: sub(o.label), feedback: sub(o.feedback), chain: o.chain && o.chain.map(sub), nextId: 'end' })) };
   delete out.phase;
   DYN[out.id] = out;
