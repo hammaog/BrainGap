@@ -1,0 +1,2570 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BrainGap.gg Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>
+  :root { --bg:#0A1428; --panel:rgba(1,10,19,.8); --line:rgba(200,155,60,.4); --track:#1E2D4A; --gold:#C89B3C; --teal:#0AC8B9; --red:#E84057; box-sizing:border-box;
+          padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+  html,body { height:100%; margin:0; background:#050A14; color:#F0E6D2; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+  @keyframes pop { 0%{transform:scale(.6);opacity:0} 60%{transform:scale(1.08);opacity:1} 100%{transform:scale(1)} }
+  .pop { animation:pop .5s ease-out both; }
+  @keyframes panic { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+  .panic { display:block; transform-origin:right center; animation:panic .6s ease-in-out infinite; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(3px)} }
+  .shake { animation:shake .3s ease-in-out; }
+  @keyframes fall { 0%{transform:translateY(-16px) rotate(0);opacity:1} 100%{transform:translateY(620px) rotate(540deg);opacity:0} }
+  .confetti { position:absolute; top:0; width:8px; height:12px; border-radius:2px; animation:fall 3s ease-in forwards; }
+  @keyframes glow { 0%,100%{opacity:.35;transform:scale(1)} 50%{opacity:.9;transform:scale(1.35)} }
+  .rankglow { animation:glow 1.4s ease-in-out infinite; }
+  @keyframes drain { from{width:100%} to{width:0} }
+  .drain { animation:drain 2.4s linear forwards; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+  .blink { animation:blink .5s ease-in-out 4; }
+  @keyframes fadein { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+  .fade-in { animation:fadein .18s ease-out; }
+  @media (prefers-reduced-motion:reduce){ .pop,.panic,.shake,.rankglow,.fade-in,.drain,.blink{animation:none} .confetti{display:none} }
+  button:focus-visible,input:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* Lucide-Icons (Original-Pfade, inline, weil Lucide-React-Module hier nicht ladbar sind) */
+const P = {
+  home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+  crown:'<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/>',
+  play:'<polygon points="6 3 20 12 6 21 6 3"/>',
+  chat:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
+  timer:'<line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/>',
+  map:'<polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/>',
+  eye:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  zoom:'<circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  brain:'<path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  crosshair:'<circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/>',
+  volume2:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',
+  volumeX:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/>',
+  heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+  zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  swords:'<polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" x2="9" y1="14" y2="18"/><line x1="7" x2="4" y1="17" y2="20"/><line x1="3" x2="5" y1="19" y2="21"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  calendar:'<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+  hexagon:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>',
+  gem:'<path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/>',
+  shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+  wand:'<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/>',
+  axe:'<path d="m14 11-9.5 9.5a1.4 1.4 0 0 1-2-2L12 9"/><path d="M12.5 3.5 15 2l7 7-1.5 2.5L18 9l-3 3-3.5-3.5 3-3z"/>',
+};
+const Icon = ({ n, size = 20, className = '', fill = 'none' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2"
+       strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true"
+       dangerouslySetInnerHTML={{ __html: P[n] }} />
+);
+
+/* ---------- Daten ---------- */
+const RUNS = [
+  /* ===== Match 1: Toplane, Smaragd (Jax) ===== */
+  {
+    "id": "top_smaragd_01", "phase": "Early Laning", "gameTime": "06:15", "timeLimit": 60,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 60, "y": 9, "type": "hero", "isPlayer": true, "label": "Jax" },
+      { "x": 70, "y": 9, "type": "enemy", "label": "Renekton" },
+      { "x": 80, "y": 8, "type": "objective", "label": "Turm" },
+      { "x": 84, "y": 72, "type": "fog", "label": "Gegnerischer Jungler zuletzt Bot gesehen" }
+    ],
+    "coachHint": "Eine große Welle ist ein Zeitfenster. Was kannst du tun, während sie den gegnerischen Turm beschäftigt?",
+    "context": "Du bist Jax (Top) gegen Renekton. Level 5 mit 1300 ungenutztem Gold. Deine Welle ist groß und schiebt auf den gegnerischen Turm zu. Der gegnerische Jungler wurde zuletzt Bot gesehen, dein Jungler ist auf der anderen Kartenseite.",
+    "options": [
+      { "label": "A: Die große Welle in den Turm crashen, dann zur Base gehen und Items kaufen.", "lpChange": 20, "nextId": "top_smaragd_02", "feedback": "Perfekt! Die Welle crasht, du kaufst Items und kommst mit Tempo zurück." },
+      { "label": "B: Weiter pushen, bis du Level 6 erreichst, und erst dann zurück.", "lpChange": -5, "nextId": "top_smaragd_02", "feedback": "Zu gierig. Ohne Vision riskierst du einen Gank mit 1300 Gold in der Tasche.", "chain": ["Ein Gank trifft dich mit 1300 ungenutztem Gold.", "Der gegnerische Jungler sichert First Blood und Tempo."] },
+      { "label": "C: Zu Renekton laufen und den Trade suchen, das Gold hat Zeit.", "lpChange": -15, "nextId": "top_smaragd_02", "feedback": "Falle! Du riskierst den Trade ohne Items und verschenkst deinen Gold-Vorteil.", "chain": ["Du verlierst den Trade ohne neue Items.", "Renekton gewinnt die Lane, dein Jungler muss Top helfen."] }
+    ]
+  },
+  {
+    "id": "top_smaragd_02", "phase": "First Objective", "gameTime": "10:45", "timeLimit": 60,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 9, "y": 56, "type": "hero", "isPlayer": true, "label": "Jax" },
+      { "x": 9, "y": 44, "type": "enemy", "label": "Renekton" },
+      { "x": 24, "y": 66, "type": "hero", "label": "Viego (Gank)" },
+      { "x": 7, "y": 22, "type": "objective", "label": "Gegner-Turm" }
+    ],
+    "coachHint": "Ein Gank gelingt, wenn der Gegner weit vom Turm steht. Welche Wellenposition lockt ihn heraus?",
+    "context": "Du bist Jax (Top) gegen Renekton. Level 8. Dein Jungler (Viego) pingt dich für einen Gank an, die Welle steht neutral in der Mitte der Lane. Renekton hat Flash und seine Ultimate ready.",
+    "options": [
+      { "label": "A: Die Welle vor deinem Turm halten (Freeze), damit Renekton für Last-Hits vorlaufen muss, und dann mit Viego angreifen.", "lpChange": 20, "nextId": "top_smaragd_03", "feedback": "Perfekt! Der Freeze zieht ihn aus der Turmreichweite, der Gank sitzt." },
+      { "label": "B: Die Welle in seinen Turm pushen, damit er unter dem Turm steht, und dann den Gank starten.", "lpChange": -15, "nextId": "top_smaragd_03", "feedback": "Falle! Unter seinem Turm ist ein Gank deutlich schwerer.", "chain": ["Renekton steht unter seinem Turm und entkommt dem Gank.", "Viego verliert Zeit, euer Dschungel bleibt ungeschützt."] },
+      { "label": "C: Normal weiterfarmen und Viego allein kommen lassen.", "lpChange": -10, "nextId": "top_smaragd_03", "feedback": "Ohne Wellenvorbereitung kann Renekton leicht entkommen.", "chain": ["Renekton sieht den Gank kommen und weicht aus.", "Ihr verschenkt den Gank und den Druck auf Top."] }
+    ]
+  },
+  {
+    "id": "top_smaragd_03", "phase": "Mid-Game", "gameTime": "18:40", "timeLimit": 60,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 62, "y": 9, "type": "hero", "isPlayer": true, "label": "Jax" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 72, "y": 82, "type": "hero", "label": "Team" },
+      { "x": 80, "y": 64, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Dein Teleport ist deine stärkste Waffe. Wann ist der beste Moment, ihn einzusetzen, nachdem du Druck aufgebaut hast?",
+    "context": "Du bist Jax (Top) und dein Teleport ist ready. Deine Welle steht groß vor dem gegnerischen Turm. Der Drache spawnt in etwa 30 Sekunden und dein Team sammelt sich dort. Renekton ist auf der Karte nicht zu sehen.",
+    "options": [
+      { "label": "A: Zu Fuß zum Drachen laufen und die Welle liegen lassen.", "lpChange": -15, "nextId": "top_smaragd_04", "feedback": "Falle! Du kommst zu spät und die Welle bringt dir keinen Turmschaden.", "chain": ["Du kommst zu spät zum Kampf und die Welle bringt nichts.", "Euer Team verliert den Drachen in Unterzahl."] },
+      { "label": "B: Auf der Toplane bleiben und den Turm weiter unter Druck setzen, ohne den Teleport zu nutzen.", "lpChange": -10, "nextId": "top_smaragd_04", "feedback": "Sicher, aber dein Team steht ohne dich am Drachen und der Teleport bleibt ungenutzt.", "chain": ["Dein Teleport bleibt ungenutzt, der Turmdruck bringt wenig.", "Das Team kämpft ohne Jax am Drachen und gibt ihn ab."] },
+      { "label": "C: Welle in den Turm crashen und dann per Teleport zum Drachen-Kampf.", "lpChange": 20, "nextId": "top_smaragd_04", "feedback": "Stark! Du holst Turmschaden und kommst mit Teleport-Vorteil zum Kampf." }
+    ]
+  },
+  {
+    "id": "top_smaragd_04", "phase": "Teamfight Setup", "gameTime": "25:10", "timeLimit": 60,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Jax" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 42, "y": 40, "type": "hero", "label": "Team" },
+      { "x": 46, "y": 46, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Wenn du im Teamkampf nicht gebraucht wirst: Wie zwingst du die Gegner, zwei Dinge gleichzeitig zu verteidigen?",
+    "context": "Du bist Jax (Top). Euer Team sammelt sich für einen Baron-Versuch, die Gegner haben die Vision bemerkt und stehen im Fluss. Dein Teleport ist ready und deine Welle schiebt auf den gegnerischen Turm zu.",
+    "options": [
+      { "label": "A: Zum Team in den Fluss gehen und mitkämpfen, obwohl deine Welle verpufft.", "lpChange": -10, "nextId": "top_smaragd_05", "feedback": "Du gibst deinen Druck auf, dabei ist Jax als Splitpusher am stärksten.", "chain": ["Deine Welle verpufft und der Druck auf Top fällt weg.", "Die Gegner können den Baron ungestört verteidigen."] },
+      { "label": "B: Die Welle in den Turm schieben und Druck auf der Top-Seite aufbauen, bis die Gegner reagieren müssen.", "lpChange": 20, "nextId": "top_smaragd_05", "feedback": "Perfekt! Die Gegner müssen Baron und Top gleichzeitig verteidigen." },
+      { "label": "C: Allein den Baron starten, damit das Team nachkommt.", "lpChange": -15, "nextId": "top_smaragd_05", "feedback": "Falle! Allein am Baron verlierst du ihn und dein Leben.", "chain": ["Du wirst am Baron gestellt, bevor das Team da ist.", "Die Gegner nehmen den Baron und kontern mit Vorteil."] }
+    ]
+  },
+  {
+    "id": "top_smaragd_05", "phase": "Late-Game", "gameTime": "31:20", "timeLimit": 60,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 22, "y": 10, "type": "hero", "isPlayer": true, "label": "Jax" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Elder Drake" },
+      { "x": 72, "y": 80, "type": "hero", "label": "Team" },
+      { "x": 78, "y": 62, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Zeitfenster entscheiden Spiele. Was ändert sich für den Gegner, wenn seine Ultimates noch nicht bereit sind?",
+    "context": "Du bist Jax (Top). Dein Team besitzt die Drachenseele und der Elder Drake spawnt in etwa 20 Sekunden. Die Ultimates der Gegner sind noch rund 45 Sekunden auf Abklingzeit. Dein Teleport ist ready und dein Team hat Vision am Drachen.",
+    "options": [
+      { "label": "A: Warten, bis die Ultimates der Gegner wieder bereit sind, und dann zum Objective gehen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Du gibst dem Gegner genau das Fenster zurück, das ihr gerade habt.", "chain": ["Die Ultimates der Gegner sind wieder bereit, das Fenster ist zu.", "Die Gegner sichern den Elder Drake und den Teamkampf."] },
+      { "label": "B: Per Teleport auf die Vision am Drachen und den Elder Drake mit dem Team nehmen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nutzt das Ultimate-Fenster und sichert den Elder Drake." },
+      { "label": "C: Den Top-Turm weiter pushen und den Elder Drake dem Team überlassen.", "lpChange": -10, "nextId": "end", "feedback": "Du fehlst im Teamfight, obwohl die Gegner gerade verwundbar sind.", "chain": ["Du fehlst im Teamkampf, obwohl ihre Ults noch warten.", "Euer Team kämpft ohne Jax und verliert den Elder Drake."] }
+    ]
+  },
+
+  /* ===== Match 2: Jungle, Diamant (Lee Sin) ===== */
+  {
+    "id": "jng_dia_01", "phase": "Early Laning", "gameTime": "03:30", "timeLimit": 60,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Diamant",
+    "markers": [
+      { "x": 45, "y": 55, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
+      { "x": 80, "y": 42, "type": "enemy", "label": "Nocturne" },
+      { "x": 86, "y": 86, "type": "enemy", "label": "ADC (kein Flash)" },
+      { "x": 10, "y": 60, "type": "hero", "label": "Top (gepusht)" }
+    ],
+    "coachHint": "Nocturne ist weit weg. Welche Fenster öffnen sich dadurch für dich auf der anderen Seite der Karte?",
+    "context": "Du bist Lee Sin (Jungle). Du hast drei Camps geklärt und siehst für eine Sekunde den gegnerischen Nocturne an seinem Gromp. Der gegnerische ADC hat seinen Flash verbraucht. Deine Midlane hat Prio, dein Top wird in den Turm gedrückt.",
+    "options": [
+      { "label": "A: Den Botlane-Turm diven, weil der ADC keinen Flash hat.", "lpChange": -15, "nextId": "jng_dia_02", "feedback": "Throw! Nocturne ist in der Nähe und bestraft den Dive.", "chain": ["Nocturne bestraft den Dive und du stirbst.", "Die Botlane verliert beide Spieler und den ersten Turm."] },
+      { "label": "B: Nocturne am Gromp invaden und das 1v1 suchen.", "lpChange": -10, "nextId": "jng_dia_02", "feedback": "Zu riskant. Ohne Vision und mit wenig Backup riskierst du Level und Tempo.", "chain": ["Du verlierst das 1v1 ohne Vision und ohne Mid-Hilfe.", "Nocturne bekommt Tempo und Level-Vorsprung im Dschungel."] },
+      { "label": "C: Zur Base resetten und direkt zur Toplane für einen Gank rennen.", "lpChange": 20, "nextId": "jng_dia_02", "feedback": "Stark! Nocturne ist Bot, du holst dir Tempo und rettest Top." }
+    ]
+  },
+  {
+    "id": "jng_dia_02", "phase": "First Objective", "gameTime": "08:10", "timeLimit": 60,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Diamant",
+    "markers": [
+      { "x": 62, "y": 66, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 80, "y": 88, "type": "hero", "label": "Botlane" },
+      { "x": 22, "y": 24, "type": "fog", "label": "Nocturne zuletzt Top gesehen" }
+    ],
+    "coachHint": "Wenn du weißt, wo der gegnerische Jungler ist, wie sicher kannst du ein Objective auf der anderen Seite spielen?",
+    "context": "Du bist Lee Sin (Jungle). Der erste Drache ist verfügbar und noch niemand hat ihn angefangen. Deine Botlane hat Prio, aber ihr habt keine Vision am Drachen. Nocturne wurde zuletzt auf der Top-Seite gesehen.",
+    "options": [
+      { "label": "A: Nocturne auf der Top-Seite jagen, um ihn zu stellen.", "lpChange": -15, "nextId": "jng_dia_03", "feedback": "Falle! Blindes Hinterherjagen kostet dich das Objective.", "chain": ["Du findest Nocturne nicht, der Drache bleibt liegen.", "Die Botlane steht ohne Jungler-Hilfe und verliert den Drachen."] },
+      { "label": "B: Vision am Drachen aufbauen und ihn mit der Botlane-Prio starten.", "lpChange": 20, "nextId": "jng_dia_03", "feedback": "Perfekt! Du nutzt, dass Nocturne weit weg ist." },
+      { "label": "C: Im Fluss warten und das Drachen-Fenster verstreichen lassen.", "lpChange": -10, "nextId": "jng_dia_03", "feedback": "Du verschenkst ein sicheres Objective.", "chain": ["Das Drachen-Fenster verstreicht ohne Aktion.", "Ihr gebt ein sicheres Objective und Tempo ab."] }
+    ]
+  },
+  {
+    "id": "jng_dia_03", "phase": "Mid-Game", "gameTime": "15:00", "timeLimit": 60,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Diamant",
+    "markers": [
+      { "x": 45, "y": 50, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
+      { "x": 80, "y": 70, "type": "enemy", "label": "Nocturne" },
+      { "x": 86, "y": 78, "type": "objective", "label": "Drache" },
+      { "x": 22, "y": 12, "type": "objective", "label": "Top-Turm" },
+      { "x": 28, "y": 9, "type": "hero", "label": "Top" }
+    ],
+    "coachHint": "Du kannst nicht überall sein. Wenn der Gegner auf einer Seite Zeit investiert, welche Seite ist dann offen?",
+    "context": "Du bist Lee Sin (Jungle). Nocturne und die gegnerische Botlane starten den Drachen auf der Bot-Seite, dein Team ist nicht rechtzeitig dort. Euer Top hat die Welle gepusht und sein Gegenspieler ist zur Base gegangen. Auf der Top-Seite haben die Gegner keine Vision.",
+    "options": [
+      { "label": "A: Den Drachen aufgeben und stattdessen auf der Top-Seite Turm und gegnerische Camps nehmen.", "lpChange": 20, "nextId": "jng_dia_04", "feedback": "Perfekt! Ein sauberer Cross-Map-Trade: Drache gegen Top-Seite." },
+      { "label": "B: Zum Drachen rennen und Nocturne dort stellen.", "lpChange": -15, "nextId": "jng_dia_04", "feedback": "Du kommst zu spät und gibst zusätzlich die freie Top-Seite auf.", "chain": ["Du kommst zu spät und gibst die freie Top-Seite auf.", "Die Gegner nehmen den Drachen und verlieren nichts."] },
+      { "label": "C: In der Mitte warten und nichts riskieren.", "lpChange": -10, "nextId": "jng_dia_04", "feedback": "Sicher, aber du schenkst dem Gegner den Drachen und lässt dein Zeitfenster verstreichen.", "chain": ["Du lässt dein Zeitfenster verstreichen.", "Euer Team verliert den Drachen ohne Gegenleistung."] }
+    ]
+  },
+  {
+    "id": "jng_dia_04", "phase": "Teamfight Setup", "gameTime": "25:40", "timeLimit": 60,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Diamant",
+    "markers": [
+      { "x": 46, "y": 48, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
+      { "x": 60, "y": 60, "type": "enemy", "label": "Ezreal (allein)" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 42, "y": 42, "type": "hero", "label": "Team" }
+    ],
+    "coachHint": "Ein Pick vor dem Objective macht den Kampf leichter. Was musst du haben, bevor du eingehst?",
+    "context": "Du bist Lee Sin (Jungle). Der gegnerische Ezreal steht allein am Rand des Flusses, sein Team ist beim Baron-Eingang. Euer Team hat Vision im gegnerischen Dschungel und der Baron ist verfügbar.",
+    "options": [
+      { "label": "A: Mit Vision hinter ihn gehen, gemeinsam mit Mid einen Pick setzen und danach den Baron starten.", "lpChange": 20, "nextId": "jng_dia_05", "feedback": "Perfekt! Der Pick macht den Baron-Kampf leichter." },
+      { "label": "B: Allein auf Ezreal springen, ohne zu wissen, wo die anderen stehen.", "lpChange": -15, "nextId": "jng_dia_05", "feedback": "Falle! Ohne Info über sein Team läufst du in den Engage.", "chain": ["Du läufst in den Engage seines Teams.", "Euer Team verliert den Jungler und die Initiative am Baron."] },
+      { "label": "C: Den Baron sofort ohne Pick starten.", "lpChange": -10, "nextId": "jng_dia_05", "feedback": "Du startest ein Objective ohne Vorteil im Kampf.", "chain": ["Ihr startet den Baron ohne Vorteil im Kampf.", "Die Gegner starten den Kampf und stehlen oder kontern den Baron."] }
+    ]
+  },
+  {
+    "id": "jng_dia_05", "phase": "Late-Game", "gameTime": "28:45", "timeLimit": 60,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Diamant",
+    "markers": [
+      { "x": 55, "y": 50, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
+      { "x": 55, "y": 58, "type": "hero", "label": "Team" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 40, "y": 38, "type": "enemy", "label": "Gegner" },
+      { "x": 46, "y": 44, "type": "enemy", "label": "Nocturne (Ult)" }
+    ],
+    "coachHint": "Beim Baron-Dance verliert, wer zuerst ohne Vision hineingeht. Wie kannst du dem Gegner die Initiative aufzwingen?",
+    "context": "Du bist Lee Sin (Jungle). Baron ist verfügbar und beide Teams tanzen im Fluss. Dein Team hat Kontrollwards im Inventar, aber keine Vision im Baron-Pit. Der gegnerische Nocturne hat seine Ultimate bereit.",
+    "options": [
+      { "label": "A: Baron sofort starten, bevor die Gegner mehr Vision bekommen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Ohne Vision und mit Nocturne-Ult im Rücken wird dein Team gefangen.", "chain": ["Ohne Vision und mit Nocturne-Ult im Rücken wirst du gefangen.", "Euer Team verliert den Kampf am Baron."] },
+      { "label": "B: Vision aufbauen und die Gegner zum Engage zwingen, statt blind zu starten.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Vision gewinnt, wer den anderen zum Fehler zwingt." },
+      { "label": "C: Auf die andere Seite gehen und dort Druck aufbauen, während das Team am Baron wartet.", "lpChange": -5, "nextId": "end", "feedback": "Riskant. Dein Team steht im Fluss ohne dich unterlegen.", "chain": ["Dein Team steht im Fluss ohne dich in Unterzahl.", "Die Gegner erzwingen den Kampf und gewinnen ihn."] }
+    ]
+  },
+
+  /* ===== Match 3: Midlane, Gold (Ahri) ===== */
+  {
+    "id": "mid_gold_01", "phase": "Early Laning", "gameTime": "03:20", "timeLimit": 45,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Gold",
+    "markers": [
+      { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Ahri" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Katarina" },
+      { "x": 60, "y": 56, "type": "objective", "label": "Fluss-Busch" },
+      { "x": 20, "y": 25, "type": "fog", "label": "Vi zuletzt Top gesehen" }
+    ],
+    "coachHint": "Vor dem Druck kommt die Info. Was fehlt dir, bevor du Katarina näher kommst?",
+    "context": "Du bist Ahri (Mid) gegen Katarina. Level 3. Die Welle steht mittig, Katarina farmt vorsichtig am Turm und der gegnerische Jungler (Vi) wurde zuletzt Top gesehen. Der Fluss-Busch hinter dir ist ohne Vision.",
+    "options": [
+      { "label": "A: Hinter die Welle gehen und einen Ward in den Fluss-Busch setzen, bevor du weiter harassst.", "lpChange": 20, "nextId": "mid_gold_02", "feedback": "Stark! Vision schützt dich vor dem Gank, bevor du Druck machst." },
+      { "label": "B: Mit Charm in Turmreichweite auf Katarina gehen, um den Trade zu erzwingen.", "lpChange": -15, "nextId": "mid_gold_02", "feedback": "Falle! Unter dem Turm verlierst du den Trade und viel Leben.", "chain": ["Der Turm und Katarina bestrafen dich, du verlierst viel Leben.", "Katarina baut Prio auf, euer Jungler kann Mid nicht stabilisieren."] },
+      { "label": "C: Zur Base laufen und die Welle liegen lassen.", "lpChange": -5, "nextId": "mid_gold_02", "feedback": "Du verlierst Erfahrung und gibst Druck ohne Grund ab.", "chain": ["Du verlierst Welle und Erfahrung.", "Katarina nimmt Prio und kann ungestört roamen."] }
+    ]
+  },
+  {
+    "id": "mid_gold_02", "phase": "First Objective", "gameTime": "08:10", "timeLimit": 45,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Gold",
+    "markers": [
+      { "x": 64, "y": 36, "type": "hero", "isPlayer": true, "label": "Ahri" },
+      { "x": 70, "y": 30, "type": "enemy", "label": "Katarina" },
+      { "x": 74, "y": 91, "type": "hero", "label": "Botlane" },
+      { "x": 86, "y": 86, "type": "enemy", "label": "Gegner Bot" },
+      { "x": 20, "y": 25, "type": "fog", "label": "Vi zuletzt Top gesehen" }
+    ],
+    "coachHint": "Du hast Prio in der Mitte. Wo auf der Karte wird gerade am dringendsten Hilfe benötigt?",
+    "context": "Du bist Ahri (Mid) gegen Katarina. Du hast die Welle in den gegnerischen Turm gepusht und deine Botlane wird hart gepresst. Der gegnerische Jungler (Vi) wurde zuletzt Top gesehen, dein Jungler macht die oberen Camps.",
+    "options": [
+      { "label": "A: In der Mitte bleiben und Gegner unter dem Turm harassen.", "lpChange": -10, "nextId": "mid_gold_03", "feedback": "Du verschwendest dein Prio-Fenster, und unter dem Turm ist es für dich gefährlich.", "chain": ["Du verschwendest dein Prio-Fenster unter dem Turm.", "Eure Botlane bleibt unter Druck und verliert Turm oder Leben."] },
+      { "label": "B: Sofort in den Fluss rotieren und die Botlane ganken.", "lpChange": 20, "nextId": "mid_gold_03", "feedback": "Stark! Du nutzt deinen Wave-Push perfekt aus." },
+      { "label": "C: Die Welle für einen Backport (Reset) nutzen.", "lpChange": 0, "nextId": "mid_gold_03", "feedback": "Sicher, aber du lässt deine Botlane im Stich. Kein Impact.", "chain": ["Die Botlane bleibt ohne Hilfe und du bringst keinen Impact.", "Die Gegner sichern Vorteile auf Bot, der erste Turm fällt."] }
+    ]
+  },
+  {
+    "id": "mid_gold_03", "phase": "Mid-Game", "gameTime": "14:30", "timeLimit": 45,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Gold",
+    "markers": [
+      { "x": 60, "y": 42, "type": "hero", "isPlayer": true, "label": "Ahri" },
+      { "x": 74, "y": 26, "type": "objective", "label": "Innerer Turm" },
+      { "x": 86, "y": 70, "type": "hero", "label": "Jungler" }
+    ],
+    "coachHint": "Ein toter Gegner ist ein Zeitfenster. Was kannst du in dieser Zeit am meisten Wert holen?",
+    "context": "Du bist Ahri (Mid). Euer Team hat den äußeren Mid-Turm zerstört und Katarina ist gestorben, sie hat noch etwa 20 Sekunden Respawnzeit. Deine Welle schiebt auf den inneren Turm zu, dein Jungler ist auf der Bot-Seite.",
+    "options": [
+      { "label": "A: Zum Dschungel rotieren und Camps farmen, die Mid-Lane ignorieren.", "lpChange": -10, "nextId": "mid_gold_04", "feedback": "Du verschenkst das Zeitfenster, in dem Mid frei ist.", "chain": ["Du lässt das freie Mid ungenutzt.", "Katarina kehrt zurück, Mid-Druck bleibt aus."] },
+      { "label": "B: Ohne Vision tief in den gegnerischen Dschungel laufen, um Katarina zu jagen.", "lpChange": -15, "nextId": "mid_gold_04", "feedback": "Falle! Blindes Jagen kostet dich Leben und Tempo.", "chain": ["Du läufst blind in den Dschungel und wirst gefangen.", "Euer Team verliert Mid-Prio, Katarina bekommt Tempo."] },
+      { "label": "C: Die Welle in den inneren Turm drücken und Turmschaden mitnehmen, solange Katarina tot ist.", "lpChange": 20, "nextId": "mid_gold_04", "feedback": "Perfekt! Du verwandelst ihren Tod in Druck auf den Turm." }
+    ]
+  },
+  {
+    "id": "mid_gold_04", "phase": "Teamfight Setup", "gameTime": "21:00", "timeLimit": 45,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Gold",
+    "markers": [
+      { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Ahri" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 74, "y": 82, "type": "hero", "label": "Team" },
+      { "x": 80, "y": 66, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Eine große Welle kostet Zeit, bringt aber Gold. Wie kommst du rechtzeitig zum Team, ohne sie zu verlieren?",
+    "context": "Du bist Ahri (Mid). Die Gegner sammeln sich auf der Bot-Seite für den Drachen und Katarina ist nicht auf der Karte zu sehen. Deine Welle ist groß, dein Team wartet auf dich.",
+    "options": [
+      { "label": "A: Die Welle liegen lassen und sofort zum Drachen rennen.", "lpChange": -5, "nextId": "mid_gold_05", "feedback": "Du kommst früh, aber die Welle und ihr Gold sind verloren.", "chain": ["Du kommst früh, aber Welle und Gold gehen verloren.", "Dem Team fehlt der Wellenvorteil für den Drachenkampf."] },
+      { "label": "B: Ohne Vision allein in den Dschungel gehen, um Katarina zu finden.", "lpChange": -15, "nextId": "mid_gold_05", "feedback": "Falle! Allein und ohne Vision läufst du direkt in einen Pick.", "chain": ["Allein und ohne Vision wirst du gepickt.", "Euer Team kämpft den Drachen in Unterzahl."] },
+      { "label": "C: Die Welle schnell clearen und dann zum Team rotieren, bevor der Drache startet.", "lpChange": 20, "nextId": "mid_gold_05", "feedback": "Stark! Du verbindest Wave-Management mit pünktlicher Rotation." }
+    ]
+  },
+  {
+    "id": "mid_gold_05", "phase": "Late-Game", "gameTime": "35:00", "timeLimit": 45,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Gold",
+    "markers": [
+      { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Ahri" },
+      { "x": 42, "y": 45, "type": "hero", "label": "Team" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 70, "y": 40, "type": "enemy", "label": "Gegner (3)" }
+    ],
+    "coachHint": "Tote Gegner sind ein Zeitfenster, das sich von selbst schließt. Welches Objective ist jetzt am wertvollsten?",
+    "context": "Du bist Ahri (Mid). Euer Team führt bei den Türmen und der Baron ist verfügbar. Katarina und der gegnerische Support sind gestorben und haben noch rund 40 Sekunden Respawnzeit.",
+    "options": [
+      { "label": "A: Sofort den Baron starten und das Team dazupingen, solange zwei Gegner tot sind.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nutzt die Respawnzeit der Gegner für das größte Objective." },
+      { "label": "B: Den Mid-Inhibitor angreifen und den Baron ignorieren.", "lpChange": -5, "nextId": "end", "feedback": "Solide, aber du lässt das wertvollere Objective liegen.", "chain": ["Du lässt den Baron liegen, die Gegner kehren zurück.", "Euer Team gibt das wertvollste Objective ab."] },
+      { "label": "C: Auf den Respawn der Gegner warten und dann gemeinsam entscheiden.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Das Zeitfenster schließt sich, sobald die Gegner zurück sind.", "chain": ["Die Gegner respawnen und das Fenster ist weg.", "Euer Team verliert Baron und Tempo."] }
+    ]
+  },
+
+  /* ===== Match 4: Botlane, Eisen (Jinx) ===== */
+  {
+    "id": "bot_eisen_01", "phase": "Early Laning", "gameTime": "04:20", "timeLimit": 30,
+    "champion": "Jinx", "role": "Botlane", "difficulty": "Eisen",
+    "markers": [
+      { "x": 56, "y": 92, "type": "hero", "isPlayer": true, "label": "Jinx" },
+      { "x": 48, "y": 92, "type": "hero", "label": "Lulu" },
+      { "x": 68, "y": 92, "type": "enemy", "label": "Caitlyn" },
+      { "x": 74, "y": 92, "type": "enemy", "label": "Leona" },
+      { "x": 62, "y": 78, "type": "objective", "label": "Fluss-Busch" }
+    ],
+    "coachHint": "Deine Vasallen schützen dich. Wo stehst du am sichersten, wenn Caitlyn mit ihrer Reichweite angreift?",
+    "context": "Du bist Jinx (Bot) mit Lulu an deiner Seite gegen Caitlyn und Leona. Level 3, die Wellen sind gleich groß. Ihr habt keine Vision im Fluss und Caitlyn läuft auf dich zu, um dich zu harassen.",
+    "options": [
+      { "label": "A: Nach vorn laufen und Caitlyn aggressiv jagen.", "lpChange": -15, "nextId": "bot_eisen_02", "feedback": "Falle! Ohne Vision läufst du in Leonas Reichweite, ein typischer Anfängerfehler.", "chain": ["Du läufst ohne Vision in Leonas Reichweite.", "Lulu steht allein, ihr verliert Kill und Turm-Druck."] },
+      { "label": "B: Hinter den eigenen Vasallen bleiben, Wellen farmen und im Fluss einen Ward setzen.", "lpChange": 20, "nextId": "bot_eisen_02", "feedback": "Perfekt! Du farmst sicher und gewinnst Vision gegen Ganks." },
+      { "label": "C: Im Busch warten und gar nicht farmen, bis der Gegner geht.", "lpChange": -5, "nextId": "bot_eisen_02", "feedback": "Du verlierst Gold und Level, ohne etwas zu gewinnen.", "chain": ["Du verlierst Gold und Level ohne Gewinn.", "Die Gegner übernehmen die Lane und den Wellenstand."] }
+    ]
+  },
+  {
+    "id": "bot_eisen_02", "phase": "First Objective", "gameTime": "08:30", "timeLimit": 30,
+    "champion": "Jinx", "role": "Botlane", "difficulty": "Eisen",
+    "markers": [
+      { "x": 62, "y": 82, "type": "hero", "isPlayer": true, "label": "Jinx" },
+      { "x": 56, "y": 84, "type": "hero", "label": "Lulu" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 74, "y": 90, "type": "enemy", "label": "Gegner Bot" },
+      { "x": 28, "y": 20, "type": "hero", "label": "Jungler" }
+    ],
+    "coachHint": "Ein Objective ohne Vision und Jungler ist ein Glücksspiel. Was fehlt euch, bevor ihr den Drachen startet?",
+    "context": "Du bist Jinx (Bot) mit Lulu. Level 6, der erste Drache ist verfügbar und noch niemand hat ihn angefangen. Euer Jungler ist auf der Top-Seite unterwegs, die gegnerische Botlane steht bei ihrem Turm und niemand hat Vision am Drachen.",
+    "options": [
+      { "label": "A: Vision am Drachen setzen und auf den Jungler warten, bevor ihr startet.", "lpChange": 20, "nextId": "bot_eisen_03", "feedback": "Perfekt! Erst Vision und Jungler, dann das Objective." },
+      { "label": "B: Allein zum Drachen laufen und ihn starten, solange niemand zu sehen ist.", "lpChange": -15, "nextId": "bot_eisen_03", "feedback": "Falle! Ohne Vision und Jungler läufst du in den Gegner-Engage.", "chain": ["Du läufst ohne Vision in den Gegner-Engage.", "Euer Jungler verliert den Drachen und die Botlane einen Spieler."] },
+      { "label": "C: In der Lane bleiben und den Drachen komplett ignorieren.", "lpChange": -10, "nextId": "bot_eisen_03", "feedback": "Du gibst ein Objective ohne Gegenwehr her.", "chain": ["Du gibst ein Objective ohne Gegenwehr her.", "Die Gegner nehmen den Drachen kampflos."] }
+    ]
+  },
+  {
+    "id": "bot_eisen_03", "phase": "Mid-Game", "gameTime": "12:40", "timeLimit": 30,
+    "champion": "Jinx", "role": "Botlane", "difficulty": "Eisen",
+    "markers": [
+      { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Jinx" },
+      { "x": 50, "y": 50, "type": "hero", "label": "Team" },
+      { "x": 46, "y": 42, "type": "enemy", "label": "Gegner" },
+      { "x": 86, "y": 90, "type": "objective", "label": "Gegner-Turm" }
+    ],
+    "coachHint": "Eine Welle ist Gold und Druck. Wie kommst du zum Team, ohne sie zu verschenken?",
+    "context": "Du bist Jinx (Bot). Level 10, deine Welle ist groß und schiebt auf den gegnerischen Turm zu. Dein Team sammelt sich in der Mitte und ruft nach dir, die Gegner stehen dort bereit.",
+    "options": [
+      { "label": "A: Weiter Platten farmen und das Team ignorieren.", "lpChange": -10, "nextId": "bot_eisen_04", "feedback": "Dein Team kämpft in Unterzahl, während du allein Gold sammelst.", "chain": ["Dein Team kämpft in Unterzahl.", "Die Gegner gewinnen den Kampf und die Mitte."] },
+      { "label": "B: Sofort zur Mitte laufen und die große Welle liegen lassen.", "lpChange": -5, "nextId": "bot_eisen_04", "feedback": "Du kommst früh, verlierst aber die Welle und ihr Gold.", "chain": ["Du verlierst die große Welle samt Gold.", "Dein Team bekommt Hilfe, aber ihr verliert Ressourcen auf Bot."] },
+      { "label": "C: Die Welle in den Turm drücken und dann zum Team rotieren.", "lpChange": 20, "nextId": "bot_eisen_04", "feedback": "Perfekt! Du verbindest Wave-Management mit pünktlicher Rotation." }
+    ]
+  },
+  {
+    "id": "bot_eisen_04", "phase": "Teamfight Setup", "gameTime": "16:10", "timeLimit": 30,
+    "champion": "Jinx", "role": "Botlane", "difficulty": "Eisen",
+    "markers": [
+      { "x": 62, "y": 70, "type": "hero", "isPlayer": true, "label": "Jinx" },
+      { "x": 50, "y": 52, "type": "hero", "label": "Team" },
+      { "x": 44, "y": 42, "type": "enemy", "label": "Gegner (5)" }
+    ],
+    "coachHint": "Als ADC bist du Schadensquelle, nicht Frontlinie. Wo musst du stehen, damit du lange schießen kannst?",
+    "context": "Du bist Jinx (Bot). Ein 5v5-Teamkampf bricht in der Mitte aus. Du stehst hinter deinem Team, euer Tank geht nach vorn und die gegnerische Frontlinie kommt langsam auf euch zu.",
+    "options": [
+      { "label": "A: Hinter dem Team bleiben und immer das nächste Ziel in Reichweite beschießen.", "lpChange": 20, "nextId": "bot_eisen_05", "feedback": "Perfekt! Du machst Schaden und bleibst am Leben." },
+      { "label": "B: Als Erste in die Gegner laufen und den Tank angreifen.", "lpChange": -15, "nextId": "bot_eisen_05", "feedback": "Falle! Allein vorn stirbst du als Erste und dein Team verliert den Kampf.", "chain": ["Du stirbst als Erste, bevor du Schaden machst.", "Dem Team fehlt der Hauptschaden und der Kampf geht verloren."] },
+      { "label": "C: Dem Kampf fernbleiben und weiter Wellen farmen.", "lpChange": -10, "nextId": "bot_eisen_05", "feedback": "Dein Team kämpft ohne deinen Schaden und verliert.", "chain": ["Dein Team kämpft ohne deinen Schaden.", "Die Gegner gewinnen den 5v4 ohne Probleme."] }
+    ]
+  },
+  {
+    "id": "bot_eisen_05", "phase": "Late-Game", "gameTime": "29:00", "timeLimit": 30,
+    "champion": "Jinx", "role": "Botlane", "difficulty": "Eisen",
+    "markers": [
+      { "x": 55, "y": 60, "type": "hero", "isPlayer": true, "label": "Jinx" },
+      { "x": 50, "y": 52, "type": "hero", "label": "Team" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 80, "y": 30, "type": "enemy", "label": "Gegner (2)" }
+    ],
+    "coachHint": "Ein gewonnener Teamkampf ist ein Zeitfenster. Was ist das wertvollste Ziel, das ihr gerade nehmen könnt?",
+    "context": "Du bist Jinx (Bot). Euer Team hat einen Teamkampf gewonnen und drei Gegner sind tot. Du hast 1800 Gold im Inventar, deine Ultimate ist ready und der Baron ist verfügbar.",
+    "options": [
+      { "label": "A: Allein dem letzten flüchtenden Gegner hinterherjagen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Allein zu jagen ist ein Anfängerfehler, du läufst in eine Falle.", "chain": ["Du läufst allein in eine Falle.", "Euer Team startet den Baron ohne dich und verliert das Fenster."] },
+      { "label": "B: Zurück zur Base gehen und Items kaufen, bevor es weitergeht.", "lpChange": -5, "nextId": "end", "feedback": "Das Zeitfenster geht verloren. Einkaufen kannst du auch nach dem Baron.", "chain": ["Das Zeitfenster am Baron geht verloren.", "Die Gegner respawnen und gewinnen die Kontrolle zurück."] },
+      { "label": "C: Mit dem Team den Baron starten, solange drei Gegner tot sind.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nutzt das Zeitfenster für das größte Objective." }
+    ]
+  },
+
+  /* ===== Match 5: Toplane, Bronze (Jax) ===== */
+  {
+    "id": "top_bronze_01", "phase": "Early Laning", "gameTime": "03:10", "timeLimit": 30,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 10, "y": 56, "type": "hero", "isPlayer": true, "label": "Jax" },
+      { "x": 10, "y": 44, "type": "enemy", "label": "Garen" },
+      { "x": 7, "y": 64, "type": "objective", "label": "Eigener Turm" }
+    ],
+    "coachHint": "Was kann Jax tun, wenn Garen mit Autoangriffen auf ihn zuläuft? Denk an Counter Strike.",
+    "context": "Du bist Jax (Top) gegen Garen. Level 3, die Wellen sind gleich groß. Garen läuft mit Autoangriffen auf dich zu, um zu traden. Counter Strike (E) ist ready.",
+    "options": [
+      { "label": "A: Counter Strike nutzen, wenn Garen angreift, und danach selbst traden.", "lpChange": 20, "nextId": "top_bronze_02", "feedback": "Perfekt! Counter Strike weicht seinen Autoangriffen aus und stunnt ihn." },
+      { "label": "B: Sofort zurückweichen und die Welle abgeben.", "lpChange": -5, "nextId": "top_bronze_02", "feedback": "Zu passiv. Dein Konter ist bereit, aber du verlierst Erfahrung.", "chain": ["Du gibst Welle und Erfahrung ab, obwohl Counter Strike ready ist.", "Garen baut Prio auf, dein Jungler muss Top helfen."] },
+      { "label": "C: Alle Fähigkeiten einsetzen, bevor Garen in Reichweite ist.", "lpChange": -15, "nextId": "top_bronze_02", "feedback": "Falle! Ohne Counter Strike hast du nichts mehr, wenn er angreift.", "chain": ["Du hast keine Fähigkeit mehr, wenn Garen angreift.", "Garen gewinnt den Trade und die Lane."] }
+    ]
+  },
+  {
+    "id": "top_bronze_02", "phase": "First Objective", "gameTime": "08:20", "timeLimit": 30,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 14, "y": 50, "type": "hero", "isPlayer": true, "label": "Jax" },
+      { "x": 10, "y": 30, "type": "enemy", "label": "Garen" },
+      { "x": 7, "y": 20, "type": "objective", "label": "Gegner-Turm" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache (Team)" }
+    ],
+    "coachHint": "Der Weg zum Drachen ist weit. Wo kannst du dem Team mehr helfen, ohne deine Welle zu verlieren?",
+    "context": "Du bist Jax (Top). Level 6, dein Jungler startet mit der Botlane den Drachen. Du bist weit entfernt, Garen steht neben seinem Turm und deine Welle ist größer als seine.",
+    "options": [
+      { "label": "A: Zu Fuß zum Drachen laufen, um zu helfen.", "lpChange": -10, "nextId": "top_bronze_03", "feedback": "Der Weg ist zu weit: Du verlierst die Welle und kommst zu spät.", "chain": ["Du kommst zu spät und verlierst die Welle.", "Das Team kämpft den Drachen ohne dich, Garen farmt frei."] },
+      { "label": "B: Die große Welle in den Turm drücken und Garen unter Druck setzen, während das Team den Drachen nimmt.", "lpChange": 20, "nextId": "top_bronze_03", "feedback": "Stark! Dein Druck bindet Garen, und das Team hat am Drachen freie Hand." },
+      { "label": "C: In der Lane stehen bleiben und nichts tun.", "lpChange": -5, "nextId": "top_bronze_03", "feedback": "Sicher, aber ohne Druck gewinnst du keinen Tausch.", "chain": ["Du baust keinen Druck auf und gewinnst keinen Tausch.", "Garen kann frei helfen, euer Drachenkampf wird schwerer."] }
+    ]
+  },
+  {
+    "id": "top_bronze_03", "phase": "Mid-Game", "gameTime": "13:40", "timeLimit": 30,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 58, "y": 9, "type": "hero", "isPlayer": true, "label": "Jax" },
+      { "x": 70, "y": 9, "type": "enemy", "label": "Garen" },
+      { "x": 78, "y": 8, "type": "objective", "label": "Gegner-Turm" }
+    ],
+    "coachHint": "Ein Power-Spike hält nicht ewig. Was passiert, wenn Garen sein Item bekommt?",
+    "context": "Du bist Jax (Top). Level 9 mit fertigem ersten Item, Garen hat sein erstes Item noch nicht. Deine Welle steht vor dem gegnerischen Turm, kein Jungler ist in Sicht.",
+    "options": [
+      { "label": "A: Abwarten und farmen, bis auch Garen sein Item hat.", "lpChange": -10, "nextId": "top_bronze_04", "feedback": "Du verschenkst deinen Vorsprung.", "chain": ["Dein Item-Vorsprung verpufft, wenn Garen aufholt.", "Euer Team verliert den Druck auf der Top-Seite."] },
+      { "label": "B: Blind in den gegnerischen Dschungel laufen, um den Jungler zu suchen.", "lpChange": -15, "nextId": "top_bronze_04", "feedback": "Falle! Ohne Vision riskierst du Leben und Welle.", "chain": ["Du läufst blind in den Dschungel und wirst gestellt.", "Euer Team verliert seinen stärksten Seitenlaner."] },
+      { "label": "C: Den Item-Vorsprung nutzen: Welle pushen und Garen unter Druck setzen oder den Turm angreifen.", "lpChange": 20, "nextId": "top_bronze_04", "feedback": "Perfekt! Ein Power-Spike will genutzt werden, bevor der Gegner aufholt." }
+    ]
+  },
+  {
+    "id": "top_bronze_04", "phase": "Teamfight Setup", "gameTime": "22:10", "timeLimit": 30,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Jax" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 42, "y": 40, "type": "hero", "label": "Team" },
+      { "x": 46, "y": 46, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Der Baron wird bald gestartet. Wann ist deine Welle fertig, und wann musst du beim Team sein?",
+    "context": "Du bist Jax (Top). Der Baron ist verfügbar und euer Team sammelt sich dort. Deine Welle steht groß vor dem gegnerischen Turm, die Gegner stehen noch außerhalb der Baron-Grube.",
+    "options": [
+      { "label": "A: Die Welle in den Turm drücken und dann rechtzeitig zum Team gehen.", "lpChange": 20, "nextId": "top_bronze_05", "feedback": "Perfekt! Die Welle bringt Druck, und du bist beim Baron dabei." },
+      { "label": "B: Allein den Baron starten, damit das Team nachkommt.", "lpChange": -15, "nextId": "top_bronze_05", "feedback": "Falle! Allein am Baron verlierst du Leben, und die Gegner kommen.", "chain": ["Du wirst am Baron gestellt, bevor das Team da ist.", "Die Gegner nehmen den Baron und kontern."] },
+      { "label": "C: Auf der Lane bleiben und nicht zum Team gehen.", "lpChange": -10, "nextId": "top_bronze_05", "feedback": "Dein Team startet den Baron ohne dich und verliert den Kampf.", "chain": ["Dein Team startet den Baron ohne dich.", "Der Kampf geht in Unterzahl verloren."] }
+    ]
+  },
+  {
+    "id": "top_bronze_05", "phase": "Late-Game", "gameTime": "29:30", "timeLimit": 30,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Jax" },
+      { "x": 42, "y": 45, "type": "hero", "label": "Team" },
+      { "x": 55, "y": 40, "type": "enemy", "label": "Gegner (5)" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" }
+    ],
+    "coachHint": "Wer zuerst seine Fähigkeiten verbrennt, verliert den Kampf. Worauf wartest du als Jax?",
+    "context": "Du bist Jax (Top). Ein 5v5-Teamkampf steht bevor: Die Gegner haben einen Magier mit Stun und einen ADC hinter ihrer Frontlinie. Dein Team wartet auf dein Zeichen. Leap Strike und Counter Strike sind ready.",
+    "options": [
+      { "label": "A: Als Erster in die Gegner springen, bevor ihre Fähigkeiten verbraucht sind.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Du wirst gestunnt und stirbst, ohne Schaden zu machen.", "chain": ["Der Magier stunnt dich und du stirbst ohne Schaden.", "Euer Team verliert den Engage und den Teamkampf."] },
+      { "label": "B: Warten, bis ihr Stun verbraucht ist, dann mit Leap Strike und Counter Strike auf die Backline gehen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Erst ihre Kontrolle abwarten, dann eingehen." },
+      { "label": "C: Hinter dem Team stehen bleiben und nicht kämpfen.", "lpChange": -10, "nextId": "end", "feedback": "Dein Team verliert ohne dich den Kampf.", "chain": ["Du machst keinen Schaden und bindest keine Gegner.", "Euer Team verliert den Kampf in Unterzahl."] }
+    ]
+  },
+
+  /* ===== Match 6: Support, Silber (Thresh) ===== */
+  {
+    "id": "sup_silber_01", "phase": "Early Laning", "gameTime": "03:20", "timeLimit": 35,
+    "champion": "Thresh", "role": "Support", "difficulty": "Silber",
+    "markers": [
+      { "x": 68, "y": 92, "type": "hero", "isPlayer": true, "label": "Thresh" },
+      { "x": 62, "y": 92, "type": "hero", "label": "Ashe (ADC)" },
+      { "x": 80, "y": 92, "type": "enemy", "label": "Lux" },
+      { "x": 86, "y": 92, "type": "enemy", "label": "Caitlyn" }
+    ],
+    "coachHint": "Der Haken ist nur gut, wenn er sein Ziel erreicht. Was steht in der Schusslinie?",
+    "context": "Du bist Thresh (Support) mit Ashe gegen Lux und Caitlyn. Level 2. Zwischen dir und Lux stehen Vasallen in der Schusslinie, Lux hat ihre Bindung ready.",
+    "options": [
+      { "label": "A: Den Haken trotzdem werfen, damit Lux Druck spürt.", "lpChange": -10, "nextId": "sup_silber_02", "feedback": "Der Haken trifft einen Vasallen und liegt auf Abklingzeit.", "chain": ["Der Haken trifft einen Vasallen und liegt auf Abklingzeit.", "Ashe verliert den Trade, die Gegner farmen frei."] },
+      { "label": "B: Den Haken zurückhalten, bis die Schusslinie frei ist, und nach einem Treffer mit Ashe traden.", "lpChange": 20, "nextId": "sup_silber_02", "feedback": "Perfekt! Ein Treffer auf freier Linie entscheidet die Lane." },
+      { "label": "C: Hinter Ashe laufen und keine Fähigkeit einsetzen.", "lpChange": -5, "nextId": "sup_silber_02", "feedback": "Du gibst Druck ab und verlierst die Lane-Kontrolle.", "chain": ["Du gibst Druck ab und verlierst die Lane-Kontrolle.", "Caitlyn und Lux bauen einen Vorsprung auf."] }
+    ]
+  },
+  {
+    "id": "sup_silber_02", "phase": "First Objective", "gameTime": "07:40", "timeLimit": 35,
+    "champion": "Thresh", "role": "Support", "difficulty": "Silber",
+    "markers": [
+      { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Thresh" },
+      { "x": 60, "y": 88, "type": "hero", "label": "Ashe (ADC)" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" }
+    ],
+    "coachHint": "Wenn die Gegner weg sind, ist das dein Zeitfenster. Was braucht ihr, bevor ihr den Drachen startet?",
+    "context": "Du bist Thresh (Support) mit Ashe. Der Drache ist verfügbar, euer Jungler (Viego) pingt ihn an. Die gegnerische Botlane hat gerade zurückgesetzt und eure Welle ist gecrasht.",
+    "options": [
+      { "label": "A: Mit Ashe zum Drachen gehen, solange die Gegner weg sind, und zuerst Vision am Pit setzen.", "lpChange": 20, "nextId": "sup_silber_03", "feedback": "Perfekt! Ihr nutzt das Fenster mit Vision im Rücken." },
+      { "label": "B: Allein vorlaufen, um den Dschungel zu checken, ohne Ashe.", "lpChange": -10, "nextId": "sup_silber_03", "feedback": "Falle! Allein bist du leichte Beute.", "chain": ["Allein bist du leichte Beute für einen Pick.", "Ashe und der Jungler starten den Drachen ohne Support."] },
+      { "label": "C: In der Lane bleiben und den Jungler allein lassen.", "lpChange": -5, "nextId": "sup_silber_03", "feedback": "Du verschenkst das Zeitfenster, in dem die Gegner nicht da sind.", "chain": ["Das Zeitfenster ohne Gegner verstreicht.", "Euer Jungler startet den Drachen ohne Hilfe."] }
+    ]
+  },
+  {
+    "id": "sup_silber_03", "phase": "Mid-Game", "gameTime": "13:10", "timeLimit": 35,
+    "champion": "Thresh", "role": "Support", "difficulty": "Silber",
+    "markers": [
+      { "x": 60, "y": 62, "type": "hero", "isPlayer": true, "label": "Thresh" },
+      { "x": 74, "y": 88, "type": "hero", "label": "Ashe (ADC)" },
+      { "x": 60, "y": 40, "type": "hero", "label": "Ahri (Mid)" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Nocturne" }
+    ],
+    "coachHint": "Eine Rotation lohnt sich, wenn deine Lane sicher ist. Was lässt du zurück, und was gewinnst du?",
+    "context": "Du bist Thresh (Support) mit Ashe. Eure Botlane hat die Welle in den gegnerischen Turm geschoben und die Gegner sind zurückgesetzt. Dein Mid (Ahri) pingt um Hilfe, weil Nocturne in der Mitte aufgetaucht ist.",
+    "options": [
+      { "label": "A: Bei Ashe bleiben und den Ping ignorieren.", "lpChange": -10, "nextId": "sup_silber_04", "feedback": "Ahri verliert ihre Lane und du verschenkst Tempo.", "chain": ["Ahri verliert ihre Lane gegen Nocturne.", "Euer Team verliert Mid-Prio und Tempo."] },
+      { "label": "B: Die Welle gecrasht lassen, mit einer Ward zur Mitte rotieren und Ahri helfen.", "lpChange": 20, "nextId": "sup_silber_04", "feedback": "Stark! Die Rotation ist sicher, weil deine Lane gecrasht ist." },
+      { "label": "C: Ohne Vision tief in die Mitte laufen, um Nocturne zu jagen.", "lpChange": -15, "nextId": "sup_silber_04", "feedback": "Falle! Blindes Jagen kostet dich Leben und Tempo.", "chain": ["Du läufst blind in Nocturne und stirbst.", "Ashe steht ohne Support, Mid verliert den Roam."] }
+    ]
+  },
+  {
+    "id": "sup_silber_04", "phase": "Teamfight Setup", "gameTime": "21:30", "timeLimit": 35,
+    "champion": "Thresh", "role": "Support", "difficulty": "Silber",
+    "markers": [
+      { "x": 36, "y": 36, "type": "hero", "isPlayer": true, "label": "Thresh" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 42, "y": 42, "type": "hero", "label": "Team" },
+      { "x": 48, "y": 40, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Vision gewinnt Objectives. Wann ist dein Haken am wertvollsten?",
+    "context": "Du bist Thresh (Support). Der Baron ist verfügbar und euer Team sammelt sich am Eingang. Ihr habt keine Vision im Baron-Bereich, die Gegner stehen im Fluss.",
+    "options": [
+      { "label": "A: Als Erster in die Baron-Grube gehen und blind Haken werfen.", "lpChange": -15, "nextId": "sup_silber_05", "feedback": "Falle! Ohne Vision verlierst du den Haken und dein Team den Kampf.", "chain": ["Dein Haken trifft nichts und du stirbst in der Grube.", "Euer Team kämpft ohne Support und verliert den Baron."] },
+      { "label": "B: Vision im Eingang und Fluss setzen und den Haken für ihren Engage aufheben.", "lpChange": 20, "nextId": "sup_silber_05", "feedback": "Perfekt! Mit Vision und Haken kontrollierst du den Kampf." },
+      { "label": "C: Hinten bleiben und gar keine Vision setzen.", "lpChange": -10, "nextId": "sup_silber_05", "feedback": "Ohne Vision geht dein Team blind in den Kampf.", "chain": ["Ohne Vision geht dein Team blind in den Kampf.", "Die Gegner überraschen euch und stehlen den Baron."] }
+    ]
+  },
+  {
+    "id": "sup_silber_05", "phase": "Late-Game", "gameTime": "28:50", "timeLimit": 35,
+    "champion": "Thresh", "role": "Support", "difficulty": "Silber",
+    "markers": [
+      { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Thresh" },
+      { "x": 46, "y": 50, "type": "hero", "label": "Ashe (ADC)" },
+      { "x": 58, "y": 42, "type": "enemy", "label": "Assassine" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" }
+    ],
+    "coachHint": "Dein ADC macht den Schaden. Wann schützt du sie, und wann gehst du ein?",
+    "context": "Du bist Thresh (Support) mit Ashe. Ein 5v5-Teamkampf am Drachen beginnt. Die Gegner haben einen Assassinen, der auf Ashe springen will. Haken, Flay und Box sind ready.",
+    "options": [
+      { "label": "A: Den Haken sofort auf den gegnerischen Tank werfen und Ashe ungeschützt lassen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Der Assassine tötet Ashe, und euer Schaden fällt aus.", "chain": ["Der Assassine tötet Ashe sofort.", "Euer Schaden fällt aus, der Teamkampf geht verloren."] },
+      { "label": "B: Die Box sofort in die Mitte werfen, bevor der Kampf beginnt.", "lpChange": -5, "nextId": "end", "feedback": "Ohne Engage der Gegner verbrennst du deinen stärksten Cooldown.", "chain": ["Deine Box ist weg, wenn die Gegner angreifen.", "Dem Team fehlen Engage-Schutz und Kontrolle."] },
+      { "label": "C: Flay und Haken für den Assassinen aufheben, um Ashe zu schützen, und die Box beim Engage nutzen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Peel für den Carry gewinnt Teamkämpfe." }
+    ]
+  },
+
+  /* ===== Match 7: Jungle, Platin (Lee Sin) ===== */
+  {
+    "id": "jng_platin_01", "phase": "Early Laning", "gameTime": "03:40", "timeLimit": 45,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Platin",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
+      { "x": 62, "y": 38, "type": "hero", "label": "Ahri" },
+      { "x": 70, "y": 30, "type": "enemy", "label": "Syndra" },
+      { "x": 60, "y": 56, "type": "objective", "label": "Fluss-Busch" }
+    ],
+    "coachHint": "Ein Gank klappt, wenn der Gegner vorlaufen musste. In welche Richtung schiebt die Welle?",
+    "context": "Du bist Lee Sin (Jungle). Level 3. Deine Midlane Ahri hat Prio, aber Syndra steht sicher an ihrem Turm. Die Welle schiebt gerade zu euch zurück.",
+    "options": [
+      { "label": "A: Warten, bis die Welle bei Ahri ankommt und Syndra dadurch vom Turm weg ist, dann von hinten ganken.", "lpChange": 20, "nextId": "jng_platin_02", "feedback": "Perfekt! Wellenstand und Position entscheiden über den Gank." },
+      { "label": "B: Sofort ganken, solange Syndra noch am Turm steht.", "lpChange": -15, "nextId": "jng_platin_02", "feedback": "Falle! Unter dem Turm kann sie fliehen, und du verlierst Tempo.", "chain": ["Syndra flieht unter den Turm, der Gank scheitert.", "Ahri verliert Leben, ihr verliert Tempo."] },
+      { "label": "C: Weiter Camps farmen und Ahri allein lassen.", "lpChange": -5, "nextId": "jng_platin_02", "feedback": "Sicher, aber du verschenkst ein gutes Gank-Fenster.", "chain": ["Du verschenkst ein gutes Gank-Fenster.", "Ahri bleibt allein gegen Syndra und verliert Prio."] }
+    ]
+  },
+  {
+    "id": "jng_platin_02", "phase": "First Objective", "gameTime": "08:50", "timeLimit": 45,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Platin",
+    "markers": [
+      { "x": 30, "y": 28, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
+      { "x": 22, "y": 24, "type": "objective", "label": "Gegner-Camps" },
+      { "x": 80, "y": 88, "type": "fog", "label": "Nocturne vor etwa 20 s bei der Botlane gesehen" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" }
+    ],
+    "coachHint": "Wenn der gegnerische Jungler auf der anderen Seite gebunden ist, was ist dann auf deiner Seite frei?",
+    "context": "Du bist Lee Sin (Jungle). Nocturne wurde vor etwa 20 Sekunden bei der Botlane gesehen, seine Camps auf der Top-Seite sind frei. Euer Team hat Vision im gegnerischen Dschungel.",
+    "options": [
+      { "label": "A: Die gegnerischen Camps auf der Top-Seite nehmen, solange Nocturne Bot gebunden ist.", "lpChange": 20, "nextId": "jng_platin_03", "feedback": "Stark! Counter-Jungling nutzt, dass Nocturne weit weg ist." },
+      { "label": "B: Zu Nocturne auf die Bot-Seite laufen und ihn stellen.", "lpChange": -15, "nextId": "jng_platin_03", "feedback": "Falle! Du läufst blind in seinen Gank und lässt freie Camps liegen.", "chain": ["Du läufst blind in seinen Gank und lässt freie Camps liegen.", "Nocturne bekommt Tempo, euer Team verliert Dschungelkontrolle."] },
+      { "label": "C: Nur die eigenen Camps farmen und nichts riskieren.", "lpChange": -5, "nextId": "jng_platin_03", "feedback": "Sicher, aber du ignorierst, dass der gegnerische Dschungel frei ist.", "chain": ["Du ignorierst den freien gegnerischen Dschungel.", "Die Gegner behalten ihre Ressourcen."] }
+    ]
+  },
+  {
+    "id": "jng_platin_03", "phase": "Mid-Game", "gameTime": "14:20", "timeLimit": 45,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Platin",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
+      { "x": 60, "y": 60, "type": "hero", "label": "Team" },
+      { "x": 70, "y": 40, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Lee Sin ist in der Mitte des Spiels stark, danach fällt er ab. Wie nutzt du das?",
+    "context": "Du bist Lee Sin (Jungle). Level 10. Das gegnerische Team hat starke Scaling-Carries, euer Team hat leichte Mid-Prio. Die Gegner haben keine Vision auf eurer Seite.",
+    "options": [
+      { "label": "A: Passiv farmen und aufs Late Game warten.", "lpChange": -10, "nextId": "jng_platin_04", "feedback": "Du wartest, während die Gegner stärker werden.", "chain": ["Die Gegner skalieren, während du wartest.", "Euer Team verschenkt den Tempo-Vorteil der Mid-Phase."] },
+      { "label": "B: Tempo erzwingen: Mit der Mid-Prio einen Pick suchen und ein Objective nehmen, bevor die Gegner skalieren.", "lpChange": 20, "nextId": "jng_platin_04", "feedback": "Perfekt! Lee Sin gewinnt, wenn er das Tempo vorgibt." },
+      { "label": "C: Allein ohne Vision tief in den gegnerischen Dschungel laufen.", "lpChange": -15, "nextId": "jng_platin_04", "feedback": "Falle! Allein und blind verlierst du Leben und Tempo.", "chain": ["Du wirst allein und blind gestellt.", "Euer Team verliert Jungler und Mid-Prio."] }
+    ]
+  },
+  {
+    "id": "jng_platin_04", "phase": "Teamfight Setup", "gameTime": "23:10", "timeLimit": 45,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Platin",
+    "markers": [
+      { "x": 35, "y": 32, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 42, "y": 42, "type": "hero", "label": "Team" },
+      { "x": 48, "y": 38, "type": "enemy", "label": "Nocturne" }
+    ],
+    "coachHint": "Ein Steal entscheidet sich im Smite-Timing. Was musst du vorher sichern?",
+    "context": "Du bist Lee Sin (Jungle). Euer Team schlägt den Baron, er hat noch etwa 25 % Leben. Nocturne steht mit bereiter Ultimate in der Nähe und könnte stehlen. Dein Smite ist ready.",
+    "options": [
+      { "label": "A: Sofort smiten und dich ohne Vision auf Nocturnes Seite positionieren.", "lpChange": -15, "nextId": "jng_platin_05", "feedback": "Falle! Er fällt über dich her oder stiehlt den Baron.", "chain": ["Nocturne fällt über dich her oder stiehlt den Baron.", "Euer Team verliert den Baron nach einem langen Kampf."] },
+      { "label": "B: Vision im Eingang sichern und den Smite genau zum Kill-Zeitpunkt auf den Baron setzen.", "lpChange": 20, "nextId": "jng_platin_05", "feedback": "Perfekt! Mit Vision und Timing gehört der Baron euch." },
+      { "label": "C: Den Smite aufsparen und alles dem ADC überlassen.", "lpChange": -10, "nextId": "jng_platin_05", "feedback": "Wer nicht smitet, riskiert den Steal.", "chain": ["Ohne deinen Smite kann der Baron gestohlen werden.", "Ein Steal gibt den Baron an die Gegner."] }
+    ]
+  },
+  {
+    "id": "jng_platin_05", "phase": "Late-Game", "gameTime": "31:40", "timeLimit": 45,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Platin",
+    "markers": [
+      { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Lee Sin" },
+      { "x": 46, "y": 50, "type": "hero", "label": "Team" },
+      { "x": 60, "y": 40, "type": "enemy", "label": "Jinx (Carry)" },
+      { "x": 58, "y": 46, "type": "enemy", "label": "Tank" }
+    ],
+    "coachHint": "Der Kick ist dein stärkster Engage. Wen willst du wohin schicken?",
+    "context": "Du bist Lee Sin (Jungle). Ein 5v5-Teamkampf beginnt. Der gegnerische Carry (Jinx) steht hinter ihrem Tank, dein Team wartet auf deinen Engage. Dragon's Rage (R) ist ready.",
+    "options": [
+      { "label": "A: Den Tank kicken, weil er am nächsten steht.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Der Kick bringt dir nichts, und Jinx schießt weiter.", "chain": ["Jinx bleibt unberührt und schießt weiter.", "Euer Team verliert den Engage und den Teamkampf."] },
+      { "label": "B: Den Kick für später aufheben und abwarten.", "lpChange": -5, "nextId": "end", "feedback": "Dein Team wartet, und der Kampf kippt ohne Engage.", "chain": ["Dein Team wartet auf einen Engage, der nicht kommt.", "Die Gegner starten den Kampf zu ihren Bedingungen."] },
+      { "label": "C: Den Carry mit dem Kick in euer Team treten und danach die Backline jagen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ein Kick auf den Carry entscheidet den Kampf." }
+    ]
+  },
+
+  /* ===== Match 8: Midlane, Master+ (Ahri) ===== */
+  {
+    "id": "mid_master_01", "phase": "Early Laning", "gameTime": "03:50", "timeLimit": 60,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 58, "y": 42, "type": "hero", "isPlayer": true, "label": "Ahri" },
+      { "x": 64, "y": 36, "type": "enemy", "label": "Viktor" },
+      { "x": 20, "y": 25, "type": "fog", "label": "Gegnerischer Jungler zuletzt vor 25 s Topside gesehen" }
+    ],
+    "coachHint": "Wann ist eine Welle für einen Recall am besten gesetzt?",
+    "context": "Du bist Ahri (Mid) gegen Viktor. Level 4 mit 1050 Gold. Deine Welle ist gleichauf, Viktor hat Flash, der gegnerische Jungler wurde zuletzt Top gesehen. Du willst recallen.",
+    "options": [
+      { "label": "A: Sofort recallen, während die Welle zwischen den Lanes steht.", "lpChange": -10, "nextId": "mid_master_02", "feedback": "Du verlierst Welle, Erfahrung und Gold.", "chain": ["Du verlierst Welle, Erfahrung und Gold.", "Viktor bekommt Wellenvorteil und Prio."] },
+      { "label": "B: Die Welle zwei Wellen lang langsam aufbauen (Slow Push), in den Turm crashen und dann recallen.", "lpChange": 20, "nextId": "mid_master_02", "feedback": "Perfekt! Die gecrashte Welle deckt deine Abwesenheit." },
+      { "label": "C: Hart pushen und danach tief stehen bleiben, um mehr Schaden zu machen.", "lpChange": -15, "nextId": "mid_master_02", "feedback": "Falle! Tief im Gegnerfeld bist du ohne Info über den Jungler verwundbar.", "chain": ["Du stehst tief ohne Info über den Jungler.", "Der Jungler gankt dich, Mid fällt zurück."] }
+    ]
+  },
+  {
+    "id": "mid_master_02", "phase": "First Objective", "gameTime": "09:30", "timeLimit": 60,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 62, "y": 38, "type": "hero", "isPlayer": true, "label": "Ahri" },
+      { "x": 68, "y": 32, "type": "enemy", "label": "Viktor" },
+      { "x": 50, "y": 56, "type": "hero", "label": "Lee Sin (Jungler)" }
+    ],
+    "coachHint": "Summoner-Cooldowns sind Zeitfenster. Wie lange hat Viktor noch keinen Flash?",
+    "context": "Du bist Ahri (Mid). Viktor hat vor 30 Sekunden seinen Flash verbraucht. Deine Welle ist größer als seine, dein Jungler (Lee Sin) ist in der Nähe.",
+    "options": [
+      { "label": "A: Allein mit Charm hineingehen, ohne auf Lee Sin zu warten.", "lpChange": -15, "nextId": "mid_master_03", "feedback": "Zu früh! Ohne Jungler kann er fliehen oder dich bestrafen.", "chain": ["Viktor entkommt oder bestraft dich ohne Lee Sin.", "Euer Jungler verliert Tempo und Mid-Prio."] },
+      { "label": "B: Die Welle liegen lassen und sofort roamen.", "lpChange": -5, "nextId": "mid_master_03", "feedback": "Du verschenkst die Welle, ohne das Flash-Fenster zu nutzen.", "chain": ["Du verschenkst die Welle und das Flash-Fenster.", "Viktor wird weder gezwungen noch bestraft."] },
+      { "label": "C: Die Welle so setzen, dass Viktor nach vorn muss, und gemeinsam mit Lee Sin angreifen, solange sein Flash fehlt.", "lpChange": 20, "nextId": "mid_master_03", "feedback": "Perfekt! Ohne Flash kann er dem gemeinsamen Angriff nicht entkommen." }
+    ]
+  },
+  {
+    "id": "mid_master_03", "phase": "Mid-Game", "gameTime": "15:20", "timeLimit": 60,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Ahri" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron (ab 20:00)" },
+      { "x": 42, "y": 40, "type": "hero", "label": "Team" },
+      { "x": 45, "y": 34, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Wer vor dem Spawn die Vision kontrolliert, entscheidet den Kampf um Baron. Wo setzt du an?",
+    "context": "Du bist Ahri (Mid). Der Baron spawnt in etwa viereinhalb Minuten. Dein Team hat Wards im eigenen Dschungel, die Gegner haben Vision im Baron-Bereich. Deine Welle ist gecrasht.",
+    "options": [
+      { "label": "A: Mit dem Team gegnerische Wards räumen und eigene setzen, bevor der Baron spawnt.", "lpChange": 20, "nextId": "mid_master_04", "feedback": "Perfekt! Vision-Kontrolle vor dem Spawn entscheidet den späteren Kampf." },
+      { "label": "B: Allein den gegnerischen Dschungel wardern.", "lpChange": -10, "nextId": "mid_master_04", "feedback": "Allein bist du ein leichtes Ziel.", "chain": ["Allein im Dschungel bist du ein leichtes Ziel.", "Euer Team verliert Vision-Kontrolle und einen Spieler."] },
+      { "label": "C: Auf die Gegner warten und erst beim Spawn reagieren.", "lpChange": -15, "nextId": "mid_master_04", "feedback": "Falle! Dann haben sie die Vision und den ersten Zug.", "chain": ["Die Gegner haben Vision und den ersten Zug am Baron.", "Euer Team reagiert nur noch und verliert die Initiative."] }
+    ]
+  },
+  {
+    "id": "mid_master_04", "phase": "Teamfight Setup", "gameTime": "23:40", "timeLimit": 60,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 46, "y": 48, "type": "hero", "isPlayer": true, "label": "Ahri" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 42, "y": 42, "type": "hero", "label": "Team" },
+      { "x": 50, "y": 38, "type": "enemy", "label": "Gegner (3 ohne Flash)" }
+    ],
+    "coachHint": "Wie viele Flashes der Gegner sind noch unten? Das ist dein Zeitfenster.",
+    "context": "Du bist Ahri (Mid). Die Gegner haben vor 60 Sekunden einen Kampf verloren, drei von ihnen haben keinen Flash mehr. Der Baron ist verfügbar, dein Team ist bereit.",
+    "options": [
+      { "label": "A: Warten, bis ihre Flashes wieder bereit sind.", "lpChange": -15, "nextId": "mid_master_05", "feedback": "Falle! Du gibst das Zeitfenster auf.", "chain": ["Die Flashes sind zurück, das Fenster ist weg.", "Euer Team verliert den Vorteil am Baron."] },
+      { "label": "B: Den Kampf an der Baron-Grube erzwingen, solange drei Gegner keinen Flash haben.", "lpChange": 20, "nextId": "mid_master_05", "feedback": "Perfekt! Ohne Flash können sie deinem Charm und dem Engage nicht ausweichen." },
+      { "label": "C: Den Baron starten, ohne die Gegner im Blick zu behalten.", "lpChange": -10, "nextId": "mid_master_05", "feedback": "Dein Team ist verteilt, und die Gegner kontern.", "chain": ["Ihr startet den Baron ohne Info über die Gegner.", "Die Gegner kontern in euer verteiltes Team."] }
+    ]
+  },
+  {
+    "id": "mid_master_05", "phase": "Late-Game", "gameTime": "33:10", "timeLimit": 60,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Ahri" },
+      { "x": 46, "y": 50, "type": "hero", "label": "Team" },
+      { "x": 88, "y": 12, "type": "objective", "label": "Inhibitor" },
+      { "x": 70, "y": 30, "type": "enemy", "label": "Gegner (4 tot)" }
+    ],
+    "coachHint": "Respawnzeiten werden spät im Spiel lang. Was bringt dir die meiste Zeit?",
+    "context": "Du bist Ahri (Mid). Euer Team hat den Kampf gewonnen, vier Gegner sind tot und haben noch rund 45 Sekunden Respawnzeit. Der gegnerische Mid-Inhibitor steht noch.",
+    "options": [
+      { "label": "A: Recallen und Items kaufen, bevor es weitergeht.", "lpChange": -15, "nextId": "end", "feedback": "Das Zeitfenster geht verloren.", "chain": ["Du verlierst das Fenster, in dem die Gegner tot sind.", "Die Gegner kehren zurück, ohne dass ihr Druck aufgebaut habt."] },
+      { "label": "B: Mit dem Team den Mid-Inhibitor und die Wellen nehmen, solange die Gegner tot sind.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Respawnzeit wird zu Turm- und Inhibitor-Druck." },
+      { "label": "C: Dem letzten Gegner allein hinterherjagen.", "lpChange": -10, "nextId": "end", "feedback": "Blindes Hinterherjagen riskiert deinen Tod und das Fenster.", "chain": ["Du riskierst deinen Tod für einen einzelnen Kill.", "Euer Team verliert Druck und das Respawn-Fenster."] }
+    ]
+  },
+
+  /* ===== Quiz-Szenarien (eigenständig, ohne Folge-Baum) ===== */
+  {
+    "id": "quiz_eisen_01", "gameTime": "06:00", "timeLimit": 30,
+    "champion": "Garen", "role": "Toplane", "difficulty": "Eisen",
+    "markers": [
+      { "x": 11, "y": 58, "type": "hero", "isPlayer": true, "label": "Garen" },
+      { "x": 9, "y": 90, "type": "objective", "label": "Base" }
+    ],
+    "coachHint": "Gold im Inventar ist ungenutzte Stärke. Was kannst du tun, bevor du weiterkämpfst?",
+    "context": "Du bist Garen (Top). Level 6 mit 1100 ungenutztem Gold und nur noch 30 % Leben. Die Welle steht neben deinem Turm, kein Gegner ist in Sicht.",
+    "options": [
+      { "label": "A: Weiter farmen und das Gold sparen.", "lpChange": -10, "nextId": "end", "feedback": "Ungenutztes Gold ist verschenkte Stärke, und mit 30 % Leben riskierst du den Tod.", "chain": ["Mit 30 % Leben und 1100 Gold riskierst du den Tod.", "Euer Team hat Top später im Kampf schwächer."] },
+      { "label": "B: Welle abfarmen, dann zur Base zurück und Items kaufen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nutzt dein Gold und kommst stärker zurück." },
+      { "label": "C: Zum Gegner laufen und einen Trade suchen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Mit wenig Leben und ohne neue Items verlierst du den Trade.", "chain": ["Du verlierst den Trade ohne neue Items.", "Der Gegner gewinnt die Lane und baut Vorsprung auf."] }
+    ]
+  },
+  {
+    "id": "quiz_eisen_02", "gameTime": "09:30", "timeLimit": 30,
+    "champion": "Lux", "role": "Midlane", "difficulty": "Eisen",
+    "markers": [
+      { "x": 62, "y": 38, "type": "hero", "isPlayer": true, "label": "Lux" },
+      { "x": 68, "y": 32, "type": "fog", "label": "Syndra von der Karte verschwunden" },
+      { "x": 20, "y": 25, "type": "fog", "label": "Gegnerischer Jungler zuletzt Top gesehen" }
+    ],
+    "coachHint": "Wenn ein Gegner von der Karte verschwindet: Wo könnte er sein, und wie schützt du dich?",
+    "context": "Du bist Lux (Mid) gegen Syndra. Level 7. Syndra ist plötzlich von der Karte verschwunden und der gegnerische Jungler wurde zuletzt Top gesehen. Deine Welle steht in der Mitte.",
+    "options": [
+      { "label": "A: Die Welle auf deiner Seite halten, Vision im Fluss setzen und erst bei neuer Info weitergehen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du bleibst sicher und behältst die Kontrolle." },
+      { "label": "B: Weiter vorpushen und tief in die gegnerische Seite gehen, um mehr Platten zu bekommen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Ohne Info über Syndra und den Jungler läufst du in einen Gank.", "chain": ["Du läufst ohne Info über Syndra und Jungler in einen Gank.", "Euer Team verliert die Mid-Lane und die Prio."] },
+      { "label": "C: Syndra im gegnerischen Dschungel suchen und hinterherjagen.", "lpChange": -10, "nextId": "end", "feedback": "Blindes Hinterherjagen kostet dich Welle und Leben.", "chain": ["Blindes Hinterherjagen kostet dich Welle und Leben.", "Syndra und der Jungler kommen frei zu Gold und Tempo."] }
+    ]
+  },
+  {
+    "id": "quiz_eisen_03", "gameTime": "11:00", "timeLimit": 30,
+    "champion": "Ashe", "role": "Botlane", "difficulty": "Eisen",
+    "markers": [
+      { "x": 70, "y": 92, "type": "hero", "isPlayer": true, "label": "Ashe" },
+      { "x": 80, "y": 70, "type": "enemy", "label": "Gegner (10 % Leben)" }
+    ],
+    "coachHint": "Ein Kill ist weniger wert als eine sichere Welle. Wohin läuft der Gegner, und was riskierst du?",
+    "context": "Du bist Ashe (Bot). Level 8. Ein Gegner flieht mit 10 % Leben in den gegnerischen Dschungel. Deine Welle trifft bald euren Turm und euer Support ist nicht in der Nähe.",
+    "options": [
+      { "label": "A: Ihm in den gegnerischen Dschungel hinterherjagen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Allein im feindlichen Dschungel zu jagen ist ein Anfängerfehler.", "chain": ["Allein im feindlichen Dschungel läufst du in eine Falle.", "Euer Support steht ohne ADC in der Lane."] },
+      { "label": "B: Mit Flash hinterherspringen, um den Kill sicher zu holen.", "lpChange": -10, "nextId": "end", "feedback": "Du verbrennst Flash und kannst trotzdem in eine Falle laufen.", "chain": ["Du verbrennst Flash und kannst trotzdem in eine Falle laufen.", "Dein Team hat ohne ADC weniger Kampfkraft."] },
+      { "label": "C: Auf der Lane bleiben, die Welle farmen und den Kill vergessen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Gold und Welle sind sicherer als ein riskanter Kill." }
+    ]
+  },
+  {
+    "id": "quiz_gold_01", "gameTime": "07:30", "timeLimit": 45,
+    "champion": "Camille", "role": "Toplane", "difficulty": "Gold",
+    "markers": [
+      { "x": 10, "y": 50, "type": "hero", "isPlayer": true, "label": "Camille" },
+      { "x": 10, "y": 38, "type": "enemy", "label": "Renekton" },
+      { "x": 22, "y": 64, "type": "hero", "label": "Sejuani (10 s)" }
+    ],
+    "coachHint": "Ein Gank klappt, wenn der Gegner nicht fliehen kann. Wie nutzt du, dass sein Flash weg ist?",
+    "context": "Du bist Camille (Top) gegen Renekton. Er hat seinen Flash verbraucht und deine Welle ist größer als seine. Dein Jungler (Sejuani) ist etwa 10 Sekunden entfernt und hat dich gepingt.",
+    "options": [
+      { "label": "A: Sofort allein auf Renekton gehen, ohne auf Sejuani zu warten.", "lpChange": -15, "nextId": "end", "feedback": "Zu früh! Ohne Jungler ist der Trade nicht sicher.", "chain": ["Ohne Sejuani gewinnst du den Trade nicht sicher.", "Euer Jungler verliert das Gank-Fenster."] },
+      { "label": "B: Die Welle so setzen, dass er nicht fliehen kann, und gemeinsam mit Sejuani angreifen.", "lpChange": 20, "nextId": "end", "feedback": "Stark! Ein koordinierter Gank nutzt sein fehlendes Flash." },
+      { "label": "C: Zum Turm zurückgehen und abwarten.", "lpChange": 0, "nextId": "end", "feedback": "Sicher, aber du verschenkst das Flash-Fenster.", "chain": ["Du verschenkst das Flash-Fenster.", "Euer Team zieht keinen Nutzen aus Renektons Schwäche."] }
+    ]
+  },
+  {
+    "id": "quiz_gold_02", "gameTime": "09:40", "timeLimit": 45,
+    "champion": "Thresh", "role": "Support", "difficulty": "Gold",
+    "markers": [
+      { "x": 74, "y": 88, "type": "hero", "isPlayer": true, "label": "Thresh" },
+      { "x": 68, "y": 92, "type": "hero", "label": "ADC" },
+      { "x": 86, "y": 92, "type": "objective", "label": "Gegner-Turm" },
+      { "x": 30, "y": 25, "type": "fog", "label": "Vi zuletzt Top gesehen" }
+    ],
+    "coachHint": "Vision ist der beste Schutz vor Ganks. Wo musst du sie setzen, bevor ihr Druck macht?",
+    "context": "Du bist Thresh (Support). Euer ADC will den Gegner unter dem Turm angreifen. Vi wurde zuletzt Top gesehen und ihr habt keine Vision im Fluss.",
+    "options": [
+      { "label": "A: Einen Ward im Fluss setzen und hinter den Vasallen bleiben, bis die Vision steht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Erst Vision, dann Druck." },
+      { "label": "B: Mit dem ADC in Turmreichweite gehen, weil Vi weit weg ist.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Ohne Vision weißt du nicht, wo Vi wirklich ist.", "chain": ["Vi taucht auf und trifft euch unter dem Turm.", "Euer ADC stirbt oder verliert den Turm-Trade."] },
+      { "label": "C: Zur Base gehen und den ADC allein lassen.", "lpChange": -5, "nextId": "end", "feedback": "Du lässt deinen ADC im Stich und verlierst Tempo.", "chain": ["Du lässt deinen ADC allein in der Lane.", "Die Botlane verliert Welle und Tempo."] }
+    ]
+  },
+  {
+    "id": "quiz_gold_03", "gameTime": "12:20", "timeLimit": 45,
+    "champion": "Viego", "role": "Jungle", "difficulty": "Gold",
+    "markers": [
+      { "x": 50, "y": 60, "type": "hero", "isPlayer": true, "label": "Viego" },
+      { "x": 22, "y": 30, "type": "enemy", "label": "Nocturne" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 80, "y": 88, "type": "hero", "label": "Botlane" }
+    ],
+    "coachHint": "Du kannst nicht alles verteidigen. Welche Seite ist für dich mehr wert?",
+    "context": "Du bist Viego (Jungle). Nocturne klärt gerade eure Top-Seite und die Gegner haben dort Prio. Der Drache wird in etwa 40 Sekunden wieder verfügbar, deine Botlane hat Prio und Vision.",
+    "options": [
+      { "label": "A: Nocturne auf eurer Top-Seite hinterherjagen und ihn stellen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Allein hinterherzujagen kostet Tempo und das Objective.", "chain": ["Allein hinterherzujagen kostet dich Tempo.", "Der Drache geht an die Gegner."] },
+      { "label": "B: Alles verteidigen und gar nichts nehmen.", "lpChange": -5, "nextId": "end", "feedback": "Du reagierst nur und gewinnst kein Objective.", "chain": ["Du reagierst nur und gewinnst nichts.", "Euer Team bekommt kein Objective."] },
+      { "label": "C: Den Invade ziehen lassen und stattdessen den Drachen mit der Botlane vorbereiten.", "lpChange": 20, "nextId": "end", "feedback": "Stark! Ein sauberer Trade: Top-Camps gegen den Drachen." }
+    ]
+  },
+  {
+    "id": "quiz_smaragd_01", "gameTime": "09:00", "timeLimit": 60,
+    "champion": "Syndra", "role": "Midlane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Syndra" },
+      { "x": 68, "y": 32, "type": "fog", "label": "Ahri von der Karte verschwunden" },
+      { "x": 20, "y": 25, "type": "fog", "label": "Lee Sin zuletzt Top gesehen" },
+      { "x": 60, "y": 56, "type": "objective", "label": "Fluss-Busch" }
+    ],
+    "coachHint": "Wenn ein Gegner fehlt, gehört dir die Welle nur so weit, wie du sie halten kannst. Wo bist du sicher?",
+    "context": "Du bist Syndra (Mid) gegen Ahri. Level 7. Ahri ist von der Karte verschwunden, der gegnerische Jungler (Lee Sin) wurde zuletzt Top gesehen und deine Welle schiebt auf die Gegner zu.",
+    "options": [
+      { "label": "A: Weiter pushen und tief gehen, um schneller Turmplatten zu holen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Ohne Info über Ahri und Lee Sin läufst du in einen Gank.", "chain": ["Du läufst ohne Info in einen Gank.", "Euer Team verliert die Mid-Lane."] },
+      { "label": "B: Ahri im gegnerischen Dschungel suchen und stellen.", "lpChange": -10, "nextId": "end", "feedback": "Blindes Hinterherjagen kostet dich Welle und Leben.", "chain": ["Blindes Hinterherjagen kostet Welle und Leben.", "Ahri und Lee Sin nutzen deine Abwesenheit."] },
+      { "label": "C: Die Welle bei dir halten, Vision im Fluss setzen und erst bei neuer Info weitermachen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du bleibst sicher und behältst die Kontrolle." }
+    ]
+  },
+  {
+    "id": "quiz_smaragd_02", "gameTime": "13:30", "timeLimit": 60,
+    "champion": "Rakan", "role": "Support", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 78, "y": 82, "type": "hero", "isPlayer": true, "label": "Rakan" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 74, "y": 64, "type": "enemy", "label": "Gegner" },
+      { "x": 70, "y": 86, "type": "hero", "label": "Team" }
+    ],
+    "coachHint": "Vision kämpft man mit Vision. Was musst du entfernen, bevor du eigene setzt?",
+    "context": "Du bist Rakan (Support). Der Drache spawnt in etwa 45 Sekunden. Die Gegner stehen im Fluss und haben Wards im Drachen-Bereich. Du hast zwei Kontrollwards und deine Orakel-Linse ist ready.",
+    "options": [
+      { "label": "A: Mit der Orakel-Linse ihre Wards räumen und eigene Kontrollwards setzen, bevor ihr startet.", "lpChange": 20, "nextId": "end", "feedback": "Stark! Wer die Vision kontrolliert, kontrolliert das Objective." },
+      { "label": "B: Ohne Vision direkt in den Drachen-Pit gehen und starten.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Ohne Vision seht ihr den Engage erst, wenn es zu spät ist.", "chain": ["Ohne Vision seht ihr den Engage zu spät.", "Euer Team verliert den Drachen im Kampf."] },
+      { "label": "C: Die Wards im Inventar lassen und am Pit abwarten.", "lpChange": -10, "nextId": "end", "feedback": "Ungenutzte Wards bringen keine Vision.", "chain": ["Ungenutzte Wards geben keine Vision.", "Die Gegner kontrollieren den Pit und starten zuerst."] }
+    ]
+  },
+  {
+    "id": "quiz_smaragd_03", "gameTime": "26:30", "timeLimit": 60,
+    "champion": "Sivir", "role": "Botlane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 50, "y": 52, "type": "hero", "isPlayer": true, "label": "Sivir" },
+      { "x": 42, "y": 45, "type": "hero", "label": "Team" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 10, "y": 30, "type": "enemy", "label": "Jax (Splitpush)" }
+    ],
+    "coachHint": "Ein gewonnener Kampf ist ein Fenster. Tausche, wenn der Gegner nicht überall sein kann.",
+    "context": "Du bist Sivir (Bot). Euer Team hat einen Kampf in der Mitte gewonnen und drei Gegner sind tot. Der gegnerische Jax drückt allein eure Top-Seite und der Baron ist verfügbar.",
+    "options": [
+      { "label": "A: Alle zurück nach Top, um Jax zu stoppen, und den Baron liegen lassen.", "lpChange": -10, "nextId": "end", "feedback": "Du gibst das größte Objective für einen Turm her.", "chain": ["Du gibst den Baron für einen Turm her.", "Euer Team verliert das größte Objective."] },
+      { "label": "B: Dem letzten fliehenden Gegner allein hinterherjagen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Blindes Hinterherjagen kostet dich Leben und Tempo.", "chain": ["Allein zu jagen kostet dich Leben und Tempo.", "Der Baron bleibt liegen, während Jax weiter Druck macht."] },
+      { "label": "C: Den Baron starten, solange drei Gegner tot sind, und Jax gegen den Turm tauschen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Baron gegen einen Turm ist ein starker Trade." }
+    ]
+  },
+  {
+    "id": "quiz_diamant_01", "gameTime": "06:30", "timeLimit": 60,
+    "champion": "Ornn", "role": "Toplane", "difficulty": "Diamant",
+    "markers": [
+      { "x": 9, "y": 56, "type": "hero", "isPlayer": true, "label": "Ornn" },
+      { "x": 9, "y": 44, "type": "enemy", "label": "Fiora" },
+      { "x": 20, "y": 28, "type": "fog", "label": "Nocturne vor etwa 20 s auf der Top-Seite gesehen" }
+    ],
+    "coachHint": "Wenn der gegnerische Jungler in der Nähe war, wie vorsichtig musst du sein?",
+    "context": "Du bist Ornn (Top) gegen Fiora. Level 5. Nocturne wurde vor etwa 20 Sekunden auf deiner Top-Seite gesehen und ist wieder verschwunden. Fiora hat ihren Flash, deine Welle steht mittig.",
+    "options": [
+      { "label": "A: Allein auf Fiora gehen und den Trade erzwingen.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Nocturne kann jederzeit aus dem Nebel auftauchen.", "chain": ["Nocturne taucht aus dem Nebel auf und bestraft den Trade.", "Euer Top verliert Leben und Tempo."] },
+      { "label": "B: Hinter die Welle gehen, Vision im Busch setzen und nahe an deinem Turm bleiben.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Erst Info über Nocturne, dann Druck." },
+      { "label": "C: In den gegnerischen Dschungel laufen und Nocturne suchen.", "lpChange": -10, "nextId": "end", "feedback": "Blindes Suchen kostet dich Welle und Tempo.", "chain": ["Blindes Suchen kostet dich Welle und Tempo.", "Fiora bekommt eine freie Lane."] }
+    ]
+  },
+  {
+    "id": "quiz_diamant_02", "gameTime": "10:30", "timeLimit": 60,
+    "champion": "Orianna", "role": "Midlane", "difficulty": "Diamant",
+    "markers": [
+      { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Orianna" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Azir" },
+      { "x": 80, "y": 88, "type": "hero", "label": "Botlane" }
+    ],
+    "coachHint": "Eine Welle liegen zu lassen kostet Gold und Turmdruck. Wie kannst du roamen und trotzdem sicher sein?",
+    "context": "Du bist Orianna (Mid) gegen Azir. Level 8. Azirs Welle ist größer als deine und schiebt auf deinen Turm zu. Dein Support pingt für einen Roam auf die Botlane und dein Jungler gankt gerade Top.",
+    "options": [
+      { "label": "A: Die große Welle schnell klären und dann zur Botlane roamen.", "lpChange": 20, "nextId": "end", "feedback": "Stark! Du verlierst weder Welle noch Tempo." },
+      { "label": "B: Sofort ohne Welle roamen, obwohl Azir pusht und den Turm nimmt.", "lpChange": -10, "nextId": "end", "feedback": "Du verlierst Turmplatten und Gold für einen unsicheren Roam.", "chain": ["Du verlierst Turmplatten und Gold für einen unsicheren Roam.", "Azir nimmt den Turm und die Mid-Prio."] },
+      { "label": "C: In der Mitte bleiben und den Roam ignorieren.", "lpChange": -5, "nextId": "end", "feedback": "Sicher, aber du verschenkst Tempo auf der Botlane.", "chain": ["Du verschenkst Tempo auf der Botlane.", "Euer Support bleibt ohne Hilfe."] }
+    ]
+  },
+  {
+    "id": "quiz_diamant_03", "gameTime": "27:00", "timeLimit": 60,
+    "champion": "Jhin", "role": "Botlane", "difficulty": "Diamant",
+    "markers": [
+      { "x": 70, "y": 70, "type": "hero", "isPlayer": true, "label": "Jhin" },
+      { "x": 42, "y": 40, "type": "hero", "label": "Team" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 80, "y": 66, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Wenn der Gegner an einem Objective gebunden ist, welches andere gehört dann dir?",
+    "context": "Du bist Jhin (Bot). Nocturne und die gegnerische Botlane starten den Drachen. Euer Team steht in der Mitte, der Baron ist verfügbar und die Top-Seite der Gegner ist ohne Vision.",
+    "options": [
+      { "label": "A: Zu Fuß zum Drachen laufen und den Baron ignorieren.", "lpChange": -10, "nextId": "end", "feedback": "Du kommst zu spät und verschenkst den Baron.", "chain": ["Du kommst zu spät und verschenkst den Baron.", "Die Gegner nehmen den Drachen und halten den Baron frei."] },
+      { "label": "B: Allein den Drachen kontestieren.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Allein gegen mehrere Gegner verlierst du Leben und Drachen.", "chain": ["Allein gegen mehrere Gegner stirbst du.", "Euer Team verliert den Drachen und einen Spieler."] },
+      { "label": "C: Mit dem Team den Baron starten, während die Gegner am Drachen gebunden sind.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ein klassischer Objective-Trade: Drache gegen Baron." }
+    ]
+  }
+];
+const START_IDS = ['top_smaragd_01', 'mid_gold_01', 'jng_dia_01', 'bot_eisen_01', 'top_bronze_01', 'sup_silber_01', 'jng_platin_01', 'mid_master_01'];
+// Daily Run: Tag des Jahres (UTC) modulo Anzahl Startpunkte -> für alle Spieler am selben Tag identisch
+const dailyStartId = () => {
+  const n = new Date();
+  const today = Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate());
+  const dayOfYear = Math.floor((today - Date.UTC(n.getUTCFullYear(), 0, 0)) / 86400000);
+  return START_IDS[dayOfYear % START_IDS.length];
+};
+const RESULT_MS = 2400;          // so lange bleibt der Ergebnis-Zustand nach einer Antwort sichtbar
+const DEFAULT_TIME_LIMIT = 15;   // Fallback, falls ein Szenario kein timeLimit hat
+
+const COACH_REPLIES = [
+  [/teleport|tp/i, 'Prüfe, ob dein Teleport ready ist und wo du ein Ziel hast: Ward, Vasall oder Turm.'],
+  [/ult|shen/i, 'Ults sind Ressourcen. Überlege, wohin sie gerade gebunden sind und was das für andere Lanes heißt.'],
+  [/drache|soul|welle|push|turm/i, 'Objectives und Wellen hängen zusammen. Wer Druck aufbaut, zwingt den Gegner zu Entscheidungen.'],
+];
+const COACH_FALLBACK = 'Gute Frage. Vergleiche Wellenstand, Vision, Cooldowns und Teamposition. Welche Information fehlt dir noch?';
+
+/* ---------- Hextech-Sound (Web Audio API, komplett synthetisch) ---------- */
+const MUTE_KEY = 'braingap.muted';
+const Sound = (() => {
+  let ctx = null, master = null, verbIn = null, failed = false, noiseBuf = null, muted = false;
+  try { muted = localStorage.getItem(MUTE_KEY) === '1'; } catch (e) {}
+  const VOLUME = 0.18;   // dezent: Master-Gain maximal ~18 %
+
+  // AudioContext erst nach einer Nutzerinteraktion anlegen (Autoplay-Richtlinien)
+  function init() {
+    if (ctx || failed) return ctx;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) { failed = true; return null; }
+      ctx = new AC();
+      const comp = ctx.createDynamicsCompressor();   // verhindert Übersteuern bei Akkorden
+      master = ctx.createGain(); master.gain.value = VOLUME;
+      master.connect(comp); comp.connect(ctx.destination);
+      // einfacher Hall aus abklingendem Rauschen
+      const len = Math.floor(ctx.sampleRate * 1.6), buf = ctx.createBuffer(2, len, ctx.sampleRate);
+      for (let ch = 0; ch < 2; ch++) { const d = buf.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
+      const verb = ctx.createConvolver(); verb.buffer = buf;
+      verbIn = ctx.createGain(); const verbOut = ctx.createGain(); verbOut.gain.value = 0.55;
+      verbIn.connect(verb); verb.connect(verbOut); verbOut.connect(master);
+    } catch (e) { failed = true; ctx = null; }
+    return ctx;
+  }
+  function unlock() {
+    try { const c = init(); if (c && c.state === 'suspended') c.resume().catch(() => {}); } catch (e) {}
+  }
+  if (typeof window !== 'undefined') ['pointerdown', 'keydown', 'touchstart'].forEach(ev => window.addEventListener(ev, unlock, { passive: true }));
+
+  // Ein Oszillator mit Frequenz- und Lautstärke-Hüllkurve, optionalem Filter und Hall-Send
+  function voice(c, o) {
+    const { type = 'sine', f0, f1 = f0, t0, attack = 0.005, decay = 0.2, peak = 0.4, ftype, freq, q = 1, fsweep, wet = 0, detune = 0 } = o;
+    const end = t0 + attack + decay;
+    const osc = c.createOscillator(), g = c.createGain();
+    osc.type = type; osc.detune.value = detune;
+    osc.frequency.setValueAtTime(f0, t0);
+    if (f1 !== f0) osc.frequency.exponentialRampToValueAtTime(f1, end);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(peak, t0 + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, end);
+    let node = osc;
+    if (ftype) {
+      const f = c.createBiquadFilter(); f.type = ftype; f.Q.value = q;
+      f.frequency.setValueAtTime(fsweep ? fsweep[0] : freq, t0);
+      if (fsweep) f.frequency.exponentialRampToValueAtTime(fsweep[1], end);
+      node.connect(f); node = f;
+    }
+    node.connect(g); g.connect(master);
+    if (wet > 0 && verbIn) { const send = c.createGain(); send.gain.value = wet; g.connect(send); send.connect(verbIn); }
+    osc.start(t0); osc.stop(end + 0.05);
+  }
+  function noise(c, { t0, dur = 0.03, peak = 0.2, ftype = 'highpass', freq = 4000, q = 1 }) {
+    if (!noiseBuf) { noiseBuf = c.createBuffer(1, Math.floor(c.sampleRate * 0.25), c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    src.buffer = noiseBuf; f.type = ftype; f.frequency.value = freq; f.Q.value = q;
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(peak, t0 + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start(t0); src.stop(t0 + dur + 0.02);
+  }
+  const bass = (c, t, f, peak) => {   // dumpfer Impact: tiefe Frequenz, schneller Decay
+    voice(c, { type: 'sine', f0: f, f1: f * 0.4, t0: t, attack: 0.004, decay: 0.32, peak });
+    voice(c, { type: 'triangle', f0: f * 2, f1: f * 0.7, t0: t, attack: 0.004, decay: 0.14, peak: peak * 0.35, ftype: 'lowpass', freq: 400 });
+    noise(c, { t0: t, dur: 0.06, peak: peak * 0.4, ftype: 'lowpass', freq: 220 });
+  };
+  const chord = (c, t, notes, o) => notes.forEach((f, i) => {
+    voice(c, { type: 'triangle', f0: f, t0: t + i * (o.stagger || 0), attack: o.attack || 0.02, decay: o.decay, peak: o.peak, wet: o.wet, ftype: o.lp ? 'lowpass' : undefined, freq: o.lp, detune: i % 2 ? 6 : -6 });
+    voice(c, { type: 'sine', f0: f * 2, t0: t + i * (o.stagger || 0), attack: o.attack || 0.02, decay: o.decay * 0.7, peak: o.peak * 0.3, wet: o.wet });
+  });
+  const C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5;
+
+  const PROFILES = {
+    click: (c, t) => {   // kurz, trocken, metallisch (~35 ms)
+      voice(c, { type: 'square', f0: 1900, f1: 800, t0: t, attack: 0.002, decay: 0.035, peak: 0.3, ftype: 'bandpass', freq: 2600, q: 9 });
+      noise(c, { t0: t, dur: 0.018, peak: 0.2, ftype: 'highpass', freq: 5000 });
+    },
+    lock_in: (c, t) => {   // energetischer Impuls mit aufsteigendem Sweep
+      voice(c, { type: 'sawtooth', f0: 220, f1: 880, t0: t, attack: 0.01, decay: 0.2, peak: 0.4, ftype: 'lowpass', fsweep: [500, 3200], q: 4, wet: 0.15 });
+      voice(c, { type: 'sine', f0: 440, f1: 1760, t0: t, attack: 0.01, decay: 0.18, peak: 0.25 });
+      noise(c, { t0: t, dur: 0.05, peak: 0.1, ftype: 'bandpass', freq: 3000, q: 3 });
+    },
+    correct: (c, t) => {   // heller Zweiklang, magischer Kristall
+      [[880, 0], [1318.5, 0.09]].forEach(([f, d]) => {
+        voice(c, { type: 'sine', f0: f, t0: t + d, attack: 0.004, decay: 0.45, peak: 0.34, wet: 0.5 });
+        voice(c, { type: 'triangle', f0: f * 2, t0: t + d, attack: 0.004, decay: 0.3, peak: 0.1, wet: 0.6 });
+      });
+      voice(c, { type: 'sine', f0: 2637, t0: t + 0.14, attack: 0.003, decay: 0.25, peak: 0.08, wet: 0.7 });
+    },
+    wrong: (c, t) => bass(c, t, 110, 0.8),
+    heart_loss: (c, t) => { bass(c, t, 90, 0.85); bass(c, t + 0.19, 72, 0.5); },   // zwei dumpfe Schläge
+    victory: (c, t) => {   // Dur-Akkord mit Nachhall
+      chord(c, t, [C5, E5, G5], { stagger: 0.07, decay: 1.4, peak: 0.28, wet: 0.7 });
+      voice(c, { type: 'sine', f0: C6, t0: t + 0.24, attack: 0.01, decay: 1.0, peak: 0.1, wet: 0.8 });
+    },
+    promotion: (c, t) => {   // aufsteigende Fanfare, danach Schlussakkord
+      [C5, E5, G5, C6].forEach((f, i) => voice(c, { type: 'triangle', f0: f, t0: t + i * 0.11, attack: 0.008, decay: 0.5, peak: 0.28, wet: 0.6 }));
+      chord(c, t + 0.5, [C5, E5, G5, C6], { stagger: 0.03, decay: 1.8, peak: 0.24, wet: 0.8 });
+    },
+    defeat: (c, t) => {   // gedämpfter Moll-Nachklang
+      chord(c, t, [220, 261.63, 329.63], { stagger: 0.05, attack: 0.03, decay: 1.5, peak: 0.28, wet: 0.6, lp: 700 });
+      voice(c, { type: 'sine', f0: 110, f1: 98, t0: t, attack: 0.03, decay: 1.2, peak: 0.22 });
+    },
+  };
+
+  function play(type) {
+    if (muted || !ctx || failed || !PROFILES[type]) return;   // ohne vorherige Interaktion gibt es noch keinen Context
+    try {
+      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+      PROFILES[type](ctx, ctx.currentTime + 0.01);
+    } catch (e) {}   // Audio darf die App nie zum Absturz bringen
+  }
+  return {
+    play, unlock, PROFILES, _ctx: () => ctx,
+    isMuted: () => muted,
+    setMuted(v) { muted = v; try { localStorage.setItem(MUTE_KEY, v ? '1' : '0'); } catch (e) {} },
+  };
+})();
+const playHextechSound = type => Sound.play(type);
+
+/* ---------- Rang-System ---------- */
+const TIERS = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Diamond', 'Master', 'Grandmaster', 'Challenger'];
+const DIV_TIERS = 7;                          // Iron bis Diamond haben Divisionen 4 bis 1
+const MAX_STEP = DIV_TIERS * 4 + 2;           // Schritt 0 = Iron 4 ... 27 = Diamond 1, 28 Master, 29 Grandmaster, 30 Challenger
+// Rang-Symbol: Lucide-Icon + Tailwind-Farbe je Liga
+const RANK_ICON = {
+  Iron:        { icon: 'shield',  cls: 'text-gray-400' },
+  Bronze:      { icon: 'shield',  cls: 'text-amber-700' },
+  Silver:      { icon: 'shield',  cls: 'text-slate-300' },
+  Gold:        { icon: 'hexagon', cls: 'text-yellow-400' },
+  Platinum:    { icon: 'hexagon', cls: 'text-teal-300' },
+  Emerald:     { icon: 'hexagon', cls: 'text-emerald-500' },
+  Diamond:     { icon: 'gem',     cls: 'text-blue-400' },
+  Master:      { icon: 'crown',   cls: 'text-purple-500' },
+  Grandmaster: { icon: 'crown',   cls: 'text-red-500' },
+  Challenger:  { icon: 'crown',   cls: 'text-yellow-200' },
+};
+const RankIcon = ({ tier, size = 44 }) => {
+  const r = RANK_ICON[tier];
+  return (
+    <span className={`inline-flex ${r.cls}`} style={{ filter: 'drop-shadow(0 0 8px currentColor)' }} role="img" aria-label={tier}>
+      <Icon n={r.icon} size={size} />
+    </span>
+  );
+};
+const tierOf = step => step < DIV_TIERS * 4 ? TIERS[Math.floor(step / 4)] : TIERS[DIV_TIERS + step - DIV_TIERS * 4];
+const rankName = step => step < DIV_TIERS * 4 ? `${tierOf(step)} ${4 - (step % 4)}` : tierOf(step);
+
+// 100 LP pro Division, Überschuss wird mitgenommen. Beim Wechsel in eine neue Liga startet man mit 0 LP.
+// Demotion Shield: Die erste Niederlage, die bei 0 LP beginnt, wird abgefangen, die zweite führt zum Abstieg auf 75 LP.
+function applyLp({ step, lp, shield = false }, delta) {
+  let event = null;
+  const before = lp;
+  lp += delta;
+  if (delta >= 0) {
+    while (lp >= 100 && step < MAX_STEP) {
+      lp -= 100; step++;
+      if (tierOf(step) !== tierOf(step - 1)) { lp = 0; event = 'tier'; } else if (!event) event = 'division';
+    }
+    if (lp > 0) shield = false;
+  } else if (lp < 0) {
+    if (step === 0) { lp = 0; shield = false; }                                        // Iron 4 ist der Boden
+    else if (before > 0) { lp = 0; }                                                   // erst auf 0 LP gesunken: Shield noch unberührt
+    else if (!shield) { lp = 0; shield = true; event = 'shield'; }                     // Shield fängt die erste Niederlage ab
+    else { step--; lp = 75; shield = false; event = 'demote'; }                        // zweite Niederlage: Abstieg
+  } else if (lp > 0) shield = false;
+  return { step, lp, shield, event };
+}
+
+// Fortschritt lokal speichern (nur Komfort; funktioniert auch ohne Storage)
+const STORE_KEY = 'braingap.v2';
+const loadSave = () => {
+  try {
+    const d = JSON.parse(localStorage.getItem(STORE_KEY));
+    if (d && d.rank && Number.isInteger(d.rank.step) && typeof d.rank.lp === 'number' && Array.isArray(d.history)) return d;
+  } catch (e) {}
+  return null;
+};
+const writeSave = d => { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) {} };
+
+/* ---------- Modi ---------- */
+const fmt = n => (n > 0 ? '+' : '') + n;
+const ROLE_FILTERS = [['Alle', null], ['Top', 'Toplane'], ['Mid', 'Midlane'], ['Jungle', 'Jungle'], ['Bot', 'Botlane'], ['Support', 'Support']];
+// Nur Schwierigkeiten anbieten, für die es Szenarien gibt
+const DIFF_FILTERS = [['Alle', null], ...['Eisen', 'Bronze', 'Silber', 'Gold', 'Platin', 'Smaragd', 'Diamant', 'Master+'].filter(d => RUNS.some(r => r.difficulty === d)).map(d => [d, d])];
+const pickRandom = list => list[Math.floor(Math.random() * list.length)];
+// Startszenarien, die zu den Filtern passen (null = kein Filter). Folge-Szenarien ergeben sich über nextId.
+const practicePool = (role, difficulty) => START_IDS.map(id => RUNS.find(r => r.id === id))
+  .filter(sc => (!role || sc.role === role) && (!difficulty || sc.difficulty === difficulty));
+
+
+/* ---------- Leaderboard-Logik ---------- */
+const LB_NAMES = ['YasuoMain99', 'GankMePls', 'ToxicTeemo', 'FeedOrDie', 'NexusNoob', 'JunglerDiff', 'MidOrFeed', 'SupportGap',
+  'PentaPete', 'WardingIsHard', 'TiltedTristana', 'BaronStealer', 'LuxLaserFan', 'SmiteCheck', 'FlashOnD', 'AFKAnnie',
+  'TowerDiveKing', 'ClutchKatarina', 'Minion_Magnet'];                         // 19 Bots
+const LB_LP = [99, 95, 91, 87, 83, 78, 73, 68, 62, 56, 50, 44, 38, 32, 26, 20, 14, 8, 3];   // feste LP der Bots (Platz 1 bis 19)
+
+// Die Position hängt strikt an den LP: Bots mit mehr LP stehen über dir. Bei Gleichstand stehst du vorn.
+// Mit 0 LP bist du Platz 20, mit 99 LP Platz 1.
+function buildLeaderboard({ step, lp }, name) {
+  const off = step % LB_NAMES.length;                                          // pro Liga andere Namensreihenfolge
+  const bots = LB_LP.map((v, i) => ({ name: LB_NAMES[(i + off) % LB_NAMES.length], lp: v }));
+  const pos = 1 + bots.filter(b => b.lp > lp).length;
+  const rows = [...bots];
+  rows.splice(pos - 1, 0, { name, lp, me: true });
+  return rows.map((r, i) => ({ ...r, pos: i + 1 }));
+}
+
+/* ---------- Ranked: Herzen, Match-Simulation, Makro-Quiz ---------- */
+const MAX_HEARTS = 3;
+const QUIZ_LENGTH = 5;
+const shuffle = list => list.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+// "Hauptlinie" eines Szenarios: die Option, die im Baum weiterführt. So läuft ein Match auch nach Fehlern weiter.
+const mainLine = sc => { const o = sc.options.find(x => x.nextId !== 'end'); return o ? o.nextId : 'end'; };
+const matchStages = id => { let n = 0, cur = id; while (cur !== 'end' && n < 10) { n++; cur = mainLine(RUNS.find(r => r.id === cur)); } return n; };
+// Startszenarien einer Rolle, die überhaupt einen Folge-Baum haben
+// Tier-Lock: Im Ranked gibt es nur Szenarien der eigenen Liga. Fehlt dafür Inhalt, gilt die nächstniedrigere Liga mit Szenarien (nie eine höhere).
+const DIFF_TIER = { Eisen: 0, Bronze: 1, Silber: 2, Gold: 3, Platin: 4, Smaragd: 5, Diamant: 6, 'Master+': 7 };   // Index in TIERS (Master+ = Master, Grandmaster, Challenger)
+const rankedTier = step => {
+  const idx = TIERS.indexOf(tierOf(step));
+  const have = [...new Set(RUNS.map(r => DIFF_TIER[r.difficulty]))].sort((a, b) => a - b);
+  const lower = have.filter(t => t <= idx);
+  return lower.length ? lower[lower.length - 1] : have[0];
+};
+const rankedPool = step => RUNS.filter(r => DIFF_TIER[r.difficulty] === rankedTier(step));
+const matchPool = (role, step) => START_IDS.map(id => RUNS.find(r => r.id === id))
+  .filter(sc => sc.role === role && DIFF_TIER[sc.difficulty] === rankedTier(step) && mainLine(sc) !== 'end');
+const RANKED_ROLES = [['Top', 'Toplane'], ['Mid', 'Midlane'], ['Jungle', 'Jungle'], ['Bot', 'Botlane'], ['Support', 'Support']];
+
+/* ---------- Wertung, Hidden MMR, Momentum ---------- */
+// Richtig = beste Option des Szenarios (lpChange > 0). Sieg ab 60 % richtig (3 von 5).
+// Die LP-Spanne hängt vom Hidden MMR im Verhältnis zum sichtbaren Rang ab: MMR über dem Rang = mehr Gewinn, weniger Verlust.
+function scoreRun(correct, n, mmr, rank) {
+  const ratio = correct / n;
+  const gap = Math.max(-1, Math.min(1, (mmr - (rank.step * 100 + rank.lp)) / 100));
+  const t = (gap + 1) / 2;
+  let kind, lp;
+  if (ratio >= 1)        { kind = 'Dominanter Sieg';     lp = 24 + Math.round(t * 4); }
+  else if (ratio >= 0.6) { kind = 'Knapper Arbeitssieg'; lp = 15 + Math.round(t * 3); }
+  else if (ratio >= 0.4) { kind = 'Knappe Niederlage';   lp = -14; }
+  else                   { kind = 'Stomp-Niederlage';    lp = -(20 + Math.round((1 - t) * 4)); }
+  return { win: ratio >= 0.6, kind, lp, mmrDelta: Math.round(lp * 0.8) };
+}
+const MOM_GOOD = ['Vorteil: +1.200 Gold & Prio', 'Vorteil: Kartenkontrolle & Vision', 'Vorteil: Objective-Tempo auf deiner Seite', 'Vorteil: Wellen gecrasht, Druck steigt'];
+const MOM_BAD = ['Druck: Gegner kontrolliert Vision', 'Rückstand: −900 Gold & Prio verloren', 'Druck: Gegner übernimmt das Tempo', 'Rückstand: Welle verloren, Team unter Druck'];
+function makeMomentum(log, stage) {
+  const last = log[log.length - 1];
+  const c = log.filter(e => e.ok).length, lead = c - (log.length - c);
+  const gold = (Math.abs(lead) * 600).toLocaleString('de-DE');
+  return { good: last.ok, text: (last.ok ? MOM_GOOD : MOM_BAD)[stage % 4],
+    state: lead > 0 ? `Zwischenstand: Du liegst vorn (+${gold} Gold)` : lead < 0 ? `Zwischenstand: Du liegst zurück (−${gold} Gold)` : 'Zwischenstand: ausgeglichen' };
+}
+
+/* ---------- Freunde (lokal, simuliert) ---------- */
+const FRIEND_NOTES = ['Grinde heute Master!', 'Suche Duo für Ranked', 'Trainiere Wave-Control', 'Nur noch ein Match...', 'Heute Quiz-Streak', ''];
+const hashStr = str => [...str.toLowerCase()].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+const makeFriend = name => {
+  const h = hashStr(name);
+  return { name, step: h % 22, lp: (h >>> 4) % 100, status: ['online', 'match', 'away'][h % 3], note: FRIEND_NOTES[(h >>> 8) % FRIEND_NOTES.length] };
+};
+const MOCK_FRIEND = { name: 'PoroBuddy', step: 7, lp: 42, status: 'online', note: 'Grinde heute Master!' };
+
+const TIMEOUT_CHAIN = ['Du reagierst zu spät und der Gegner nutzt das Zeitfenster.', 'Dein Team spielt ohne Ansage und verliert Tempo.'];
+const stripLetter = t => t.replace(/^[A-Z]:\s*/, '');
+
+// Welche Karten-Animation passt zur gewählten Aktion? (Schlüsselwörter im Optionstext)
+const RECALL_RE = /recall|zur base|resett|backport|items kaufen/i;
+const PUSH_RE = /welle|crash|push|freeze|drück/i;
+function effectsFor(opt, scenario, ok) {
+  const label = opt ? opt.label : '';
+  const recall = RECALL_RE.test(label);
+  const push = !recall && PUSH_RE.test(label) && !/liegen/i.test(label);
+  const text = opt ? `${opt.feedback} ${(opt.chain || []).join(' ')}` : '';
+  const caught = /gank|nebel|gestellt|gefangen|gepickt|falle|bestraft|engage|stirbst|angreif/i.test(text);
+  return { recall, push, gank: !ok && !!opt && caught && scenario.markers.some(m => m.type === 'fog') };
+}
+
+/* ---------- Visuelle Bausteine ---------- */
+function SoundToggle() {
+  const [muted, setMuted] = useState(Sound.isMuted());
+  const toggle = () => { const m = !muted; Sound.setMuted(m); setMuted(m); };   // der Klick-Ton kommt über den globalen Button-Listener
+  return (
+    <button onClick={toggle} aria-pressed={!muted} aria-label={muted ? 'Sound einschalten' : 'Sound ausschalten'} title={muted ? 'Sound aus' : 'Sound an'}
+      className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#C89B3C]/60 text-[#C89B3C] transition hover:border-[#0AC8B9] hover:text-[#0AC8B9] active:scale-95">
+      <Icon n={muted ? 'volumeX' : 'volume2'} size={16} />
+    </button>
+  );
+}
+
+const Hearts = ({ n }) => (
+  <div className="flex items-center gap-0.5" role="img" aria-label={`Herzen: ${n} von ${MAX_HEARTS}`}>
+    {Array.from({ length: MAX_HEARTS }, (_, i) => (
+      <Icon key={i} n="heart" size={18} fill={i < n ? 'currentColor' : 'none'} className={i < n ? 'text-red-500' : 'text-gray-600'} />
+    ))}
+  </div>
+);
+
+const ROLE_ICON = { Toplane: 'shield', Midlane: 'wand', Jungle: 'axe', Botlane: 'crosshair', Support: 'eye' };
+const CHAMP_BG = { 'Jax': '#313244', 'Ahri': '#5b3a6b', 'Lee Sin': '#7a3b2e', 'Jinx': '#2f5b7a' };
+
+// Data Dragon (Riot): Champion-Porträts und Summoner's Rift
+const DDRAGON = 'https://ddragon.leagueoflegends.com/cdn/14.8.1/img';
+const MAP_URL = `${DDRAGON}/map/map11.png`;
+const champImg = name => `${DDRAGON}/champion/${name.replace(/[^A-Za-z]/g, '')}.png`;   // "Lee Sin" -> "LeeSin"
+
+// Rundes Champion-Porträt. Lädt das Bild nicht, bleibt ein User-Icon sichtbar.
+const ChampAvatar = ({ name, className = 'w-10 h-10', iconSize = 20, ring = 'border border-[#C89B3C]/60', fallbackIcon = 'user' }) => {
+  const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <span className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full ${ring} ${className}`}
+          style={{ background: CHAMP_BG[name] || '#313244' }} role="img" aria-label={name}>
+      <Icon n={fallbackIcon} size={iconSize} className="text-white/80" />
+      {!failed && (
+        <img src={champImg(name)} alt="" onLoad={() => setLoaded(true)} onError={() => setFailed(true)}
+             className={`absolute inset-0 h-full w-full object-cover transition-opacity ${loaded ? 'opacity-100' : 'opacity-0'}`} />
+      )}
+    </span>
+  );
+};
+
+// Taktik-Karte: Mock-Map (Fallback) -> echte Map als Hintergrund -> Marker-Overlay -> Spieler-Porträt.
+// Marker-Koordinaten in Prozent (0-100) beziehen sich auf das quadratische Kartenfeld.
+const MARKER_COLOR = { hero: '#3b82f6', enemy: '#ef4444', objective: '#C89B3C', fog: '#94a3b8' };
+const Minimap = ({ markers = [], champion, role, showLabels = false, result = null, fx = null }) => {
+  const player = markers.find(m => m.isPlayer);
+  const k = showLabels ? 1 : 1.5;   // in der Vorschau größere Marker, damit sie ohne Zoom auffallen
+  const reduce = typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const at = m => ({ x: 110 + m.x * 1.8, y: 10 + m.y * 1.8 });
+  const me = player ? at(player) : null;
+  const TOWER = { Toplane: { x: 78, y: 8 }, Midlane: { x: 70, y: 30 }, Jungle: { x: 70, y: 30 }, Botlane: { x: 93, y: 64 }, Support: { x: 93, y: 64 } };
+  const towerMarker = markers.find(m => m.type === 'objective' && /turm/i.test(m.label) && !/eigener/i.test(m.label));
+  const tower = fx && me ? at(towerMarker || TOWER[role] || { x: 70, y: 30 }) : null;
+  const fogSrc = markers.find(m => m.type === 'fog') || markers.find(m => m.type === 'enemy');
+  const fxLayer = fx && me ? (
+    <g aria-hidden="true">
+      {fx.push && tower && (
+        <>
+          {[0, 1, 2, 3, 4].map(i => {
+            const ex = tower.x - 7 + i * 1.6, ey = tower.y + 4 + (i % 2) * 2.5;
+            return (
+              <circle key={i} cx={reduce ? ex : me.x + i * 2} cy={reduce ? ey : me.y + (i % 2) * 2.5} r="2.3" fill="#93c5fd" stroke="#1e3a8a" strokeWidth=".6">
+                {!reduce && <animate attributeName="cx" from={me.x + i * 2} to={ex} dur="1.9s" begin={`${i * 0.12}s`} fill="freeze" />}
+                {!reduce && <animate attributeName="cy" from={me.y + (i % 2) * 2.5} to={ey} dur="1.9s" begin={`${i * 0.12}s`} fill="freeze" />}
+              </circle>
+            );
+          })}
+          <circle cx={tower.x} cy={tower.y} r="9" fill="none" stroke="#fde68a" strokeWidth="2.5" className="blink" />
+        </>
+      )}
+      {fx.recall && (
+        <circle cx={me.x} cy={me.y} r="12" fill="none" stroke="#60a5fa" strokeWidth="2.5">
+          {!reduce && <animate attributeName="r" values="8;18;8" dur="1.2s" repeatCount="2" />}
+          {!reduce && <animate attributeName="opacity" values="1;.25;1" dur="1.2s" repeatCount="2" />}
+        </circle>
+      )}
+      {fx.gank && fogSrc && (() => {
+        const g = at(fogSrc);
+        return (
+          <>
+            <line x1={g.x} y1={g.y} x2={me.x} y2={me.y} stroke="#ef4444" strokeWidth="1.5" strokeDasharray="4 3" opacity=".7" />
+            <circle cx={reduce ? me.x : g.x} cy={reduce ? me.y : g.y} r="5" fill="#ef4444" stroke="#fff" strokeWidth="1">
+              {!reduce && <animate attributeName="cx" from={g.x} to={me.x} dur="1.4s" fill="freeze" />}
+              {!reduce && <animate attributeName="cy" from={g.y} to={me.y} dur="1.4s" fill="freeze" />}
+            </circle>
+          </>
+        );
+      })()}
+    </g>
+  ) : null;
+  return (
+    <div className="h-full w-full flex items-center justify-center bg-[#010A13]">
+      <div className="relative h-full aspect-square">
+        <svg viewBox="110 10 180 180" className="absolute inset-0 h-full w-full" aria-hidden="true">
+          <rect x="110" y="10" width="180" height="180" fill="#16222e" />
+          <path d="M122 178 L278 22" stroke="#45475a" strokeWidth="6" strokeLinecap="round" fill="none" />
+          <path d="M122 178 V22 H278 M122 178 H278 V22" stroke="#45475a" strokeWidth="6" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+          <path d="M122 22 L278 178" stroke="#0AC8B9" strokeOpacity=".35" strokeWidth="10" strokeDasharray="2 12" strokeLinecap="round" />
+          <circle cx="122" cy="178" r="11" fill="#3b82f6" fillOpacity=".7" /><circle cx="278" cy="22" r="11" fill="#ef4444" fillOpacity=".7" />
+        </svg>
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${MAP_URL})` }} />
+        <svg viewBox="110 10 180 180" className="absolute inset-0 h-full w-full" role="img" aria-label="Minimap mit Taktik-Markern">
+          {markers.filter(m => !m.isPlayer).map((m, i) => {
+            const px = 110 + m.x * 1.8, py = 10 + m.y * 1.8, c = MARKER_COLOR[m.type];
+            const flip = px > 250;
+            return (
+              <g key={i} className={result === 'good' && m.type === 'objective' ? 'blink' : undefined}>
+                {m.type === 'fog' ? (
+                  <>
+                    <title>{m.label}</title>
+                    <circle cx={px} cy={py} r={10 * k} fill="#0A1428" fillOpacity=".55" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="3 3" />
+                    <text x={px} y={py + 4.5 * k} textAnchor="middle" fontSize={13 * k} fontWeight="700" fill="#cbd5e1">?</text>
+                  </>
+                ) : m.type === 'objective' ? (
+                  <>
+                    <circle cx={px} cy={py} r={11 * k} fill="none" stroke={c} strokeOpacity=".3" strokeWidth="4" className="motion-safe:animate-pulse" />
+                    <circle cx={px} cy={py} r={7 * k} fill="none" stroke={c} strokeWidth="2.5" />
+                    <circle cx={px} cy={py} r={2 * k} fill={c} />
+                  </>
+                ) : (
+                  <>
+                    <circle cx={px} cy={py} r={13 * k} fill={c} fillOpacity=".14" className="motion-safe:animate-pulse" />
+                    <circle cx={px} cy={py} r={9 * k} fill={c} fillOpacity=".3" />
+                    <circle cx={px} cy={py} r={5 * k} fill={c} stroke="#fff" strokeOpacity=".85" strokeWidth="1" />
+                  </>
+                )}
+                {showLabels && m.label && m.type !== 'fog' && (
+                  <text x={flip ? px - 12 : px + 12} y={py + 3} textAnchor={flip ? 'end' : 'start'} fontSize="8" fontWeight="600"
+                        fill="#e2e8f0" stroke="#010A13" strokeWidth="2.5" paintOrder="stroke" fontFamily="system-ui,sans-serif">{m.label}</text>
+                )}
+              </g>
+            );
+          })}
+        {fxLayer}
+        </svg>
+        {player && (
+          <div className="absolute z-10 flex flex-col items-center -translate-x-1/2 -translate-y-1/2" style={{ left: `${player.x}%`, top: `${player.y}%` }}>
+            <div className="relative">
+              {result && <span className={`absolute inset-0 rounded-full opacity-70 motion-safe:animate-ping ${result === 'good' ? 'bg-[#0AC8B9]' : 'bg-[#E84057]'}`} aria-hidden="true" />}
+              <ChampAvatar name={champion || player.label} className={showLabels ? 'w-10 h-10' : 'w-8 h-8'} iconSize={showLabels ? 20 : 16}
+                           ring={result === 'good' ? 'border-2 border-[#0AC8B9] shadow-[0_0_16px_rgba(10,200,185,.9)]'
+                               : result === 'bad' ? 'border-2 border-[#E84057] shadow-[0_0_16px_rgba(232,64,87,.9)]'
+                               : 'border-2 border-[#F5E6B8] shadow-[0_0_12px_rgba(245,230,184,.85)]'} />
+            </div>
+            {showLabels && <span className="mt-0.5 text-[10px] font-bold text-[#F5E6B8] [text-shadow:0_0_3px_#010A13]">{player.label}</span>}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const Divider = () => (
+  <div className="flex items-center gap-2 text-[#C89B3C]/70" aria-hidden="true">
+    <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#C89B3C]/50" />
+    <span className="text-xs">♦</span>
+    <span className="h-px flex-1 bg-gradient-to-l from-transparent to-[#C89B3C]/50" />
+  </div>
+);
+
+/* ---------- Screens ---------- */
+function Dashboard({ rank, history, hearts, profile, onDaily, onRanked, onPractice, onMastery, onNoHearts, onShop, onReset }) {
+  const locked = hearts < 1;
+  const masteryN = masteryPool(profile.champion, profile.role).length;   // ohne Herzen sind Daily und Ranked gesperrt
+  const [confirm, setConfirm] = useState(false);
+  const tier = tierOf(rank.step), cls = RANK_ICON[tier].cls;   // eine Farbquelle für Icon, Text, Rahmen und Balken
+  const pct = Math.min(100, rank.lp);
+  return (
+    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+      <div className="rounded-xl border p-3 flex flex-col gap-3" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+        <div className="flex items-center gap-3">
+          <div className={`w-[72px] h-[72px] shrink-0 rounded-2xl border border-current flex items-center justify-center ${cls}`} style={{ background: 'var(--bg)' }}>
+            <RankIcon tier={tier} size={46} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="truncate font-bold">{profile.name}</div>
+            <div className="truncate text-sm text-slate-400">Main: {profile.champion} · {profile.role}</div>
+            <div className="truncate text-xs text-gray-400">{STATUS[profile.status].emoji} {STATUS[profile.status].label}{profile.note ? ` · „${profile.note}“` : ''}</div>
+          </div>
+          <div className="text-right">
+            <div className={`flex items-center justify-end gap-1.5 font-serif text-xl font-black leading-tight ${cls}`}>
+              <RankIcon tier={tier} size={20} />{rankName(rank.step)}
+            </div>
+            <div className="text-sm text-slate-300 tabular-nums">{rank.lp} LP</div>
+            {rank.shield && <div className="flex items-center justify-end gap-1 text-xs text-[#0AC8B9]"><Icon n="shield" size={12} /> Demotion Shield aktiv</div>}
+          </div>
+        </div>
+        <div>
+          <div className="h-3 rounded-full overflow-hidden" style={{ background: 'var(--track)' }} role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
+            <div className={`h-full rounded-full bg-current shadow-[0_0_10px_currentColor] transition-all duration-500 ${cls}`} style={{ width: `${pct}%` }} />
+          </div>
+          <div className="flex justify-between text-xs text-slate-400 mt-1">
+            <span className="tabular-nums">{Math.min(rank.lp, 100)} / 100 LP</span>
+            <span>{rank.step < MAX_STEP ? `Nächster Rang: ${rankName(rank.step + 1)}` : 'Höchster Rang'}</span>
+          </div>
+        </div>
+      </div>
+
+      {locked && (
+        <div role="status" className="flex items-center gap-2 rounded-lg border border-red-500/50 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+          <Icon n="heart" size={16} /> Keine Herzen mehr.
+          <button onClick={onNoHearts} className="underline font-semibold">Recovery Drill</button>
+          <button onClick={onShop} className="underline font-semibold">Herzen holen</button>
+        </div>
+      )}
+      <div className="grid grid-cols-2 gap-2">
+        <button onClick={locked ? onNoHearts : onDaily} aria-disabled={locked}
+          className="col-span-2 aria-disabled:opacity-50 flex items-center gap-3 rounded-xl border border-[#0AC8B9]/60 bg-[#010A13]/80 px-4 py-3.5 text-left shadow-[0_0_12px_rgba(10,200,185,.18)] transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
+          <Icon n="calendar" size={28} className="text-[#0AC8B9]" />
+          <span>
+            <span className="block font-serif text-lg font-extrabold leading-tight text-white">Daily Run</span>
+            <span className="block text-xs text-[#0AC8B9]">Challenge des Tages, Herz nur bei Niederlage</span>
+          </span>
+        </button>
+        <button onClick={locked ? onNoHearts : onRanked} aria-disabled={locked}
+          className="aria-disabled:opacity-50 flex flex-col gap-1.5 rounded-xl bg-[#C89B3C] p-3 text-left text-[#010A13] shadow-[0_0_16px_rgba(200,155,60,.5)] transition hover:brightness-110 active:scale-[.98]">
+          <Icon n="swords" size={26} />
+          <span className="font-serif font-extrabold leading-tight">Ranked Match</span>
+          <span className="text-xs font-semibold text-[#010A13]/70">Match oder Quiz, Herz nur bei Niederlage</span>
+        </button>
+        <button onClick={onPractice}
+          className="flex flex-col gap-1.5 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3 text-left transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
+          <Icon n="target" size={26} className="text-[#0AC8B9]" />
+          <span className="font-serif font-extrabold text-white leading-tight">Übungsmodus</span>
+          <span className="text-xs text-gray-400">Ohne LP-Risiko</span>
+        </button>
+        <button onClick={locked ? onNoHearts : onMastery} disabled={!masteryN} aria-disabled={locked}
+          className="col-span-2 aria-disabled:opacity-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-3 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2.5 text-left transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
+          <ChampAvatar name={profile.champion || 'Heimerdinger'} className="w-10 h-10" />
+          <span className="min-w-0">
+            <span className="block font-serif font-extrabold leading-tight text-white">Champion Mastery</span>
+            <span className="block truncate text-xs text-gray-400">
+              {masteryN ? `${profile.champion}: ${Math.min(QUIZ_LENGTH, masteryN)} Fragen, Herz nur bei Niederlage` : `Keine Szenarien für ${profile.champion} (${profile.role})`}
+            </span>
+          </span>
+        </button>
+      </div>
+
+      <Divider />
+      <div className="flex flex-col gap-2">
+        <div className="font-serif font-bold">Letzte Runs</div>
+        {history.length === 0 && <div className="text-sm text-slate-500 rounded-lg border border-dashed p-3 text-center" style={{ borderColor: 'var(--line)' }}><span aria-hidden="true">🐹</span> Ein Poro schläft hier... Spiel deinen ersten Run.</div>}
+        {history.slice(0, 5).map((h, i) => {
+          const win = h.lp >= 0, c = win ? 'var(--teal)' : 'var(--red)';
+          return (
+            <div key={h.ts + '-' + i} className="flex items-center gap-3 rounded-lg border px-3 py-2" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+              <span className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center" style={{ color: c, background: win ? 'rgba(10,200,185,.14)' : 'rgba(232,64,87,.14)' }} aria-label={win ? 'Sieg' : 'Niederlage'}>
+                <Icon n={win ? 'check' : 'x'} size={16} />
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-sm truncate">{h.champion}</div>
+                <div className="text-xs text-slate-400">{h.role}</div>
+              </div>
+              <div className="font-extrabold tabular-nums" style={{ color: h.lp === 0 ? 'var(--gold)' : c }}>{h.lp > 0 ? '+' : ''}{h.lp} LP</div>
+            </div>
+          );
+        })}
+      </div>
+
+      <button onClick={() => { if (confirm) { onReset(); setConfirm(false); } else setConfirm(true); }}
+        className="self-center text-xs text-slate-500 underline pb-1">{confirm ? 'Wirklich zurücksetzen? Nochmal tippen' : 'Fortschritt zurücksetzen'}</button>
+    </div>
+  );
+}
+
+const Chip = ({ active, disabled, onClick, children }) => (
+  <button type="button" onClick={onClick} disabled={disabled} aria-pressed={active}
+    className={`rounded-lg border px-3 py-1.5 text-sm font-semibold transition disabled:opacity-35 disabled:cursor-not-allowed ${active ? 'border-[#0AC8B9] bg-[#0AC8B9]/15 text-[#0AC8B9]' : 'border-[#C89B3C]/40 bg-[#010A13]/80 text-gray-300 hover:border-[#0AC8B9]'}`}>
+    {children}
+  </button>
+);
+
+function PracticeSetup({ onStart, onClose }) {
+  const [role, setRole] = useState(null);
+  const [difficulty, setDifficulty] = useState(null);
+  const count = practicePool(role, difficulty).length;
+  return (
+    <div className="absolute inset-0 z-40 flex items-end justify-center p-3" style={{ background: 'rgba(5,10,20,.8)' }} onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label="Übungsmodus einrichten" onClick={e => e.stopPropagation()}
+           className="w-full rounded-2xl border p-4 flex flex-col gap-4" style={{ background: '#06111F', borderColor: 'var(--teal)' }}>
+        <div className="flex items-center gap-2">
+          <Icon n="target" size={22} className="text-teal-300" />
+          <div className="flex-1 font-bold">Übungsmodus</div>
+          <button onClick={onClose} aria-label="Schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
+        </div>
+        <div className="text-xs text-gray-400">Safe Space: Es werden keine LP gewertet und nichts in der Historie gespeichert.</div>
+        <div>
+          <div className="text-sm font-semibold mb-1.5">Rolle</div>
+          <div className="flex flex-wrap gap-2">{ROLE_FILTERS.map(([l, v]) => <Chip key={l} active={role === v} onClick={() => setRole(v)}>{l}</Chip>)}</div>
+        </div>
+        <div>
+          <div className="text-sm font-semibold mb-1.5">Schwierigkeit</div>
+          <div className="flex flex-wrap gap-2">{DIFF_FILTERS.map(([l, v]) => <Chip key={l} active={difficulty === v} onClick={() => setDifficulty(v)}>{l}</Chip>)}</div>
+        </div>
+        <div className={`text-xs ${count ? 'text-gray-400' : 'text-red-400'}`} role="status">
+          {count ? `${count} ${count === 1 ? 'Szenario passt' : 'Szenarien passen'}` : 'Kein Szenario für diese Kombination. Ändere einen Filter.'}
+        </div>
+        <button disabled={!count} onClick={() => onStart({ role, difficulty })}
+          className="py-3 rounded-xl font-serif font-extrabold text-[#010A13] disabled:opacity-40" style={{ background: 'linear-gradient(#7ee8df,#0AC8B9)' }}>Start Practice</button>
+      </div>
+    </div>
+  );
+}
+
+const WayCard = ({ active, icon, title, text, onClick }) => (
+  <button type="button" onClick={onClick} aria-pressed={active}
+    className={`flex flex-col gap-1.5 rounded-xl border p-3 text-left transition active:scale-[.98] ${active
+      ? 'border-[#C89B3C] bg-[#0A1428] shadow-[0_0_14px_rgba(200,155,60,.35)]'
+      : 'border-[#C89B3C]/40 bg-[#010A13]/80 shadow-[0_2px_0_0_#030712] hover:border-[#0AC8B9]'}`}>
+    <Icon n={icon} size={26} className="text-[#C89B3C]" />
+    <span className="font-serif font-extrabold text-white leading-tight">{title}</span>
+    <span className="text-xs text-gray-400">{text}</span>
+  </button>
+);
+
+function RankedSetup({ rank, onStart, onClose }) {
+  const [way, setWay] = useState(null);       // 'match' | 'quiz'
+  const [role, setRole] = useState(null);
+  const pool = rankedPool(rank.step);          // Tier-Lock
+  const quizCount = Math.min(QUIZ_LENGTH, pool.length);
+  const ready = way === 'quiz' || (way === 'match' && !!role);
+  return (
+    <div className="absolute inset-0 z-40 flex items-end justify-center p-3" style={{ background: 'rgba(1,10,19,.85)' }} onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label="Ranked Match einrichten" onClick={e => e.stopPropagation()}
+           className="w-full rounded-2xl border border-[#C89B3C]/40 bg-[#06111F] p-4 flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <Icon n="swords" size={22} className="text-[#C89B3C]" />
+          <div className="flex-1 font-serif text-lg font-bold">Ranked Match</div>
+          <button onClick={onClose} aria-label="Schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
+        </div>
+        <div className="text-xs text-gray-400">
+          Ein Herz geht nur bei Niederlage oder Abbruch verloren. LP werden erst am Ende gebucht. Liga {tierOf(rank.step)}: Du spielst nur {pool[0].difficulty}-Szenarien.
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <WayCard active={way === 'match'} icon="swords" title="Match-Simulation" text="Ein echtes Match: zusammenhängende Entscheidungen einer Rolle" onClick={() => setWay('match')} />
+          <WayCard active={way === 'quiz'} icon="zap" title="Makro-Quiz" text={`${quizCount} schnelle, unabhängige Situationen aus deiner Liga`} onClick={() => setWay('quiz')} />
+        </div>
+        {way === 'match' && (
+          <div>
+            <div className="text-sm font-semibold mb-1.5">Rolle wählen</div>
+            <div className="flex flex-wrap gap-2">
+              {RANKED_ROLES.map(([l, v]) => <Chip key={l} active={role === v} disabled={!matchPool(v, rank.step).length} onClick={() => setRole(v)}>{l}</Chip>)}
+            </div>
+            <div className="text-xs text-gray-400 mt-2">Ausgegraute Rollen haben in deiner Liga noch kein Match. Fehler beenden das Match nicht.</div>
+          </div>
+        )}
+        {way === 'quiz' && (
+          <div className="text-xs text-gray-400">
+            Keine Rollenwahl nötig. {quizCount} Szenarien nacheinander{quizCount < QUIZ_LENGTH ? ` (in deiner Liga gibt es erst ${pool.length})` : ''}, danach das Gesamtergebnis.
+          </div>
+        )}
+        {!way && <div className="text-xs text-gray-500">Wähle einen Weg.</div>}
+        <button disabled={!ready} onClick={() => onStart({ way, role })}
+          className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#C89B3C] font-serif font-extrabold text-[#010A13] shadow-[0_0_14px_rgba(200,155,60,.45)] disabled:opacity-40">
+          Start
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort }) {
+  const limit = Math.min(scenario.timeLimit || DEFAULT_TIME_LIMIT, timeCap || Infinity);   // individuelles Zeitlimit pro Szenario
+  const [left, setLeft] = useState(limit);
+  const [pick, setPick] = useState(null);       // { opt } | { timeout: true } | null
+  const [coach, setCoach] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [leave, setLeave] = useState(false);   // Bestätigung zum Abbrechen
+  const [showMom, setShowMom] = useState(true);   // Momentum-Banner am Phasenstart
+  const [msgs, setMsgs] = useState([{ from: 'coach', t: 'Ich gebe dir Hinweise, aber nie die Lösung. Was willst du wissen?' }]);
+  const [draft, setDraft] = useState('');
+  const endRef = useRef(null);
+  const adv = useRef(false);   // verhindert doppeltes Weiter
+  const replyTimer = useRef(null);
+
+  // Timer: pausiert, solange der Coach offen ist
+  useEffect(() => {
+    if (pick || coach || leave) return;   // Timer pausiert bei Coach und Abbruch-Dialog
+    if (left <= 0) { setPick({ timeout: true }); return; }
+    const t = setTimeout(() => setLeft(l => l - 1), 1000);
+    return () => clearTimeout(t);
+  }, [left, pick, coach, leave]);
+
+  useEffect(() => () => clearTimeout(replyTimer.current), []);
+  useEffect(() => { if (pick) setMapOpen(false); }, [pick]);
+  useEffect(() => { const t = setTimeout(() => setShowMom(false), 5000); return () => clearTimeout(t); }, []);
+  // Auflösung: kurz nach dem Lock-in erklingt Erfolg oder Fehler (bei Timeout sofort)
+  useEffect(() => {
+    if (!pick) return;
+    const t = setTimeout(() => playHextechSound(ok ? 'correct' : 'wrong'), pick.opt ? 260 : 0);
+    return () => clearTimeout(t);
+  }, [pick]);
+  // Ergebnis-Zustand: kurz stehen bleiben, dann automatisch weiter (oder per Button)
+  useEffect(() => {
+    if (!pick || leave || !ok) return;   // richtige Antwort: automatisch weiter; falsche: erst lesen, dann "Weiter"
+    const t = setTimeout(goNext, RESULT_MS);
+    return () => clearTimeout(t);
+  }, [pick, leave]);
+  useEffect(() => {
+    if (!mapOpen) return;
+    const h = e => { if (e.key === 'Escape') setMapOpen(false); };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [mapOpen]);
+  useEffect(() => { if (coach) endRef.current && endRef.current.scrollIntoView({ block: 'end' }); }, [msgs, typing, coach]);
+
+  const choose = opt => { if (!pick) { playHextechSound('lock_in'); setPick({ opt }); setCoach(false); } };
+  const urgent = left <= 5;
+
+  // Dummy-KI: antwortet nach 1,5 s immer mit dem coachHint des aktuellen Szenarios
+  const ask = e => {
+    e.preventDefault();
+    const q = draft.trim();
+    if (!q || typing) return;
+    setDraft('');
+    setMsgs(m => [...m, { from: 'me', t: q }]);
+    setTyping(true);
+    replyTimer.current = setTimeout(() => {
+      setMsgs(m => [...m, { from: 'coach', t: scenario.coachHint || COACH_FALLBACK }]);
+      setTyping(false);
+    }, 1500);
+  };
+
+  const ok = !!pick && !!pick.opt && pick.opt.lpChange > 0;   // richtig = beste Option
+  const wrong = !!pick && !ok;                                // falsch oder Timeout -> Screen-Shake
+  const fbColor = ok ? 'var(--teal)' : 'var(--red)';
+  const fbText = pick ? (pick.opt ? pick.opt.feedback : 'Zeit abgelaufen. Kein Call ist ein Throw.') : '';
+  const choice = pick ? (pick.opt ? stripLetter(pick.opt.label) : 'Keine Entscheidung (Zeit abgelaufen)') : '';
+  const chain = pick ? ((pick.opt && pick.opt.chain) || TIMEOUT_CHAIN) : null;
+  const fx = pick ? effectsFor(pick.opt, scenario, ok) : null;
+  const goNext = () => { if (adv.current || !pick) return; adv.current = true; onNext(pick.opt || null); };
+
+  return (
+    <div className={`flex-1 min-h-0 relative flex flex-col ${wrong ? 'shake' : ''}`}>
+      <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
+        {/* Spielzeit und Phase in einem Badge */}
+        <div className="flex items-center gap-2">
+          <div className={`inline-flex min-w-0 items-center gap-2 rounded-lg border bg-[#010A13]/80 px-3 py-1.5 font-serif text-lg font-black text-white ${practice ? 'border-[#0AC8B9]/70' : 'border-[#C89B3C]/60'}`}
+               aria-label={`${practice ? 'Übungsmodus, ' : ''}Spielzeit ${scenario.gameTime}, ${tag}`}>
+            <Icon n="clock" size={18} className={practice ? 'text-[#0AC8B9]' : 'text-[#C89B3C]'} />
+            <span className="tabular-nums leading-none">{scenario.gameTime}</span>
+            <span className="text-[#C89B3C]" aria-hidden="true">•</span>
+            {practice && <Icon n="target" size={16} className="shrink-0 text-[#0AC8B9]" />}
+            <span className="truncate text-sm font-bold leading-none">{tag}</span>
+          </div>
+          <button onClick={() => setLeave(true)} aria-label="Zurück zum Hauptmenü" title="Zurück zum Hauptmenü"
+            className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C] text-[#C89B3C] transition hover:bg-[#C89B3C]/15 active:scale-95">
+            <Icon n="home" size={18} />
+          </button>
+        </div>
+
+        {momentum && showMom && !pick && (
+          <div role="status" className={`rounded-lg border px-3 py-1.5 text-sm ${momentum.good ? 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10 text-[#0AC8B9]' : 'border-red-500/60 bg-red-500/10 text-red-300'}`}>
+            <div className="font-semibold">{momentum.text}</div>
+            <div className="text-xs opacity-80">{momentum.state}</div>
+          </div>
+        )}
+
+        {/* Timer */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--track)' }} role="progressbar" aria-valuenow={left} aria-valuemax={limit}>
+            <div className="h-full transition-[width] duration-1000 ease-linear" style={{ width: `${(left / limit) * 100}%`, background: coach ? 'var(--gold)' : 'var(--red)' }} />
+          </div>
+          <div className={`w-9 text-right font-extrabold tabular-nums ${coach ? 'text-[#C89B3C]' : urgent ? 'text-[#E84057]' : ''} ${urgent && !coach && !leave && !pick ? 'panic' : ''}`}>{left}s</div>
+        </div>
+
+        {/* Minimap mit Markern (Zoom per Klick) */}
+        <button type="button" onClick={() => setMapOpen(true)} aria-label="Minimap vergrößern"
+          className="relative h-36 shrink-0 rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13] cursor-pointer transition hover:border-[#0AC8B9]">
+          <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} result={pick ? (ok ? 'good' : 'bad') : null} fx={fx} />
+          <span className="absolute top-1.5 right-1.5 rounded-md bg-black/40 p-1 text-white/80"><Icon n="zoom" size={16} /></span>
+        </button>
+
+        {/* Champion & Rolle */}
+        <div className="flex items-center gap-2.5 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 px-2.5 py-1.5">
+          <ChampAvatar name={scenario.champion} className="w-10 h-10" />
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-white leading-tight truncate">{scenario.champion}</div>
+            <div className="text-xs text-gray-400">{scenario.role}</div>
+          </div>
+          <span className="text-xs font-semibold rounded-md px-2 py-1 border text-[#0AC8B9]" style={{ borderColor: 'var(--teal)' }}>{scenario.difficulty}</span>
+          <span title={scenario.role} aria-label={scenario.role}
+                className="w-8 h-8 rounded-lg border border-[#C89B3C]/60 bg-[#0A1428] flex items-center justify-center text-[#0AC8B9]">
+            <Icon n={ROLE_ICON[scenario.role]} size={16} />
+          </span>
+        </div>
+
+        {/* Kontext */}
+        <div className="rounded-xl border p-2.5 leading-snug text-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+          {scenario.context}
+        </div>
+
+        {/* Entscheidungen: 2 bis 4 Optionen, je nach Länge des Arrays */}
+        <div className="flex flex-col gap-1.5">
+          {scenario.options.map(opt => {
+            const m = opt.label.match(/^([A-Z]):\s*(.*)$/);
+            const key = m ? m[1] : '', text = m ? m[2] : opt.label;
+            const chosen = pick && pick.opt === opt;
+            return (
+              <button key={opt.label} data-silent="true" disabled={!!pick} onClick={() => choose(opt)}
+                className={`group flex items-center gap-2.5 rounded-xl border px-2.5 py-2 text-left transition-all duration-150 shadow-[0_2px_0_0_#030712] ${
+                  !pick ? 'bg-[#010A13]/80 border-[#C89B3C]/40 hover:border-[#0AC8B9] hover:bg-[#0A1428] hover:-translate-y-0.5 active:translate-y-0 active:scale-[.99]'
+                  : chosen ? 'bg-[#0A1428]' : 'bg-[#010A13]/80 border-[#C89B3C]/40 opacity-50'}`}
+                style={chosen ? { borderColor: fbColor } : undefined}>
+                <span className={`w-7 h-7 shrink-0 rounded-md border flex items-center justify-center text-sm font-extrabold bg-[#0A1428] border-[#C89B3C]/60 text-[#C89B3C] transition-colors ${!pick ? 'group-hover:border-[#0AC8B9] group-hover:text-[#0AC8B9]' : ''}`}>{key}</span>
+                <span className="font-semibold text-[13px] leading-snug text-gray-100">{text}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {pick && (
+          <div role="status" className="overflow-hidden rounded-lg border" style={{ borderColor: fbColor }}>
+            {ok ? (
+              <div className="flex items-start gap-2 px-3 py-2 text-sm" style={{ color: fbColor }}>
+                <Icon n="check" size={18} className="mt-0.5 shrink-0" /><span>{fbText}</span>
+              </div>
+            ) : (
+              <dl className="space-y-1 px-3 py-2 text-sm">
+                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Deine Wahl: </dt><dd className="inline text-slate-200">{choice}</dd></div>
+                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Direkte Folge: </dt><dd className="inline text-slate-200">{chain[0]}</dd></div>
+                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Team-Schaden: </dt><dd className="inline text-slate-200">{chain[1]}</dd></div>
+              </dl>
+            )}
+            {ok && (
+              <div className="h-0.5 w-full" style={{ background: 'var(--track)' }}>
+                <div className="drain h-full" style={{ background: fbColor, animationDuration: `${RESULT_MS}ms` }} />
+              </div>
+            )}
+          </div>
+        )}
+        {pick && (
+          <button autoFocus onClick={goNext}
+            className={`rounded-xl py-2 text-sm font-serif font-bold transition active:scale-[.98] ${ok
+              ? 'border border-[#C89B3C]/60 text-[#C89B3C] hover:border-[#0AC8B9] hover:text-[#0AC8B9]'
+              : 'bg-[#C89B3C] text-[#010A13] shadow-[0_0_12px_rgba(200,155,60,.4)]'}`}>Weiter</button>
+        )}
+
+        <div className="flex items-center justify-between mt-auto pt-0.5">
+          <div className="text-xs text-slate-400">{practice ? 'Übung: zählt nicht' : 'Ergebnis nach der letzten Entscheidung'}</div>
+          <button onClick={() => setCoach(true)} disabled={!!pick}
+            className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold text-[#C89B3C] disabled:opacity-40"
+            style={{ borderColor: 'var(--gold)', background: 'var(--panel)' }}>
+            <span aria-hidden="true">🐾</span> Ask Poro Coach
+          </button>
+        </div>
+      </div>
+
+      {/* Abbruch-Bestätigung (Timer pausiert) */}
+      {leave && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center p-5" style={{ background: 'rgba(1,10,19,.88)' }}>
+          <div role="alertdialog" aria-modal="true" aria-labelledby="leave-title"
+               className="w-full rounded-2xl border border-[#C89B3C]/60 bg-[#06111F] p-4 flex flex-col gap-3 text-center">
+            <div id="leave-title" className="font-serif text-lg font-bold">Zurück zum Dashboard?</div>
+            <div className="text-sm text-slate-300">
+              Dein aktueller Fortschritt geht verloren und es werden keine LP gewertet.{!practice && ' Du verlierst dafür 1 Herz.'}
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button autoFocus onClick={() => setLeave(false)}
+                className="rounded-xl border border-[#C89B3C]/60 py-2.5 font-serif font-bold transition hover:border-[#0AC8B9]">Weiterspielen</button>
+              <button onClick={onAbort} className="rounded-xl bg-[#C89B3C] py-2.5 font-serif font-extrabold text-[#010A13]">Ja, abbrechen</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Karten-Modal (Timer läuft weiter) */}
+      {mapOpen && (
+        <div className="absolute inset-0 z-30 flex flex-col p-4 gap-3" style={{ background: 'rgba(5,10,20,.96)' }}>
+          <div className="flex items-center gap-3" role="dialog" aria-modal="true" aria-label="Taktik-Karte">
+            <div className="font-bold flex-1">Taktik-Karte · {scenario.gameTime}</div>
+            <div className={`flex items-center gap-1 font-extrabold tabular-nums ${urgent ? 'text-[#E84057]' : ''}`}><Icon n="timer" size={16} /> {left}s</div>
+            <button onClick={() => setMapOpen(false)} aria-label="Karte schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
+          </div>
+          <div className="w-full max-w-[380px] aspect-square mx-auto rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13]">
+            <Minimap markers={scenario.markers} champion={scenario.champion} showLabels />
+          </div>
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
+            {[['hero', 'Du / Team'], ['enemy', 'Gegner'], ['objective', 'Objective'], ['fog', 'Ungesichtet']].map(([t, l]) => (
+              <span key={t} className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full" style={t === 'fog' ? { border: '1.5px dashed #94a3b8' } : t === 'objective' ? { border: `2px solid ${MARKER_COLOR[t]}` } : { background: MARKER_COLOR[t] }} />{l}
+              </span>
+            ))}
+          </div>
+          {scenario.markers.some(m => m.type === 'fog') && (
+            <div className="rounded-lg border border-dashed border-slate-500/60 px-3 py-2 text-xs text-slate-300">
+              {scenario.markers.filter(m => m.type === 'fog').map(m => <div key={m.label}><span className="font-bold text-slate-200">?</span> {m.label}</div>)}
+            </div>
+          )}
+          <div className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 p-3 text-sm leading-relaxed overflow-y-auto">{scenario.context}</div>
+        </div>
+      )}
+
+      {/* Coach-Modal */}
+      {coach && (
+        <div className="absolute inset-0 z-30 flex flex-col justify-end" style={{ background: 'rgba(5,10,20,.75)' }}>
+          <div role="dialog" aria-modal="true" aria-label="Poro Coach"
+               className="h-[78%] flex flex-col rounded-t-2xl border-t" style={{ background: '#06111F', borderColor: 'var(--gold)' }}>
+            <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: 'var(--line)' }}>
+              <span className="text-xl" aria-hidden="true">🐹</span>
+              <div className="flex-1 min-w-0">
+                <div className="font-serif font-bold leading-tight">Poro Coach</div>
+                <div className="text-xs text-[#C89B3C]">Timer pausiert bei {left}s</div>
+              </div>
+              <button onClick={() => setCoach(false)} aria-label="Coach schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+              {msgs.map((m, i) => (
+                <div key={i} className={`max-w-[85%] rounded-lg px-3 py-2 text-sm leading-relaxed ${m.from === 'me' ? 'self-end' : 'self-start'}`}
+                     style={{ background: m.from === 'me' ? '#1A2A48' : 'var(--bg)' }}>{m.t}</div>
+              ))}
+              {typing && (
+                <div className="self-start rounded-lg px-3 py-2 text-sm text-slate-400 italic" style={{ background: 'var(--bg)' }} role="status">Coach tippt...</div>
+              )}
+              <div ref={endRef} />
+            </div>
+
+            <form onSubmit={ask} className="flex gap-2 p-3 border-t" style={{ borderColor: 'var(--line)' }}>
+              <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Frag den Coach..." autoFocus
+                className="flex-1 min-w-0 rounded-lg border px-3 py-2.5 text-sm bg-transparent placeholder:text-slate-500" style={{ borderColor: 'var(--line)' }} />
+              <button type="submit" aria-label="Senden" disabled={!draft.trim() || typing}
+                className="px-3.5 rounded-lg text-[#0A1428] disabled:opacity-40" style={{ background: 'var(--gold)' }}><Icon n="send" size={18} /></button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const CONFETTI_COLORS = ['#f5d36b', '#C89B3C', '#3b82f6', '#0AC8B9', '#E84057', '#b86bff'];
+const Confetti = () => (
+  <div className="pointer-events-none absolute inset-0 overflow-hidden z-10" aria-hidden="true">
+    {Array.from({ length: 28 }, (_, i) => (
+      <span key={i} className="confetti" style={{
+        left: `${(i * 37) % 100}%`, background: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+        animationDelay: `${(i % 7) * 0.12}s`, animationDuration: `${2.4 + (i % 5) * 0.35}s` }} />
+    ))}
+  </div>
+);
+
+const StepList = ({ log }) => (
+  <div className="w-full flex flex-col gap-2 text-left">
+    {log.map((e, i) => (
+      <div key={i} className="rounded-lg border p-2.5 text-sm" style={{ background: 'var(--panel)', borderColor: e.ok ? 'rgba(10,200,185,.45)' : 'rgba(232,64,87,.45)' }}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">{e.title}</div>
+            <div className="font-semibold">{e.text}</div>
+          </div>
+          <span className={`shrink-0 text-lg font-black leading-none ${e.ok ? 'text-[#0AC8B9]' : 'text-[#E84057]'}`} aria-label={e.ok ? 'richtig' : 'falsch'}>{e.ok ? '✔' : '✖'}</span>
+        </div>
+        {e.ok ? <div className="mt-1 text-slate-400">{e.feedback}</div> : (
+          <dl className="mt-1.5 space-y-1 text-xs">
+            {e.chain && <div><dt className="inline font-semibold text-slate-300">Direkte Folge: </dt><dd className="inline text-slate-400">{e.chain[0]}</dd></div>}
+            {e.chain && <div><dt className="inline font-semibold text-slate-300">Team-Schaden: </dt><dd className="inline text-slate-400">{e.chain[1]}</dd></div>}
+            {e.best && <div><dt className="inline font-semibold text-[#0AC8B9]">Besser wäre: </dt><dd className="inline text-slate-300">{e.best}</dd></div>}
+          </dl>
+        )}
+      </div>
+    ))}
+  </div>
+);
+
+function RunComplete({ result, log, practice, format, onDone, onRetry }) {
+  useEffect(() => {
+    const timers = [];
+    if (result.drill) playHextechSound(result.passed ? 'correct' : 'wrong');
+    else {
+      const promo = !practice && result.to.step > result.from.step;
+      playHextechSound(result.win ? (promo ? 'promotion' : 'victory') : 'defeat');
+      if (!practice && result.heartLost) timers.push(setTimeout(() => playHextechSound('heart_loss'), 1100));
+    }
+    return () => timers.forEach(clearTimeout);
+  }, []);
+  const unit = format === 'match' ? 'Match' : format === 'quiz' ? 'Quiz' : format === 'mastery' ? 'Mastery' : format === 'drill' ? 'Drill' : 'Run';
+
+  if (result.drill) {
+    return (
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center gap-3 text-center">
+        <div className="pt-3">
+          <div className={`pop font-serif text-3xl font-black ${result.passed ? 'text-[#0AC8B9]' : 'text-[#E84057]'}`}>{result.passed ? 'Drill bestanden!' : 'Nicht bestanden'}</div>
+          <div className="mt-1 text-sm text-slate-400">Recovery Drill · {result.correct}/{result.n} richtig</div>
+        </div>
+        <div className="w-full"><Divider /></div>
+        {result.passed ? (
+          <div className="flex items-center gap-2 rounded-xl border border-red-500/60 bg-red-500/10 px-5 py-3 font-serif text-lg font-bold text-red-300">
+            <Icon n="heart" size={22} fill="currentColor" /> +1 Herz zurück
+          </div>
+        ) : <div className="text-sm text-slate-300">Beide Fragen müssen richtig sein. Ein neuer Versuch kostet nichts.</div>}
+        <StepList log={log} />
+        {!result.passed && <button onClick={onRetry} className="w-full rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Nochmal versuchen</button>}
+        <button onClick={onDone} className="w-full rounded-xl border border-[#C89B3C]/60 py-3 font-serif font-bold">Weiter zum Dashboard</button>
+      </div>
+    );
+  }
+
+  const win = result.win;
+  const color = win ? 'var(--teal)' : 'var(--red)';
+  const to = result.to;
+  const promoted = !practice && to.step > result.from.step;
+  const demoted = !practice && to.step < result.from.step;
+  const newLeague = promoted && tierOf(to.step) !== tierOf(result.from.step);
+  const cls = to && RANK_ICON[tierOf(to.step)].cls;
+  const toGo = to && to.step < MAX_STEP ? 100 - to.lp : null;   // Challenger hat kein Ziel mehr
+
+  return (
+    <div className="flex-1 min-h-0 relative flex flex-col">
+      {promoted && <Confetti />}
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center gap-3 text-center">
+        <div className="pt-2">
+          <div className="pop font-serif text-4xl font-black tracking-wide" style={{ color }}>{win ? 'VICTORY' : 'DEFEAT'}</div>
+          <div className="mt-1 font-serif text-lg font-bold text-white">{result.kind}</div>
+          <div className="text-xs text-slate-400">{unit} Complete · {result.correct} von {result.n} richtig</div>
+        </div>
+        <div className="rounded-xl border px-8 py-3" style={{ background: 'var(--panel)', borderColor: practice ? 'var(--line)' : color }}>
+          {practice ? (
+            <div className="text-lg font-extrabold" style={{ color }}>Das wären {fmt(result.lp)} LP gewesen</div>
+          ) : (
+            <>
+              <div className="text-4xl font-black tabular-nums" style={{ color }}>{fmt(result.lp)} LP</div>
+              <div className={`mt-1 text-sm font-semibold tabular-nums ${result.mmrDelta > 0 ? 'text-[#0AC8B9]' : 'text-[#E84057]'}`}>
+                MMR {fmt(result.mmrDelta)} {result.mmrDelta > 0 ? '▲' : '▼'}
+              </div>
+              <div className={`mt-1 flex items-center justify-center gap-1 text-xs ${result.heartLost ? 'text-red-300' : 'text-slate-400'}`}>
+                <Icon n="heart" size={12} fill={result.heartLost ? 'currentColor' : 'none'} /> {result.heartLost ? '−1 Herz' : 'Kein Herz verloren'}
+              </div>
+            </>
+          )}
+        </div>
+
+        {practice ? (
+          <div className="text-sm text-slate-400">Dein Rang und deine Historie bleiben unverändert.</div>
+        ) : (
+          <div className="w-full flex flex-col items-center gap-2 rounded-xl border p-3" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+            <div className="relative w-20 h-20 flex items-center justify-center">
+              {promoted && <span className="rankglow absolute inset-0 rounded-full bg-yellow-400/50 blur-xl" aria-hidden="true" />}
+              <span className="relative"><RankIcon tier={tierOf(to.step)} size={56} /></span>
+            </div>
+            {promoted && <div className="pop font-black text-yellow-300">{newLeague ? `Neue Liga: ${rankName(to.step)}!` : 'Aufstieg!'}</div>}
+            {demoted && <div className="font-bold text-red-400">Abstieg in {rankName(to.step)} mit {to.lp} LP</div>}
+            {result.event === 'shield' && (
+              <div className="flex items-center gap-1.5 rounded-lg border border-[#0AC8B9]/60 bg-[#0AC8B9]/10 px-3 py-1.5 text-xs font-semibold text-[#0AC8B9]" role="status">
+                <Icon n="shield" size={14} /> Demotion Shield aktiv: Eine weitere Niederlage bei 0 LP führt zum Abstieg.
+              </div>
+            )}
+            <div className="text-sm text-slate-300">
+              Aktueller Rang: <span className={`font-bold ${cls}`}>{rankName(to.step)}</span> <span className="tabular-nums text-slate-400">({to.lp} LP)</span>
+            </div>
+            <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--track)' }}>
+              <div className={`h-full rounded-full bg-current ${cls}`} style={{ width: `${Math.min(100, to.lp)}%` }} />
+            </div>
+            {toGo !== null && <div className="text-sm font-semibold text-slate-100">Noch {toGo} LP bis {rankName(to.step + 1)}</div>}
+          </div>
+        )}
+
+        <div className="w-full"><Divider /></div>
+        <div className="font-serif text-lg font-bold">Post-Match Breakdown</div>
+        <StepList log={log} />
+        <button onClick={onDone} className="w-full py-3 rounded-xl font-serif font-extrabold text-[#010A13]" style={{ background: 'var(--gold)' }}>Weiter zum Dashboard</button>
+      </div>
+    </div>
+  );
+}
+
+function NoHearts({ onDrill, onShop, onClose }) {
+  return (
+    <div className="absolute inset-0 z-40 flex items-end justify-center p-3" style={{ background: 'rgba(1,10,19,.85)' }} onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label="Keine Herzen mehr" onClick={e => e.stopPropagation()}
+           className="w-full rounded-2xl border border-red-500/60 bg-[#06111F] p-4 flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <Icon n="heart" size={22} className="text-red-500" />
+          <div className="flex-1 font-serif text-lg font-bold">Keine Herzen mehr</div>
+          <button onClick={onClose} aria-label="Schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
+        </div>
+        <div className="text-sm text-slate-300">Daily, Ranked und Mastery brauchen mindestens ein Herz, denn Niederlagen und Abbrüche kosten eines. Löse im Recovery Drill zwei kurze Fragen richtig und du bekommst sofort 1 Herz zurück.</div>
+        <button onClick={onDrill} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13] shadow-[0_0_14px_rgba(200,155,60,.45)]">Recovery Drill absolvieren</button>
+        <button onClick={onShop} className="rounded-xl border border-[#0AC8B9]/60 py-2.5 text-sm font-semibold text-[#0AC8B9]">Stattdessen Werbung ansehen</button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Account, Profil, Champion Mastery ---------- */
+const STATUS = { online: { emoji: '🟢', label: 'Online' }, match: { emoji: '🟡', label: 'Im Match' }, away: { emoji: '🔴', label: 'Away / AFK' } };
+const ROLES = [['Top', 'Toplane'], ['Jungle', 'Jungle'], ['Mid', 'Midlane'], ['Bot', 'Botlane'], ['Support', 'Support']];
+const normName = n => (n || '').toLowerCase().replace(/[^a-z]/g, '');
+const masteryPool = (champ, role) => RUNS.filter(r => normName(r.champion) === normName(champ) && r.role === role);
+const CHAMP_NAMES = [...new Set(RUNS.map(r => r.champion))].sort();
+const fieldCls = 'rounded-lg border border-[#C89B3C]/40 bg-[#010A13] px-3 py-2 text-sm text-white placeholder:text-slate-500 outline-none focus:border-[#0AC8B9]';
+
+const MASTERY_TILES = [['Jax', 'Toplane', 'Top'], ['Lee Sin', 'Jungle', 'Jungle'], ['Ahri', 'Midlane', 'Mid'], ['Jinx', 'Botlane', 'Bot'], ['Thresh', 'Support', 'Support']];
+
+function MainPicker({ role, champion, onRole, onChampion }) {
+  const n = masteryPool(champion, role).length;
+  const name = champion.trim();
+  const tileHint = MASTERY_TILES.find(([c]) => normName(c) === normName(name));
+  return (
+    <div className="flex flex-col gap-3">
+      <div>
+        <div className="mb-1.5 text-sm font-semibold">Spielbare Mastery-Champions</div>
+        <div className="grid grid-cols-5 gap-1.5">
+          {MASTERY_TILES.map(([c, r, short]) => {
+            const active = normName(champion) === normName(c) && role === r;
+            return (
+              <button key={c} type="button" aria-pressed={active} onClick={() => { onRole(r); onChampion(c); }}
+                className={`flex flex-col items-center gap-1 rounded-lg border px-1 py-2 transition active:scale-95 ${active
+                  ? 'border-[#0AC8B9] bg-[#0AC8B9]/15 shadow-[0_0_10px_rgba(10,200,185,.35)]' : 'border-[#C89B3C]/40 bg-[#010A13]/80 hover:border-[#0AC8B9]'}`}>
+                <ChampAvatar name={c} className="w-9 h-9" iconSize={16} />
+                <span className="text-[11px] font-bold leading-none">{c}</span>
+                <span className="text-[10px] leading-none text-slate-400">{short}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div>
+        <div className="mb-1.5 text-sm font-semibold">Main-Rolle</div>
+        <div className="flex flex-wrap gap-2">{ROLES.map(([l, v]) => <Chip key={v} active={role === v} onClick={() => onRole(v)}>{l}</Chip>)}</div>
+      </div>
+      <div>
+        <label htmlFor="champ" className="mb-1.5 block text-sm font-semibold">Anderer Champion? Frei eintippen</label>
+        <input id="champ" list="champ-names" value={champion} onChange={e => onChampion(e.target.value)} maxLength={20}
+               placeholder="z. B. Jax" className={`w-full ${fieldCls}`} />
+        <datalist id="champ-names">{CHAMP_NAMES.map(c => <option key={c} value={c} />)}</datalist>
+        {name && (
+          <div className={`mt-1.5 text-xs ${n ? 'text-[#0AC8B9]' : 'text-gray-400'}`} role="status">
+            {n ? `Mastery verfügbar: ${n} Szenarien für ${name}`
+               : <>Für diesen Champion ist aktuell noch kein dedizierter Mastery-Run verfügbar.{tileHint ? ` Tipp: ${tileHint[0]} ist als ${tileHint[2]} spielbar.` : ''}</>}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Onboarding({ onDone }) {
+  const [name, setName] = useState('');
+  const [tier, setTier] = useState(0);
+  const [div, setDiv] = useState(4);
+  const [role, setRole] = useState('Toplane');
+  const [champion, setChampion] = useState('');
+  const hasDiv = tier < DIV_TIERS;
+  const step = hasDiv ? tier * 4 + (4 - div) : DIV_TIERS * 4 + (tier - DIV_TIERS);
+  const valid = name.trim().length >= 3 && champion.trim().length >= 2;
+  const submit = e => {
+    e.preventDefault();
+    if (!valid) return;
+    const canon = CHAMP_NAMES.find(c => normName(c) === normName(champion));
+    onDone({ name: name.trim(), step, role, champion: canon || champion.trim() });
+  };
+  return (
+    <form onSubmit={submit} className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+      <div className="pt-2 text-center">
+        <div className="font-serif text-2xl font-black">Willkommen, Beschwörer</div>
+        <div className="text-sm text-gray-400">Erstelle deinen Account für BrainGap.gg</div>
+      </div>
+      <Divider />
+      <div>
+        <label htmlFor="acc" className="mb-1.5 block text-sm font-semibold">Account-Name</label>
+        <input id="acc" value={name} onChange={e => setName(e.target.value)} maxLength={16} placeholder="Mindestens 3 Zeichen" className={`w-full ${fieldCls}`} />
+      </div>
+      <div>
+        <div className="mb-1.5 text-sm font-semibold">Aktueller Rang</div>
+        <div className="flex gap-2">
+          <select aria-label="Liga" value={tier} onChange={e => setTier(+e.target.value)} className={`w-full ${fieldCls}`} style={{ colorScheme: 'dark' }}>
+            {TIERS.map((t, i) => <option key={t} value={i}>{t}</option>)}
+          </select>
+          {hasDiv && (
+            <select aria-label="Division" value={div} onChange={e => setDiv(+e.target.value)} className={`w-24 ${fieldCls}`} style={{ colorScheme: 'dark' }}>
+              {[4, 3, 2, 1].map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+          )}
+        </div>
+        <div className="mt-1 text-xs text-gray-500">Du startest als {rankName(step)} mit 0 LP.</div>
+      </div>
+      <MainPicker role={role} champion={champion} onRole={setRole} onChampion={setChampion} />
+      <button type="submit" disabled={!valid}
+        className="mt-1 rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13] shadow-[0_0_14px_rgba(200,155,60,.45)] disabled:opacity-40">Account erstellen</button>
+    </form>
+  );
+}
+
+function Friends({ friends, selfName, onAdd, onRemove }) {
+  const [draft, setDraft] = useState('');
+  const [err, setErr] = useState('');
+  const add = e => {
+    e.preventDefault();
+    const name = draft.trim();
+    if (name.length < 3) return setErr('Der Name braucht mindestens 3 Zeichen.');
+    if (name.toLowerCase() === selfName.toLowerCase()) return setErr('Das bist du selbst.');
+    if (friends.some(f => f.name.toLowerCase() === name.toLowerCase())) return setErr('Dieser Freund ist schon in deiner Liste.');
+    if (friends.length >= 20) return setErr('Maximal 20 Freunde.');
+    onAdd(makeFriend(name)); setDraft(''); setErr('');
+  };
+  return (
+    <div className="flex flex-col gap-3">
+      <form onSubmit={add} className="flex gap-2">
+        <input value={draft} maxLength={16} onChange={e => { setDraft(e.target.value); setErr(''); }} placeholder="Beschwörername" aria-label="Beschwörername" className={`min-w-0 flex-1 ${fieldCls}`} />
+        <button type="submit" className="shrink-0 rounded-lg bg-[#C89B3C] px-4 font-serif font-bold text-[#010A13]">Hinzufügen</button>
+      </form>
+      {err && <div role="alert" className="text-xs text-red-400">{err}</div>}
+      <div className="text-xs text-gray-500">Es gibt noch keinen Server: Rang, Status und Notiz neuer Freunde sind simuliert und nur lokal gespeichert.</div>
+      {friends.length === 0 && <div className="rounded-lg border border-dashed border-[#C89B3C]/40 p-3 text-center text-sm text-slate-500">Noch keine Freunde. Füge oben einen Beschwörernamen hinzu.</div>}
+      {friends.map(f => (
+        <div key={f.name} className="flex items-center gap-3 rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankIcon tier={tierOf(f.step)} size={22} /></span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5"><span aria-hidden="true">{STATUS[f.status].emoji}</span><span className="truncate font-semibold">{f.name}</span></div>
+            <div className="text-xs text-gray-400">{rankName(f.step)} · {f.lp} LP · {STATUS[f.status].label}</div>
+            {f.note && <div className="truncate text-xs italic text-gray-500">„{f.note}“</div>}
+          </div>
+          <button onClick={() => onRemove(f.name)} aria-label={`${f.name} entfernen`} className="p-1.5 text-slate-500 hover:text-white"><Icon n="x" size={16} /></button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const TabBar = ({ tabs, value, onChange }) => (
+  <div role="tablist" className={`grid gap-2 ${tabs.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+    {tabs.map(([k, l]) => (
+      <button key={k} role="tab" aria-selected={value === k} onClick={() => onChange(k)}
+        className={`rounded-lg border py-2 text-sm font-semibold transition ${value === k ? 'border-[#0AC8B9] bg-[#0AC8B9]/15 text-[#0AC8B9]' : 'border-[#C89B3C]/40 bg-[#010A13]/80 text-gray-300 hover:border-[#0AC8B9]'}`}>{l}</button>
+    ))}
+  </div>
+);
+
+function Profile({ profile, rank, friends, onChange, onAddFriend, onRemoveFriend, onLogout }) {
+  const [tab, setTab] = useState('me');
+  const [confirm, setConfirm] = useState(false);
+  const tier = tierOf(rank.step);
+  return (
+    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+      <div className="flex items-center gap-3 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3">
+        <div className="relative shrink-0">
+          <ChampAvatar name={profile.champion || 'Heimerdinger'} className="w-16 h-16" iconSize={28} />
+          <span className="absolute -bottom-1 -right-1 text-base" aria-hidden="true">{STATUS[profile.status].emoji}</span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate font-serif text-xl font-bold">{profile.name}</div>
+          <div className={`flex items-center gap-1.5 text-sm font-semibold ${RANK_ICON[tier].cls}`}>
+            <RankIcon tier={tier} size={16} />{rankName(rank.step)} · {rank.lp} LP
+          </div>
+          {profile.note && <div className="mt-0.5 truncate text-xs italic text-gray-400">„{profile.note}“</div>}
+        </div>
+      </div>
+      <TabBar tabs={[['me', 'Profil'], ['friends', `Freunde (${friends.length})`]]} value={tab} onChange={setTab} />
+      {tab === 'friends' ? (
+        <Friends friends={friends} selfName={profile.name} onAdd={onAddFriend} onRemove={onRemoveFriend} />
+      ) : (
+        <>
+          <div>
+            <label htmlFor="status" className="mb-1.5 block text-sm font-semibold">Status</label>
+            <select id="status" value={profile.status} onChange={e => onChange({ status: e.target.value })} className={`w-full ${fieldCls}`} style={{ colorScheme: 'dark' }}>
+              {Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{v.emoji} {v.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="note" className="mb-1.5 block text-sm font-semibold">Notiz</label>
+            <input id="note" value={profile.note} maxLength={80} onChange={e => onChange({ note: e.target.value })} placeholder="z. B. Grinde heute Master!" className={`w-full ${fieldCls}`} />
+            <div className="mt-1 text-right text-xs text-gray-500 tabular-nums">{profile.note.length}/80</div>
+          </div>
+          <Divider />
+          <div>
+            <label htmlFor="pname" className="mb-1.5 block text-sm font-semibold">Account-Name</label>
+            <input id="pname" value={profile.name} maxLength={16} onChange={e => onChange({ name: e.target.value })}
+                   onBlur={() => { if (profile.name.trim().length < 3) onChange({ name: 'Spieler' }); }} className={`w-full ${fieldCls}`} />
+          </div>
+          <MainPicker role={profile.role} champion={profile.champion} onRole={v => onChange({ role: v })} onChampion={v => onChange({ champion: v })} />
+          <button onClick={() => { if (confirm) onLogout(); else setConfirm(true); }}
+            className="self-center pb-1 text-xs text-slate-500 underline">{confirm ? 'Wirklich abmelden und Profil löschen? Nochmal tippen' : 'Abmelden und Profil löschen'}</button>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Simulierter Zähler: wächst über die Zeit und tickt live weiter (inklusive dir)
+const BASE_PLAYERS = 12847, PLAYER_EPOCH = Date.UTC(2026, 9, 1);
+function PlayerCount() {
+  const [n, setN] = useState(() => BASE_PLAYERS + 1 + Math.floor((Date.now() - PLAYER_EPOCH) / (1000 * 60 * 17)));
+  useEffect(() => {
+    const t = setInterval(() => setN(v => v + (Math.random() < 0.4 ? 1 : 0)), 5000);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="flex items-center justify-center gap-2 rounded-lg border border-[#0AC8B9]/40 bg-[#010A13]/80 px-3 py-1.5 text-sm text-gray-300" role="status">
+      <span className="h-2 w-2 rounded-full bg-[#0AC8B9] motion-safe:animate-pulse" aria-hidden="true" />
+      Registrierte Spieler: <span className="font-bold tabular-nums text-white">{n.toLocaleString('de-DE')}</span>
+    </div>
+  );
+}
+
+function Leaderboard({ rank, profile, friends }) {
+  const [tab, setTab] = useState('global');
+  const rows = buildLeaderboard(rank, profile.name);
+  const meIdx = rows.findIndex(r => r.me);
+  const target = meIdx > 0 ? rows[meIdx - 1] : null;      // Bot direkt über dir
+  const meRef = useRef(null);
+  const podium = ['text-yellow-400', 'text-slate-300', 'text-amber-700'];
+
+  // Freunde-Ranking: eigener Account und Freunde nach Rangpunkten (bei Gleichstand stehst du vorn)
+  const myScore = rank.step * 100 + rank.lp;
+  const crew = [...friends.map(f => ({ ...f, score: f.step * 100 + f.lp })),
+    { name: profile.name, step: rank.step, lp: rank.lp, status: profile.status, note: profile.note, me: true, score: myScore + 0.5 }]
+    .sort((a, b) => b.score - a.score);
+  const crewMe = crew.findIndex(r => r.me);
+  const crewTarget = crewMe > 0 ? crew[crewMe - 1] : null;
+
+  useEffect(() => { if (meRef.current) meRef.current.scrollIntoView({ block: 'center' }); }, [tab]);
+
+  const rowCls = me => `flex items-center gap-3 rounded-lg border px-3 py-2 ${me
+    ? 'border-2 border-[#C89B3C] bg-[#1A2A48] shadow-[0_0_14px_rgba(200,155,60,.35)]' : 'bg-[var(--panel)] border-[var(--line)]'}`;
+  const Pos = ({ n }) => <div className={`w-7 text-center font-extrabold tabular-nums ${n <= 3 ? podium[n - 1] : 'text-slate-400'}`}>{n}</div>;
+
+  return (
+    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-1.5">
+      <PlayerCount />
+      <div className="my-1"><TabBar tabs={[['global', 'Global'], ['friends', 'Freunde']]} value={tab} onChange={setTab} /></div>
+
+      {tab === 'global' ? (
+        <>
+          <div className="flex items-center gap-2 my-1">
+            <RankIcon tier={tierOf(rank.step)} size={26} />
+            <div className="font-serif font-bold text-lg">{rankName(rank.step)} Leaderboard</div>
+          </div>
+          <div className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2 text-sm text-gray-300 mb-1">
+            Dein Platz: <span className="font-bold text-white">{meIdx + 1}</span> von {rows.length}.{' '}
+            {target
+              ? <>Nächstes Ziel: <span className="font-bold text-white">{target.name}</span>, noch <span className="font-bold text-[#C89B3C] tabular-nums">{target.lp - rank.lp} LP</span> bis zum Überholen.</>
+              : 'Du führst die Liga an.'}
+          </div>
+          {rows.map(r => (
+            <div key={r.pos} ref={r.me ? meRef : null} className={rowCls(r.me)}>
+              <Pos n={r.pos} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  {r.me && <span aria-label={STATUS[profile.status].label}>{STATUS[profile.status].emoji}</span>}
+                  <span className={`truncate ${r.me ? 'font-extrabold text-white' : 'font-semibold'}`}>{r.name}</span>
+                  {r.me && <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}
+                </div>
+                {r.me && profile.note && <div className="truncate text-xs italic text-gray-400">„{profile.note}“</div>}
+              </div>
+              <div className={`font-bold tabular-nums ${r.me ? 'text-[#C89B3C]' : ''}`}>{r.lp} LP</div>
+            </div>
+          ))}
+        </>
+      ) : (
+        <>
+          <div className="font-serif font-bold text-lg my-1">Freunde-Leaderboard</div>
+          <div className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2 text-sm text-gray-300 mb-1">
+            {friends.length === 0 ? 'Noch keine Freunde. Füge im Profil welche hinzu, um dich zu vergleichen.'
+              : crewTarget ? <>Dein Platz: <span className="font-bold text-white">{crewMe + 1}</span> von {crew.length}. Nächstes Ziel: <span className="font-bold text-white">{crewTarget.name}</span>, noch <span className="font-bold text-[#C89B3C] tabular-nums">{Math.max(1, Math.ceil(crewTarget.score - myScore))} LP</span> bis zum Überholen.</>
+              : <>Du führst deine Freundesliste an.</>}
+          </div>
+          {crew.map((r, i) => (
+            <div key={r.name} ref={r.me ? meRef : null} className={rowCls(r.me)}>
+              <Pos n={i + 1} />
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankIcon tier={tierOf(r.step)} size={20} /></span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span aria-label={STATUS[r.status].label}>{STATUS[r.status].emoji}</span>
+                  <span className={`truncate ${r.me ? 'font-extrabold text-white' : 'font-semibold'}`}>{r.name}</span>
+                  {r.me && <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}
+                </div>
+                <div className="truncate text-xs text-gray-400">{rankName(r.step)} · {r.lp} LP{r.note ? ` · „${r.note}“` : ''}</div>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+function Premium({ hearts, onRefill }) {
+  const [refilled, setRefilled] = useState(false);
+  const perks = ['Keine Werbung', 'Unbegrenzte Coach-Fragen', 'OP.GG-Replay-Analyse (später)'];
+  return (
+    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+      <div className="text-center pt-4">
+        <Icon n="crown" size={44} className="mx-auto text-[#C89B3C]" />
+        <div className="font-serif text-2xl font-black mt-2">BrainGap Premium</div>
+        <div className="text-slate-400 text-sm">Trainiere ohne Limit.</div>
+      </div>
+      <div className="rounded-lg border p-4 flex flex-col gap-3" style={{ background: 'var(--panel)', borderColor: 'var(--gold)' }}>
+        {perks.map(p => <div key={p} className="flex items-center gap-2"><Icon n="check" size={18} className="text-[#0AC8B9]" />{p}</div>)}
+        <div className="text-center mt-2"><span className="text-3xl font-black">2 €</span><span className="text-slate-400"> / Monat</span></div>
+        <button className="py-3 rounded-lg font-serif font-extrabold text-[#010A13]" style={{ background: 'var(--gold)' }}>Premium freischalten</button>
+      </div>
+      <button onClick={() => { onRefill(); setRefilled(true); }} className="rounded-lg border py-3 font-semibold text-[#0AC8B9]" style={{ borderColor: 'var(--teal)' }}>
+        Werbung ansehen
+        <span className="block text-xs font-normal text-slate-400">Test: füllt deine Herzen sofort auf {MAX_HEARTS} (Ghost-Buff folgt)</span>
+      </button>
+      {refilled && <div role="status" className="text-sm text-center text-red-400">Herzen aufgefüllt: {hearts}/{MAX_HEARTS}</div>}
+    </div>
+  );
+}
+
+/* ---------- App ---------- */
+function App() {
+  const [init] = useState(() => loadSave() || { rank: { step: 0, lp: 0 }, history: [] });  // Rang und Profil kommen aus dem Onboarding
+  const [screen, setScreen] = useState('home');   // home | scenario | complete | board | premium
+  const [mode, setMode] = useState('daily');      // 'daily' | 'ranked' | 'practice'
+  const [setupOpen, setSetupOpen] = useState(false);
+  const [rankedOpen, setRankedOpen] = useState(false);
+  const [heartsOpen, setHeartsOpen] = useState(false);
+  const [profile, setProfile] = useState(init.profile || null);   // null = noch nicht registriert
+  const [friends, setFriends] = useState(init.friends || [MOCK_FRIEND]);
+  const [rank, setRank] = useState(init.rank);
+  const [history, setHistory] = useState(init.history);
+  const [hearts, setHearts] = useState(Number.isInteger(init.hearts) ? Math.max(0, Math.min(MAX_HEARTS, init.hearts)) : MAX_HEARTS);
+  const [run, setRun] = useState(0);
+  // format: 'tree' (Daily, Übung), 'match' (Ranked: Match-Simulation), 'quiz' (Ranked: Makro-Quiz)
+  const [rs, setRs] = useState({ id: START_IDS[0], format: 'tree', correct: 0, log: [], champion: '', role: '', stage: 0, stages: 1, queue: [] });
+  const [result, setResult] = useState(null);     // { from, to } bei Daily und Ranked
+
+  useEffect(() => { writeSave({ rank, history, hearts, profile, friends }); }, [rank, history, hearts, profile, friends]);
+
+  // Jeder Button klickt (Optionen ausgenommen: sie lösen lock_in aus)
+  useEffect(() => {
+    const onClick = e => {
+      const b = e.target && e.target.closest ? e.target.closest('button') : null;
+      if (b && !b.disabled && !b.hasAttribute('data-silent')) playHextechSound('click');
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, []);
+
+  // Startet einen Lauf. Ein Herz kostet nur eine Niederlage oder ein Abbruch, nicht der Start.
+  const begin = (nextMode, cfg) => {
+    const sc = RUNS.find(r => r.id === cfg.id);
+    setMode(nextMode); setRun(n => n + 1); setResult(null); setSetupOpen(false); setRankedOpen(false); setHeartsOpen(false);
+    setRs({ format: 'tree', correct: 0, log: [], champion: sc.champion, role: sc.role, stage: 0, stages: matchStages(cfg.id), queue: [], ...cfg });
+    setScreen('scenario');
+  };
+  const canPlay = hearts > 0;
+  const playDaily = () => { if (canPlay) begin('daily', { id: dailyStartId() }); };
+  const playPractice = ({ role, difficulty }) => {
+    const pool = practicePool(role, difficulty);
+    if (pool.length) begin('practice', { id: pickRandom(pool).id });
+  };
+  const playRanked = ({ way, role }) => {
+    if (!canPlay) return;
+    if (way === 'match') {
+      const pool = matchPool(role, rank.step);
+      if (pool.length) { const sc = pickRandom(pool); begin('ranked', { format: 'match', id: sc.id, stages: matchStages(sc.id) }); }
+    } else {
+      const queue = shuffle(rankedPool(rank.step).map(r => r.id)).slice(0, QUIZ_LENGTH);   // nur eigene Liga, unabhängig vom nextId-Baum
+      begin('ranked', { format: 'quiz', id: queue[0], queue, stages: queue.length });
+    }
+  };
+
+  const mmr = profile && profile.hiddenMmr != null ? profile.hiddenMmr : rank.step * 100 + rank.lp;
+
+  const next = opt => {
+    const cur = RUNS.find(r => r.id === rs.id);
+    const ok = !!opt && opt.lpChange > 0;                 // richtig = beste Option, keine LP pro Phase
+    const best = cur.options.find(o => o.lpChange > 0);
+    const log = [...rs.log, {
+      title: rs.format === 'match' || rs.format === 'tree' ? `Phase ${rs.stage + 1}: ${cur.phase} (${cur.gameTime})` : `Frage ${rs.stage + 1}: ${cur.champion} (${cur.gameTime})`,
+      text: opt ? stripLetter(opt.label) : 'Keine Entscheidung (Zeit abgelaufen)',
+      feedback: opt ? opt.feedback : 'Zeit abgelaufen.',
+      ok, chain: opt ? (opt.chain || null) : TIMEOUT_CHAIN, best: ok || !best ? null : stripLetter(best.label),
+    }];
+    const correct = rs.correct + (ok ? 1 : 0);
+
+    let nextId = null;                                    // null = Lauf beendet
+    if (rs.queue.length) nextId = rs.queue[rs.stage + 1] || null;   // Quiz, Mastery, Drill: feste Frageliste
+    else {
+      nextId = opt ? opt.nextId : mainLine(cur);          // Timeout wirkt wie eine Fehlentscheidung: das Spiel geht weiter
+      if (nextId === 'end' || !RUNS.some(r => r.id === nextId)) nextId = null;
+    }
+    if (nextId) { setRs({ ...rs, id: nextId, stage: rs.stage + 1, correct, log }); return; }
+
+    // Endabrechnung nach der letzten Entscheidung
+    const n = log.length;
+    if (rs.format === 'drill') {
+      const passed = correct === n;
+      if (passed) setHearts(h => Math.min(MAX_HEARTS, h + 1));
+      setResult({ drill: true, passed, correct, n });
+    } else {
+      const v = scoreRun(correct, n, mmr, rank);
+      if (mode !== 'practice') {   // Übungsmodus: nichts aufs Profil, nichts in die Historie
+        const { event, ...to } = applyLp(rank, v.lp);
+        const heartLost = !v.win;                         // Siege kosten kein Herz, Niederlagen genau eines
+        setRank(to);
+        updateProfile({ hiddenMmr: mmr + v.mmrDelta });
+        if (heartLost) setHearts(h => Math.max(0, h - 1));
+        setHistory(h => [{
+          champion: rs.format === 'quiz' ? 'Makro-Quiz' : rs.champion,
+          role: rs.format === 'quiz' ? `${rs.queue.length} Szenarien` : rs.format === 'mastery' ? `Mastery · ${rs.role}` : rs.format === 'match' ? `${rs.role} · Match` : rs.role,
+          lp: v.lp, ts: Date.now() }, ...h].slice(0, 20));
+        setResult({ ...v, correct, n, from: rank, to, event, heartLost });
+      } else setResult({ ...v, correct, n, from: rank, to: rank });
+    }
+    setRs({ ...rs, correct, log });
+    setScreen('complete');
+  };
+
+  // Abbruch während eines Laufs: kein LP-Eintrag, keine Historie, zurück ins Hauptmenü
+  const abort = () => {
+    if (mode !== 'practice') { setHearts(h => Math.max(0, h - 1)); playHextechSound('heart_loss'); }   // Aufgeben nimmt 1 Herz
+    setRs({ id: START_IDS[0], format: 'tree', correct: 0, log: [], champion: '', role: '', stage: 0, stages: 1, queue: [] });
+    setResult(null); setSetupOpen(false); setRankedOpen(false);
+    setScreen('home');
+  };
+
+  const playMastery = () => {
+    if (!canPlay || !profile) return;
+    const pool = masteryPool(profile.champion, profile.role);   // nur Szenarien deines Champions und deiner Rolle
+    if (!pool.length) return;
+    const queue = shuffle(pool.map(r => r.id)).slice(0, QUIZ_LENGTH);
+    begin('ranked', { format: 'mastery', id: queue[0], queue, stages: queue.length });
+  };
+
+  // Recovery Drill: 2 kurze Fragen aus der eigenen Liga, beide richtig = 1 Herz zurück (kostenlos, wiederholbar)
+  const startDrill = () => {
+    const queue = shuffle(rankedPool(rank.step).map(r => r.id)).slice(0, 2);
+    begin('practice', { format: 'drill', id: queue[0], queue, stages: queue.length });
+  };
+
+  const register = ({ name, step, role, champion }) => {
+    setProfile({ name, role, champion, status: 'online', note: '', startStep: step, hiddenMmr: step * 100 + 50 });
+    setRank({ step, lp: 0 }); setHistory([]); setHearts(MAX_HEARTS); setFriends([MOCK_FRIEND]); setScreen('home');
+  };
+  const updateProfile = patch => setProfile(p => ({ ...p, ...patch }));
+  const logout = () => { setProfile(null); setScreen('home'); };
+
+  const reset = () => { setRank({ step: profile && profile.startStep ? profile.startStep : 0, lp: 0 }); setHistory([]); setHearts(MAX_HEARTS); };
+
+  const scenario = RUNS.find(r => r.id === rs.id);
+  const phaseTag = scenario ? `${scenario.phase} (${rs.stage + 1}/${rs.stages})` : '';
+  const tag = rs.format === 'quiz' ? `Quiz (${rs.stage + 1}/${rs.stages})` : rs.format === 'mastery' ? `Mastery (${rs.stage + 1}/${rs.stages})`
+    : rs.format === 'drill' ? `Recovery Drill (${rs.stage + 1}/${rs.stages})` : phaseTag;
+  const momentum = (rs.format === 'match' || rs.format === 'tree') && rs.stage > 0 && rs.log.length ? makeMomentum(rs.log, rs.stage) : null;
+  const tabs = [['home', 'home', 'Home'], ['board', 'trophy', 'Leaderboard'], ['profile', 'user', 'Profil'], ['premium', 'crown', 'Premium']];
+
+  if (!profile) {   // Erster Start: Registrierung
+    return (
+      <div className="relative mx-auto w-full max-w-[400px] h-full max-h-[820px] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
+           style={{ borderColor: 'var(--line)' }}>
+        <header className="px-4 py-2.5 border-b flex items-center gap-2" style={{ borderColor: 'var(--line)' }}>
+          <ChampAvatar name="Heimerdinger" className="w-8 h-8" iconSize={16} fallbackIcon="brain" ring="border border-[#C89B3C]" />
+          <div className="font-serif font-extrabold tracking-wide">BrainGap<span className="text-[#C89B3C]">.gg</span></div>
+        <div className="ml-auto"><SoundToggle /></div>
+        </header>
+        <Onboarding onDone={register} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative mx-auto w-full max-w-[400px] h-full max-h-[820px] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
+         style={{ borderColor: 'var(--line)' }}>
+      <header className="px-4 py-2.5 border-b flex items-center gap-2" style={{ borderColor: 'var(--line)' }}>
+        <ChampAvatar name="Heimerdinger" className="w-8 h-8" iconSize={16} fallbackIcon="brain" ring="border border-[#C89B3C]" />
+        <div className="font-serif font-extrabold tracking-wide">BrainGap<span className="text-[#C89B3C]">.gg</span></div>
+        <div className="ml-auto flex items-center gap-2"><Hearts n={hearts} /><SoundToggle /></div>
+      </header>
+
+      {(screen === 'home' || screen === 'board' || screen === 'profile' || screen === 'premium') && (
+        <div key={screen} className="fade-in flex-1 min-h-0 flex flex-col">
+          {screen === 'home' && <Dashboard rank={rank} history={history} hearts={hearts} profile={profile} onDaily={playDaily} onRanked={() => setRankedOpen(true)}
+            onPractice={() => setSetupOpen(true)} onMastery={playMastery} onNoHearts={() => setHeartsOpen(true)} onShop={() => setScreen('premium')} onReset={reset} />}
+          {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} />}
+          {screen === 'profile' && <Profile profile={profile} rank={rank} friends={friends} onChange={updateProfile} onLogout={logout}
+            onAddFriend={f => setFriends(l => [...l, f])} onRemoveFriend={name => setFriends(l => l.filter(x => x.name !== name))} />}
+          {screen === 'premium' && <Premium hearts={hearts} onRefill={() => setHearts(MAX_HEARTS)} />}
+        </div>
+      )}
+      {screen === 'scenario' && scenario && (
+        <Scenario key={`${run}-${scenario.id}-${rs.stage}`} scenario={scenario} practice={mode === 'practice'}
+          tag={tag} momentum={momentum} timeCap={rs.format === 'drill' ? 30 : null} onNext={next} onAbort={abort} />
+      )}
+      {screen === 'complete' && result && <RunComplete result={result} log={rs.log} practice={mode === 'practice'} format={rs.format} onDone={() => setScreen('home')} onRetry={startDrill} />}
+
+      {screen !== 'scenario' && screen !== 'complete' && (
+        <nav className="grid grid-cols-4 border-t" style={{ borderColor: 'var(--line)', background: '#010A13' }}>
+          {tabs.map(([id, ic, label]) => (
+            <button key={id} onClick={() => setScreen(id)} aria-current={screen === id}
+              className={`py-3 flex flex-col items-center gap-1 text-xs ${screen === id ? 'text-[#0AC8B9]' : 'text-slate-500'}`}>
+              <Icon n={ic} size={22} />{label}
+            </button>
+          ))}
+        </nav>
+      )}
+
+      {setupOpen && <PracticeSetup onStart={playPractice} onClose={() => setSetupOpen(false)} />}
+      {rankedOpen && <RankedSetup rank={rank} onStart={playRanked} onClose={() => setRankedOpen(false)} />}
+      {heartsOpen && <NoHearts onDrill={startDrill} onShop={() => { setHeartsOpen(false); setScreen('premium'); }} onClose={() => setHeartsOpen(false)} />}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
