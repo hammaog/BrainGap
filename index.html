@@ -22,13 +22,15 @@
   .confetti { position:absolute; top:0; width:8px; height:12px; border-radius:2px; animation:fall 3s ease-in forwards; }
   @keyframes glow { 0%,100%{opacity:.35;transform:scale(1)} 50%{opacity:.9;transform:scale(1.35)} }
   .rankglow { animation:glow 1.4s ease-in-out infinite; }
-  @keyframes drain { from{width:100%} to{width:0} }
-  .drain { animation:drain 2.4s linear forwards; }
+  * { scrollbar-width:thin; scrollbar-color:rgba(200,155,60,.55) transparent; }
+  *::-webkit-scrollbar { width:6px; height:6px; }
+  *::-webkit-scrollbar-thumb { background:rgba(200,155,60,.55); border-radius:3px; }
+  *::-webkit-scrollbar-track { background:transparent; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
   .blink { animation:blink .5s ease-in-out 4; }
   @keyframes fadein { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
   .fade-in { animation:fadein .18s ease-out; }
-  @media (prefers-reduced-motion:reduce){ .pop,.panic,.shake,.rankglow,.fade-in,.drain,.blink{animation:none} .confetti{display:none} }
+  @media (prefers-reduced-motion:reduce){ .pop,.panic,.shake,.rankglow,.fade-in,.blink{animation:none} .confetti{display:none} }
   button:focus-visible,input:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
 </style>
 </head>
@@ -1018,6 +1020,406 @@ const RUNS = [
       { "label": "B: Passiv bleiben, obwohl der Gegner in Unterzahl ist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Das Zeitfenster geschlossen, ohne dass du Druck gemacht hast.", "Der Gegner-Support kehrt zurück und die Lane bleibt ausgeglichen."] },
       { "label": "C: Mit Zeri die Lane übernehmen, solange der Support fehlt, und Vision für den Rückweg setzen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nutzt die Unterzahl und sicherst dich ab." }
     ]
+  },
+  {
+    "id": "quiz_eisen_04", "gameTime": "07:20", "timeLimit": 30,
+    "champion": "Amumu", "role": "Jungle", "difficulty": "Eisen",
+    "markers": [
+      { "x": 46, "y": 52, "type": "hero", "isPlayer": true, "label": "Amumu" },
+      { "x": 60, "y": 40, "type": "hero", "label": "Lux" },
+      { "x": 68, "y": 32, "type": "enemy", "label": "Zed" },
+      { "x": 72, "y": 26, "type": "objective", "label": "Gegner-Turm" }
+    ],
+    "coachHint": "Ein Gank klappt, wenn der Gegner nicht am Turm steht. Wann muss Zed vorlaufen?",
+    "context": "Du bist Amumu (Jungle). Level 6. Deine Midlane Lux hat die Welle direkt vor den gegnerischen Turm geschoben, und Zed steht dahinter am Turm.",
+    "options": [
+      { "label": "A: Unter dem Turm ganken und Zed dort stellen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm schlägt auf euch ein und Zed entkommt.", "Lux verliert Leben und Tempo, Zed behält die Lane."] },
+      { "label": "B: Warten, bis Zed für Last-Hits vorlaufen muss, und dann ganken.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Turm im Rücken hat Zed keinen Ausweg." },
+      { "label": "C: Nicht ganken und nur die eigenen Camps farmen.", "lpChange": -5, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst ein mögliches Gank-Fenster.", "Lux bleibt allein in der Lane und verliert Prio."] }
+    ]
+  },
+  {
+    "id": "quiz_eisen_05", "gameTime": "08:40", "timeLimit": 30,
+    "champion": "Annie", "role": "Midlane", "difficulty": "Eisen",
+    "markers": [
+      { "x": 62, "y": 38, "type": "hero", "isPlayer": true, "label": "Annie" },
+      { "x": 68, "y": 32, "type": "enemy", "label": "Zed" },
+      { "x": 22, "y": 24, "type": "fog", "label": "Gegnerischer Jungler nicht gesehen" }
+    ],
+    "coachHint": "Mit wenig Mana und Leben bist du leicht zu töten. Was tust du mit deinem Gold?",
+    "context": "Du bist Annie (Mid) gegen Zed. Level 7 mit 1400 Gold, wenig Mana und 45 % Leben. Der gegnerische Jungler wurde nicht gesehen.",
+    "options": [
+      { "label": "A: Weiterfarmen, bis das Mana ganz leer ist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du hast keine Fähigkeiten mehr, wenn ein Gank kommt.", "Mid ist leicht zu gewinnen und Zed kann roamen."] },
+      { "label": "B: Die Welle abfarmen, dann zur Base zurück und Items kaufen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Mit Items und vollem Mana bist du wieder stark." },
+      { "label": "C: Mit wenig Mana auf Zed gehen und den Trade erzwingen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlierst den Trade ohne Mana und Leben.", "Zed übernimmt Mid und kann frei roamen."] }
+    ]
+  },
+  {
+    "id": "quiz_eisen_06", "gameTime": "03:40", "timeLimit": 30,
+    "champion": "Warwick", "role": "Jungle", "difficulty": "Eisen",
+    "markers": [
+      { "x": 46, "y": 52, "type": "hero", "isPlayer": true, "label": "Warwick" },
+      { "x": 50, "y": 60, "type": "objective", "label": "Scuttle Crab" },
+      { "x": 28, "y": 28, "type": "fog", "label": "Gegnerischer Jungler nicht gesehen" }
+    ],
+    "coachHint": "Ein Objective ohne Info ist ein Risiko. Wo steht der gegnerische Jungler?",
+    "context": "Du bist Warwick (Jungle). Der Scuttle Crab ist gespawnt und eure Mid-Lane hat Prio. Der gegnerische Jungler wurde noch nicht gesehen.",
+    "options": [
+      { "label": "A: Die Mid-Lane pingen, Vision am Scuttle setzen und den Crab nehmen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Vision und Prio sichern das Objective." },
+      { "label": "B: Den Scuttle allein ohne Vision nehmen und das 1v1 annehmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler taucht auf und bestraft dich.", "Euer Team verliert den Scuttle und die Dschungelkontrolle."] },
+      { "label": "C: Den Scuttle ignorieren und nur Camps farmen.", "lpChange": -5, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du lässt ein sicheres Objective liegen.", "Die Gegner nehmen den Scuttle und gewinnen Vision."] }
+    ]
+  },
+  {
+    "id": "quiz_bronze_02", "gameTime": "06:40", "timeLimit": 30,
+    "champion": "Caitlyn", "role": "Botlane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 72, "y": 86, "type": "hero", "isPlayer": true, "label": "Caitlyn" },
+      { "x": 80, "y": 90, "type": "enemy", "label": "Leona" },
+      { "x": 86, "y": 88, "type": "enemy", "label": "Jinx" },
+      { "x": 66, "y": 90, "type": "objective", "label": "Eigener Turm" }
+    ],
+    "coachHint": "Ohne Support bist du in der Unterzahl. Wo bist du am sichersten?",
+    "context": "Du bist Caitlyn (Bot). Level 6. Dein Support Lulu ist gerade gestorben und braucht noch etwa 20 Sekunden. Die gegnerischen Leona und Jinx stehen vor euch.",
+    "options": [
+      { "label": "A: Zum Turm zurückweichen und nur sicher farmen, bis Lulu zurück ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verlierst nichts und wartest auf deinen Support." },
+      { "label": "B: Vorn bleiben und die Welle allein pushen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Leona und Jinx fallen über dich her.", "Euer Bot verliert beide Spieler und den Turm."] },
+      { "label": "C: Die Welle liegen lassen und in den Dschungel fliehen.", "lpChange": -5, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlierst Gold und Erfahrung.", "Die Gegner pushen frei und bekommen Turm-Druck."] }
+    ]
+  },
+  {
+    "id": "quiz_bronze_03", "gameTime": "12:20", "timeLimit": 30,
+    "champion": "Veigar", "role": "Midlane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 56, "y": 70, "type": "hero", "isPlayer": true, "label": "Veigar" },
+      { "x": 70, "y": 74, "type": "enemy", "label": "Ornn" },
+      { "x": 76, "y": 80, "type": "enemy", "label": "Jinx" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" }
+    ],
+    "coachHint": "Wer macht in einem Teamkampf den meisten Schaden? Wer ist leicht zu erreichen?",
+    "context": "Du bist Veigar (Mid). Ein 5v5 am Drachen beginnt. Die gegnerische Jinx steht in deiner Reichweite hinter ihrem Tank Ornn, und dein Team kämpft vorn.",
+    "options": [
+      { "label": "A: Ornn angreifen, weil er am nächsten steht.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschwendest Schaden auf einen Tank.", "Jinx schießt ungestört und euer Team verliert den Kampf."] },
+      { "label": "B: Jinx fokussieren, solange du sie sicher erreichst.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der gegnerische Carry ist das wichtigste Ziel." },
+      { "label": "C: Ohne Ziel nach vorn laufen und alle Fähigkeiten auf einmal einsetzen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst vorn und hast keine Fähigkeiten mehr.", "Euer Team verliert den Kampf ohne deinen Schaden."] }
+    ]
+  },
+  {
+    "id": "quiz_bronze_04", "gameTime": "11:00", "timeLimit": 30,
+    "champion": "Sejuani", "role": "Jungle", "difficulty": "Bronze",
+    "markers": [
+      { "x": 50, "y": 60, "type": "hero", "isPlayer": true, "label": "Sejuani" },
+      { "x": 58, "y": 50, "type": "objective", "label": "Gegner-Ward" },
+      { "x": 30, "y": 25, "type": "fog", "label": "Gegnerischer Jungler zuletzt Top gesehen" }
+    ],
+    "coachHint": "Wards zeigen dir, was die Gegner vorhaben. Was räumst du zuerst?",
+    "context": "Du bist Sejuani (Jungle). Die Gegner haben eine Ward in eurem Dschungel platziert. Deine Orakel-Linse ist ready und kein Gegner ist in der Nähe.",
+    "options": [
+      { "label": "A: Die Ward mit der Orakel-Linse räumen, bevor du weiterfarmst.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne ihre Vision bleiben deine Wege geheim." },
+      { "label": "B: Die Ward ignorieren und einfach den Camp farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner sehen deine Wege und planen einen Gank.", "Euer Team verliert Dschungelkontrolle und wird überrascht."] },
+      { "label": "C: Die Ward mit normalen Angriffen zerstören und dich zeigen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst sichtbar im gegnerischen Blickfeld.", "Der gegnerische Jungler kann dich gezielt abfangen."] }
+    ]
+  },
+  {
+    "id": "quiz_silber_01", "gameTime": "09:00", "timeLimit": 35,
+    "champion": "Malphite", "role": "Toplane", "difficulty": "Silber",
+    "markers": [
+      { "x": 9, "y": 60, "type": "hero", "isPlayer": true, "label": "Malphite" },
+      { "x": 9, "y": 48, "type": "enemy", "label": "Fiora" },
+      { "x": 7, "y": 66, "type": "objective", "label": "Eigener Turm" },
+      { "x": 30, "y": 25, "type": "fog", "label": "Gegnerischer Jungler nicht gesehen" }
+    ],
+    "coachHint": "Ein Freeze lässt den Gegner vorlaufen. Wie viel Risiko gehst du dabei ein?",
+    "context": "Du bist Malphite (Top) gegen Fiora. Du führst leicht, die Welle steht nahe an deinem Turm und der gegnerische Jungler wurde nicht gesehen.",
+    "options": [
+      { "label": "A: Die Welle vor deinem Turm einfrieren (Freeze), damit Fiora für Last-Hits vorlaufen muss.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Freeze nimmt ihr Gold, ohne dich zu riskieren." },
+      { "label": "B: Die Welle hart in ihren Turm pushen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlierst deinen Vorteil und stehst ohne Vision weit vorn.", "Der gegnerische Jungler kann leicht ganken und Fiora gleicht aus."] },
+      { "label": "C: Die Welle ignorieren und Fiora allein jagen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst ohne Info aus der Reichweite deines Turms.", "Der Jungler fängt dich ab und Fiora bekommt die Lane."] }
+    ]
+  },
+  {
+    "id": "quiz_silber_02", "gameTime": "12:30", "timeLimit": 35,
+    "champion": "Orianna", "role": "Midlane", "difficulty": "Silber",
+    "markers": [
+      { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Orianna" },
+      { "x": 70, "y": 56, "type": "fog", "label": "Azir von der Karte verschwunden" },
+      { "x": 74, "y": 90, "type": "hero", "label": "Botlane" }
+    ],
+    "coachHint": "Wenn dein Gegner fehlt, hast du Zeit. Was gewinnst du, und wen warnst du?",
+    "context": "Du bist Orianna (Mid). Dein Gegner Azir ist von der Karte verschwunden und deine Botlane steht bei ihrem Turm.",
+    "options": [
+      { "label": "A: Azir hinterherroamen, ohne zu wissen, wohin er gegangen ist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst blind los und verlierst die Welle.", "Azir taucht woanders auf und ihr verliert Mid-Prio."] },
+      { "label": "B: Die Welle in den Turm schieben, Druck machen und die Botlane vor Azir warnen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nutzt sein Fehlen und schützt dein Team." },
+      { "label": "C: In der Lane bleiben, ohne zu pingen oder zu warnen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Deine Botlane wird von Azir überrascht.", "Euer Team verliert einen Spieler und das Tempo."] }
+    ]
+  },
+  {
+    "id": "quiz_silber_03", "gameTime": "14:00", "timeLimit": 35,
+    "champion": "Soraka", "role": "Support", "difficulty": "Silber",
+    "markers": [
+      { "x": 74, "y": 86, "type": "hero", "isPlayer": true, "label": "Soraka" },
+      { "x": 66, "y": 88, "type": "hero", "label": "Ashe (ADC)" },
+      { "x": 56, "y": 70, "type": "objective", "label": "Fluss-Busch" }
+    ],
+    "coachHint": "Wards bringen nur etwas, wenn du sie vor dem Recall setzt. Was kommt zuerst?",
+    "context": "Du bist Soraka (Support) mit Ashe. Level 11 mit zwei Kontroll-Wards und 1000 Gold. Ihr wollt gleich zurück zur Base.",
+    "options": [
+      { "label": "A: Sofort zurück zur Base und die Wards im Inventar lassen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Beim Rückweg und danach habt ihr keine Vision.", "Das Team läuft wieder blind in Ganks und Objectives."] },
+      { "label": "B: Erst beide Wards im Fluss und im Dschungel setzen, dann zur Base zurück.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Vision zuerst, dann der Einkauf." },
+      { "label": "C: Beide Wards in der Base platzieren, wo niemand sie braucht.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Wards bringen keine Vision.", "Euer Team hat keine Info über die Gegner."] }
+    ]
+  },
+  {
+    "id": "quiz_gold_04", "gameTime": "17:20", "timeLimit": 45,
+    "champion": "Sett", "role": "Toplane", "difficulty": "Gold",
+    "markers": [
+      { "x": 14, "y": 40, "type": "hero", "isPlayer": true, "label": "Sett" },
+      { "x": 7, "y": 22, "type": "objective", "label": "Gegner-Turm" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 80, "y": 68, "type": "enemy", "label": "Gegner (4)" },
+      { "x": 74, "y": 84, "type": "hero", "label": "Team (2)" }
+    ],
+    "coachHint": "Du kannst nicht jeden Kampf retten. Was ist auf der anderen Seite der Karte frei?",
+    "context": "Du bist Sett (Top). Dein Team verliert den Kampf am Drachen 2v4 und deine Welle ist groß. Der gegnerische Top-Turm steht ohne Verteidiger.",
+    "options": [
+      { "label": "A: Per Teleport in den verlorenen 2v4-Kampf springen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stirbst im aussichtslosen Kampf.", "Euer Team verliert den Drachen und dich zusätzlich."] },
+      { "label": "B: Nicht teleportieren, sondern den Top-Turm nehmen und den Drachen abgeben (Cross-Map-Trade).", "lpChange": 20, "nextId": "end", "feedback": "Stark! Ein Turm gegen den Drachen hält das Spiel offen." },
+      { "label": "C: In der Lane stehen bleiben und nur die Welle farmen.", "lpChange": -5, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bringst weder Druck noch Hilfe.", "Die Gegner nehmen den Drachen ohne Gegenleistung."] }
+    ]
+  },
+  {
+    "id": "quiz_gold_05", "gameTime": "12:30", "timeLimit": 45,
+    "champion": "Ezreal", "role": "Botlane", "difficulty": "Gold",
+    "markers": [
+      { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Ezreal" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" }
+    ],
+    "coachHint": "Ein ungenutztes Item ist verschenkte Stärke. Wann gehst du zurück?",
+    "context": "Du bist Ezreal (Bot). Level 11 mit 2100 Gold im Inventar. Der Drache spawnt in etwa 60 Sekunden und eure Welle ist gecrasht.",
+    "options": [
+      { "label": "A: Mit 2100 ungenutztem Gold direkt zum Drachen gehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kämpfst ohne deine neuen Items.", "Euer Team verliert den Kampf am Drachen gegen stärkere Gegner."] },
+      { "label": "B: Jetzt zur Base zurück, Items kaufen und rechtzeitig vor dem Drachen zurückkehren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die gecrashte Welle deckt deine Abwesenheit." },
+      { "label": "C: Den Drachen ignorieren und weiterfarmen.", "lpChange": -5, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du lässt ein wichtiges Objective liegen.", "Die Gegner nehmen den Drachen kampflos."] }
+    ]
+  },
+  {
+    "id": "quiz_gold_06", "gameTime": "18:00", "timeLimit": 45,
+    "champion": "Gwen", "role": "Toplane", "difficulty": "Gold",
+    "markers": [
+      { "x": 40, "y": 9, "type": "hero", "isPlayer": true, "label": "Gwen" },
+      { "x": 76, "y": 8, "type": "objective", "label": "Gegner-Turm" },
+      { "x": 50, "y": 46, "type": "hero", "label": "Team" },
+      { "x": 58, "y": 42, "type": "fog", "label": "Gegner zuletzt in der Mitte gesehen" }
+    ],
+    "coachHint": "Ein Splitpush ist nur so gut wie deine Info. Wo sind die Gegner?",
+    "context": "Du bist Gwen (Top). Du willst die Seitenwelle pushen und den gegnerischen Turm angreifen. Dein Team steht in der Mitte, die Gegner wurden zuletzt dort gesehen.",
+    "options": [
+      { "label": "A: Vor dem Splitpush Vision im gegnerischen Dschungel setzen und nur so tief pushen, dass du fliehen kannst.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Vision und Rückzugsweg machen den Splitpush sicher." },
+      { "label": "B: Ohne Vision tief unter den gegnerischen Turm pushen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner fangen dich ab und töten dich.", "Euer Team verliert Druck und steht in Unterzahl."] },
+      { "label": "C: Nicht splitpushen und nur dem Team folgen.", "lpChange": -5, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du lässt Druck auf der Karte ungenutzt.", "Die Gegner können ihr gesamtes Team in der Mitte konzentrieren."] }
+    ]
+  },
+  {
+    "id": "quiz_platin_02", "gameTime": "10:50", "timeLimit": 45,
+    "champion": "Graves", "role": "Jungle", "difficulty": "Platin",
+    "markers": [
+      { "x": 80, "y": 70, "type": "hero", "isPlayer": true, "label": "Graves" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 78, "y": 66, "type": "enemy", "label": "Nocturne" },
+      { "x": 74, "y": 64, "type": "hero", "label": "Team" }
+    ],
+    "coachHint": "Ein Steal gelingt nur mit dem richtigen Smite-Zeitpunkt. Wann stirbt der Drache?",
+    "context": "Du bist Graves (Jungle). Das gegnerische Team schlägt den Drachen, er hat noch etwa 20 % Leben. Nocturne steht mit bereitem Smite in der Grube, dein Smite ist ebenfalls ready.",
+    "options": [
+      { "label": "A: Sofort in die Grube springen und früh smiten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Nocturne smitet zuerst und sichert den Drachen.", "Euer Team verliert den Drachen und dich."] },
+      { "label": "B: Mit Vision am Eingang warten und den Smite erst setzen, wenn der Drache im Smite-Bereich ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Wer den Smite-Zeitpunkt trifft, stiehlt das Objective." },
+      { "label": "C: Den Steal aufgeben und den gegnerischen Dschungel farmen.", "lpChange": -5, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verzichtest auf ein mögliches Objective.", "Die Gegner bekommen den Drachen ohne Gegenwehr."] }
+    ]
+  },
+  {
+    "id": "quiz_platin_03", "gameTime": "09:30", "timeLimit": 45,
+    "champion": "Cassiopeia", "role": "Midlane", "difficulty": "Platin",
+    "markers": [
+      { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Cassiopeia" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Lux" },
+      { "x": 54, "y": 48, "type": "hero", "label": "Elise (Jungler)" },
+      { "x": 70, "y": 28, "type": "objective", "label": "Gegner-Turm" }
+    ],
+    "coachHint": "Wenn die Welle zurückbounct, muss der Gegner vorlaufen. Wann kommt dein Jungler?",
+    "context": "Du bist Cassiopeia (Mid) gegen Lux. Du hast die große Welle in ihren Turm gecrasht und sie bounct nun zu dir zurück. Dein Jungler Elise erreicht Mid in etwa 10 Sekunden.",
+    "options": [
+      { "label": "A: Sofort recallen und den Gank verpassen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Lux läuft frei zu den Last-Hits.", "Elise gankt ins Leere und verliert Tempo."] },
+      { "label": "B: Die zurückbouncende Welle halten, Lux zu Last-Hits zwingen und mit Elise ganken.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Bounce zieht Lux vom Turm weg." },
+      { "label": "C: Mit der Welle tief zurück in ihren Turm laufen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst wieder unter ihrem Turm ohne Wellenvorteil.", "Lux bestraft dich und der Gank von Elise läuft ins Leere."] }
+    ]
+  },
+  {
+    "id": "quiz_platin_04", "gameTime": "18:00", "timeLimit": 45,
+    "champion": "Lucian", "role": "Botlane", "difficulty": "Platin",
+    "markers": [
+      { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Lucian" },
+      { "x": 60, "y": 84, "type": "hero", "label": "Nautilus (Support)" },
+      { "x": 92, "y": 64, "type": "objective", "label": "Gegner-Turm" }
+    ],
+    "coachHint": "Allein unter dem Turm ist riskant. Wer kann dir helfen?",
+    "context": "Du bist Lucian (Bot). Euer Team führt, aber dein Support Nautilus ist gerade bei Mid. Der gegnerische Bot-Turm steht und die Welle ist ausgeglichen.",
+    "options": [
+      { "label": "A: Auf Nautilus und die Welle warten und den Turm gemeinsam angreifen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Mit Support und Welle fällt der Turm sicher." },
+      { "label": "B: Allein unter den Turm tauchen, weil ihr führt.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm und die Gegner töten dich.", "Euer Vorsprung schrumpft und Bot verliert den Support-Druck."] },
+      { "label": "C: Zur Base zurück und nichts tun.", "lpChange": -5, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst Zeit und Wellen.", "Die Gegner können ungestört den Turm verteidigen."] }
+    ]
+  },
+  {
+    "id": "quiz_smaragd_04", "gameTime": "15:30", "timeLimit": 60,
+    "champion": "Aphelios", "role": "Botlane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Aphelios" },
+      { "x": 92, "y": 64, "type": "objective", "label": "Gegner-Turm" },
+      { "x": 20, "y": 22, "type": "enemy", "label": "Gegner (3)" },
+      { "x": 10, "y": 30, "type": "objective", "label": "Eigener Top-Turm" }
+    ],
+    "coachHint": "Wenn der Gegner an einer Stelle bindet, wo ist er dann nicht?",
+    "context": "Du bist Aphelios (Bot). Die gegnerischen Mid, Top und Jungler stehen am Top-Turm eures Teams. Die Bot-Seite der Gegner ist ohne Vision und ihr Bot-Turm steht allein.",
+    "options": [
+      { "label": "A: Mit deinem Support den Bot-Turm nehmen, während sie Top binden (Cross-Map-Trade).", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Turm gegen Turm, aber du bist früher dran." },
+      { "label": "B: Zum Top-Turm rennen, um zu verteidigen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kommst zu spät und läufst in drei Gegner.", "Ihr verliert den Top-Turm und einen Spieler."] },
+      { "label": "C: In der Lane bleiben und keinen Druck machen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du lässt den freien Bot-Turm liegen.", "Die Gegner nehmen den Top-Turm ohne Gegenwehr."] }
+    ]
+  },
+  {
+    "id": "quiz_smaragd_05", "gameTime": "29:30", "timeLimit": 60,
+    "champion": "Syndra", "role": "Midlane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Syndra" },
+      { "x": 36, "y": 40, "type": "hero", "label": "Team" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 46, "y": 34, "type": "enemy", "label": "Malphite" }
+    ],
+    "coachHint": "Ein Engage-Tank verbraucht seine Ultimate. Wann gehst du in den Kampf?",
+    "context": "Du bist Syndra (Mid). Ein 5v5 vor dem Baron steht bevor. Die Gegner haben einen Engage-Tank (Malphite) mit bereiter Ultimate, dein Team steht hinter einer Wand.",
+    "options": [
+      { "label": "A: Direkt vor den Gegnern positionieren, bevor sie einsteigen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Malphite trifft dich und das ganze Team mit seiner Ultimate.", "Euer Team wird zerlegt, bevor ihr kämpft."] },
+      { "label": "B: Außerhalb seiner Reichweite bleiben, bis er seine Ultimate verbraucht, und dann einsteigen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Engage-Ultimate gewinnt ihr den Kampf." },
+      { "label": "C: Den Kampf meiden und den Baron aufgeben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verzichtest auf den Kampf und das Objective.", "Die Gegner nehmen den Baron kampflos."] }
+    ]
+  },
+  {
+    "id": "quiz_smaragd_06", "gameTime": "24:30", "timeLimit": 60,
+    "champion": "Kindred", "role": "Jungle", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 34, "y": 40, "type": "hero", "isPlayer": true, "label": "Kindred" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 42, "y": 44, "type": "hero", "label": "Team" },
+      { "x": 48, "y": 36, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Ein Baron-Start kann ein Köder sein. Wer hat den Vorteil, wenn die Gegner angreifen?",
+    "context": "Du bist Kindred (Jungle). Die Gegner haben Vision im Fluss und warten auf euren Baron-Start. Euer Team hat Smite und die Ultimates sind bereit.",
+    "options": [
+      { "label": "A: Den Baron als Köder anstarten, den Eingang mit Flankern sichern und umdrehen, sobald die Gegner angreifen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Köder lockt die Gegner in euren Vorteil." },
+      { "label": "B: Den Baron blind durchziehen und nicht auf die Gegner achten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr seid in der Grube gefangen, wenn sie angreifen.", "Ihr verliert den Baron und den Kampf."] },
+      { "label": "C: Den Baron ignorieren und auf bessere Chancen warten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr gebt das wichtigste Objective her.", "Die Gegner starten den Baron selbst und bekommen den Buff."] }
+    ]
+  },
+  {
+    "id": "quiz_diamant_04", "gameTime": "26:20", "timeLimit": 60,
+    "champion": "Viktor", "role": "Midlane", "difficulty": "Diamant",
+    "markers": [
+      { "x": 46, "y": 48, "type": "hero", "isPlayer": true, "label": "Viktor" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 40, "y": 38, "type": "hero", "label": "Team" },
+      { "x": 52, "y": 40, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Ein Baron-Bait lockt die Gegner. Wo kämpft ihr am liebsten?",
+    "context": "Du bist Viktor (Mid). Die Gegner haben ihre Ultimates verbraucht und stehen im Fluss ohne Vision im Baron-Eingang. Euer Jungler hat Smite und ihr kontrolliert die Enge.",
+    "options": [
+      { "label": "A: Den Baron scheinbar starten, um die Gegner zu locken, und den Kampf an der engen Stelle annehmen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Bait zwingt sie in euren Vorteil." },
+      { "label": "B: Alle in die Grube schicken und blind den Baron nehmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr seid in der Grube gefangen, wenn sie angreifen.", "Ihr verliert Baron und Tempo."] },
+      { "label": "C: Gar nichts versuchen und weiter warten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr gebt das Zeitfenster ohne Ultimates der Gegner auf.", "Die Gegner bekommen ihre Ultimates zurück und übernehmen die Initiative."] }
+    ]
+  },
+  {
+    "id": "quiz_diamant_05", "gameTime": "12:00", "timeLimit": 60,
+    "champion": "Varus", "role": "Botlane", "difficulty": "Diamant",
+    "markers": [
+      { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Varus" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 92, "y": 64, "type": "objective", "label": "Gegner-Turm" }
+    ],
+    "coachHint": "Eine große Welle kostet Zeit, bringt aber Gold und Druck. Wann gehst du zum Drachen?",
+    "context": "Du bist Varus (Bot). Der Drache spawnt in etwa 90 Sekunden. Die Welle ist ausgeglichen und dein Support ist bei dir.",
+    "options": [
+      { "label": "A: Sofort zum Drachen gehen und die Welle verpuffen lassen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlierst Gold und Erfahrung der Welle.", "Das Team hat am Drachen weniger Ressourcen."] },
+      { "label": "B: Die Welle zwei Wellen lang aufbauen (Slow Push), mit der großen Welle den Turm treffen und dann zum Drachen rotieren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die große Welle gibt dir Zeit und Druck." },
+      { "label": "C: Die Welle einfrieren und die Lane gar nicht verlassen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bist nicht beim Drachen und lässt Prio liegen.", "Die Gegner nehmen den Drachen mit freier Hand."] }
+    ]
+  },
+  {
+    "id": "quiz_diamant_06", "gameTime": "33:00", "timeLimit": 60,
+    "champion": "Fiora", "role": "Toplane", "difficulty": "Diamant",
+    "markers": [
+      { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Fiora" },
+      { "x": 46, "y": 48, "type": "hero", "label": "Team" },
+      { "x": 52, "y": 44, "type": "enemy", "label": "Gegner (5)" },
+      { "x": 76, "y": 8, "type": "objective", "label": "Gegner-Turm" }
+    ],
+    "coachHint": "Splitpush bindet Gegner, aber nur, wenn er lange genug läuft. Wann musst du kommen?",
+    "context": "Du bist Fiora (Top). Dein Team steht Mid gegen die Gegner in einem 5v5. Du splitpushst Top mit bereitem Teleport und der Turm ist fast gefallen.",
+    "options": [
+      { "label": "A: Sofort zum Team teleportieren und den Druck aufgeben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm bleibt stehen und die Gegner schlagen frei zu.", "Die Gegner müssen nicht mehr auf Top achten."] },
+      { "label": "B: Den Turm weiter angreifen und erst teleportieren, wenn der Kampf begonnen hat und eine Lücke entsteht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Dein Druck bindet Gegner und du kommst im richtigen Moment." },
+      { "label": "C: Ohne Teleport in die Mitte laufen, um zu helfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kommst zu spät und verlierst den Teleport-Vorteil.", "Euer Team kämpft ohne dich, der Turm bleibt stehen."] }
+    ]
+  },
+  {
+    "id": "quiz_master_02", "gameTime": "24:00", "timeLimit": 60,
+    "champion": "Irelia", "role": "Toplane", "difficulty": "Master+",
+    "markers": [
+      { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Irelia" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 42, "y": 40, "type": "hero", "label": "Team" },
+      { "x": 50, "y": 38, "type": "enemy", "label": "Gegner" }
+    ],
+    "coachHint": "Ein Flank wirkt, wenn die Gegner auf den Köder reagieren. Wo wartest du?",
+    "context": "Du bist Irelia (Top). Die Gegner haben Vision im Fluss und warten auf euren Baron-Start. Dein Teleport ist ready und deine Welle ist gecrasht.",
+    "options": [
+      { "label": "A: Per Teleport direkt in die Baron-Grube springen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bist in der Grube gefangen und stirbst zuerst.", "Euer Team verliert den Köder und den Kampf."] },
+      { "label": "B: Das Team den Baron anstarten lassen, per Teleport auf eine Ward am Eingang gehen und den Engage der Gegner flankieren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Dein Flank trifft die Gegner im Rücken." },
+      { "label": "C: Die Welle weiter pushen und nichts tun.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bindest zwar Gegner, bist aber nicht am Kampf beteiligt.", "Euer Team kämpft ohne Flank und Vorteil."] }
+    ]
+  },
+  {
+    "id": "quiz_master_03", "gameTime": "20:30", "timeLimit": 60,
+    "champion": "Ornn", "role": "Toplane", "difficulty": "Master+",
+    "markers": [
+      { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Ornn" },
+      { "x": 76, "y": 8, "type": "objective", "label": "Gegner-Turm" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 60, "y": 9, "type": "enemy", "label": "Aatrox" }
+    ],
+    "coachHint": "Wenn der Gegner seinen Teleport verbraucht hat, was kannst du dir erlauben?",
+    "context": "Du bist Ornn (Top). Aatrox hat gerade seinen Teleport verbraucht. Deine Welle ist in seinem Turm gecrasht und bounct nun zu dir zurück. Euer Team will in etwa 40 Sekunden den Baron starten.",
+    "options": [
+      { "label": "A: Die Welle nutzen, um den Turm zu pushen, und mit dem Teleport rechtzeitig zum Baron rotieren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Aatrox kann dir nicht folgen und du bist beim Baron." },
+      { "label": "B: Sofort zur Base zurück und den Bounce ignorieren.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlierst Welle und Turmdruck.", "Euer Team hat am Baron weniger Ressourcen."] },
+      { "label": "C: Aatrox allein jagen, weil er keinen Teleport hat.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst ohne Info in sein Team.", "Du fehlst am Baron und euer Team startet in Unterzahl."] }
+    ]
+  },
+  {
+    "id": "quiz_master_04", "gameTime": "32:30", "timeLimit": 60,
+    "champion": "Azir", "role": "Midlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 74, "y": 66, "type": "hero", "isPlayer": true, "label": "Azir" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Elder Drake" },
+      { "x": 78, "y": 70, "type": "hero", "label": "Team" },
+      { "x": 68, "y": 60, "type": "enemy", "label": "Lee Sin" }
+    ],
+    "coachHint": "Wer den Eingang kontrolliert, entscheidet über den Steal. Wo stehst du?",
+    "context": "Du bist Azir (Mid). Euer Team schlägt den Elder Drake, er hat noch etwa 15 % Leben. Der gegnerische Lee Sin wartet in der Nähe mit Smite auf einen Steal.",
+    "options": [
+      { "label": "A: Hinten bleiben und die Verteidigung dem Team überlassen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Lee Sin steht frei und kann den Elder stehlen.", "Euer Team verliert den Elder und den Teamfight-Vorteil."] },
+      { "label": "B: Den Eingang mit Kontrolle absichern, Lee Sin zurückdrängen und das Smite-Fenster verteidigen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ein gesicherter Eingang verhindert den Steal." },
+      { "label": "C: Selbst in die Grube gehen und Lee Sin ignorieren.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du hilfst nicht beim Eingang und Lee Sin kann einsteigen.", "Der Steal gelingt oder ihr verliert die Kontrolle."] }
+    ]
   }
 ];
 const START_IDS = ['top_smaragd_01', 'mid_gold_01', 'jng_dia_01', 'bot_eisen_01', 'top_bronze_01', 'sup_silber_01', 'jng_platin_01', 'mid_master_01'];
@@ -1028,7 +1430,6 @@ const dailyStartId = () => {
   const dayOfYear = Math.floor((today - Date.UTC(n.getUTCFullYear(), 0, 0)) / 86400000);
   return START_IDS[dayOfYear % START_IDS.length];
 };
-const RESULT_MS = 2400;          // so lange bleibt der Ergebnis-Zustand nach einer Antwort sichtbar
 const DEFAULT_TIME_LIMIT = 15;   // Fallback, falls ein Szenario kein timeLimit hat
 
 const COACH_REPLIES = [
@@ -1274,6 +1675,17 @@ const matchPool = (role, step) => {
   const best = Math.min(...starts.map(dist));
   return starts.filter(sc => dist(sc) === best);
 };
+// Anti-Wiederholung: die zuletzt gespielten Szenario-IDs (Basis-IDs, auch adaptive Varianten) werden bei neuen Läufen zuerst ausgeschlossen
+const RECENT_MAX = 15;
+const baseId = id => id.split('~')[0];
+function freshFirst(ids, recent, n) {
+  const fresh = shuffle(ids.filter(i => !recent.includes(baseId(i))));
+  if (fresh.length >= n) return fresh.slice(0, n);
+  const used = ids.filter(i => recent.includes(baseId(i))).sort((a, b) => recent.indexOf(baseId(b)) - recent.indexOf(baseId(a)));   // am längsten her zuerst
+  return [...fresh, ...used].slice(0, n);
+}
+const chainIds = id => { const out = []; let c = id; while (c !== 'end' && out.length < 10) { const sc = getScenario(c); if (!sc) break; out.push(sc.id); c = mainLine(sc); } return out; };
+const freshStarts = (pool, recent) => { const f = pool.filter(sc => !chainIds(sc.id).some(i => recent.includes(baseId(i)))); return f.length ? f : pool; };
 const RANKED_ROLES = [['Top', 'Toplane'], ['Mid', 'Midlane'], ['Jungle', 'Jungle'], ['Bot', 'Botlane'], ['Support', 'Support']];
 
 /* ---------- Wertung, Hidden MMR, Momentum ---------- */
@@ -1290,14 +1702,21 @@ function scoreRun(correct, n, mmr, rank) {
   else                   { kind = 'Stomp-Niederlage';    lp = -(20 + Math.round((1 - t) * 4)); }
   return { win: ratio >= 0.6, kind, lp, mmrDelta: Math.round(lp * 0.8) };
 }
-const MOM_GOOD = ['Vorteil: +1.200 Gold & Prio', 'Vorteil: Kartenkontrolle & Vision', 'Vorteil: Objective-Tempo auf deiner Seite', 'Vorteil: Wellen gecrasht, Druck steigt'];
-const MOM_BAD = ['Druck: Gegner kontrolliert Vision', 'Rückstand: −900 Gold & Prio verloren', 'Druck: Gegner übernimmt das Tempo', 'Rückstand: Welle verloren, Team unter Druck'];
+const GOLD_STEP = 700;   // Gold-Unterschied pro Vorsprung in Entscheidungen (Spielgefühl, keine echte Spielmessung)
+const GOOD_TAGS = ['Lane-Prio gesichert', 'Vision-Kontrolle gesichert', 'Objective-Tempo auf deiner Seite', 'Wellenvorteil gesichert'];
+const BAD_TAGS = ['Gegner mit Lane-Prio', 'Gegner kontrolliert die Vision', 'Gegner übernimmt das Tempo', 'Welle verloren, Team unter Druck'];
+function standing(lead, ok, stage) {
+  const gold = (Math.abs(lead) * GOLD_STEP).toLocaleString('de-DE');
+  const tag = (ok ? GOOD_TAGS : BAD_TAGS)[stage % 4];
+  if (lead > 0) return { good: true, text: `Dein Team: +${gold} Gold Vorsprung | ${tag}` };
+  if (lead < 0) return { good: false, text: `Gegner: +${gold} Gold Vorsprung | ${tag}` };
+  return { good: ok, text: `Ausgeglichen: kein Gold-Unterschied | ${tag}` };
+}
 function makeMomentum(log, stage) {
   const last = log[log.length - 1];
   const c = log.filter(e => e.ok).length, lead = c - (log.length - c);
-  const gold = (Math.abs(lead) * 600).toLocaleString('de-DE');
-  return { good: last.ok, text: (last.ok ? MOM_GOOD : MOM_BAD)[stage % 4],
-    state: lead > 0 ? `Zwischenstand: Du liegst vorn (+${gold} Gold)` : lead < 0 ? `Zwischenstand: Du liegst zurück (−${gold} Gold)` : 'Zwischenstand: ausgeglichen' };
+  const tag = (last.ok ? GOOD_TAGS : BAD_TAGS)[(stage - 1) % 4];
+  return { good: last.ok, text: `${last.ok ? 'Vorteil' : 'Druck'}: ${tag}`, state: standing(lead, last.ok, stage - 1).text };
 }
 
 /* ---------- Freunde (lokal, simuliert) ---------- */
@@ -1313,7 +1732,7 @@ const MOCK_REQUESTS = [
   { name: 'GankMeIfYouCan', step: 13, lp: 18, status: 'match', note: 'Trainiere Gank-Tracking.' },
 ];
 
-const TIMEOUT_CHAIN = ['Du reagierst zu spät und der Gegner nutzt das Zeitfenster.', 'Dein Team spielt ohne Ansage und verliert Tempo.'];
+const TIMEOUT_CHAIN = ['Du reagierst zu spät und der Gegner nutzt das Zeitfenster für Druck und Vision.', 'Dein Team spielt ohne klare Ansage und verliert dadurch Map-Control sowie das nächste Objective.'];
 const stripLetter = t => t.replace(/^[A-Z]:\s*/, '');
 
 // Welche Karten-Animation passt zur gewählten Aktion? (Schlüsselwörter im Optionstext)
@@ -1352,18 +1771,18 @@ const ROLE_ICON = { Toplane: 'shield', Midlane: 'wand', Jungle: 'axe', Botlane: 
 const CHAMP_BG = { 'Jax': '#313244', 'Ahri': '#5b3a6b', 'Lee Sin': '#7a3b2e', 'Jinx': '#2f5b7a' };
 
 // Data Dragon (Riot): Champion-Porträts und Summoner's Rift
-const DDRAGON = 'https://ddragon.leagueoflegends.com/cdn/14.8.1/img';
+const DDRAGON = 'https://ddragon.leagueoflegends.com/cdn/14.20.1/img';
 const MAP_URL = `${DDRAGON}/map/map11.png`;
 const champImg = name => `${DDRAGON}/champion/${name.replace(/[^A-Za-z]/g, '')}.png`;   // "Lee Sin" -> "LeeSin"
 
 // Rundes Champion-Porträt. Lädt das Bild nicht, bleibt ein User-Icon sichtbar.
-const ChampAvatar = ({ name, className = 'w-10 h-10', iconSize = 20, ring = 'border border-[#C89B3C]/60', fallbackIcon = 'user' }) => {
+const ChampAvatar = ({ name, className = 'w-10 h-10', iconSize = 20, ring = 'border border-[#C89B3C]/60', fallbackIcon = 'user', initial = null }) => {
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   return (
     <span className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full ${ring} ${className}`}
           style={{ background: CHAMP_BG[name] || '#313244' }} role="img" aria-label={name}>
-      <Icon n={fallbackIcon} size={iconSize} className="text-white/80" />
+      {initial ? <span className="text-[11px] font-extrabold text-white">{initial}</span> : <Icon n={fallbackIcon} size={iconSize} className="text-white/80" />}
       {!failed && (
         <img src={champImg(name)} alt="" onLoad={() => setLoaded(true)} onError={() => setFailed(true)}
              className={`absolute inset-0 h-full w-full object-cover transition-opacity ${loaded ? 'opacity-100' : 'opacity-0'}`} />
@@ -1394,6 +1813,30 @@ function focusFor(markers) {
   const lane = Object.entries(LANES).map(([n, pts]) => [n, Math.min(...pts.slice(1).map((q, i) => segDist(c, pts[i], q)))]).sort((p, q) => p[1] - q[1])[0][0];
   const zone = /drache|elder/i.test(objs) ? 'Dragon-Pit' : /baron/i.test(objs) ? 'Baron-Pit' : lane;
   return { x0, y0, size, zone };
+}
+
+// Bekannte Champion-Namen für Karten-Marker (Präfix im Marker-Label, z. B. "Nocturne (Ult)" oder "Ezreal (ADC)")
+const MARKER_EXTRA = ['Zed', 'Aatrox', 'Fiora', 'Lux', 'Leona', 'Caitlyn', 'Jinx', 'Ashe', 'Ezreal', 'Zeri', 'Renekton', 'Garen', 'Viego', 'Nocturne', 'Katarina', 'Syndra',
+  'Viktor', 'Azir', 'Vi', 'Sejuani', 'Lee Sin', 'Ahri', 'Orianna', 'Nautilus', 'Karma', 'Lulu', 'Malphite', 'Ornn', 'Elise'];
+const KNOWN_CHAMPS = [...new Set([...RUNS.map(r => r.champion), ...MARKER_EXTRA])].sort((a, b) => b.length - a.length);
+const markerChampion = label => { const l = label.toLowerCase(); return KNOWN_CHAMPS.find(c => l.startsWith(c.toLowerCase()) && !/[a-z]/.test(l[c.length] || '')); };
+
+// Runder Marker für Verbündete (cyan) und Gegner (rot): Champion-Porträt, sonst Anfangsbuchstabe
+function PortraitMarker({ m, sc, showLabels }) {
+  const champ = markerChampion(m.label);
+  const enemy = m.type === 'enemy';
+  const ring = enemy ? 'border-2 border-[#E84057] shadow-[0_0_8px_rgba(232,64,87,.8)]' : 'border-2 border-[#0AC8B9] shadow-[0_0_8px_rgba(10,200,185,.8)]';
+  const size = showLabels ? 'w-7 h-7' : 'w-6 h-6';
+  const initial = (champ || m.label).trim()[0].toUpperCase();
+  return (
+    <div className="absolute z-[5]" style={{ left: `${m.x}%`, top: `${m.y}%`, transform: `translate(-50%, -50%) scale(${sc})` }}>
+      {champ
+        ? <ChampAvatar name={champ} className={size} initial={initial} ring={ring} />
+        : <span className={`flex items-center justify-center rounded-full text-[10px] font-extrabold text-white ${size} ${ring}`}
+                style={{ background: enemy ? 'rgba(232,64,87,.55)' : 'rgba(10,200,185,.45)' }}>{initial}</span>}
+      {showLabels && <span className="absolute left-1/2 top-full mt-0.5 -translate-x-1/2 whitespace-nowrap rounded bg-black/60 px-1 text-[9px] font-semibold text-slate-100">{m.label}</span>}
+    </div>
+  );
 }
 
 // Taktik-Karte: Mock-Map (Fallback) -> echte Map als Hintergrund -> Marker-Overlay -> Spieler-Porträt, alles in einer zoombaren "Welt".
@@ -1462,7 +1905,7 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
           </svg>
           <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${MAP_URL})` }} />
           <svg viewBox="110 10 180 180" className="absolute inset-0 h-full w-full" role="img" aria-label="Minimap mit Taktik-Markern">
-            {markers.filter(m => !m.isPlayer).map((m, i) => {
+            {markers.filter(m => !m.isPlayer && (m.type === 'fog' || m.type === 'objective')).map((m, i) => {
               const px = 110 + m.x * 1.8, py = 10 + m.y * 1.8, c = MARKER_COLOR[m.type];
               const flip = px > 250;
               return (
@@ -1479,13 +1922,7 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
                       <circle cx={px} cy={py} r={7 * k} fill="none" stroke={c} strokeWidth="2.5" />
                       <circle cx={px} cy={py} r={2 * k} fill={c} />
                     </>
-                  ) : (
-                    <>
-                      <circle cx={px} cy={py} r={13 * k} fill={c} fillOpacity=".14" className="motion-safe:animate-pulse" />
-                      <circle cx={px} cy={py} r={9 * k} fill={c} fillOpacity=".3" />
-                      <circle cx={px} cy={py} r={5 * k} fill={c} stroke="#fff" strokeOpacity=".85" strokeWidth="1" />
-                    </>
-                  )}
+                  ) : null}
                   {showLabels && m.label && m.type !== 'fog' && (
                     <text x={flip ? px - 12 * sc : px + 12 * sc} y={py + 3 * sc} textAnchor={flip ? 'end' : 'start'} fontSize={8 * sc} fontWeight="600"
                           fill="#e2e8f0" stroke="#010A13" strokeWidth={2.5 * sc} paintOrder="stroke" fontFamily="system-ui,sans-serif">{m.label}</text>
@@ -1495,6 +1932,7 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
             })}
             {fxLayer}
           </svg>
+          {markers.filter(m => !m.isPlayer && (m.type === 'hero' || m.type === 'enemy')).map((m, i) => <PortraitMarker key={i} m={m} sc={sc} showLabels={showLabels} />)}
           {player && (
             <div className="absolute z-10 flex flex-col items-center" style={{ left: `${player.x}%`, top: `${player.y}%`, transform: `translate(-50%, -50%) scale(${sc})` }}>
               <div className="relative">
@@ -1502,7 +1940,7 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
                 <ChampAvatar name={champion || player.label} className={showLabels ? 'w-10 h-10' : 'w-8 h-8'} iconSize={showLabels ? 20 : 16}
                              ring={result === 'good' ? 'border-2 border-[#0AC8B9] shadow-[0_0_16px_rgba(10,200,185,.9)]'
                                  : result === 'bad' ? 'border-2 border-[#E84057] shadow-[0_0_16px_rgba(232,64,87,.9)]'
-                                 : 'border-2 border-[#F5E6B8] shadow-[0_0_12px_rgba(245,230,184,.85)]'} />
+                                 : 'border-2 border-[#C89B3C] shadow-[0_0_0_2px_rgba(10,200,185,.75),0_0_14px_rgba(10,200,185,.7)]'} />
               </div>
               {showLabels && <span className="mt-0.5 text-[10px] font-bold text-[#F5E6B8] [text-shadow:0_0_3px_#010A13]">{player.label}</span>}
             </div>
@@ -1788,7 +2226,7 @@ function RankedSetup({ rank, onStart, onClose }) {
   );
 }
 
-function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort }) {
+function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree', stage = 0, stages = 1, record = { c: 0, w: 0 }, onNext, onAbort }) {
   const limit = Math.min(scenario.timeLimit || DEFAULT_TIME_LIMIT, timeCap || Infinity);   // individuelles Zeitlimit pro Szenario
   const [left, setLeft] = useState(limit);
   const [pick, setPick] = useState(null);       // { opt } | { timeout: true } | null
@@ -1796,7 +2234,8 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
   const [typing, setTyping] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [leave, setLeave] = useState(false);   // Bestätigung zum Abbrechen
-  const [full, setFull] = useState(false);     // kurz auf die Gesamtkarte schalten
+  const [full, setFull] = useState(false);     // Gesamtkarte statt Fokus-Ausschnitt
+  const paused = mapOpen || full;               // Taktik-Analyse: Timer steht
   const [showMom, setShowMom] = useState(true);   // Momentum-Banner am Phasenstart
   const [msgs, setMsgs] = useState([{ from: 'coach', t: 'Ich gebe dir Hinweise, aber nie die Lösung. Was willst du wissen?' }]);
   const [draft, setDraft] = useState('');
@@ -1806,15 +2245,14 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
 
   // Timer: pausiert, solange der Coach offen ist
   useEffect(() => {
-    if (pick || coach || leave) return;   // Timer pausiert bei Coach und Abbruch-Dialog
+    if (pick || coach || leave || mapOpen || full) return;   // Timer pausiert bei Coach, Abbruch-Dialog und Karten-Analyse
     if (left <= 0) { setPick({ timeout: true }); return; }
     const t = setTimeout(() => setLeft(l => l - 1), 1000);
     return () => clearTimeout(t);
-  }, [left, pick, coach, leave]);
+  }, [left, pick, coach, leave, mapOpen, full]);
 
   useEffect(() => () => clearTimeout(replyTimer.current), []);
   useEffect(() => { if (pick) setMapOpen(false); }, [pick]);
-  useEffect(() => { if (!full) return; const t = setTimeout(() => setFull(false), 5000); return () => clearTimeout(t); }, [full]);
   useEffect(() => { const t = setTimeout(() => setShowMom(false), 5000); return () => clearTimeout(t); }, []);
   // Auflösung: kurz nach dem Lock-in erklingt Erfolg oder Fehler (bei Timeout sofort)
   useEffect(() => {
@@ -1822,12 +2260,6 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
     const t = setTimeout(() => playHextechSound(ok ? 'correct' : 'wrong'), pick.opt ? 260 : 0);
     return () => clearTimeout(t);
   }, [pick]);
-  // Ergebnis-Zustand: kurz stehen bleiben, dann automatisch weiter (oder per Button)
-  useEffect(() => {
-    if (!pick || leave || !ok) return;   // richtige Antwort: automatisch weiter; falsche: erst lesen, dann "Weiter"
-    const t = setTimeout(goNext, RESULT_MS);
-    return () => clearTimeout(t);
-  }, [pick, leave]);
   useEffect(() => {
     if (!mapOpen) return;
     const h = e => { if (e.key === 'Escape') setMapOpen(false); };
@@ -1861,6 +2293,9 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
   const chain = pick ? ((pick.opt && pick.opt.chain) || TIMEOUT_CHAIN) : null;
   const fx = pick ? effectsFor(pick.opt, scenario, ok) : null;
   const focus = focusFor(scenario.markers);
+  const cc = record.c + (ok ? 1 : 0), nn = record.c + record.w + 1, lead = cc - (nn - cc);
+  const st = pick ? ((format === 'match' || format === 'tree') ? standing(lead, ok, stage) : { good: ok, text: `Zwischenstand: ${cc} von ${nn} richtig` }) : null;
+  const nextLabel = stage + 1 >= stages ? 'Zur Auswertung ➔' : (format === 'match' || format === 'tree') ? 'Nächste Phase ➔' : 'Nächste Frage ➔';
   const goNext = () => { if (adv.current || !pick) return; adv.current = true; onNext(pick.opt || null); };
 
   return (
@@ -1892,12 +2327,15 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
         {/* Timer */}
         <div className="flex items-center gap-2">
           <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--track)' }} role="progressbar" aria-valuenow={left} aria-valuemax={limit}>
-            <div className="h-full transition-[width] duration-1000 ease-linear" style={{ width: `${(left / limit) * 100}%`, background: coach ? 'var(--gold)' : 'var(--red)' }} />
+            <div className="h-full transition-[width] duration-1000 ease-linear" style={{ width: `${(left / limit) * 100}%`, background: (coach || paused) ? 'var(--gold)' : 'var(--red)' }} />
           </div>
-          <div className={`w-9 text-right font-extrabold tabular-nums ${coach ? 'text-[#C89B3C]' : urgent ? 'text-[#E84057]' : ''} ${urgent && !coach && !leave && !pick ? 'panic' : ''}`}>{left}s</div>
+          <div className={`w-9 text-right font-extrabold tabular-nums ${(coach || paused) ? 'text-[#C89B3C]' : urgent ? 'text-[#E84057]' : ''} ${urgent && !coach && !paused && !leave && !pick ? 'panic' : ''}`}>{left}s</div>
         </div>
 
         {/* Minimap mit Markern (Zoom per Klick) */}
+        {paused && (
+          <div role="status" className="shrink-0 rounded-md border border-[#C89B3C]/50 bg-[#C89B3C]/10 px-2 py-1 text-center text-xs font-semibold text-[#C89B3C]">⏸️ Taktik-Analyse (Timer pausiert)</div>
+        )}
         <div role="button" tabIndex={0} onClick={() => setMapOpen(true)} aria-label="Minimap vergrößern"
           onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMapOpen(true); } }}
           className="relative h-36 shrink-0 rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13] cursor-pointer transition hover:border-[#0AC8B9]">
@@ -1945,30 +2383,30 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
         </div>
 
         {pick && (
-          <div role="status" className="overflow-hidden rounded-lg border" style={{ borderColor: fbColor }}>
+          <div role="status" className="shrink-0 max-h-[60vh] sm:max-h-[70vh] overflow-y-auto rounded-lg border" style={{ borderColor: fbColor }}>
+            <div className="flex items-center gap-2 px-3 pt-2 font-serif font-bold" style={{ color: fbColor }}>
+              <Icon n={ok ? 'check' : 'x'} size={18} />{ok ? 'Richtige Entscheidung' : 'Fehlentscheidung'}
+            </div>
             {ok ? (
-              <div className="flex items-start gap-2 px-3 py-2 text-sm" style={{ color: fbColor }}>
-                <Icon n="check" size={18} className="mt-0.5 shrink-0" /><span>{fbText}</span>
-              </div>
+              <p className="px-3 py-1.5 text-sm leading-relaxed text-slate-200">{fbText}</p>
             ) : (
-              <dl className="space-y-1 px-3 py-2 text-sm">
+              <dl className="space-y-1 px-3 py-1.5 text-sm leading-relaxed">
                 <div><dt className="inline font-semibold" style={{ color: fbColor }}>Deine Wahl: </dt><dd className="inline text-slate-200">{choice}</dd></div>
                 <div><dt className="inline font-semibold" style={{ color: fbColor }}>Direkte Folge: </dt><dd className="inline text-slate-200">{chain[0]}</dd></div>
                 <div><dt className="inline font-semibold" style={{ color: fbColor }}>Team-Schaden: </dt><dd className="inline text-slate-200">{chain[1]}</dd></div>
               </dl>
             )}
-            {ok && (
-              <div className="h-0.5 w-full" style={{ background: 'var(--track)' }}>
-                <div className="drain h-full" style={{ background: fbColor, animationDuration: `${RESULT_MS}ms` }} />
-              </div>
+            {st && (
+              <div className="mx-3 mb-2 rounded-md border px-2.5 py-1.5 text-sm font-semibold"
+                   style={{ borderColor: st.good ? 'rgba(10,200,185,.5)' : 'rgba(232,64,87,.5)', color: st.good ? 'var(--teal)' : 'var(--red)', background: st.good ? 'rgba(10,200,185,.08)' : 'rgba(232,64,87,.08)' }}>{st.text}</div>
             )}
           </div>
         )}
         {pick && (
-          <button autoFocus onClick={goNext}
-            className={`rounded-xl py-2 text-sm font-serif font-bold transition active:scale-[.98] ${ok
-              ? 'border border-[#C89B3C]/60 text-[#C89B3C] hover:border-[#0AC8B9] hover:text-[#0AC8B9]'
-              : 'bg-[#C89B3C] text-[#010A13] shadow-[0_0_12px_rgba(200,155,60,.4)]'}`}>Weiter</button>
+          <div className="sticky bottom-0 z-10 -mx-3 mt-auto shrink-0 bg-gradient-to-t from-[#010A13] via-[#010A13]/95 to-transparent px-3 pb-2 pt-3">
+            <button autoFocus onClick={goNext}
+              className="w-full rounded-xl bg-[#C89B3C] py-2.5 font-serif font-extrabold text-[#010A13] shadow-[0_0_12px_rgba(200,155,60,.4)] transition active:scale-[.98]">{nextLabel}</button>
+          </div>
         )}
 
         <div className="flex items-center justify-between mt-auto pt-0.5">
@@ -2007,6 +2445,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
             <div className={`flex items-center gap-1 font-extrabold tabular-nums ${urgent ? 'text-[#E84057]' : ''}`}><Icon n="timer" size={16} /> {left}s</div>
             <button onClick={() => setMapOpen(false)} aria-label="Karte schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
           </div>
+          <div role="status" className="rounded-md border border-[#C89B3C]/50 bg-[#C89B3C]/10 px-2 py-1 text-center text-xs font-semibold text-[#C89B3C]">⏸️ Taktik-Analyse (Timer pausiert)</div>
           <div className="w-full max-w-[380px] aspect-square mx-auto rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13]">
             <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} showLabels focus={focus} full={full} onToggleView={() => setFull(f => !f)} />
           </div>
@@ -2229,11 +2668,15 @@ const champLabel = n => CHAMP_NAMES.find(c => normName(c) === normName(n)) || ti
 
 // Adaptives Rollen-Template: Szenarien ohne champion-spezifische Fähigkeiten, die für jeden Champion der Rolle passen
 const GENERIC = {
-  Toplane: ['top_smaragd_01', 'top_smaragd_02', 'top_smaragd_03', 'top_smaragd_05', 'top_bronze_02', 'top_bronze_03', 'top_bronze_04', 'quiz_eisen_01', 'quiz_gold_01', 'quiz_diamant_01'],
-  Jungle: ['jng_dia_01', 'jng_dia_02', 'jng_dia_03', 'jng_dia_04', 'jng_dia_05', 'jng_platin_01', 'jng_platin_02', 'jng_platin_04', 'quiz_gold_03'],
-  Midlane: ['mid_gold_02', 'mid_gold_03', 'mid_gold_04', 'mid_gold_05', 'mid_master_01', 'mid_master_03', 'mid_master_05', 'quiz_eisen_02', 'quiz_smaragd_01', 'quiz_diamant_02'],
-  Botlane: ['bot_eisen_01', 'bot_eisen_02', 'bot_eisen_03', 'bot_eisen_04', 'bot_eisen_05', 'quiz_eisen_03', 'quiz_smaragd_03', 'quiz_diamant_03'],
-  Support: ['sup_silber_02', 'sup_silber_03', 'quiz_gold_02', 'quiz_smaragd_02', 'quiz_bronze_01', 'quiz_platin_01', 'quiz_master_01'],
+  Toplane: ['top_smaragd_01', 'top_smaragd_02', 'top_smaragd_03', 'top_smaragd_05', 'top_bronze_02', 'top_bronze_03', 'top_bronze_04', 'quiz_eisen_01', 'quiz_gold_01', 'quiz_diamant_01',
+    'quiz_silber_01', 'quiz_gold_04', 'quiz_gold_06', 'quiz_diamant_06', 'quiz_master_02', 'quiz_master_03'],
+  Jungle: ['jng_dia_01', 'jng_dia_02', 'jng_dia_03', 'jng_dia_04', 'jng_dia_05', 'jng_platin_01', 'jng_platin_02', 'jng_platin_04', 'quiz_gold_03',
+    'quiz_eisen_04', 'quiz_eisen_06', 'quiz_bronze_04', 'quiz_platin_02', 'quiz_smaragd_06'],
+  Midlane: ['mid_gold_02', 'mid_gold_03', 'mid_gold_04', 'mid_gold_05', 'mid_master_01', 'mid_master_03', 'mid_master_05', 'quiz_eisen_02', 'quiz_smaragd_01', 'quiz_diamant_02',
+    'quiz_eisen_05', 'quiz_bronze_03', 'quiz_silber_02', 'quiz_platin_03', 'quiz_smaragd_05', 'quiz_diamant_04', 'quiz_master_04'],
+  Botlane: ['bot_eisen_01', 'bot_eisen_02', 'bot_eisen_03', 'bot_eisen_04', 'bot_eisen_05', 'quiz_eisen_03', 'quiz_smaragd_03', 'quiz_diamant_03',
+    'quiz_bronze_02', 'quiz_gold_05', 'quiz_platin_04', 'quiz_smaragd_04', 'quiz_diamant_05'],
+  Support: ['sup_silber_02', 'sup_silber_03', 'quiz_gold_02', 'quiz_smaragd_02', 'quiz_bronze_01', 'quiz_platin_01', 'quiz_master_01', 'quiz_silber_03'],
 };
 function adaptScenario(sc, champ) {
   const from = new RegExp(escapeRe(sc.champion), 'g');
@@ -2611,6 +3054,7 @@ function App() {
   const [profile, setProfile] = useState(init.profile || null);   // null = noch nicht registriert
   const [friends, setFriends] = useState(init.friends || [MOCK_FRIEND]);
   const [requests, setRequests] = useState(init.requests || MOCK_REQUESTS);
+  const [recent, setRecent] = useState(init.recent || []);   // zuletzt gespielte Szenario-IDs
   const [infoMode, setInfoMode] = useState(null);
   const [rank, setRank] = useState(init.rank);
   const [history, setHistory] = useState(init.history);
@@ -2620,7 +3064,7 @@ function App() {
   const [rs, setRs] = useState({ id: START_IDS[0], format: 'tree', correct: 0, log: [], champion: '', role: '', stage: 0, stages: 1, queue: [] });
   const [result, setResult] = useState(null);     // { from, to } bei Daily und Ranked
 
-  useEffect(() => { writeSave({ rank, history, hearts, profile, friends, requests }); }, [rank, history, hearts, profile, friends, requests]);
+  useEffect(() => { writeSave({ rank, history, hearts, profile, friends, requests, recent }); }, [rank, history, hearts, profile, friends, requests, recent]);
 
   // Jeder Button klickt (Optionen ausgenommen: sie lösen lock_in aus)
   useEffect(() => {
@@ -2643,15 +3087,15 @@ function App() {
   const playDaily = () => { if (canPlay) begin('daily', { id: dailyStartId() }); };
   const playPractice = ({ role, difficulty }) => {
     const pool = practicePool(role, difficulty);
-    if (pool.length) begin('practice', { id: pickRandom(pool).id });
+    if (pool.length) begin('practice', { id: pickRandom(freshStarts(pool, recent)).id });
   };
   const playRanked = ({ way, role }) => {
     if (!canPlay) return;
     if (way === 'match') {
       const pool = matchPool(role, rank.step);
-      if (pool.length) { const sc = pickRandom(pool); begin('ranked', { format: 'match', id: sc.id, stages: matchStages(sc.id) }); }
+      if (pool.length) { const sc = pickRandom(freshStarts(pool, recent)); begin('ranked', { format: 'match', id: sc.id, stages: matchStages(sc.id) }); }
     } else {
-      const queue = shuffle(rankedPool(rank.step).map(r => r.id)).slice(0, QUIZ_LENGTH);   // nur eigene Liga, unabhängig vom nextId-Baum
+      const queue = freshFirst(rankedPool(rank.step).map(r => r.id), recent, QUIZ_LENGTH);   // nur eigene Liga, ohne zuletzt gespielte
       begin('ranked', { format: 'quiz', id: queue[0], queue, stages: queue.length });
     }
   };
@@ -2661,6 +3105,7 @@ function App() {
   const next = opt => {
     const cur = getScenario(rs.id);
     const ok = !!opt && opt.lpChange > 0;                 // richtig = beste Option, keine LP pro Phase
+    setRecent(r => [baseId(cur.id), ...r.filter(x => x !== baseId(cur.id))].slice(0, RECENT_MAX));
     const best = cur.options.find(o => o.lpChange > 0);
     const log = [...rs.log, {
       title: rs.format === 'match' || rs.format === 'tree' ? `Phase ${rs.stage + 1}: ${cur.phase} (${cur.gameTime})` : `Frage ${rs.stage + 1}: ${cur.champion} (${cur.gameTime})`,
@@ -2715,13 +3160,13 @@ function App() {
     if (!canPlay || !profile) return;
     const pool = masteryScenarios(profile.champion, profile.role);   // eigenes Set oder adaptives Rollen-Template
     if (!pool.length) return;
-    const queue = shuffle(pool.map(r => r.id)).slice(0, QUIZ_LENGTH);
+    const queue = freshFirst(pool.map(r => r.id), recent, QUIZ_LENGTH);
     begin('ranked', { format: 'mastery', id: queue[0], queue, stages: queue.length });
   };
 
   // Recovery Drill: 2 kurze Fragen aus der eigenen Liga, beide richtig = 1 Herz zurück (kostenlos, wiederholbar)
   const startDrill = () => {
-    const queue = shuffle(rankedPool(rank.step).map(r => r.id)).slice(0, 2);
+    const queue = freshFirst(rankedPool(rank.step).map(r => r.id), recent, 2);
     begin('practice', { format: 'drill', id: queue[0], queue, stages: queue.length });
   };
 
@@ -2786,7 +3231,8 @@ function App() {
       )}
       {screen === 'scenario' && scenario && (
         <Scenario key={`${run}-${scenario.id}-${rs.stage}`} scenario={scenario} practice={mode === 'practice'}
-          tag={tag} momentum={momentum} timeCap={rs.format === 'drill' ? 30 : null} onNext={next} onAbort={abort} />
+          tag={tag} momentum={momentum} timeCap={rs.format === 'drill' ? 30 : null} format={rs.format} stage={rs.stage} stages={rs.stages}
+          record={{ c: rs.log.filter(e => e.ok).length, w: rs.log.filter(e => !e.ok).length }} onNext={next} onAbort={abort} />
       )}
       {screen === 'complete' && result && <RunComplete result={result} log={rs.log} practice={mode === 'practice'} format={rs.format} onDone={() => setScreen('home')} onRetry={startDrill} />}
 
