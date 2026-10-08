@@ -1594,6 +1594,603 @@ const RUNS = [
       { "label": "B: Den Baron bei 4.000 Leben blind weiterschlagen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner brechen aus dem Busch und fangen euch in der Grube.", "Euer Team verliert den Baron und mehrere Spieler."] },
       { "label": "C: In die Grube laufen und beim Baron mitschlagen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst im Baron-Pit ohne Vision und ohne Falle.", "Das Team kann den Bait nicht auflösen und verliert die Initiative."] }
     ]
+  },
+
+  /* ===== Handgeschriebene Mastery-Szenarien der Kern-Champions (Aatrox, Darius, Viego, Kayn, Zed, Yasuo, Kai'Sa, Ezreal, Leona, Nautilus) ===== */
+  {
+    "id": "mast_aatrox_1", "gameTime": "03:30", "timeLimit": 30,
+    "champion": "Aatrox", "role": "Toplane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 10, "y": 50, "type": "hero", "isPlayer": true, "label": "Aatrox" },
+      { "x": 10, "y": 38, "type": "enemy", "label": "Garen", "champion": "Garen" },
+      { "x": 7, "y": 64, "type": "objective", "label": "Eigener Turm" }
+    ],
+    "coachHint": "Der Rand der Klinge trifft härter als die Mitte. Wo muss Garen stehen?",
+    "context": "Du bist Aatrox (Top) gegen Garen. Level 3, Q, W und E sind ready. Garen steht vor seiner Welle und will mit Autoangriffen traden.",
+    "options": [
+      { "label": "A: Q so werfen, dass der Rand der Klinge (Sweetspot) Garen trifft, und mit E den Winkel für die nächsten Q-Würfe nachkorrigieren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Sweetspot schleudert Garen hoch und gibt dir den Trade." },
+      { "label": "B: Direkt an Garen kleben und Q aus nächster Nähe werfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Aus nächster Nähe trifft nur der schwächere Teil der Klinge und Garen wird nicht hochgeschleudert.", "Du verlierst den Trade und Garen gewinnt den Wellenvorteil."] },
+      { "label": "C: Alle Fähigkeiten sofort einsetzen, ohne auf den Sweetspot zu achten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Deine Fähigkeiten sind verbraucht, bevor sie richtig treffen.", "Garen kontert mit seinem Zeitfenster und die Lane kippt."] }
+    ]
+  },
+  {
+    "id": "mast_aatrox_2", "gameTime": "09:20", "timeLimit": 45,
+    "champion": "Aatrox", "role": "Toplane", "difficulty": "Gold",
+    "markers": [
+      { "x": 9, "y": 56, "type": "hero", "isPlayer": true, "label": "Aatrox" },
+      { "x": 9, "y": 44, "type": "enemy", "label": "Gnar", "champion": "Gnar" },
+      { "x": 7, "y": 66, "type": "objective", "label": "Eigener Turm" }
+    ],
+    "coachHint": "Gegen Fernkämpfer entscheidet die Wellenposition. Wer muss vorlaufen?",
+    "context": "Du bist Aatrox (Top) gegen Gnar. Level 7, deine Welle steht nahe an deinem Turm. Gnar pokt dich aus der Distanz und weicht deinem Nahkampf aus.",
+    "options": [
+      { "label": "A: Die Welle nahe an deinem Turm halten, damit Gnar zum Farmen vorlaufen muss, und ihn dann mit W (Chains) festhalten und Q treffen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Wellenposition zwingt ihn in deine Reichweite." },
+      { "label": "B: Die Welle hart in seinen Turm pushen und dort die Chains versuchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Unter seinem Turm wird jeder Chains-Versuch bestraft und Gnar entkommt.", "Du verlierst Leben und die Welle bounct gegen dich."] },
+      { "label": "C: Nur mit Autoangriffen farmen und die Fähigkeiten aufsparen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Gnar pokt dich ungestraft herunter.", "Du verlierst Leben und Wellenkontrolle ohne Gegenleistung."] }
+    ]
+  },
+  {
+    "id": "mast_aatrox_3", "gameTime": "18:10", "timeLimit": 45,
+    "champion": "Aatrox", "role": "Toplane", "difficulty": "Platin",
+    "markers": [
+      { "x": 60, "y": 66, "type": "hero", "isPlayer": true, "label": "Aatrox" },
+      { "x": 74, "y": 64, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
+      { "x": 70, "y": 62, "type": "enemy", "label": "Ornn", "champion": "Ornn" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache" }
+    ],
+    "coachHint": "Deine Fähigkeiten gehören dem Carry, nicht dem Tank. Wie kommst du an ihn heran?",
+    "context": "Du bist Aatrox (Top). Euer Team kämpft am Drachen. Die gegnerische Jinx steht hinter ihrem Tank Ornn, und E (Umbral Dash), Q und W sind ready.",
+    "options": [
+      { "label": "A: Mit E um den Tank herum an Jinx heranspringen und Q (Sweetspot) plus W auf sie setzen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du erreichst den Carry und hältst ihn fest." },
+      { "label": "B: Den Tank mit Q und W festhalten, weil er am nächsten steht.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bindest dich an den Tank, während Jinx frei schießt.", "Euer Team verliert den Schadenskampf und den Drachen."] },
+      { "label": "C: Hinten stehen bleiben und nur auf Distanz mit Q zielen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Deine Fähigkeiten treffen nur Randziele.", "Euer Engage bleibt aus und der Kampf kippt."] }
+    ]
+  },
+  {
+    "id": "mast_aatrox_4", "gameTime": "29:40", "timeLimit": 60,
+    "champion": "Aatrox", "role": "Toplane", "difficulty": "Master+",
+    "markers": [
+      { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Aatrox" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 42, "y": 40, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 50, "y": 38, "type": "enemy", "label": "Gegner (4)", "champion": "Zed" }
+    ],
+    "coachHint": "Ein Bait funktioniert, wenn du erst im richtigen Moment kommst. Wann zündest du deine Ultimate?",
+    "context": "Du bist Aatrox (Top). Euer Team baitet den Baron, die Gegner haben Vision im Fluss. Dein Teleport ist ready und deine Ultimate (World Ender) ist bereit.",
+    "options": [
+      { "label": "A: Auf eine Ward am Eingang teleportieren, erst beim Engage der Gegner einsteigen und die Ultimate im Kampf zünden.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Dein Flank trifft sie, während World Ender voll wirkt." },
+      { "label": "B: Die Ultimate sofort vor dem Kampf zünden und frontal einsteigen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Ultimate läuft ab, bevor der Kampf wirklich beginnt.", "Du bist ausgelaugt, wenn die Gegner angreifen, und der Baron geht verloren."] },
+      { "label": "C: Allein den Baron anfangen und das Team nachkommen lassen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du wirst in der Grube gestellt.", "Der Köder platzt und die Gegner nehmen den Baron."] }
+    ]
+  },
+  {
+    "id": "mast_darius_1", "gameTime": "03:00", "timeLimit": 30,
+    "champion": "Darius", "role": "Toplane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 10, "y": 50, "type": "hero", "isPlayer": true, "label": "Darius" },
+      { "x": 10, "y": 38, "type": "enemy", "label": "Garen", "champion": "Garen" },
+      { "x": 7, "y": 64, "type": "objective", "label": "Eigener Turm" }
+    ],
+    "coachHint": "Der äußere Rand der Axt heilt und trifft härter. Wo steht Garen?",
+    "context": "Du bist Darius (Top) gegen Garen. Level 3, Q und W sind ready. Jeder Treffer auf Garen baut Blutungs-Stapel auf.",
+    "options": [
+      { "label": "A: Q so setzen, dass der äußere Rand der Axt trifft, und danach mit Autoangriffen weitere Blutungs-Stapel aufbauen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Rand heilt dich und die Stapel steigen." },
+      { "label": "B: Q aus nächster Nähe in der Mitte werfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Im inneren Bereich der Axt ist der Schaden geringer und du heilst dich kaum.", "Du verlierst den Trade und Garen gewinnt Lane-Prio."] },
+      { "label": "C: Nur Autoangriffe nutzen und die Fähigkeiten aufsparen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du baust keine Blutungs-Stapel für deine Kampfstärke auf.", "Garen farmt gefahrlos und gleicht aus."] }
+    ]
+  },
+  {
+    "id": "mast_darius_2", "gameTime": "08:30", "timeLimit": 35,
+    "champion": "Darius", "role": "Toplane", "difficulty": "Silber",
+    "markers": [
+      { "x": 9, "y": 56, "type": "hero", "isPlayer": true, "label": "Darius" },
+      { "x": 9, "y": 44, "type": "enemy", "label": "Vayne", "champion": "Vayne" },
+      { "x": 7, "y": 66, "type": "objective", "label": "Eigener Turm" }
+    ],
+    "coachHint": "Gegen Kiter brauchst du ein Werkzeug zum Heranziehen. Was ist das?",
+    "context": "Du bist Darius (Top) gegen Vayne. Sie weicht deinen Angriffen aus und schießt dich aus der Distanz herunter. E (Apprehend), Q und W sind ready.",
+    "options": [
+      { "label": "A: Mit E (Apprehend) heranziehen und dann Q und W kombinieren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Pull zwingt sie in deine Reichweite." },
+      { "label": "B: Hinterherlaufen und Q ohne E verschwenden.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Q trifft ins Leere, weil Vayne ausweicht.", "Du verlierst Leben und die Welle."] },
+      { "label": "C: Nur W (Slow) einsetzen und weiter folgen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Slow reicht nicht, um sie zu halten.", "Vayne entkommt und pokt weiter."] }
+    ]
+  },
+  {
+    "id": "mast_darius_3", "gameTime": "16:20", "timeLimit": 60,
+    "champion": "Darius", "role": "Toplane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Darius" },
+      { "x": 50, "y": 9, "type": "enemy", "label": "Fiora", "champion": "Fiora" },
+      { "x": 76, "y": 8, "type": "objective", "label": "Gegner-Turm" }
+    ],
+    "coachHint": "Die Ultimate wird zur Hinrichtung, wenn die Blutungs-Stapel stehen. Wie viele hast du?",
+    "context": "Du bist Darius (Top) gegen Fiora. Level 11, deine Ultimate (Noxian Guillotine) ist ready und Fiora hat nur noch wenig Leben. Du hast erst einen Blutungs-Stapel auf ihr.",
+    "options": [
+      { "label": "A: Erst mit Autoangriffen und Q Stapel aufbauen und die Ultimate nutzen, wenn sie den Kill sicher macht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Mit Stapeln trifft die Ultimate hart genug." },
+      { "label": "B: Die Ultimate sofort ohne Stapel einsetzen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Stapel reicht der Schaden nicht für den Kill.", "Die Ultimate liegt auf Abklingzeit und Fiora entkommt."] },
+      { "label": "C: Die Ultimate aufsparen und nur Autoangriffe nutzen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Fiora erholt sich und das Fenster schließt sich.", "Du verschenkst eine sichere Chance auf Tempo."] }
+    ]
+  },
+  {
+    "id": "mast_darius_4", "gameTime": "27:10", "timeLimit": 60,
+    "champion": "Darius", "role": "Toplane", "difficulty": "Diamant",
+    "markers": [
+      { "x": 30, "y": 9, "type": "hero", "isPlayer": true, "label": "Darius" },
+      { "x": 50, "y": 9, "type": "enemy", "label": "Vayne", "champion": "Vayne" },
+      { "x": 26, "y": 24, "type": "fog", "label": "Gegner zuletzt Mid gesehen" }
+    ],
+    "coachHint": "Disziplin gegen Counter-Picks: Wer folgt wem?",
+    "context": "Du bist Darius (Top) gegen Vayne. Sie kitet dich im Lategame und zieht dich in ihre Vision. Euer Team ist Mid beschäftigt, die Gegner wurden zuletzt dort gesehen.",
+    "options": [
+      { "label": "A: Nicht hinterherlaufen, Vision setzen und E (Apprehend) nur nutzen, wenn sie sich verläuft oder in Reichweite steht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du bleibst diszipliniert und nutzt deine Reichweite." },
+      { "label": "B: Vayne hinterherjagen, um ihr den Raum zu nehmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Sie zieht dich in Vision und Fähigkeiten und du stirbst allein.", "Euer Team verliert Druck auf Top und steht in Unterzahl."] },
+      { "label": "C: Allein ohne Vision splitpushen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Info läufst du in die Gegner.", "Du stirbst und euer Team verliert ein Objective."] }
+    ]
+  },
+  {
+    "id": "mast_viego_1", "gameTime": "04:10", "timeLimit": 35,
+    "champion": "Viego", "role": "Jungle", "difficulty": "Silber",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Viego" },
+      { "x": 62, "y": 38, "type": "hero", "label": "Lux", "champion": "Lux" },
+      { "x": 68, "y": 32, "type": "enemy", "label": "Zed", "champion": "Zed" },
+      { "x": 60, "y": 48, "type": "objective", "label": "Fluss-Busch" }
+    ],
+    "coachHint": "Ein aufgeladenes W trifft sicherer. Wo lädst du es auf?",
+    "context": "Du bist Viego (Jungle). Level 3, deine Midlane Lux steht gegen Zed. Du willst ganken, und Zed kennt deine Position nicht.",
+    "options": [
+      { "label": "A: Aus dem Fluss-Busch W (Spectral Maw) aufladen und stunnen, sobald Zed in Reichweite ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der aufgeladene Stun hält Zed fest." },
+      { "label": "B: Offen von vorn laufen und W erst direkt vor ihm starten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Zed sieht dich kommen und weicht aus.", "Der Gank scheitert und Lux verliert Tempo."] },
+      { "label": "C: Gar nicht ganken und nur Camps farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst ein gutes Fenster.", "Lux bleibt allein und verliert Prio."] }
+    ]
+  },
+  {
+    "id": "mast_viego_2", "gameTime": "13:40", "timeLimit": 45,
+    "champion": "Viego", "role": "Jungle", "difficulty": "Platin",
+    "markers": [
+      { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Viego" },
+      { "x": 52, "y": 46, "type": "enemy", "label": "Lux (tot)", "champion": "Lux" },
+      { "x": 60, "y": 40, "type": "enemy", "label": "Ornn", "champion": "Ornn" },
+      { "x": 66, "y": 36, "type": "enemy", "label": "Jinx", "champion": "Jinx" }
+    ],
+    "coachHint": "Die Übernahme ist ein Werkzeug, kein Muss. Was brauchst du für die Verfolgung?",
+    "context": "Du bist Viego (Jungle). Du hast gerade Lux getötet und könntest ihren Körper übernehmen. Zwei Gegner fliehen: der Tank Ornn und der Carry Jinx.",
+    "options": [
+      { "label": "A: Den Körper übernehmen, Lux' Fähigkeiten nutzen, um die fliehende Jinx zu erreichen, und das Leben zurückholen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Übernahme gibt dir Reichweite und Leben." },
+      { "label": "B: Den Körper nicht übernehmen und dem Tank hinterherjagen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst Leben und Fähigkeiten und jagst das falsche Ziel.", "Jinx entkommt und euer Team verliert den Nachfolgekampf."] },
+      { "label": "C: Den Körper übernehmen und sofort unter den Turm tauchen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst im Turmschuss mit fremden Fähigkeiten.", "Du stirbst für einen Kill und gibst den Vorteil ab."] }
+    ]
+  },
+  {
+    "id": "mast_viego_3", "gameTime": "25:50", "timeLimit": 60,
+    "champion": "Viego", "role": "Jungle", "difficulty": "Master+",
+    "markers": [
+      { "x": 36, "y": 40, "type": "hero", "isPlayer": true, "label": "Viego" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 30, "y": 34, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 46, "y": 40, "type": "enemy", "label": "Gegner (4)", "champion": "Zed" }
+    ],
+    "coachHint": "Der Nebel verbirgt dich nur, wenn du ihn im richtigen Moment nutzt. Wann?",
+    "context": "Du bist Viego (Jungle). Euer Team baitet den Baron, die Gegner lauern im Fluss. Dein E (Harrowed Path) ist ready.",
+    "options": [
+      { "label": "A: Den Nebel (E) erst nutzen, wenn die Gegner angreifen, um getarnt in ihre Backline zu kommen und den Carry mit W festzuhalten.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Nebel bringt dich unbemerkt hinter ihre Linie." },
+      { "label": "B: E früh als Vorbereitung verbrauchen und warten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Nebel läuft aus, bevor der Kampf beginnt.", "Dir fehlt das Werkzeug zum Eindringen und der Baron geht verloren."] },
+      { "label": "C: Frontal in die Gegner laufen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Tarnung wirst du sofort gefangen.", "Euer Team verliert seinen Jungler und die Initiative."] }
+    ]
+  },
+  {
+    "id": "mast_kayn_1", "gameTime": "03:50", "timeLimit": 30,
+    "champion": "Kayn", "role": "Jungle", "difficulty": "Bronze",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Kayn" },
+      { "x": 10, "y": 50, "type": "hero", "label": "Garen", "champion": "Garen" },
+      { "x": 10, "y": 38, "type": "enemy", "label": "Fiora", "champion": "Fiora" },
+      { "x": 20, "y": 46, "type": "objective", "label": "Dschungelwand" }
+    ],
+    "coachHint": "Kayn kann durch Wände laufen. Wie kommst du an Fiora heran?",
+    "context": "Du bist Kayn (Jungle). Level 3, deine Toplane Garen steht gegen Fiora, die Welle ist neutral. W (Blade's Reach) und E (Shadow Step) sind ready.",
+    "options": [
+      { "label": "A: Mit E durch die Wand laufen und Fiora von hinten mit W treffen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Weg durch die Wand überrascht Fiora." },
+      { "label": "B: Frontal über die Lane laufen und W blind einsetzen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Fiora sieht dich kommen und weicht dem W aus.", "Der Gank scheitert und Garen verliert Tempo."] },
+      { "label": "C: Warten, bis die Welle zu Garen schiebt, und nichts tun.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Das Fenster mit neutraler Welle verstreicht.", "Fiora baut Prio auf."] }
+    ]
+  },
+  {
+    "id": "mast_kayn_2", "gameTime": "12:30", "timeLimit": 45,
+    "champion": "Kayn", "role": "Jungle", "difficulty": "Gold",
+    "markers": [
+      { "x": 60, "y": 66, "type": "hero", "isPlayer": true, "label": "Kayn" },
+      { "x": 70, "y": 60, "type": "enemy", "label": "Leona", "champion": "Leona" },
+      { "x": 74, "y": 64, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache" }
+    ],
+    "coachHint": "Die Ultimate macht dich unangreifbar. Wann ist der beste Moment?",
+    "context": "Du bist Kayn (Jungle). Ein Kampf am Drachen beginnt. Die gegnerische Leona hat ihre Ultimate (Solar Flare) ready, ihr Carry Jinx steht hinter ihr. Deine Ultimate (Umbral Trespass) ist ready.",
+    "options": [
+      { "label": "A: Die Ultimate auf Jinx einsetzen, um nach dem Engage von Leona unangreifbar zu bleiben und hinter die Frontline zu kommen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du entgehst dem Engage und erreichst den Carry." },
+      { "label": "B: Die Ultimate vor dem Engage verbrauchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bist beim Engage von Leona ungeschützt.", "Euer Team verliert den Kampf und den Drachen."] },
+      { "label": "C: Die Ultimate gar nicht nutzen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kannst dem Engage nicht ausweichen.", "Du wirst gestunnt und stirbst."] }
+    ]
+  },
+  {
+    "id": "mast_kayn_3", "gameTime": "20:40", "timeLimit": 60,
+    "champion": "Kayn", "role": "Jungle", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 44, "y": 52, "type": "hero", "isPlayer": true, "label": "Kayn" },
+      { "x": 72, "y": 30, "type": "objective", "label": "Gegner-Camps" },
+      { "x": 78, "y": 62, "type": "fog", "label": "Gegnerischer Jungler zuletzt Bot gesehen" }
+    ],
+    "coachHint": "Wenn der gegnerische Jungler gebunden ist, was ist in seinem Dschungel frei?",
+    "context": "Du bist Kayn (Jungle). Der gegnerische Jungler wurde vor etwa 20 Sekunden Bot gesehen, seine Camps auf der Top-Seite sind frei. Dein E (Shadow Step) ist ready.",
+    "options": [
+      { "label": "A: Vision setzen, mit E durch die Wand auf die gegnerischen Camps schleichen und sie stehlen, solange der Jungler gebunden ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Wand ist dein Vorteil im gegnerischen Dschungel." },
+      { "label": "B: Ohne Vision tief in den Dschungel laufen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler taucht auf und stellt dich.", "Du stirbst und euer Team verliert Dschungelkontrolle."] },
+      { "label": "C: Nur die eigenen Camps farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst das Zeitfenster.", "Der Gegner behält seine Ressourcen."] }
+    ]
+  },
+  {
+    "id": "mast_kayn_4", "gameTime": "30:30", "timeLimit": 60,
+    "champion": "Kayn", "role": "Jungle", "difficulty": "Diamant",
+    "markers": [
+      { "x": 36, "y": 42, "type": "hero", "isPlayer": true, "label": "Kayn" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 30, "y": 36, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 46, "y": 38, "type": "enemy", "label": "Gegner (3)", "champion": "Zed" }
+    ],
+    "coachHint": "Flanken gewinnen Teamkämpfe, wenn der Gegner nach vorn schaut. Wann steigst du ein?",
+    "context": "Du bist Kayn (Jungle). Ein 5v5 vor dem Baron steht bevor. Die Gegner haben einen Engage-Tank mit bereiter Ultimate und ihr Carry steht hinten. Dein E (Shadow Step) und deine Ultimate sind ready.",
+    "options": [
+      { "label": "A: Durch die Wand um die Gegner herumlaufen, erst nach dem Engage des Tanks einsteigen und den Carry mit der Ultimate isolieren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Flank trifft sie, wenn ihre Kontrolle verbraucht ist." },
+      { "label": "B: Mit dem Tank gleichzeitig frontal einsteigen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst mitten in den Engage und die Kontrolle trifft dich.", "Euer Flank bleibt aus und der Kampf geht verloren."] },
+      { "label": "C: Hinter der Wand stehen bleiben und nie einsteigen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich in Unterzahl.", "Der Teamkampf kippt, bevor du eingreifst."] }
+    ]
+  },
+  {
+    "id": "mast_zed_1", "gameTime": "03:10", "timeLimit": 35,
+    "champion": "Zed", "role": "Midlane", "difficulty": "Silber",
+    "markers": [
+      { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Zed" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Lux", "champion": "Lux" }
+    ],
+    "coachHint": "Energie ist deine Munition. Wie viel bleibt für den Rückzug?",
+    "context": "Du bist Zed (Mid) gegen Lux. Level 3. Du willst mit Q pokes machen, hast aber nur begrenzt Energie, und Lux hat ihre Bindung ready.",
+    "options": [
+      { "label": "A: Mit Q poken, nur wenn nach dem Wurf genug Energie für einen Rückzug übrig bleibt, und den Schatten (W) nicht verschwenden.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du machst Poke, ohne dich auszupowern." },
+      { "label": "B: Alle Fähigkeiten in die Lane werfen und die Energie leer machen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du hast keine Energie mehr, wenn Lux ihre Bindung nutzt.", "Du verlierst den Trade und Lux gewinnt Prio."] },
+      { "label": "C: Nur Autoangriffe nutzen und nie poken.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du lässt deinen Poke-Vorteil ungenutzt.", "Lux harassed dich ungestraft."] }
+    ]
+  },
+  {
+    "id": "mast_zed_2", "gameTime": "11:30", "timeLimit": 45,
+    "champion": "Zed", "role": "Midlane", "difficulty": "Gold",
+    "markers": [
+      { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Zed" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Ahri", "champion": "Ahri" }
+    ],
+    "coachHint": "Die Ultimate ist nur so gut wie dein Ausstieg. Hat Ahri ihren Charm?",
+    "context": "Du bist Zed (Mid) gegen Ahri. Level 6, deine Ultimate (Death Mark) ist ready. Ahri hat noch etwa 60 % Leben, ihr Charm ist ready.",
+    "options": [
+      { "label": "A: Auf Ahris Charm warten, die Ultimate nutzen, wenn er verbraucht ist, und mit dem Schatten (W) wieder aussteigen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Charm ist der All-in sicher." },
+      { "label": "B: Sofort All-in mit der Ultimate, obwohl Ahri ihren Charm ready hat.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Charm stoppt dich mitten im Combo.", "Du stirbst ohne Kill und Mid fällt zurück."] },
+      { "label": "C: Die Ultimate gar nicht einsetzen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst den Level-6-Vorteil.", "Ahri holt auf und gleicht die Lane aus."] }
+    ]
+  },
+  {
+    "id": "mast_zed_3", "gameTime": "17:20", "timeLimit": 45,
+    "champion": "Zed", "role": "Midlane", "difficulty": "Platin",
+    "markers": [
+      { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Zed" },
+      { "x": 58, "y": 44, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
+      { "x": 54, "y": 48, "type": "enemy", "label": "Ornn", "champion": "Ornn" },
+      { "x": 40, "y": 42, "type": "hero", "label": "Team", "champion": "Alistar" }
+    ],
+    "coachHint": "Der Schatten ist dein Rückfahrschein. Wann tauschst du?",
+    "context": "Du bist Zed (Mid). Ein Teamkampf beginnt. Du springst mit der Ultimate (Death Mark) auf den gegnerischen Carry Jinx. Ornn und weitere Gegner haben Kontrolle ready.",
+    "options": [
+      { "label": "A: Die Ultimate auf Jinx setzen und, wenn die Kontrolle der Gegner kommt, per Schatten (W) zurücktauschen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Schatten rettet dich, und das Mark zündet trotzdem." },
+      { "label": "B: Nach der Ultimate in der Mitte der Gegner stehen bleiben.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du wirst festgehalten und getötet.", "Euer Team verliert den Assassinen und den Kampf."] },
+      { "label": "C: Die Ultimate auf den Tank einsetzen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Tank überlebt und Jinx schießt weiter.", "Der Schaden fehlt und der Kampf kippt."] }
+    ]
+  },
+  {
+    "id": "mast_zed_4", "gameTime": "28:40", "timeLimit": 60,
+    "champion": "Zed", "role": "Midlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 46, "y": 48, "type": "hero", "isPlayer": true, "label": "Zed" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 40, "y": 38, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 52, "y": 40, "type": "enemy", "label": "Gegner (5)", "champion": "Viktor" }
+    ],
+    "coachHint": "Ein Kill entscheidet sich im Timing. Wer muss zuerst fallen?",
+    "context": "Du bist Zed (Mid). Die Gegner starten den Baron und achten kaum auf ihre Flanken. Deine Ultimate und der Schatten sind ready.",
+    "options": [
+      { "label": "A: Auf die gegnerische Backline warten, mit der Ultimate auf den Carry springen und bei Gefahr mit dem Schatten wieder aussteigen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Dein Sprung nimmt ihnen den Carry und den Baron-Kampf." },
+      { "label": "B: Direkt vor dem Kampf springen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner sehen dich und reagieren sofort.", "Du stirbst, bevor dein Team eintritt."] },
+      { "label": "C: Draußen warten und nichts tun.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Baron fällt kampflos.", "Die Gegner gewinnen den Buff."] }
+    ]
+  },
+  {
+    "id": "mast_yasuo_1", "gameTime": "02:50", "timeLimit": 30,
+    "champion": "Yasuo", "role": "Midlane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Yasuo" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Annie", "champion": "Annie" }
+    ],
+    "coachHint": "Q3 ist dein Zeitfenster. Wann wird es ready?",
+    "context": "Du bist Yasuo (Mid) gegen Annie. Level 3. Dein Q hat noch keine drei Stapel. Annie hat ihre Fähigkeiten ready.",
+    "options": [
+      { "label": "A: Q auf Vasallen aufbauen, bis Q3 bereit ist, und mit E über Vasallen an Annie herankommen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Mit Q3 und E bist du im richtigen Moment dran." },
+      { "label": "B: Die Q-Stapel auf Vasallen verschwenden und danach ohne Plan zu ihr laufen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Q3 ist weg, bevor du Annie erreichst.", "Du verlierst den Trade und Annie gewinnt Prio."] },
+      { "label": "C: Den Windwall (W) früh verbrauchen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dir fehlt der Schutz, wenn Annie ihre Fähigkeiten einsetzt.", "Du verlierst Leben ohne Gegenwert."] }
+    ]
+  },
+  {
+    "id": "mast_yasuo_2", "gameTime": "10:10", "timeLimit": 45,
+    "champion": "Yasuo", "role": "Midlane", "difficulty": "Gold",
+    "markers": [
+      { "x": 60, "y": 40, "type": "hero", "isPlayer": true, "label": "Yasuo" },
+      { "x": 66, "y": 34, "type": "enemy", "label": "Syndra", "champion": "Syndra" }
+    ],
+    "coachHint": "Der Windwall blockiert nur, was auf ihn trifft. Wann kommt der Wurf?",
+    "context": "Du bist Yasuo (Mid) gegen Syndra. Level 8. Syndra wirft ihre Kugeln auf dich und bereitet ihre Bindung vor.",
+    "options": [
+      { "label": "A: Den Windwall (W) genau gegen ihr gefährliches Projektil einsetzen und danach mit E auf sie zugehen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Wall nimmt ihr das Zeitfenster." },
+      { "label": "B: Den Windwall früh werfen, ohne dass etwas auf ihn trifft.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Wall verfällt, bevor Syndras Projektil kommt.", "Du wirst von der Bindung getroffen und verlierst Leben."] },
+      { "label": "C: Den Windwall gar nicht benutzen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Syndra trifft dich mit jedem Wurf.", "Du verlierst die Lane."] }
+    ]
+  },
+  {
+    "id": "mast_yasuo_3", "gameTime": "19:30", "timeLimit": 60,
+    "champion": "Yasuo", "role": "Midlane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 50, "y": 50, "type": "hero", "isPlayer": true, "label": "Yasuo" },
+      { "x": 40, "y": 42, "type": "hero", "label": "Malphite", "champion": "Malphite" },
+      { "x": 56, "y": 46, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
+      { "x": 52, "y": 44, "type": "enemy", "label": "Leona", "champion": "Leona" }
+    ],
+    "coachHint": "Deine Ultimate braucht einen Gegner in der Luft. Wer kann ihn hochschleudern?",
+    "context": "Du bist Yasuo (Mid). Ein Teamkampf beginnt. Dein Team hat Malphite, deine Ultimate (Last Breath) ist ready. Die Gegner stehen noch auf dem Boden.",
+    "options": [
+      { "label": "A: Warten, bis Malphite oder dein Q3 einen Gegner hochschleudert, dann mit der Ultimate nachsetzen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Ultimate trifft nur Gegner in der Luft." },
+      { "label": "B: Die Ultimate ohne hochgeschleuderten Gegner einsetzen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Knock-up hat die Ultimate kein gültiges Ziel.", "Dein Engage bleibt aus und die Ultimate ist verbraucht."] },
+      { "label": "C: Hinten stehen bleiben und nur Q3 schießen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bleibst unter deinen Möglichkeiten.", "Euer Team kämpft ohne deine Ultimate."] }
+    ]
+  },
+  {
+    "id": "mast_yasuo_4", "gameTime": "31:00", "timeLimit": 60,
+    "champion": "Yasuo", "role": "Midlane", "difficulty": "Diamant",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Yasuo" },
+      { "x": 36, "y": 42, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 56, "y": 44, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
+      { "x": 52, "y": 40, "type": "enemy", "label": "Zed", "champion": "Zed" }
+    ],
+    "coachHint": "Der Windwall gehört deinem Team. Wann steigst du ein?",
+    "context": "Du bist Yasuo (Mid). Euer Team hat den Engage begonnen. Die gegnerische Backline (Jinx und Zed) schießt auf deine Frontline. Dein Windwall (W) und E sind ready.",
+    "options": [
+      { "label": "A: Den Windwall gegen die gegnerischen Projektile auf die Frontline einsetzen und danach über E in die Backline springen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Erst Schutz, dann Einstieg." },
+      { "label": "B: Sofort ohne Windwall in die Backline springen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Projektile treffen dich ungeschützt.", "Du stirbst, bevor du Schaden machst, und der Kampf kippt."] },
+      { "label": "C: Den Windwall in die falsche Richtung setzen und hinten bleiben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Projektile treffen weiter.", "Deine Frontline fällt zusammen."] }
+    ]
+  },
+  {
+    "id": "mast_kaisa_1", "gameTime": "05:20", "timeLimit": 35,
+    "champion": "Kai'Sa", "role": "Botlane", "difficulty": "Silber",
+    "markers": [
+      { "x": 72, "y": 86, "type": "hero", "isPlayer": true, "label": "Kai'Sa" },
+      { "x": 66, "y": 88, "type": "hero", "label": "Nautilus", "champion": "Nautilus" },
+      { "x": 80, "y": 90, "type": "enemy", "label": "Caitlyn", "champion": "Caitlyn" },
+      { "x": 86, "y": 88, "type": "enemy", "label": "Leona", "champion": "Leona" }
+    ],
+    "coachHint": "Die Passive belohnt dich für Stapel. Wie baust du sie auf?",
+    "context": "Du bist Kai'Sa (Bot) mit Nautilus gegen Caitlyn und Leona. Level 4, Q und W sind ready. Deine Passive baut Stapel auf, die einen Burst auslösen.",
+    "options": [
+      { "label": "A: Mit Q und W Stapel aufbauen und dann mit Autoangriffen den Burst auslösen, wenn Nautilus einen Gegner festhält.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Burst trifft, wenn die Gegner stehen." },
+      { "label": "B: Alle Fähigkeiten blind in die Gegner werfen, ohne auf Nautilus zu warten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verbrauchst Q und W, bevor jemand festgehalten ist.", "Der Burst bleibt aus und Leona bestraft dich."] },
+      { "label": "C: Nur Autoangriffe nutzen und die Fähigkeiten aufsparen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du baust keine Stapel auf.", "Du lässt Schaden ungenutzt."] }
+    ]
+  },
+  {
+    "id": "mast_kaisa_2", "gameTime": "13:40", "timeLimit": 45,
+    "champion": "Kai'Sa", "role": "Botlane", "difficulty": "Gold",
+    "markers": [
+      { "x": 60, "y": 66, "type": "hero", "isPlayer": true, "label": "Kai'Sa" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache" },
+      { "x": 70, "y": 60, "type": "enemy", "label": "Gegner (3)", "champion": "Nocturne" }
+    ],
+    "coachHint": "Das W reicht weit. Was gewinnst du, bevor der Kampf beginnt?",
+    "context": "Du bist Kai'Sa (Bot). Euer Team bereitet den Drachen vor, die Gegner stehen außerhalb der Grube. Dein W (Void Seeker) ist ready.",
+    "options": [
+      { "label": "A: Mit W aus der Distanz Schaden machen und Gegner markieren, bevor ihr den Drachen startet.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Poke schwächt sie und gibt dir Plasma-Stapel." },
+      { "label": "B: Ohne W direkt in die Grube gehen und den Drachen starten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du startest ohne Vorteil und die Gegner engagen.", "Euer Team verliert Leben und den Drachen."] },
+      { "label": "C: Hinten stehen bleiben und gar nicht kämpfen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Poke fehlt.", "Die Gegner kontrollieren das Pit und starten den Drachen selbst."] }
+    ]
+  },
+  {
+    "id": "mast_kaisa_3", "gameTime": "24:10", "timeLimit": 60,
+    "champion": "Kai'Sa", "role": "Botlane", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Kai'Sa" },
+      { "x": 36, "y": 42, "type": "hero", "label": "Team", "champion": "Alistar" },
+      { "x": 58, "y": 40, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
+      { "x": 54, "y": 44, "type": "enemy", "label": "Ornn", "champion": "Ornn" }
+    ],
+    "coachHint": "Die Ultimate setzt dich neben einen markierten Gegner und schützt dich. Wer ist markiert?",
+    "context": "Du bist Kai'Sa (Bot). Ein Teamkampf beginnt. Die gegnerische Jinx steht hinter ihrem Tank Ornn. Du hast sie mit W markiert, und deine Ultimate (Killer Instinct) ist ready.",
+    "options": [
+      { "label": "A: Mit der Ultimate von der Flanke zu Jinx springen, solange der Schild dich schützt, und sie ausschalten.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Flanke, Schild und Burst gegen den Carry." },
+      { "label": "B: Die Ultimate von vorn in die Frontline nutzen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du landest neben dem Tank und wirst gestunnt.", "Der Schild reicht nicht und der Carry überlebt."] },
+      { "label": "C: Die Ultimate für später aufsparen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Teamkampf läuft ohne deinen Flank weiter.", "Jinx gewinnt den Schadenskampf."] }
+    ]
+  },
+  {
+    "id": "mast_kaisa_4", "gameTime": "31:20", "timeLimit": 60,
+    "champion": "Kai'Sa", "role": "Botlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 42, "y": 48, "type": "hero", "isPlayer": true, "label": "Kai'Sa" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 36, "y": 40, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 50, "y": 38, "type": "enemy", "label": "Gegner (4)", "champion": "Zed" }
+    ],
+    "coachHint": "Die Ultimate ist deine Eintrittskarte. Wann bezahlst du sie?",
+    "context": "Du bist Kai'Sa (Bot). Die Gegner verteidigen den Baron. Ihre Kontrolle (CC) ist noch ready, deine Ultimate ebenfalls.",
+    "options": [
+      { "label": "A: Erst die Kontrolle der Gegner verbrauchen lassen und dann mit der Ultimate einsteigen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne ihre Kontrolle überlebst du den Einstieg." },
+      { "label": "B: Die Ultimate sofort zu Beginn nutzen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihre Kontrolle trifft dich mitten im Sprung.", "Du stirbst, bevor dein Team eintritt."] },
+      { "label": "C: Den Baron abschreiben und weglaufen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich.", "Die Gegner gewinnen den Baron."] }
+    ]
+  },
+  {
+    "id": "mast_ezreal_1", "gameTime": "05:00", "timeLimit": 30,
+    "champion": "Ezreal", "role": "Botlane", "difficulty": "Bronze",
+    "markers": [
+      { "x": 72, "y": 86, "type": "hero", "isPlayer": true, "label": "Ezreal" },
+      { "x": 80, "y": 90, "type": "enemy", "label": "Caitlyn", "champion": "Caitlyn" },
+      { "x": 86, "y": 88, "type": "enemy", "label": "Leona", "champion": "Leona" }
+    ],
+    "coachHint": "Dein Q trifft nur das erste Ziel. Wer steht in der Linie?",
+    "context": "Du bist Ezreal (Bot) gegen Caitlyn und Leona. Level 4. Vasallen stehen in deiner Schusslinie, dein Q (Mystic Shot) ist ready.",
+    "options": [
+      { "label": "A: Das Q nur werfen, wenn kein Vasall in der Schusslinie steht, und die Welle sicher farmen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! So trifft dein Poke und du bleibst sicher." },
+      { "label": "B: Das Q durch die Vasallen werfen, obwohl sie im Weg stehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Das Q trifft den Vasallen statt eines Gegners.", "Du verlierst Mana und die Gegner bestrafen dich."] },
+      { "label": "C: Gar nicht poken und nur Autoangriffe nutzen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du lässt deinen Poke-Vorteil liegen.", "Die Gegner pushen die Welle."] }
+    ]
+  },
+  {
+    "id": "mast_ezreal_2", "gameTime": "15:10", "timeLimit": 45,
+    "champion": "Ezreal", "role": "Botlane", "difficulty": "Platin",
+    "markers": [
+      { "x": 62, "y": 68, "type": "hero", "isPlayer": true, "label": "Ezreal" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache" },
+      { "x": 70, "y": 60, "type": "enemy", "label": "Leona", "champion": "Leona" },
+      { "x": 74, "y": 64, "type": "enemy", "label": "Jinx", "champion": "Jinx" }
+    ],
+    "coachHint": "Dein E ist der Notausgang. Wofür hebst du ihn auf?",
+    "context": "Du bist Ezreal (Bot). Ein Kampf am Drachen beginnt. Die gegnerische Leona sucht den Engage auf dich, dein E (Arcane Shift) ist ready.",
+    "options": [
+      { "label": "A: Aus Distanz mit Q und W Schaden machen und E für den Rückzug beim Engage aufheben.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Dein E rettet dich, wenn Leona springt." },
+      { "label": "B: E vorab offensiv zum Poke verbrauchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dir fehlt der Notausgang, als Leona einsteigt.", "Du wirst gestunnt und stirbst."] },
+      { "label": "C: Hinten stehen bleiben und keine Fähigkeit einsetzen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Schaden fehlt.", "Euer Team verliert den Kampf am Drachen."] }
+    ]
+  },
+  {
+    "id": "mast_ezreal_3", "gameTime": "26:40", "timeLimit": 60,
+    "champion": "Ezreal", "role": "Botlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 46, "y": 52, "type": "hero", "isPlayer": true, "label": "Ezreal" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 40, "y": 40, "type": "hero", "label": "Team", "champion": "Ornn" },
+      { "x": 56, "y": 36, "type": "enemy", "label": "Gegner (2)", "champion": "Zed" }
+    ],
+    "coachHint": "Die Ultimate reicht über die ganze Karte. Wen erreichst du damit?",
+    "context": "Du bist Ezreal (Bot). Euer Team kämpft am Baron, zwei Gegner fliehen verwundet in den Dschungel. Deine Ultimate (Trueshot Barrage) ist ready.",
+    "options": [
+      { "label": "A: Mit der Ultimate aus der Ferne die fliehenden Gegner treffen und beim Baron bleiben.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Ultimate holt den Kill, ohne dass du dein Team verlässt." },
+      { "label": "B: Den Fliehenden allein hinterherlaufen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst allein in den gegnerischen Dschungel.", "Du stirbst und euer Team verliert den Baron-Kampf."] },
+      { "label": "C: Die Ultimate aufsparen und nichts tun.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner entkommen mit Leben.", "Sie kehren zurück und nehmen euch den Vorteil."] }
+    ]
+  },
+  {
+    "id": "mast_leona_1", "gameTime": "06:10", "timeLimit": 45,
+    "champion": "Leona", "role": "Support", "difficulty": "Gold",
+    "markers": [
+      { "x": 74, "y": 86, "type": "hero", "isPlayer": true, "label": "Leona" },
+      { "x": 68, "y": 88, "type": "hero", "label": "Jinx (ADC)", "champion": "Jinx" },
+      { "x": 84, "y": 88, "type": "enemy", "label": "Lux", "champion": "Lux" },
+      { "x": 88, "y": 90, "type": "enemy", "label": "Caitlyn", "champion": "Caitlyn" }
+    ],
+    "coachHint": "Die Kombination ist E, dann Q. Warum in dieser Reihenfolge?",
+    "context": "Du bist Leona (Support) mit Jinx gegen Lux und Caitlyn. Level 4, E, Q und W sind ready. Lux steht etwas weiter vorn.",
+    "options": [
+      { "label": "A: Mit E zu Lux springen, mit Q stunnen und gemeinsam mit Jinx den Trade beenden.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! E bringt dich heran, Q hält sie fest." },
+      { "label": "B: E allein einsetzen, ohne auf Jinx zu warten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst allein vorn und hast den Stun noch nicht eingesetzt.", "Caitlyn und Lux bestrafen dich."] },
+      { "label": "C: Q zuerst einsetzen, bevor du heran bist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Stun trifft ins Leere.", "Du verschenkst dein Zeitfenster."] }
+    ]
+  },
+  {
+    "id": "mast_leona_2", "gameTime": "15:30", "timeLimit": 45,
+    "champion": "Leona", "role": "Support", "difficulty": "Platin",
+    "markers": [
+      { "x": 60, "y": 66, "type": "hero", "isPlayer": true, "label": "Leona" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache" },
+      { "x": 70, "y": 60, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
+      { "x": 74, "y": 64, "type": "enemy", "label": "Ornn", "champion": "Ornn" }
+    ],
+    "coachHint": "Eine gute Ultimate trifft mehrere. Wo ist ihr Zentrum?",
+    "context": "Du bist Leona (Support). Ein Teamkampf am Drachen beginnt. Deine Ultimate (Solar Flare) ist ready. Die Gegner stehen eng beieinander.",
+    "options": [
+      { "label": "A: Die Ultimate so setzen, dass sie mehrere Gegner im Zentrum trifft, und danach mit E auf den Carry springen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Mehrere Ziele werden festgehalten." },
+      { "label": "B: Die Ultimate auf einen einzelnen Gegner im Randbereich werfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Nur der Randbereich trifft und der Stun ist kürzer.", "Der Kampf ist verloren, bevor er richtig anfängt."] },
+      { "label": "C: Die Ultimate aufsparen und warten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Euer Engage bleibt aus.", "Die Gegner starten den Kampf zu ihren Bedingungen."] }
+    ]
+  },
+  {
+    "id": "mast_leona_3", "gameTime": "29:20", "timeLimit": 60,
+    "champion": "Leona", "role": "Support", "difficulty": "Diamant",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Leona" },
+      { "x": 36, "y": 42, "type": "hero", "label": "Team", "champion": "Alistar" },
+      { "x": 58, "y": 40, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
+      { "x": 54, "y": 44, "type": "enemy", "label": "Ornn", "champion": "Ornn" }
+    ],
+    "coachHint": "Das W schützt dich im Engage. Wann nutzt du es?",
+    "context": "Du bist Leona (Support). Der Teamkampf vor dem Baron steht bevor. Dein W (Eclipse) und E sind ready. Die gegnerische Kontrolle ist noch nicht verbraucht.",
+    "options": [
+      { "label": "A: Das W kurz vor dem Einstieg aktivieren, mit E auf den Carry springen und die Kontrolle mit Q verlängern.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Das Schild trägt dich durch ihre Kontrolle." },
+      { "label": "B: Das W lange vor dem Engage verbrauchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Das Schild ist weg, wenn ihre Kontrolle kommt.", "Du stirbst im Einstieg."] },
+      { "label": "C: Ohne W einsteigen und auf ihre Fehler hoffen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bist ungeschützt.", "Euer Engage scheitert."] }
+    ]
+  },
+  {
+    "id": "mast_nautilus_1", "gameTime": "04:40", "timeLimit": 30,
+    "champion": "Nautilus", "role": "Support", "difficulty": "Bronze",
+    "markers": [
+      { "x": 74, "y": 86, "type": "hero", "isPlayer": true, "label": "Nautilus" },
+      { "x": 68, "y": 88, "type": "hero", "label": "Ashe (ADC)", "champion": "Ashe" },
+      { "x": 84, "y": 88, "type": "enemy", "label": "Lux", "champion": "Lux" },
+      { "x": 88, "y": 90, "type": "enemy", "label": "Caitlyn", "champion": "Caitlyn" }
+    ],
+    "coachHint": "Der Haken trifft das erste Ziel in der Linie. Wer steht davor?",
+    "context": "Du bist Nautilus (Support) mit Ashe gegen Lux und Caitlyn. Level 3. Vasallen stehen zwischen dir und den Gegnern, dein Q (Dredge Line) ist ready.",
+    "options": [
+      { "label": "A: Den Haken nur bei freier Schusslinie werfen, damit er sicher trifft und Ashe nachsetzen kann.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ein freier Treffer entscheidet die Lane." },
+      { "label": "B: Den Haken durch die Vasallen werfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Haken trifft den Vasallen statt eines Gegners.", "Du stehst vorn und hast keinen Haken mehr."] },
+      { "label": "C: Gar keinen Haken benutzen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du lässt Druck liegen.", "Die Gegner pushen frei."] }
+    ]
+  },
+  {
+    "id": "mast_nautilus_2", "gameTime": "18:10", "timeLimit": 60,
+    "champion": "Nautilus", "role": "Support", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 60, "y": 66, "type": "hero", "isPlayer": true, "label": "Nautilus" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache" },
+      { "x": 70, "y": 60, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
+      { "x": 74, "y": 64, "type": "enemy", "label": "Leona", "champion": "Leona" }
+    ],
+    "coachHint": "Der Haken sollte den Carry treffen, nicht den Tank. Wer ist erreichbar?",
+    "context": "Du bist Nautilus (Support). Ein Kampf am Drachen beginnt. Die gegnerische Jinx steht nah genug für deinen Haken, ihre Leona schirmt sie ab. Dein Q ist ready.",
+    "options": [
+      { "label": "A: Den Haken auf Jinx werfen, damit sie festgehalten wird, und danach mit E nachsetzen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Carry fällt aus dem Kampf." },
+      { "label": "B: Den Haken auf Leona werfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Leona wird gezogen, Jinx bleibt frei.", "Euer Team verliert den Schadenskampf."] },
+      { "label": "C: Den Haken für später aufheben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Engage bleibt aus.", "Die Gegner starten den Kampf selbst."] }
+    ]
+  },
+  {
+    "id": "mast_nautilus_3", "gameTime": "30:50", "timeLimit": 60,
+    "champion": "Nautilus", "role": "Support", "difficulty": "Master+",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Nautilus" },
+      { "x": 36, "y": 42, "type": "hero", "label": "Team", "champion": "Alistar" },
+      { "x": 58, "y": 40, "type": "enemy", "label": "Jinx", "champion": "Jinx" },
+      { "x": 54, "y": 44, "type": "enemy", "label": "Ornn", "champion": "Ornn" }
+    ],
+    "coachHint": "Die Ultimate jagt ein Ziel. Wen soll sie finden?",
+    "context": "Du bist Nautilus (Support). Ein 5v5 vor dem Baron beginnt. Deine Ultimate (Depth Charge) ist ready. Die gegnerische Jinx steht hinter Ornn.",
+    "options": [
+      { "label": "A: Die Ultimate auf Jinx richten, damit die Welle auf dem Weg Gegner hochschleudert und sie festhält.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Ultimate trifft mehrere und endet beim Carry." },
+      { "label": "B: Die Ultimate auf den Tank richten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Welle endet beim Tank und Jinx schießt frei.", "Euer Team verliert den Schadenskampf."] },
+      { "label": "C: Die Ultimate aufsparen und warten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Euer Engage bleibt aus.", "Die Gegner gewinnen die Initiative."] }
+    ]
   }
 ];
 const START_IDS = ['top_smaragd_01', 'mid_gold_01', 'jng_dia_01', 'bot_eisen_01', 'top_bronze_01', 'sup_silber_01', 'jng_platin_01', 'mid_master_01'];
@@ -1784,12 +2381,43 @@ function applyLp({ step, lp, shield = false }, delta) {
 
 // Fortschritt lokal speichern (nur Komfort; funktioniert auch ohne Storage)
 const STORE_KEY = 'braingap.v2';
+const LS_STATUS = ['online', 'match', 'away'];
+const LS_ROLES = ['Toplane', 'Jungle', 'Midlane', 'Botlane', 'Support'];
+const sanitizeSave = d => {
+  if (!d || typeof d !== 'object') return null;
+  const r = d.rank && typeof d.rank === 'object' ? d.rank : {};
+  const step = Number.isInteger(r.step) && r.step >= 0 && r.step <= MAX_STEP ? r.step : 0;   // unsinniger Wert = Neustart bei Iron
+  const rank = { step, lp: Number.isFinite(r.lp) ? Math.max(0, r.lp) : 0, shield: !!r.shield };
+  const p = d.profile;
+  const profile = p && typeof p === 'object' && typeof p.name === 'string' && typeof p.champion === 'string' ? {
+    name: p.name.trim() || 'Beschwörer', champion: p.champion.trim() || 'Jax',
+    role: LS_ROLES.includes(p.role) ? p.role : 'Toplane',
+    status: LS_STATUS.includes(p.status) ? p.status : 'online',
+    note: typeof p.note === 'string' ? p.note : '',
+    startStep: Number.isInteger(p.startStep) ? p.startStep : step,
+    hiddenMmr: Number.isFinite(p.hiddenMmr) ? p.hiddenMmr : step * 100 + 50,
+    winStreak: Number.isInteger(p.winStreak) && p.winStreak > 0 ? p.winStreak : 0,
+  } : null;
+  const person = f => f && typeof f === 'object' && typeof f.name === 'string' && Number.isInteger(f.step) && Number.isFinite(f.lp);
+  const fix = f => ({ ...f, status: LS_STATUS.includes(f.status) ? f.status : 'online', note: typeof f.note === 'string' ? f.note : '' });
+  return {
+    rank, profile,
+    history: Array.isArray(d.history) ? d.history.filter(h => h && typeof h === 'object' && Number.isFinite(h.lp)) : [],
+    hearts: d.hearts,
+    friends: Array.isArray(d.friends) ? d.friends.filter(person).map(fix) : undefined,
+    requests: Array.isArray(d.requests) ? d.requests.filter(person).map(fix) : undefined,
+    recent: Array.isArray(d.recent) ? d.recent.filter(x => typeof x === 'string') : [],
+    mastery: d.mastery,
+  };
+};
 const loadSave = () => {
-  try {
-    const d = JSON.parse(localStorage.getItem(STORE_KEY));
-    if (d && d.rank && Number.isInteger(d.rank.step) && typeof d.rank.lp === 'number' && Array.isArray(d.history)) return d;
-  } catch (e) {}
+  try { return sanitizeSave(JSON.parse(localStorage.getItem(STORE_KEY))); } catch (e) { console.error('BrainGap: Speicherstand unlesbar, starte neu.', e); }
   return null;
+};
+// Notfall: alle BrainGap-Daten löschen und neu laden
+const resetAllData = () => {
+  try { Object.keys(localStorage).filter(k => k.startsWith('braingap.')).forEach(k => localStorage.removeItem(k)); } catch (e) { console.error(e); }
+  try { window.location.reload(); } catch (e) { console.error(e); }
 };
 const writeSave = d => { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) {} };
 
@@ -2237,10 +2865,10 @@ const MODE_INFO = {
     risk: 'Kein Risiko: keine LP, kein MMR, keine Herzen und kein Eintrag in der Historie. Am Ende siehst du nur, wie viele LP es gewesen wären.',
     focus: 'Gezieltes Training einzelner Rollen und Schwierigkeitsstufen, vom Early Game bis zum Closing.' },
   mastery: { icon: 'crown', title: 'Champion Mastery',
-    goal: 'Spiele Szenarien rund um deinen Main-Champion und deine Rolle. Jax, Lee Sin, Ahri, Jinx und Thresh haben handgeschriebene Spezial-Sets, jeder andere Champion nutzt das adaptive Rollen-Template.',
+    goal: 'Level deinen Main-Champion von Stufe 1 bis 7. Für 15 Kern-Champions (Jax, Aatrox, Darius, Lee Sin, Viego, Kayn, Ahri, Zed, Yasuo, Jinx, Kai\'Sa, Ezreal, Thresh, Leona, Nautilus) gibt es handgeschriebene Szenarien, jeder andere Champion nutzt das adaptive Rollen-Template.',
     duration: '5 Fragen (ca. 2 bis 3 Minuten)',
-    risk: 'Gewertet wie Ranked: ab 3 von 5 richtig Sieg, sonst Niederlage, mit LP, Hidden MMR und Herz nur bei Niederlage oder Abbruch.',
-    focus: 'Power-Spikes, Matchup-Taktik und Teamfight-Verhalten deines Champions.' },
+    risk: 'Gewertet wie Ranked (LP, Hidden MMR, Herz nur bei Niederlage oder Abbruch). Zusätzlich gibt es Mastery-Punkte: Sieg mit 4 bis 5 richtig +300 bis +350 MP, 3 von 5 richtig +150 MP, Niederlage +50 MP (nie ein Stufenverlust). Stufen ab 300, 750, 1.400, 2.200 (Hextech-Emblem), 3.200 und 4.500 MP (Meister-Wappen).',
+    focus: 'Stufe 1 bis 2: Grundlagen und Trading-Fenster. Stufe 3 bis 4: Matchups, Wave-Control und Setups. Stufe 5 bis 7: Late-Game, Flanken und Clutch-Entscheidungen, jeweils passend zu deinem Ranked-Rang.' },
 };
 
 function ModeInfo({ mode, onClose }) {
@@ -2268,8 +2896,9 @@ function ModeInfo({ mode, onClose }) {
   );
 }
 
-function Dashboard({ rank, history, hearts, profile, onDaily, onRanked, onPractice, onMastery, onNoHearts, onInfo, onShop, onReset }) {
-  const locked = hearts < 1;   // ohne Herzen sind Daily und Ranked gesperrt
+function Dashboard({ rank, history, hearts, profile, mastery, onDaily, onRanked, onPractice, onMastery, onNoHearts, onInfo, onShop, onReset }) {
+  const locked = hearts < 1;
+  const { mp: mpNow, level: lvNow } = masteryOf(mastery, profile.champion);   // ohne Herzen sind Daily und Ranked gesperrt
   const [confirm, setConfirm] = useState(false);
   const tier = tierOf(rank.step), cls = RANK_ICON[tier].cls;   // eine Farbquelle für Icon, Text, Rahmen und Balken
   const pct = Math.min(100, rank.lp);
@@ -2337,7 +2966,7 @@ function Dashboard({ rank, history, hearts, profile, onDaily, onRanked, onPracti
           <ChampAvatar name={profile.champion || 'Heimerdinger'} className="w-10 h-10" />
           <span className="min-w-0 pr-8">
             <span className="block font-serif font-extrabold leading-tight text-white">Champion Mastery</span>
-            <span className="block truncate text-xs text-gray-400">Szenarien rund um {champLabel(profile.champion)} ({profile.role}).</span>
+            <span className="block truncate text-xs text-gray-400">{champLabel(profile.champion)} – Stufe {lvNow}<span className="text-[#C89B3C]"> · {mpNow.toLocaleString('de-DE')} MP</span></span>
           </span>
         </ModeCard>
       </div>
@@ -2743,12 +3372,12 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
               <div ref={endRef} />
             </div>
 
-            <form onSubmit={ask} className="flex gap-2 p-3 border-t" style={{ borderColor: 'var(--line)' }}>
-              <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Frag den Coach..." autoFocus
+            <div className="flex gap-2 p-3 border-t" style={{ borderColor: 'var(--line)' }}>
+              <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Frag den Coach..." autoFocus onKeyDown={e => { if (e.key === 'Enter') ask(e); }}
                 className="flex-1 min-w-0 rounded-lg border px-3 py-2.5 text-sm bg-transparent placeholder:text-slate-500" style={{ borderColor: 'var(--line)' }} />
-              <button type="submit" aria-label="Senden" disabled={!draft.trim() || typing}
+              <button type="button" onClick={ask} aria-label="Senden" disabled={!draft.trim() || typing}
                 className="px-3.5 rounded-lg text-[#0A1428] disabled:opacity-40" style={{ background: 'var(--gold)' }}><Icon n="send" size={18} /></button>
-            </form>
+            </div>
           </div>
         </div>
       )}
@@ -2791,12 +3420,13 @@ const StepList = ({ log }) => (
 );
 
 function RunComplete({ result, log, practice, format, onDone, onRetry }) {
+  const [lvPopup, setLvPopup] = useState(!!(result.mastery && result.mastery.levelUp));
   useEffect(() => {
     const timers = [];
     if (result.drill) playHextechSound(result.passed ? 'correct' : 'wrong');
     else {
       const promo = !practice && result.to.step > result.from.step;
-      playHextechSound(result.win ? (promo ? 'promotion' : 'victory') : 'defeat');
+      if (!(result.mastery && result.mastery.levelUp)) playHextechSound(result.win ? (promo ? 'promotion' : 'victory') : 'defeat');   // bei Mastery-Level-Up spielt das Popup den promotion-Sound
       if (!practice && result.heartLost) timers.push(setTimeout(() => playHextechSound('heart_loss'), 1100));
     }
     return () => timers.forEach(clearTimeout);
@@ -2835,6 +3465,7 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
   return (
     <div className="flex-1 min-h-0 relative flex flex-col">
       {promoted && <Confetti />}
+      {lvPopup && result.mastery && <MasteryLevelUp m={result.mastery} onClose={() => setLvPopup(false)} />}
       <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center gap-3 text-center">
         <div className="pt-2">
           <div className="pop font-serif text-4xl font-black tracking-wide" style={{ color }}>{win ? 'VICTORY' : 'DEFEAT'}</div>
@@ -2885,6 +3516,7 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
         )}
 
         <div className="w-full"><Divider /></div>
+        {result.mastery && <MasteryResult m={result.mastery} />}
         <div className="font-serif text-lg font-bold">Post-Match Breakdown</div>
         <StepList log={log} />
         <button onClick={onDone} className="w-full py-3 rounded-xl font-serif font-extrabold text-[#010A13]" style={{ background: 'var(--gold)' }}>Weiter zum Dashboard</button>
@@ -2944,11 +3576,55 @@ function adaptScenario(sc, champ) {
   DYN[out.id] = out;
   return out;
 }
-// Mastery für jeden Champion: handgeschriebenes Set, wenn es mindestens 5 Szenarien hat, sonst ergänzt um adaptive Rollen-Szenarien
+// Mastery-Punkte (MP) und Stufen 1 bis 7
+const MP_STEPS = [0, 300, 750, 1400, 2200, 3200, 4500];
+const masteryLevel = mp => MP_STEPS.reduce((lv, t, i) => (mp >= t ? i + 1 : lv), 1);
+const masteryGain = (correct, n) => { const r = correct / n; return r >= 1 ? 350 : r >= 0.8 ? 300 : r >= 0.6 ? 150 : 50; };   // Niederlage: Trost-MP
+function masteryProgress(mp) {
+  const level = masteryLevel(mp);
+  if (level >= 7) return { level, pct: 100, into: mp - MP_STEPS[6], span: 0, next: null };
+  const a = MP_STEPS[level - 1], b = MP_STEPS[level];
+  return { level, pct: Math.round(((mp - a) / (b - a)) * 100), into: mp - a, span: b - a, next: b };
+}
+const MASTERY_EMBLEM = lv => lv >= 7 ? { icon: 'crown', label: 'Meister-Wappen', cls: 'text-yellow-300' } : lv >= 5 ? { icon: 'hexagon', label: 'Hextech-Emblem', cls: 'text-[#0AC8B9]' } : null;
+
+// Mastery-Daten bereinigen: akzeptiert { mp }, { points }, Zahlen; alles Unbrauchbare wird zu 0
+function normalizeMastery(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  for (const [name, v] of Object.entries(raw)) {
+    if (!name) continue;
+    const num = typeof v === 'number' ? v : v && typeof v === 'object' ? (Number.isFinite(v.mp) ? v.mp : Number.isFinite(v.points) ? v.points : 0) : 0;
+    out[name] = { mp: Math.max(0, Math.round(Number.isFinite(num) ? num : 0)), runs: Math.max(0, Math.round((v && Number(v.runs)) || 0)) };
+  }
+  return out;
+}
+// Sicherer Zugriff: liefert immer Stufe und Punkte, auch für Champions ohne Eintrag (Stufe 1, 0 Punkte)
+const masteryOf = (mastery, champ) => {
+  const e = (mastery && mastery[champLabel(champ)]) || {};
+  const mp = Number.isFinite(e.mp) ? e.mp : 0;
+  return { mp, points: mp, runs: e.runs || 0, level: masteryLevel(mp) };
+};
+
+// Schwierigkeitsband eines Szenarios nach Spielminute: 1 = Grundlagen und Trading-Fenster, 2 = Matchup und Wave-Control, 3 = High-Elo Micro-Macro
+const sceneBand = sc => { const m = parseInt(sc.gameTime, 10); return m < 10 ? 1 : m < 22 ? 2 : 3; };
+
+// Mastery-Auswahl: Band nach Stufe (1-2, 3-4, 5-7), dazu Nähe zum Ranked-Rang, handgeschriebene Szenarien bevorzugt, kürzlich Gespieltes zurückgestellt
+function pickMastery(pool, level, step, recent, n) {
+  const band = level <= 2 ? 1 : level <= 4 ? 2 : 3;
+  const mine = TIERS.indexOf(tierOf(step));
+  const cost = sc => {
+    const hand = !sc.id.includes('~');
+    const d = (DIFF_TIER[sc.difficulty] ?? mine) - mine;                       // Abstand zum eigenen Rang: zu leichte Fragen wirken auf höhere Ränge unpassend und kosten mehr
+    return Math.abs(sceneBand(sc) - band) * 10 + (d > 0 ? d * 2.5 : -d * 3.5) + (hand ? -11 : 0) + (recent.includes(baseId(sc.id)) ? 6 : 0) + Math.random() * 1.5;
+  };
+  return pool.map(sc => [cost(sc), sc.id]).sort((a, b) => a[0] - b[0]).slice(0, n).map(x => x[1]);
+}
+
+// Mastery für jeden Champion: handgeschriebenes Set plus adaptive Rollen-Szenarien (für die Anpassung an Stufe und Rang)
 function masteryScenarios(champ, role) {
   const name = champLabel(champ);
   const own = RUNS.filter(r => normName(r.champion) === normName(name) && r.role === role);
-  if (own.length >= QUIZ_LENGTH) return own;
   const clash = new RegExp('\\b' + escapeRe(name) + '\\b', 'i');   // Champion kommt schon als Gegner im Text vor: überspringen
   const adaptive = (GENERIC[role] || []).map(id => RUNS.find(r => r.id === id))
     .filter(sc => sc && normName(sc.champion) !== normName(name) && !clash.test(JSON.stringify(sc)))
@@ -2957,45 +3633,75 @@ function masteryScenarios(champ, role) {
 }
 const fieldCls = 'rounded-lg border border-[#C89B3C]/40 bg-[#010A13] px-3 py-2 text-sm text-white placeholder:text-slate-500 outline-none focus:border-[#0AC8B9]';
 
-const MASTERY_TILES = [['Jax', 'Toplane', 'Top'], ['Lee Sin', 'Jungle', 'Jungle'], ['Ahri', 'Midlane', 'Mid'], ['Jinx', 'Botlane', 'Bot'], ['Thresh', 'Support', 'Support']];
+const MASTERY_TILES = [['Jax', 'Toplane', 'Top'], ['Aatrox', 'Toplane', 'Top'], ['Darius', 'Toplane', 'Top'],
+  ['Lee Sin', 'Jungle', 'Jungle'], ['Viego', 'Jungle', 'Jungle'], ['Kayn', 'Jungle', 'Jungle'],
+  ['Ahri', 'Midlane', 'Mid'], ['Zed', 'Midlane', 'Mid'], ['Yasuo', 'Midlane', 'Mid'],
+  ['Jinx', 'Botlane', 'Bot'], ["Kai'Sa", 'Botlane', 'Bot'], ['Ezreal', 'Botlane', 'Bot'],
+  ['Thresh', 'Support', 'Support'], ['Leona', 'Support', 'Support'], ['Nautilus', 'Support', 'Support']];
 
-function MainPicker({ role, champion, onRole, onChampion }) {
-  const n = masteryPool(champion, role).length;
+const MASTERY_TAGS = { 'Jax': 'Duellant', 'Aatrox': 'Kämpfer', 'Darius': 'Juggernaut', 'Lee Sin': 'Skirmisher', 'Viego': 'Duellant', 'Kayn': 'Flanker',
+  'Ahri': 'Burst-Magierin', 'Zed': 'Assassine', 'Yasuo': 'Skirmisher', 'Jinx': 'Hypercarry', "Kai'Sa": 'Hybrid-Carry', 'Ezreal': 'Poke-Carry',
+  'Thresh': 'Playmaker', 'Leona': 'Engage-Tank', 'Nautilus': 'Hook-Tank' };
+const ROLE_TABS = [['all', 'Alle'], ['Toplane', '🛡️ Top'], ['Jungle', '🌲 Jungle'], ['Midlane', '⚡ Mid'], ['Botlane', '🏹 Bot'], ['Support', '🔮 Support']];
+
+// Champion-Auswahl im Stil des LoL-Clients: Rollen-Tabs, große Karten, Vorschau, freie Suche
+function MainPicker({ role, champion, onRole, onChampion, mastery }) {
+  const [filter, setFilter] = useState('all');
   const name = champion.trim();
+  const shown = MASTERY_TILES.filter(t => filter === 'all' || t[1] === filter);
+  const n = role && name ? masteryPool(champion, role).length : 0;
+  const info = name ? masteryOf(mastery, name) : null;
+  const typed = v => {   // Eingabe eines Kern-Champions setzt automatisch seine Rolle
+    onChampion(v);
+    const t = MASTERY_TILES.find(x => normName(x[0]) === normName(v));
+    if (t) onRole(t[1]);
+  };
   return (
     <div className="flex flex-col gap-3">
+      <div role="tablist" aria-label="Rollen-Filter" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+        {ROLE_TABS.map(([v, label]) => (
+          <button key={v} type="button" role="tab" aria-selected={filter === v} onClick={() => setFilter(v)}
+            className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-bold transition ${filter === v
+              ? 'border-[#C89B3C] bg-[#C89B3C] text-[#010A13] shadow-[0_0_10px_rgba(200,155,60,.5)]' : 'border-[#C89B3C]/40 bg-[#010A13]/80 text-slate-300 hover:border-[#0AC8B9]'}`}>{label}</button>
+        ))}
+      </div>
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3" role="group" aria-label="Kern-Champions">
+        {shown.map(([c, rl]) => {
+          const active = normName(champion) === normName(c) && (!role || role === rl);
+          return (
+            <button key={c} type="button" data-champ={c} aria-pressed={active} onClick={() => { onRole(rl); onChampion(c); }}
+              className={`relative flex flex-col items-center gap-1.5 rounded-xl border-2 px-2 pb-2.5 pt-3 transition active:scale-95 ${active
+                ? 'border-[#C89B3C] bg-[#0AC8B9]/10 shadow-[0_0_0_2px_rgba(10,200,185,.75),0_0_20px_rgba(10,200,185,.5)]'
+                : 'border-[#C89B3C]/30 bg-gradient-to-b from-[#0A1428] to-[#010A13] hover:border-[#C89B3C]/70'}`}>
+              {active && <span className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#0AC8B9] text-[#010A13]" aria-hidden="true"><Icon n="check" size={12} /></span>}
+              <ChampAvatar name={c} className="w-16 h-16" iconSize={26} ring={`border-2 ${active ? 'border-[#C89B3C]' : 'border-[#C89B3C]/50'}`} />
+              <span className="font-serif text-sm font-bold leading-none text-[#C89B3C]">{c}</span>
+              <span className="text-[10px] leading-none text-slate-400">{MASTERY_TAGS[c]}</span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/70 px-3 py-2 text-sm" role="status" aria-live="polite">
+        {name ? (
+          <>
+            <div>Gewählter Main: <span className="font-bold text-[#C89B3C]">{champLabel(name)}</span> – {info && info.mp > 0 ? `Stufe ${info.level} (${info.mp.toLocaleString('de-DE')} MP)` : 'Startet auf Stufe 1'}</div>
+            <div className={`mt-0.5 text-xs ${n ? 'text-[#0AC8B9]' : 'text-gray-400'}`}>
+              {!role ? 'Wähle unten noch die Rolle für diesen Champion.'
+                : n > 0 ? `Handgeschriebenes Mastery-Set: ${n} Szenarien, ergänzt durch adaptive Rollen-Szenarien für die Stufen-Anpassung.`
+                : `Kein handgeschriebenes Set: Mastery nutzt das adaptive ${role}-Template mit deinem Champion.`}
+            </div>
+          </>
+        ) : <div className="text-gray-400">Noch kein Main gewählt. Ohne Auswahl starten wir mit Top und Jax.</div>}
+      </div>
       <div>
-        <div className="mb-1.5 text-sm font-semibold">Spielbare Mastery-Champions</div>
-        <div className="grid grid-cols-5 gap-1.5">
-          {MASTERY_TILES.map(([c, r, short]) => {
-            const active = normName(champion) === normName(c) && role === r;
-            return (
-              <button key={c} type="button" aria-pressed={active} onClick={() => { onRole(r); onChampion(c); }}
-                className={`flex flex-col items-center gap-1 rounded-lg border px-1 py-2 transition active:scale-95 ${active
-                  ? 'border-[#0AC8B9] bg-[#0AC8B9]/15 shadow-[0_0_10px_rgba(10,200,185,.35)]' : 'border-[#C89B3C]/40 bg-[#010A13]/80 hover:border-[#0AC8B9]'}`}>
-                <ChampAvatar name={c} className="w-9 h-9" iconSize={16} />
-                <span className="text-[11px] font-bold leading-none">{c}</span>
-                <span className="text-[10px] leading-none text-slate-400">{short}</span>
-              </button>
-            );
-          })}
-        </div>
+        <label htmlFor="champ" className="mb-1.5 block text-sm font-semibold">Anderen Champion wählen...</label>
+        <input id="champ" list="champ-names" value={champion} onChange={e => typed(e.target.value)} maxLength={20}
+               placeholder="Beliebigen Champion eintippen, z. B. Katarina" className={`w-full ${fieldCls}`} />
+        <datalist id="champ-names">{CHAMP_NAMES.map(c => <option key={c} value={c} />)}</datalist>
       </div>
       <div>
         <div className="mb-1.5 text-sm font-semibold">Main-Rolle</div>
         <div className="flex flex-wrap gap-2">{ROLES.map(([l, v]) => <Chip key={v} active={role === v} onClick={() => onRole(v)}>{l}</Chip>)}</div>
-      </div>
-      <div>
-        <label htmlFor="champ" className="mb-1.5 block text-sm font-semibold">Anderer Champion? Frei eintippen</label>
-        <input id="champ" list="champ-names" value={champion} onChange={e => onChampion(e.target.value)} maxLength={20}
-               placeholder="z. B. Jax" className={`w-full ${fieldCls}`} />
-        <datalist id="champ-names">{CHAMP_NAMES.map(c => <option key={c} value={c} />)}</datalist>
-        {name && (
-          <div className={`mt-1.5 text-xs ${n ? 'text-[#0AC8B9]' : 'text-gray-400'}`} role="status">
-            {n > 0 ? `Handgeschriebenes Mastery-Set: ${n} Szenarien für ${name}${n < QUIZ_LENGTH ? ', ergänzt durch adaptive Rollen-Szenarien' : ''}.`
-               : `Kein handgeschriebenes Set für ${name}: Mastery nutzt das adaptive ${role}-Template mit deinem Champion.`}
-          </div>
-        )}
       </div>
     </div>
   );
@@ -3003,20 +3709,33 @@ function MainPicker({ role, champion, onRole, onChampion }) {
 
 function Onboarding({ onDone }) {
   const [name, setName] = useState('');
-  const [tier, setTier] = useState(0);
-  const [div, setDiv] = useState(4);
-  const [role, setRole] = useState('Toplane');
-  const [champion, setChampion] = useState('');
+  const [tier, setTier] = useState(0);                 // Standard: Iron
+  const [div, setDiv] = useState(4);                   // Standard: IV
+  const [role, setRole] = useState(null);              // null = nicht gewählt, Standard Top
+  const [champion, setChampion] = useState('');        // leer = Standard Jax
+  const [error, setError] = useState('');
   const hasDiv = tier < DIV_TIERS;
   const step = hasDiv ? tier * 4 + (4 - div) : DIV_TIERS * 4 + (tier - DIV_TIERS);
-  const valid = name.trim().length >= 3 && champion.trim().length >= 2;
-  const submit = e => {
-    e.preventDefault();
-    if (!valid) return;
-    onDone({ name: name.trim(), step, role, champion: champLabel(champion) });
+
+  // Bewusst ohne Formular-Element: In Sandbox-Umgebungen ohne allow-forms feuert der Browser kein submit-Event, der Button wäre tot.
+  const handleCreateAccount = e => {
+    if (e && e.preventDefault) e.preventDefault();
+    try {
+      const tile = MASTERY_TILES.find(t => normName(t[0]) === normName(champion));
+      const finalRole = role || (tile ? tile[1] : 'Toplane');                                                                  // Standard: Top
+      const finalChamp = champion.trim() ? champLabel(champion) : (MASTERY_TILES.find(t => t[1] === finalRole) || ['Jax'])[0];   // Standard: Jax
+      const used = [!name.trim() && 'Name „Beschwörer"', !role && !champion.trim() && 'Rolle und Champion (Top, Jax)', (!role) !== (!champion.trim()) && (!role ? 'Rolle' : 'Champion') + ' (' + (role ? finalChamp : finalRole.replace('lane', '')) + ')'].filter(Boolean);
+      setError('');
+      onDone({ name: name.trim() || 'Beschwörer', step, role: finalRole, champion: finalChamp,
+               notice: used.length ? `Standardwerte übernommen: ${used.join(', ')}. Du kannst alles im Profil ändern.` : '' });
+    } catch (err) {
+      console.error('BrainGap: Account-Erstellung fehlgeschlagen', err);
+      setError(`Fehler beim Starten: ${err && err.message ? err.message : String(err)}`);
+    }
   };
+  const onEnter = e => { if (e.key === 'Enter') { e.preventDefault(); handleCreateAccount(); } };
   return (
-    <form onSubmit={submit} className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
       <div className="pt-2 text-center">
         <div className="font-serif text-2xl font-black">Willkommen, Beschwörer</div>
         <div className="text-sm text-gray-400">Erstelle deinen Account für BrainGap.gg</div>
@@ -3024,7 +3743,7 @@ function Onboarding({ onDone }) {
       <Divider />
       <div>
         <label htmlFor="acc" className="mb-1.5 block text-sm font-semibold">Account-Name</label>
-        <input id="acc" value={name} onChange={e => setName(e.target.value)} maxLength={16} placeholder="Mindestens 3 Zeichen" className={`w-full ${fieldCls}`} />
+        <input id="acc" value={name} onChange={e => setName(e.target.value)} onKeyDown={onEnter} maxLength={16} placeholder="Beschwörer (Standard)" className={`w-full ${fieldCls}`} />
       </div>
       <div>
         <div className="mb-1.5 text-sm font-semibold">Aktueller Rang</div>
@@ -3040,10 +3759,13 @@ function Onboarding({ onDone }) {
         </div>
         <div className="mt-1 text-xs text-gray-500">Du startest als {rankName(step)} mit 0 LP.</div>
       </div>
-      <MainPicker role={role} champion={champion} onRole={setRole} onChampion={setChampion} />
-      <button type="submit" disabled={!valid}
-        className="mt-1 rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13] shadow-[0_0_14px_rgba(200,155,60,.45)] disabled:opacity-40">Account erstellen</button>
-    </form>
+      <MainPicker role={role} champion={champion} onRole={r => { setRole(r); setError(''); }} onChampion={c => { setChampion(c); setError(''); }} mastery={null} />
+      <div className="-mt-1 text-xs text-gray-500">Ohne Auswahl starten wir mit Top und Jax. Alles lässt sich später im Profil ändern.</div>
+      {error && <div role="alert" className="rounded-lg border border-red-500/80 bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-300">{error}</div>}
+      <button type="button" onClick={handleCreateAccount}
+        className="mt-1 rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13] shadow-[0_0_14px_rgba(200,155,60,.45)] active:scale-[.98]">Account erstellen</button>
+      <button type="button" onClick={resetAllData} className="self-center text-xs text-slate-500 underline hover:text-slate-300">Daten zurücksetzen &amp; neu starten</button>
+    </div>
   );
 }
 
@@ -3061,10 +3783,10 @@ function Friends({ friends, selfName, onAdd, onRemove }) {
   };
   return (
     <div className="flex flex-col gap-3">
-      <form onSubmit={add} className="flex gap-2">
-        <input value={draft} maxLength={16} onChange={e => { setDraft(e.target.value); setErr(''); }} placeholder="Beschwörername" aria-label="Beschwörername" className={`min-w-0 flex-1 ${fieldCls}`} />
-        <button type="submit" className="shrink-0 rounded-lg bg-[#C89B3C] px-4 font-serif font-bold text-[#010A13]">Hinzufügen</button>
-      </form>
+      <div className="flex gap-2">
+        <input value={draft} maxLength={16} onChange={e => { setDraft(e.target.value); setErr(''); }} placeholder="Beschwörername" aria-label="Beschwörername" onKeyDown={e => { if (e.key === 'Enter') add(e); }} className={`min-w-0 flex-1 ${fieldCls}`} />
+        <button type="button" onClick={add} className="shrink-0 rounded-lg bg-[#C89B3C] px-4 font-serif font-bold text-[#010A13]">Hinzufügen</button>
+      </div>
       {err && <div role="alert" className="text-xs text-red-400">{err}</div>}
       <div className="text-xs text-gray-500">Es gibt noch keinen Server: Rang, Status und Notiz neuer Freunde sind simuliert und nur lokal gespeichert.</div>
       {friends.length === 0 && <div className="rounded-lg border border-dashed border-[#C89B3C]/40 p-3 text-center text-sm text-slate-500">Noch keine Freunde. Füge oben einen Beschwörernamen hinzu.</div>}
@@ -3091,6 +3813,92 @@ const TabBar = ({ tabs, value, onChange }) => (
     ))}
   </div>
 );
+
+function MasteryResult({ m }) {
+  const pr = masteryProgress(m.after), emb = MASTERY_EMBLEM(pr.level);
+  return (
+    <div className="w-full rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3 text-left">
+      <div className="flex items-center gap-3">
+        <ChampAvatar name={m.champion} className="w-12 h-12" iconSize={20} ring="border-2 border-[#C89B3C]" />
+        <div className="min-w-0 flex-1">
+          <div className="font-serif font-bold">{m.champion} · Stufe {pr.level}</div>
+          <div className="text-xs tabular-nums text-slate-400">+{m.gain} MP · {m.after.toLocaleString('de-DE')} MP gesamt</div>
+        </div>
+        {emb && <span className={emb.cls} title={emb.label}><Icon n={emb.icon} size={24} /></span>}
+      </div>
+      <div className="mt-2 h-2 overflow-hidden rounded-full" style={{ background: 'var(--track)' }}><div className="h-full rounded-full bg-[#C89B3C]" style={{ width: `${pr.pct}%` }} /></div>
+      <div className="mt-1 text-xs text-slate-400 tabular-nums">{pr.next ? `${pr.into} / ${pr.span} MP bis Stufe ${pr.level + 1}` : 'Höchste Stufe erreicht'}</div>
+    </div>
+  );
+}
+
+function MasteryLevelUp({ m, onClose }) {
+  useEffect(() => { playHextechSound('promotion'); }, []);
+  const emb = [5, 7].includes(m.lvAfter) ? MASTERY_EMBLEM(m.lvAfter) : null;   // Emblem nur beim Erreichen von Stufe 5 und 7
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-5" style={{ background: 'rgba(1,10,19,.92)' }} role="dialog" aria-modal="true" aria-label="Mastery-Stufe aufgestiegen">
+      <Confetti />
+      <div className="relative z-20 flex w-full flex-col items-center gap-3 rounded-2xl border border-[#C89B3C] bg-[#06111F] p-5 text-center shadow-[0_0_30px_rgba(200,155,60,.4)]">
+        <div className="relative">
+          <span className="rankglow absolute inset-0 rounded-full bg-yellow-400/40 blur-xl" aria-hidden="true" />
+          <ChampAvatar name={m.champion} className="relative w-24 h-24" iconSize={36} ring="border-[3px] border-[#C89B3C] shadow-[0_0_0_3px_rgba(10,200,185,.55)]" />
+        </div>
+        <div className="pop font-serif text-2xl font-black text-yellow-300">Mastery-Stufe aufgestiegen!</div>
+        <div className="font-serif text-lg font-bold">{m.champion}: Stufe {m.lvBefore} ➔ Stufe {m.lvAfter}</div>
+        {emb && (
+          <div className={`flex items-center gap-2 rounded-lg border border-current/40 px-3 py-1.5 text-sm font-bold ${emb.cls}`}>
+            <Icon n={emb.icon} size={20} /> {emb.label} freigeschaltet
+          </div>
+        )}
+        <button onClick={onClose} className="mt-1 w-full rounded-xl bg-[#C89B3C] py-2.5 font-serif font-extrabold text-[#010A13]">Weiter</button>
+      </div>
+    </div>
+  );
+}
+
+function MasteryShowcase({ mastery }) {
+  const list = Object.entries(mastery || {}).map(([name, v]) => ({ name, mp: (v && v.mp) || 0, runs: (v && v.runs) || 0 })).filter(c => c.mp > 0)
+    .map(c => ({ ...c, level: masteryLevel(c.mp) })).sort((a, b) => b.mp - a.mp);
+  if (!list.length) {
+    return <div className="rounded-xl border border-dashed border-[#C89B3C]/40 p-3 text-center text-sm text-slate-500">Noch kein Mastery-Fortschritt. Spiele einen Mastery-Run, um deinen Meister-Champion zu küren.</div>;
+  }
+  const top = list[0], pr = masteryProgress(top.mp), emb = MASTERY_EMBLEM(pr.level);
+  return (
+    <div className="rounded-xl border border-[#C89B3C]/60 bg-gradient-to-b from-[#0A1428] to-[#010A13] p-3 shadow-[0_0_16px_rgba(200,155,60,.25)]">
+      <div className="flex items-center gap-3">
+        <div className="relative shrink-0">
+          <ChampAvatar name={top.name} className="w-24 h-24" iconSize={36} ring="border-[3px] border-[#C89B3C] shadow-[0_0_0_3px_rgba(10,200,185,.55),0_0_22px_rgba(200,155,60,.55)]" />
+          {emb && <span className={`absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border border-[#C89B3C] bg-[#010A13] ${emb.cls}`} title={emb.label}><Icon n={emb.icon} size={20} /></span>}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="font-serif text-xl font-bold leading-tight">{top.name}</div>
+          <span className="mt-1 inline-block rounded-full border border-[#C89B3C]/60 bg-[#C89B3C]/10 px-2 py-0.5 text-xs font-bold text-[#C89B3C]">
+            Meister-Champion: {top.name} (Stufe {pr.level} • {top.mp.toLocaleString('de-DE')} MP)
+          </span>
+          {emb && <div className={`mt-1 text-xs font-semibold ${emb.cls}`}>{emb.label}</div>}
+        </div>
+      </div>
+      <div className="mt-3 h-2.5 overflow-hidden rounded-full" style={{ background: 'var(--track)' }} role="progressbar" aria-valuenow={pr.pct} aria-valuemin={0} aria-valuemax={100}>
+        <div className="h-full rounded-full bg-gradient-to-r from-[#C89B3C] to-yellow-300" style={{ width: `${pr.pct}%` }} />
+      </div>
+      <div className="mt-1 text-xs tabular-nums text-slate-400">{pr.next ? `${pr.into} / ${pr.span} MP bis Stufe ${pr.level + 1}` : 'Höchste Stufe erreicht'}</div>
+      <details className="mt-3">
+        <summary className="cursor-pointer text-sm font-semibold text-[#C89B3C]">Alle gelevelten Champions ({list.length})</summary>
+        <div className="mt-2 flex flex-col gap-1.5">
+          {list.map(c => { const p = masteryProgress(c.mp); return (
+            <div key={c.name} className="flex items-center gap-2.5 rounded-lg border border-[#C89B3C]/30 bg-[#010A13]/70 px-2 py-1.5">
+              <ChampAvatar name={c.name} className="w-8 h-8" iconSize={14} />
+              <div className="min-w-0 flex-1">
+                <div className="flex justify-between gap-2 text-sm"><span className="truncate font-semibold">{c.name}</span><span className="shrink-0 font-bold text-[#C89B3C]">Stufe {p.level}</span></div>
+                <div className="mt-0.5 h-1 overflow-hidden rounded-full" style={{ background: 'var(--track)' }}><div className="h-full bg-[#C89B3C]" style={{ width: `${p.pct}%` }} /></div>
+              </div>
+              <div className="w-16 shrink-0 text-right text-xs tabular-nums text-slate-400">{c.mp.toLocaleString('de-DE')} MP</div>
+            </div>); })}
+        </div>
+      </details>
+    </div>
+  );
+}
 
 function Requests({ requests, onAccept, onDecline }) {
   if (!requests.length) return <div className="rounded-lg border border-dashed border-[#C89B3C]/40 p-4 text-center text-sm text-slate-500">Keine offenen Anfragen.</div>;
@@ -3123,7 +3931,7 @@ function Requests({ requests, onAccept, onDecline }) {
   );
 }
 
-function Profile({ profile, rank, friends, requests, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout }) {
+function Profile({ profile, rank, mastery, friends, requests, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout }) {
   const [tab, setTab] = useState('me');
   const [confirm, setConfirm] = useState(false);
   const tier = tierOf(rank.step);
@@ -3151,6 +3959,7 @@ function Profile({ profile, rank, friends, requests, onChange, onAddFriend, onRe
         <Friends friends={friends} selfName={profile.name} onAdd={onAddFriend} onRemove={onRemoveFriend} />
       ) : (
         <>
+          <MasteryShowcase mastery={mastery} />
           <div>
             <label htmlFor="status" className="mb-1.5 block text-sm font-semibold">Status</label>
             <select id="status" value={profile.status} onChange={e => onChange({ status: e.target.value })} className={`w-full ${fieldCls}`} style={{ colorScheme: 'dark' }}>
@@ -3166,9 +3975,9 @@ function Profile({ profile, rank, friends, requests, onChange, onAddFriend, onRe
           <div>
             <label htmlFor="pname" className="mb-1.5 block text-sm font-semibold">Account-Name</label>
             <input id="pname" value={profile.name} maxLength={16} onChange={e => onChange({ name: e.target.value })}
-                   onBlur={() => { if (profile.name.trim().length < 3) onChange({ name: 'Spieler' }); }} className={`w-full ${fieldCls}`} />
+                   onBlur={() => { if (profile.name.trim().length < 1) onChange({ name: 'Beschwörer' }); }} className={`w-full ${fieldCls}`} />
           </div>
-          <MainPicker role={profile.role} champion={profile.champion} onRole={v => onChange({ role: v })} onChampion={v => onChange({ champion: v })} />
+          <MainPicker role={profile.role} champion={profile.champion} mastery={mastery} onRole={v => onChange({ role: v })} onChampion={v => onChange({ champion: v })} />
           <button onClick={() => { if (confirm) onLogout(); else setConfirm(true); }}
             className="self-center pb-1 text-xs text-slate-500 underline">{confirm ? 'Wirklich abmelden und Profil löschen? Nochmal tippen' : 'Abmelden und Profil löschen'}</button>
         </>
@@ -3310,7 +4119,10 @@ function App() {
   const [profile, setProfile] = useState(init.profile || null);   // null = noch nicht registriert
   const [friends, setFriends] = useState(init.friends || [MOCK_FRIEND]);
   const [requests, setRequests] = useState(init.requests || MOCK_REQUESTS);
-  const [recent, setRecent] = useState(init.recent || []);   // zuletzt gespielte Szenario-IDs
+  const [recent, setRecent] = useState(init.recent || []);
+  const [mastery, setMastery] = useState(() => normalizeMastery(init.mastery));
+  const [notice, setNotice] = useState('');   // kurzer Hinweis nach dem Start, z. B. übernommene Standardwerte
+  useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(''), 6000); return () => clearTimeout(t); }, [notice]);   // Mastery-Punkte je Champion: { Name: { mp, runs } }   // zuletzt gespielte Szenario-IDs
   const [infoMode, setInfoMode] = useState(null);
   const [rank, setRank] = useState(init.rank);
   const [history, setHistory] = useState(init.history);
@@ -3320,7 +4132,7 @@ function App() {
   const [rs, setRs] = useState({ id: START_IDS[0], format: 'tree', correct: 0, log: [], champion: '', role: '', stage: 0, stages: 1, queue: [] });
   const [result, setResult] = useState(null);     // { from, to } bei Daily und Ranked
 
-  useEffect(() => { writeSave({ rank, history, hearts, profile, friends, requests, recent }); }, [rank, history, hearts, profile, friends, requests, recent]);
+  useEffect(() => { writeSave({ rank, history, hearts, profile, friends, requests, recent, mastery }); }, [rank, history, hearts, profile, friends, requests, recent, mastery]);
 
   // Jeder Button klickt (Optionen ausgenommen: sie lösen lock_in aus)
   useEffect(() => {
@@ -3400,7 +4212,14 @@ function App() {
           champion: rs.format === 'quiz' ? 'Makro-Quiz' : rs.champion,
           role: rs.format === 'quiz' ? `${rs.queue.length} Szenarien` : rs.format === 'mastery' ? `Mastery · ${rs.role}` : rs.format === 'match' ? `${rs.role} · Match` : rs.role,
           lp: v.lp, ts: Date.now() }, ...h].slice(0, 20));
-        setResult({ ...v, correct, n, from: rank, to, event, heartLost, streak, prevStreak, bonus });
+        let mres = null;
+        if (rs.format === 'mastery') {   // Mastery-Punkte buchen: Sieg 300 bis 350, knapp 150, Niederlage 50 Trost-MP
+          const champ = rs.champion, gain = masteryGain(correct, n);
+          const before = (mastery[champ] || {}).mp || 0, after = before + gain;
+          setMastery(m => ({ ...m, [champ]: { mp: after, runs: ((m[champ] || {}).runs || 0) + 1 } }));
+          mres = { champion: champ, gain, before, after, lvBefore: masteryLevel(before), lvAfter: masteryLevel(after), levelUp: masteryLevel(after) > masteryLevel(before) };
+        }
+        setResult({ ...v, correct, n, from: rank, to, event, heartLost, streak, prevStreak, bonus, mastery: mres });
       } else setResult({ ...v, correct, n, from: rank, to: rank });
     }
     setRs({ ...rs, correct, log });
@@ -3419,7 +4238,8 @@ function App() {
     if (!canPlay || !profile) return;
     const pool = masteryScenarios(profile.champion, profile.role);   // eigenes Set oder adaptives Rollen-Template
     if (!pool.length) return;
-    const queue = freshFirst(pool.map(r => r.id), recent, QUIZ_LENGTH);
+    const mp = (mastery[champLabel(profile.champion)] || {}).mp || 0;
+    const queue = pickMastery(pool, masteryLevel(mp), rank.step, recent, QUIZ_LENGTH);   // Stufe und Ranked-Rang steuern die Auswahl
     begin('ranked', { format: 'mastery', id: queue[0], queue, stages: queue.length });
   };
 
@@ -3429,9 +4249,21 @@ function App() {
     begin('practice', { format: 'drill', id: queue[0], queue, stages: queue.length });
   };
 
-  const register = ({ name, step, role, champion }) => {
-    setProfile({ name, role, champion, status: 'online', note: '', startStep: step, hiddenMmr: step * 100 + 50, winStreak: 0 });
-    setRank({ step, lp: 0 }); setHistory([]); setHearts(MAX_HEARTS); setFriends([MOCK_FRIEND]); setRequests(MOCK_REQUESTS); setScreen('home');
+  const register = ({ name, step, role, champion, notice }) => {   // Reihenfolge: erst State und Ansicht, danach (getrennt) der Speicher
+    const cleanName = ((typeof name === 'string' && name.trim()) || 'Beschwörer').slice(0, 16);
+    const cleanStep = Number.isInteger(step) ? Math.max(0, Math.min(MAX_STEP, step)) : 0;               // Standard: Iron 4
+    const cleanRole = LS_ROLES.includes(role) ? role : 'Toplane';                                       // Standard: Top
+    const cleanChamp = champLabel((typeof champion === 'string' && champion.trim()) || 'Jax');          // Standard: Jax
+    const newProfile = { name: cleanName, role: cleanRole, champion: cleanChamp, status: 'online', note: '', startStep: cleanStep, hiddenMmr: cleanStep * 100 + 50, winStreak: 0 };
+    const newRank = { step: cleanStep, lp: 0 };
+    const newMastery = { [cleanChamp]: { mp: 0, runs: 0 } };
+    // 1) Alles synchron in den State: profile gesetzt = Dashboard wird gerendert, kein Weg zurück ins Onboarding
+    setProfile(newProfile); setRank(newRank); setHistory([]); setHearts(MAX_HEARTS); setFriends([MOCK_FRIEND]); setRequests(MOCK_REQUESTS);
+    setRecent([]); setMastery(newMastery); setScreen('home');
+    if (notice) setNotice(notice);
+    // 2) Speichern getrennt: ein blockierter oder voller Speicher (Privatmodus, Quota) darf den Wechsel nie verhindern
+    try { writeSave({ rank: newRank, history: [], hearts: MAX_HEARTS, profile: newProfile, friends: [MOCK_FRIEND], requests: MOCK_REQUESTS, recent: [], mastery: newMastery }); }
+    catch (e) { console.warn('BrainGap: Speichern nicht möglich, die App läuft ohne Speicher weiter.', e); }
   };
   // Anfrage annehmen: Spieler wandert in die Freundesliste (und damit ins Freunde-Leaderboard)
   const acceptRequest = name => {
@@ -3449,7 +4281,7 @@ function App() {
 
   const scenario = getScenario(rs.id);
   const phaseTag = scenario ? `${scenario.phase} (${rs.stage + 1}/${rs.stages})` : '';
-  const tag = rs.format === 'quiz' ? `Quiz (${rs.stage + 1}/${rs.stages})` : rs.format === 'mastery' ? `Mastery (${rs.stage + 1}/${rs.stages})`
+  const tag = rs.format === 'quiz' ? `Quiz (${rs.stage + 1}/${rs.stages})` : rs.format === 'mastery' ? `Mastery · Stufe ${masteryLevel(((mastery[rs.champion] || {}).mp) || 0)} (${rs.stage + 1}/${rs.stages})`
     : rs.format === 'drill' ? `Recovery Drill (${rs.stage + 1}/${rs.stages})` : phaseTag;
   const momentum = (rs.format === 'match' || rs.format === 'tree') && rs.stage > 0 && rs.log.length ? makeMomentum(rs.log, rs.stage) : null;
   const tabs = [['home', 'home', 'Home'], ['board', 'trophy', 'Leaderboard'], ['profile', 'user', 'Profil'], ['premium', 'crown', 'Premium']];
@@ -3476,13 +4308,19 @@ function App() {
         <div className="font-serif font-extrabold tracking-wide">BrainGap<span className="text-[#C89B3C]">.gg</span></div>
         <div className="ml-auto flex items-center gap-2"><Hearts n={hearts} /><SoundToggle /></div>
       </header>
+      {notice && (
+        <div role="status" className="flex items-start gap-2 border-b border-[#C89B3C]/40 bg-[#C89B3C]/10 px-4 py-2 text-xs text-[#E8D7A8]">
+          <span className="flex-1">{notice}</span>
+          <button type="button" onClick={() => setNotice('')} aria-label="Hinweis schließen" className="shrink-0 font-bold text-[#C89B3C]">×</button>
+        </div>
+      )}
 
       {(screen === 'home' || screen === 'board' || screen === 'profile' || screen === 'premium') && (
         <div key={screen} className="fade-in flex-1 min-h-0 flex flex-col">
-          {screen === 'home' && <Dashboard rank={rank} history={history} hearts={hearts} profile={profile} onDaily={playDaily} onRanked={() => setRankedOpen(true)}
+          {screen === 'home' && <Dashboard rank={rank} history={history} hearts={hearts} profile={profile} mastery={mastery} onDaily={playDaily} onRanked={() => setRankedOpen(true)}
             onPractice={() => setSetupOpen(true)} onMastery={playMastery} onInfo={setInfoMode} onNoHearts={() => setHeartsOpen(true)} onShop={() => setScreen('premium')} onReset={reset} />}
           {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} />}
-          {screen === 'profile' && <Profile profile={profile} rank={rank} friends={friends} onChange={updateProfile} onLogout={logout}
+          {screen === 'profile' && <Profile profile={profile} rank={rank} mastery={mastery} friends={friends} onChange={updateProfile} onLogout={logout}
             onAddFriend={f => setFriends(l => [...l, f])} onRemoveFriend={name => setFriends(l => l.filter(x => x.name !== name))}
             requests={requests} onAccept={acceptRequest} onDecline={declineRequest} />}
           {screen === 'premium' && <Premium hearts={hearts} onRefill={() => setHearts(MAX_HEARTS)} />}
@@ -3514,7 +4352,24 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  componentDidCatch(error, info) { console.error('BrainGap: Anzeigefehler', error, info && info.componentStack); }
+  render() {
+    if (!this.state.error) return this.props.children;
+    return (
+      <div role="alert" className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-4 bg-[#010A13] p-6 text-center text-white">
+        <div className="font-serif text-2xl font-black text-[#C89B3C]">Hoppla, da ist etwas schiefgelaufen</div>
+        <div className="text-sm text-red-300">{String((this.state.error && this.state.error.message) || this.state.error)}</div>
+        <button onClick={() => window.location.reload()} className="w-full rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Seite neu laden</button>
+        <button onClick={resetAllData} className="text-xs text-slate-400 underline">Daten zurücksetzen &amp; neu starten</button>
+      </div>
+    );
+  }
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<ErrorBoundary><App /></ErrorBoundary>);
 </script>
 </body>
 </html>
