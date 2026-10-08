@@ -57,6 +57,7 @@ const P = {
   crosshair:'<circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/>',
   volume2:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',
   volumeX:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/>',
+  info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
   zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
   swords:'<polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" x2="9" y1="14" y2="18"/><line x1="7" x2="4" y1="17" y2="20"/><line x1="3" x2="5" y1="19" y2="21"/>',
@@ -966,6 +967,57 @@ const RUNS = [
       { "label": "B: Allein den Drachen kontestieren.", "lpChange": -15, "nextId": "end", "feedback": "Falle! Allein gegen mehrere Gegner verlierst du Leben und Drachen.", "chain": ["Allein gegen mehrere Gegner stirbst du.", "Euer Team verliert den Drachen und einen Spieler."] },
       { "label": "C: Mit dem Team den Baron starten, während die Gegner am Drachen gebunden sind.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ein klassischer Objective-Trade: Drache gegen Baron." }
     ]
+  },
+  {
+    "id": "quiz_bronze_01", "gameTime": "05:30", "timeLimit": 30,
+    "champion": "Lulu", "role": "Support", "difficulty": "Bronze",
+    "markers": [
+      { "x": 66, "y": 88, "type": "hero", "isPlayer": true, "label": "Lulu" },
+      { "x": 60, "y": 88, "type": "hero", "label": "Jinx (ADC)" },
+      { "x": 56, "y": 70, "type": "objective", "label": "Fluss-Busch" },
+      { "x": 30, "y": 25, "type": "fog", "label": "Gegnerischer Jungler noch nicht gesehen" }
+    ],
+    "coachHint": "Vision schützt deinen ADC. Wo ist der beste Platz für eine Kontroll-Ward?",
+    "context": "Du bist Lulu (Support) mit Jinx gegen Caitlyn und Leona. Level 4. Du hast eine Kontroll-Ward im Inventar, der Fluss ist ohne Vision und der gegnerische Jungler wurde noch nicht gesehen.",
+    "options": [
+      { "label": "A: Die Kontroll-Ward im Fluss-Busch platzieren und danach zurück zur Lane gehen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Vision im Fluss warnt dich vor Ganks." },
+      { "label": "B: Die Ward im Inventar lassen, bis du sie wirklich brauchst.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Vision überrascht dich ein Gank.", "Jinx stirbt oder verliert Tempo ohne Vorwarnung."] },
+      { "label": "C: Allein in den gegnerischen Busch laufen, um nachzusehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst blind in eine Falle und stirbst.", "Jinx steht allein gegen Caitlyn und Leona."] }
+    ]
+  },
+  {
+    "id": "quiz_platin_01", "gameTime": "12:00", "timeLimit": 45,
+    "champion": "Nautilus", "role": "Support", "difficulty": "Platin",
+    "markers": [
+      { "x": 74, "y": 84, "type": "hero", "isPlayer": true, "label": "Nautilus" },
+      { "x": 68, "y": 86, "type": "hero", "label": "Ezreal (ADC)" },
+      { "x": 85, "y": 75, "type": "objective", "label": "Drache" },
+      { "x": 70, "y": 58, "type": "fog", "label": "Gegnerischer Jungler zuletzt Mid gesehen" }
+    ],
+    "coachHint": "Ein toter Gegner ist ein Überzahl-Fenster. Was nutzt du, bevor er zurückkommt?",
+    "context": "Du bist Nautilus (Support) mit Ezreal. Der gegnerische ADC ist gerade gestorben und hat noch etwa 25 Sekunden Respawnzeit. Der Drache ist verfügbar und eure Welle ist gecrasht.",
+    "options": [
+      { "label": "A: In der Lane bleiben und weiter farmen, obwohl ein Gegner tot ist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Das Überzahl-Fenster verstreicht ungenutzt.", "Die Gegner respawnen und verteidigen den Drachen wieder."] },
+      { "label": "B: Mit Ezreal zum Drachen rotieren, Vision am Pit setzen und ihn im Überzahl-Fenster starten.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ein toter ADC ist dein Fenster für den Drachen." },
+      { "label": "C: Allein den gegnerischen Dschungel invaden, um den ADC zu jagen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst allein in den Nebel und wirst gestellt.", "Ezreal steht ohne Support und ihr verliert das Fenster."] }
+    ]
+  },
+  {
+    "id": "quiz_master_01", "gameTime": "17:40", "timeLimit": 60,
+    "champion": "Karma", "role": "Support", "difficulty": "Master+",
+    "markers": [
+      { "x": 72, "y": 86, "type": "hero", "isPlayer": true, "label": "Karma" },
+      { "x": 66, "y": 88, "type": "hero", "label": "Zeri (ADC)" },
+      { "x": 84, "y": 90, "type": "enemy", "label": "Gegner-ADC" },
+      { "x": 26, "y": 18, "type": "fog", "label": "Gegnerischer Jungler zuletzt Topside gesehen" }
+    ],
+    "coachHint": "Wenn der gegnerische Support fehlt und der Jungler weit weg ist: Wer hat jetzt die Lane?",
+    "context": "Du bist Karma (Support) mit Zeri. Der gegnerische Support ist zurückgesetzt und ihr ADC steht allein an der Lane. Der gegnerische Jungler wurde vor etwa 15 Sekunden Topside gesehen.",
+    "options": [
+      { "label": "A: Den ADC allein und ohne Vision tief in den Dschungel verfolgen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlässt deine Lane blind und läufst in den Gegner-Jungler.", "Zeri steht allein und die Gegner gewinnen den Wellenstand."] },
+      { "label": "B: Passiv bleiben, obwohl der Gegner in Unterzahl ist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Das Zeitfenster geschlossen, ohne dass du Druck gemacht hast.", "Der Gegner-Support kehrt zurück und die Lane bleibt ausgeglichen."] },
+      { "label": "C: Mit Zeri die Lane übernehmen, solange der Support fehlt, und Vision für den Rückweg setzen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nutzt die Unterzahl und sicherst dich ab." }
+    ]
   }
 ];
 const START_IDS = ['top_smaragd_01', 'mid_gold_01', 'jng_dia_01', 'bot_eisen_01', 'top_bronze_01', 'sup_silber_01', 'jng_platin_01', 'mid_master_01'];
@@ -1200,7 +1252,9 @@ const QUIZ_LENGTH = 5;
 const shuffle = list => list.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
 // "Hauptlinie" eines Szenarios: die Option, die im Baum weiterführt. So läuft ein Match auch nach Fehlern weiter.
 const mainLine = sc => { const o = sc.options.find(x => x.nextId !== 'end'); return o ? o.nextId : 'end'; };
-const matchStages = id => { let n = 0, cur = id; while (cur !== 'end' && n < 10) { n++; cur = mainLine(RUNS.find(r => r.id === cur)); } return n; };
+const DYN = {};   // zur Laufzeit erzeugte (adaptive) Szenarien
+const getScenario = id => DYN[id] || RUNS.find(r => r.id === id);
+const matchStages = id => { let n = 0, cur = id; while (cur !== 'end' && n < 10) { const sc = getScenario(cur); if (!sc) break; n++; cur = mainLine(sc); } return Math.max(n, 1); };
 // Startszenarien einer Rolle, die überhaupt einen Folge-Baum haben
 // Tier-Lock: Im Ranked gibt es nur Szenarien der eigenen Liga. Fehlt dafür Inhalt, gilt die nächstniedrigere Liga mit Szenarien (nie eine höhere).
 const DIFF_TIER = { Eisen: 0, Bronze: 1, Silber: 2, Gold: 3, Platin: 4, Smaragd: 5, Diamant: 6, 'Master+': 7 };   // Index in TIERS (Master+ = Master, Grandmaster, Challenger)
@@ -1211,8 +1265,15 @@ const rankedTier = step => {
   return lower.length ? lower[lower.length - 1] : have[0];
 };
 const rankedPool = step => RUNS.filter(r => DIFF_TIER[r.difficulty] === rankedTier(step));
-const matchPool = (role, step) => START_IDS.map(id => RUNS.find(r => r.id === id))
-  .filter(sc => sc.role === role && DIFF_TIER[sc.difficulty] === rankedTier(step) && mainLine(sc) !== 'end');
+// Jede Rolle ist wählbar: Gibt es in der eigenen Liga kein Match für die Rolle, gilt das nächstpassende (bevorzugt eine Liga darunter).
+const matchPool = (role, step) => {
+  const starts = START_IDS.map(id => RUNS.find(r => r.id === id)).filter(sc => sc.role === role && mainLine(sc) !== 'end');
+  if (!starts.length) return [];
+  const mine = TIERS.indexOf(tierOf(step));
+  const dist = sc => { const t = DIFF_TIER[sc.difficulty]; return t <= mine ? mine - t : 100 + (t - mine); };
+  const best = Math.min(...starts.map(dist));
+  return starts.filter(sc => dist(sc) === best);
+};
 const RANKED_ROLES = [['Top', 'Toplane'], ['Mid', 'Midlane'], ['Jungle', 'Jungle'], ['Bot', 'Botlane'], ['Support', 'Support']];
 
 /* ---------- Wertung, Hidden MMR, Momentum ---------- */
@@ -1247,6 +1308,10 @@ const makeFriend = name => {
   return { name, step: h % 22, lp: (h >>> 4) % 100, status: ['online', 'match', 'away'][h % 3], note: FRIEND_NOTES[(h >>> 8) % FRIEND_NOTES.length] };
 };
 const MOCK_FRIEND = { name: 'PoroBuddy', step: 7, lp: 42, status: 'online', note: 'Grinde heute Master!' };
+const MOCK_REQUESTS = [
+  { name: 'FakerFan99', step: 25, lp: 61, status: 'online', note: 'Sucht Duo für Ranked, spielt nur Mid.' },
+  { name: 'GankMeIfYouCan', step: 13, lp: 18, status: 'match', note: 'Trainiere Gank-Tracking.' },
+];
 
 const TIMEOUT_CHAIN = ['Du reagierst zu spät und der Gegner nutzt das Zeitfenster.', 'Dein Team spielt ohne Ansage und verliert Tempo.'];
 const stripLetter = t => t.replace(/^[A-Z]:\s*/, '');
@@ -1307,12 +1372,39 @@ const ChampAvatar = ({ name, className = 'w-10 h-10', iconSize = 20, ring = 'bor
   );
 };
 
-// Taktik-Karte: Mock-Map (Fallback) -> echte Map als Hintergrund -> Marker-Overlay -> Spieler-Porträt.
+// Kamera-Fokus: kleinster Kartenausschnitt, der alle Marker (auch Fog-of-War) zeigt. Zu weit verteilt = Gesamtansicht.
+const LANES = { 'Top-Lane': [[7, 93], [7, 7], [93, 7]], 'Mid-Lane': [[7, 93], [93, 7]], 'Bot-Lane': [[7, 93], [93, 93], [93, 7]] };
+const segDist = (p, a, b) => {
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / (dx * dx + dy * dy)));
+  return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy));
+};
+function focusFor(markers) {
+  const core = markers.filter(m => m.type !== 'fog');
+  if (!core.length) return null;
+  const xs = markers.map(m => m.x), ys = markers.map(m => m.y);
+  const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+  const size = Math.min(100, Math.max(48, Math.max(w, h) + 24));
+  if (size > 76) return null;
+  const clamp = v => Math.max(0, Math.min(100 - size, v));
+  const x0 = clamp((Math.max(...xs) + Math.min(...xs)) / 2 - size / 2), y0 = clamp((Math.max(...ys) + Math.min(...ys)) / 2 - size / 2);
+  const inView = m => m.x >= x0 && m.x <= x0 + size && m.y >= y0 && m.y <= y0 + size;
+  const objs = core.filter(m => m.type === 'objective' && inView(m)).map(m => m.label).join(' ');
+  const c = [core.reduce((t, m) => t + m.x, 0) / core.length, core.reduce((t, m) => t + m.y, 0) / core.length];
+  const lane = Object.entries(LANES).map(([n, pts]) => [n, Math.min(...pts.slice(1).map((q, i) => segDist(c, pts[i], q)))]).sort((p, q) => p[1] - q[1])[0][0];
+  const zone = /drache|elder/i.test(objs) ? 'Dragon-Pit' : /baron/i.test(objs) ? 'Baron-Pit' : lane;
+  return { x0, y0, size, zone };
+}
+
+// Taktik-Karte: Mock-Map (Fallback) -> echte Map als Hintergrund -> Marker-Overlay -> Spieler-Porträt, alles in einer zoombaren "Welt".
 // Marker-Koordinaten in Prozent (0-100) beziehen sich auf das quadratische Kartenfeld.
 const MARKER_COLOR = { hero: '#3b82f6', enemy: '#ef4444', objective: '#C89B3C', fog: '#94a3b8' };
-const Minimap = ({ markers = [], champion, role, showLabels = false, result = null, fx = null }) => {
+const Minimap = ({ markers = [], champion, role, showLabels = false, result = null, fx = null, focus = null, full = false, onToggleView }) => {
   const player = markers.find(m => m.isPlayer);
-  const k = showLabels ? 1 : 1.5;   // in der Vorschau größere Marker, damit sie ohne Zoom auffallen
+  const view = focus && !full ? focus : { x0: 0, y0: 0, size: 100 };
+  const z = 100 / view.size;
+  const sc = Math.pow(1 / z, 0.65);                         // Marker wachsen beim Zoom nur dezent mit
+  const k = (showLabels ? 1 : 1.5) * sc;                    // in der Vorschau größere Marker, damit sie ohne Zoom auffallen
   const reduce = typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const at = m => ({ x: 110 + m.x * 1.8, y: 10 + m.y * 1.8 });
   const me = player ? at(player) : null;
@@ -1327,18 +1419,18 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
           {[0, 1, 2, 3, 4].map(i => {
             const ex = tower.x - 7 + i * 1.6, ey = tower.y + 4 + (i % 2) * 2.5;
             return (
-              <circle key={i} cx={reduce ? ex : me.x + i * 2} cy={reduce ? ey : me.y + (i % 2) * 2.5} r="2.3" fill="#93c5fd" stroke="#1e3a8a" strokeWidth=".6">
+              <circle key={i} cx={reduce ? ex : me.x + i * 2} cy={reduce ? ey : me.y + (i % 2) * 2.5} r={2.3 * sc} fill="#93c5fd" stroke="#1e3a8a" strokeWidth=".6">
                 {!reduce && <animate attributeName="cx" from={me.x + i * 2} to={ex} dur="1.9s" begin={`${i * 0.12}s`} fill="freeze" />}
                 {!reduce && <animate attributeName="cy" from={me.y + (i % 2) * 2.5} to={ey} dur="1.9s" begin={`${i * 0.12}s`} fill="freeze" />}
               </circle>
             );
           })}
-          <circle cx={tower.x} cy={tower.y} r="9" fill="none" stroke="#fde68a" strokeWidth="2.5" className="blink" />
+          <circle cx={tower.x} cy={tower.y} r={9 * sc} fill="none" stroke="#fde68a" strokeWidth={2.5 * sc} className="blink" />
         </>
       )}
       {fx.recall && (
-        <circle cx={me.x} cy={me.y} r="12" fill="none" stroke="#60a5fa" strokeWidth="2.5">
-          {!reduce && <animate attributeName="r" values="8;18;8" dur="1.2s" repeatCount="2" />}
+        <circle cx={me.x} cy={me.y} r={12 * sc} fill="none" stroke="#60a5fa" strokeWidth={2.5 * sc}>
+          {!reduce && <animate attributeName="r" values={`${8 * sc};${18 * sc};${8 * sc}`} dur="1.2s" repeatCount="2" />}
           {!reduce && <animate attributeName="opacity" values="1;.25;1" dur="1.2s" repeatCount="2" />}
         </circle>
       )}
@@ -1346,8 +1438,8 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
         const g = at(fogSrc);
         return (
           <>
-            <line x1={g.x} y1={g.y} x2={me.x} y2={me.y} stroke="#ef4444" strokeWidth="1.5" strokeDasharray="4 3" opacity=".7" />
-            <circle cx={reduce ? me.x : g.x} cy={reduce ? me.y : g.y} r="5" fill="#ef4444" stroke="#fff" strokeWidth="1">
+            <line x1={g.x} y1={g.y} x2={me.x} y2={me.y} stroke="#ef4444" strokeWidth={1.5 * sc} strokeDasharray="4 3" opacity=".7" />
+            <circle cx={reduce ? me.x : g.x} cy={reduce ? me.y : g.y} r={5 * sc} fill="#ef4444" stroke="#fff" strokeWidth="1">
               {!reduce && <animate attributeName="cx" from={g.x} to={me.x} dur="1.4s" fill="freeze" />}
               {!reduce && <animate attributeName="cy" from={g.y} to={me.y} dur="1.4s" fill="freeze" />}
             </circle>
@@ -1357,61 +1449,73 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
     </g>
   ) : null;
   return (
-    <div className="h-full w-full flex items-center justify-center bg-[#010A13]">
-      <div className="relative h-full aspect-square">
-        <svg viewBox="110 10 180 180" className="absolute inset-0 h-full w-full" aria-hidden="true">
-          <rect x="110" y="10" width="180" height="180" fill="#16222e" />
-          <path d="M122 178 L278 22" stroke="#45475a" strokeWidth="6" strokeLinecap="round" fill="none" />
-          <path d="M122 178 V22 H278 M122 178 H278 V22" stroke="#45475a" strokeWidth="6" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-          <path d="M122 22 L278 178" stroke="#0AC8B9" strokeOpacity=".35" strokeWidth="10" strokeDasharray="2 12" strokeLinecap="round" />
-          <circle cx="122" cy="178" r="11" fill="#3b82f6" fillOpacity=".7" /><circle cx="278" cy="22" r="11" fill="#ef4444" fillOpacity=".7" />
-        </svg>
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${MAP_URL})` }} />
-        <svg viewBox="110 10 180 180" className="absolute inset-0 h-full w-full" role="img" aria-label="Minimap mit Taktik-Markern">
-          {markers.filter(m => !m.isPlayer).map((m, i) => {
-            const px = 110 + m.x * 1.8, py = 10 + m.y * 1.8, c = MARKER_COLOR[m.type];
-            const flip = px > 250;
-            return (
-              <g key={i} className={result === 'good' && m.type === 'objective' ? 'blink' : undefined}>
-                {m.type === 'fog' ? (
-                  <>
-                    <title>{m.label}</title>
-                    <circle cx={px} cy={py} r={10 * k} fill="#0A1428" fillOpacity=".55" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="3 3" />
-                    <text x={px} y={py + 4.5 * k} textAnchor="middle" fontSize={13 * k} fontWeight="700" fill="#cbd5e1">?</text>
-                  </>
-                ) : m.type === 'objective' ? (
-                  <>
-                    <circle cx={px} cy={py} r={11 * k} fill="none" stroke={c} strokeOpacity=".3" strokeWidth="4" className="motion-safe:animate-pulse" />
-                    <circle cx={px} cy={py} r={7 * k} fill="none" stroke={c} strokeWidth="2.5" />
-                    <circle cx={px} cy={py} r={2 * k} fill={c} />
-                  </>
-                ) : (
-                  <>
-                    <circle cx={px} cy={py} r={13 * k} fill={c} fillOpacity=".14" className="motion-safe:animate-pulse" />
-                    <circle cx={px} cy={py} r={9 * k} fill={c} fillOpacity=".3" />
-                    <circle cx={px} cy={py} r={5 * k} fill={c} stroke="#fff" strokeOpacity=".85" strokeWidth="1" />
-                  </>
-                )}
-                {showLabels && m.label && m.type !== 'fog' && (
-                  <text x={flip ? px - 12 : px + 12} y={py + 3} textAnchor={flip ? 'end' : 'start'} fontSize="8" fontWeight="600"
-                        fill="#e2e8f0" stroke="#010A13" strokeWidth="2.5" paintOrder="stroke" fontFamily="system-ui,sans-serif">{m.label}</text>
-                )}
-              </g>
-            );
-          })}
-        {fxLayer}
-        </svg>
-        {player && (
-          <div className="absolute z-10 flex flex-col items-center -translate-x-1/2 -translate-y-1/2" style={{ left: `${player.x}%`, top: `${player.y}%` }}>
-            <div className="relative">
-              {result && <span className={`absolute inset-0 rounded-full opacity-70 motion-safe:animate-ping ${result === 'good' ? 'bg-[#0AC8B9]' : 'bg-[#E84057]'}`} aria-hidden="true" />}
-              <ChampAvatar name={champion || player.label} className={showLabels ? 'w-10 h-10' : 'w-8 h-8'} iconSize={showLabels ? 20 : 16}
-                           ring={result === 'good' ? 'border-2 border-[#0AC8B9] shadow-[0_0_16px_rgba(10,200,185,.9)]'
-                               : result === 'bad' ? 'border-2 border-[#E84057] shadow-[0_0_16px_rgba(232,64,87,.9)]'
-                               : 'border-2 border-[#F5E6B8] shadow-[0_0_12px_rgba(245,230,184,.85)]'} />
+    <div className="relative h-full w-full flex items-center justify-center bg-[#010A13]">
+      <div className="relative h-full aspect-square overflow-hidden">
+        <div className="absolute left-0 top-0 h-full w-full origin-top-left transition-transform duration-700 ease-out motion-reduce:transition-none"
+             style={{ transform: `scale(${z}) translate(${-view.x0}%, ${-view.y0}%)` }}>
+          <svg viewBox="110 10 180 180" className="absolute inset-0 h-full w-full" aria-hidden="true">
+            <rect x="110" y="10" width="180" height="180" fill="#16222e" />
+            <path d="M122 178 L278 22" stroke="#45475a" strokeWidth="6" strokeLinecap="round" fill="none" />
+            <path d="M122 178 V22 H278 M122 178 H278 V22" stroke="#45475a" strokeWidth="6" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+            <path d="M122 22 L278 178" stroke="#0AC8B9" strokeOpacity=".35" strokeWidth="10" strokeDasharray="2 12" strokeLinecap="round" />
+            <circle cx="122" cy="178" r="11" fill="#3b82f6" fillOpacity=".7" /><circle cx="278" cy="22" r="11" fill="#ef4444" fillOpacity=".7" />
+          </svg>
+          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${MAP_URL})` }} />
+          <svg viewBox="110 10 180 180" className="absolute inset-0 h-full w-full" role="img" aria-label="Minimap mit Taktik-Markern">
+            {markers.filter(m => !m.isPlayer).map((m, i) => {
+              const px = 110 + m.x * 1.8, py = 10 + m.y * 1.8, c = MARKER_COLOR[m.type];
+              const flip = px > 250;
+              return (
+                <g key={i} className={result === 'good' && m.type === 'objective' ? 'blink' : undefined}>
+                  {m.type === 'fog' ? (
+                    <>
+                      <title>{m.label}</title>
+                      <circle cx={px} cy={py} r={10 * k} fill="#0A1428" fillOpacity=".55" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="3 3" />
+                      <text x={px} y={py + 4.5 * k} textAnchor="middle" fontSize={13 * k} fontWeight="700" fill="#cbd5e1">?</text>
+                    </>
+                  ) : m.type === 'objective' ? (
+                    <>
+                      <circle cx={px} cy={py} r={11 * k} fill="none" stroke={c} strokeOpacity=".3" strokeWidth="4" className="motion-safe:animate-pulse" />
+                      <circle cx={px} cy={py} r={7 * k} fill="none" stroke={c} strokeWidth="2.5" />
+                      <circle cx={px} cy={py} r={2 * k} fill={c} />
+                    </>
+                  ) : (
+                    <>
+                      <circle cx={px} cy={py} r={13 * k} fill={c} fillOpacity=".14" className="motion-safe:animate-pulse" />
+                      <circle cx={px} cy={py} r={9 * k} fill={c} fillOpacity=".3" />
+                      <circle cx={px} cy={py} r={5 * k} fill={c} stroke="#fff" strokeOpacity=".85" strokeWidth="1" />
+                    </>
+                  )}
+                  {showLabels && m.label && m.type !== 'fog' && (
+                    <text x={flip ? px - 12 * sc : px + 12 * sc} y={py + 3 * sc} textAnchor={flip ? 'end' : 'start'} fontSize={8 * sc} fontWeight="600"
+                          fill="#e2e8f0" stroke="#010A13" strokeWidth={2.5 * sc} paintOrder="stroke" fontFamily="system-ui,sans-serif">{m.label}</text>
+                  )}
+                </g>
+              );
+            })}
+            {fxLayer}
+          </svg>
+          {player && (
+            <div className="absolute z-10 flex flex-col items-center" style={{ left: `${player.x}%`, top: `${player.y}%`, transform: `translate(-50%, -50%) scale(${sc})` }}>
+              <div className="relative">
+                {result && <span className={`absolute inset-0 rounded-full opacity-70 motion-safe:animate-ping ${result === 'good' ? 'bg-[#0AC8B9]' : 'bg-[#E84057]'}`} aria-hidden="true" />}
+                <ChampAvatar name={champion || player.label} className={showLabels ? 'w-10 h-10' : 'w-8 h-8'} iconSize={showLabels ? 20 : 16}
+                             ring={result === 'good' ? 'border-2 border-[#0AC8B9] shadow-[0_0_16px_rgba(10,200,185,.9)]'
+                                 : result === 'bad' ? 'border-2 border-[#E84057] shadow-[0_0_16px_rgba(232,64,87,.9)]'
+                                 : 'border-2 border-[#F5E6B8] shadow-[0_0_12px_rgba(245,230,184,.85)]'} />
+              </div>
+              {showLabels && <span className="mt-0.5 text-[10px] font-bold text-[#F5E6B8] [text-shadow:0_0_3px_#010A13]">{player.label}</span>}
             </div>
-            {showLabels && <span className="mt-0.5 text-[10px] font-bold text-[#F5E6B8] [text-shadow:0_0_3px_#010A13]">{player.label}</span>}
-          </div>
+          )}
+        </div>
+        {focus && !full && (
+          <span className="pointer-events-none absolute left-1.5 top-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-semibold text-[#0AC8B9]">Fokus: {focus.zone}</span>
+        )}
+        {focus && onToggleView && (
+          <button type="button" onClick={e => { e.stopPropagation(); onToggleView(); }} onKeyDown={e => e.stopPropagation()}
+            className="absolute bottom-1.5 right-1.5 z-20 rounded-md border border-[#C89B3C]/60 bg-[#010A13]/85 px-2 py-1 text-[10px] font-semibold text-[#C89B3C] transition hover:border-[#0AC8B9] hover:text-[#0AC8B9]">
+            {full ? 'Fokus-Ansicht' : 'Gesamtansicht'}
+          </button>
         )}
       </div>
     </div>
@@ -1427,9 +1531,67 @@ const Divider = () => (
 );
 
 /* ---------- Screens ---------- */
-function Dashboard({ rank, history, hearts, profile, onDaily, onRanked, onPractice, onMastery, onNoHearts, onShop, onReset }) {
-  const locked = hearts < 1;
-  const masteryN = masteryPool(profile.champion, profile.role).length;   // ohne Herzen sind Daily und Ranked gesperrt
+// Modus-Karte mit Info-Button oben rechts (zwei getrennte Buttons, damit nichts verschachtelt ist)
+const ModeCard = ({ wrap = '', cls, onClick, onInfo, label, locked = false, infoCls = 'bg-black/30 text-white/90', children }) => (
+  <div className={`relative ${wrap}`}>
+    <button onClick={onClick} aria-disabled={locked} className={`h-full w-full aria-disabled:opacity-50 ${cls}`}>{children}</button>
+    <button onClick={onInfo} aria-label={`Info zu ${label}`} title={`Info zu ${label}`}
+      className={`absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full transition hover:scale-110 ${infoCls}`}>
+      <Icon n="info" size={15} />
+    </button>
+  </div>
+);
+
+const MODE_INFO = {
+  daily: { icon: 'calendar', title: 'Daily Run',
+    goal: 'Jeden Tag gibt es dasselbe Match für alle Spieler (Rotation nach UTC-Datum). So lassen sich Ergebnisse fair vergleichen.',
+    duration: '5 Phasen (ca. 3 bis 4 Minuten)',
+    risk: 'Gewertet wie ein Ranked-Match: ab 3 von 5 richtigen Entscheidungen Sieg mit +15 bis +28 LP, sonst Niederlage mit −14 bis −24 LP. Das Hidden MMR steuert, wie hoch die LP in dieser Spanne ausfallen. Ein Herz geht nur bei Niederlage oder Abbruch verloren.',
+    focus: 'Der gesamte Matchverlauf: Wave Management, Objective-Timing und Rotationen.' },
+  ranked: { icon: 'swords', title: 'Ranked Match',
+    goal: 'Steige in der Rangliste auf. Du wählst die Match-Simulation (ein zusammenhängendes Match in einer Rolle deiner Wahl) oder das Makro-Quiz (5 unabhängige Situationen).',
+    duration: '5 Phasen oder 5 Fragen (ca. 3 bis 5 Minuten)',
+    risk: 'Nach der letzten Entscheidung wird einmal abgerechnet: 5/5 Dominanter Sieg (+24 bis +28 LP), 3 bis 4/5 Arbeitssieg (+15 bis +18), 2/5 knappe Niederlage (−14), 0 bis 1/5 Stomp (−20 bis −24). Das Hidden MMR verschiebt die LP innerhalb der Spanne. Siege kosten kein Herz, Niederlagen und Aufgeben jeweils eines. Es gilt der Tier-Lock: Du bekommst Szenarien deiner Liga.',
+    focus: 'Macro, Wave Management, Vision und Clutch-Decisions unter Zeitdruck.' },
+  practice: { icon: 'target', title: 'Übungsmodus',
+    goal: 'Trainiere ohne Druck und filtere nach Rolle und Schwierigkeit, um gezielt Schwächen zu üben.',
+    duration: '5 Phasen (ca. 3 bis 5 Minuten, je nach Szenario-Timer)',
+    risk: 'Kein Risiko: keine LP, kein MMR, keine Herzen und kein Eintrag in der Historie. Am Ende siehst du nur, wie viele LP es gewesen wären.',
+    focus: 'Gezieltes Training einzelner Rollen und Schwierigkeitsstufen, vom Early Game bis zum Closing.' },
+  mastery: { icon: 'crown', title: 'Champion Mastery',
+    goal: 'Spiele Szenarien rund um deinen Main-Champion und deine Rolle. Jax, Lee Sin, Ahri, Jinx und Thresh haben handgeschriebene Spezial-Sets, jeder andere Champion nutzt das adaptive Rollen-Template.',
+    duration: '5 Fragen (ca. 2 bis 3 Minuten)',
+    risk: 'Gewertet wie Ranked: ab 3 von 5 richtig Sieg, sonst Niederlage, mit LP, Hidden MMR und Herz nur bei Niederlage oder Abbruch.',
+    focus: 'Power-Spikes, Matchup-Taktik und Teamfight-Verhalten deines Champions.' },
+};
+
+function ModeInfo({ mode, onClose }) {
+  const m = MODE_INFO[mode];
+  const rows = [['target', 'Ziel', m.goal], ['timer', 'Dauer', m.duration], ['heart', 'Risiko & Belohnung', m.risk], ['eye', 'Taktischer Schwerpunkt', m.focus]];
+  return (
+    <div className="absolute inset-0 z-40 flex items-end justify-center p-3" style={{ background: 'rgba(1,10,19,.85)' }} onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label={`Info zu ${m.title}`} onClick={e => e.stopPropagation()}
+           className="flex max-h-[85%] w-full flex-col gap-3 overflow-y-auto rounded-2xl border border-[#C89B3C]/60 bg-[#06111F] p-4">
+        <div className="flex items-center gap-2">
+          <Icon n={m.icon} size={22} className="text-[#C89B3C]" />
+          <div className="flex-1 font-serif text-lg font-bold">{m.title}</div>
+          <button onClick={onClose} aria-label="Schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
+        </div>
+        <Divider />
+        {rows.map(([ic, h, t]) => (
+          <div key={h}>
+            <div className="mb-0.5 flex items-center gap-1.5 text-sm font-semibold text-[#C89B3C]"><Icon n={ic} size={14} />{h}</div>
+            <div className="text-sm leading-relaxed text-slate-300">{t}</div>
+          </div>
+        ))}
+        <button onClick={onClose} className="mt-1 rounded-xl border border-[#C89B3C]/60 py-2.5 font-serif font-bold transition hover:border-[#0AC8B9]">Verstanden</button>
+      </div>
+    </div>
+  );
+}
+
+function Dashboard({ rank, history, hearts, profile, onDaily, onRanked, onPractice, onMastery, onNoHearts, onInfo, onShop, onReset }) {
+  const locked = hearts < 1;   // ohne Herzen sind Daily und Ranked gesperrt
   const [confirm, setConfirm] = useState(false);
   const tier = tierOf(rank.step), cls = RANK_ICON[tier].cls;   // eine Farbquelle für Icon, Text, Rahmen und Balken
   const pct = Math.min(100, rank.lp);
@@ -1472,36 +1634,34 @@ function Dashboard({ rank, history, hearts, profile, onDaily, onRanked, onPracti
         </div>
       )}
       <div className="grid grid-cols-2 gap-2">
-        <button onClick={locked ? onNoHearts : onDaily} aria-disabled={locked}
-          className="col-span-2 aria-disabled:opacity-50 flex items-center gap-3 rounded-xl border border-[#0AC8B9]/60 bg-[#010A13]/80 px-4 py-3.5 text-left shadow-[0_0_12px_rgba(10,200,185,.18)] transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
+        <ModeCard wrap="col-span-2" onClick={locked ? onNoHearts : onDaily} locked={locked} onInfo={() => onInfo('daily')} label="Daily Run"
+          cls="flex items-center gap-3 rounded-xl border border-[#0AC8B9]/60 bg-[#010A13]/80 px-4 py-3.5 text-left shadow-[0_0_12px_rgba(10,200,185,.18)] transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
           <Icon n="calendar" size={28} className="text-[#0AC8B9]" />
-          <span>
+          <span className="pr-8">
             <span className="block font-serif text-lg font-extrabold leading-tight text-white">Daily Run</span>
-            <span className="block text-xs text-[#0AC8B9]">Challenge des Tages, Herz nur bei Niederlage</span>
+            <span className="block text-xs text-[#0AC8B9]">Das Tages-Match für alle Spieler, 5 Phasen.</span>
           </span>
-        </button>
-        <button onClick={locked ? onNoHearts : onRanked} aria-disabled={locked}
-          className="aria-disabled:opacity-50 flex flex-col gap-1.5 rounded-xl bg-[#C89B3C] p-3 text-left text-[#010A13] shadow-[0_0_16px_rgba(200,155,60,.5)] transition hover:brightness-110 active:scale-[.98]">
+        </ModeCard>
+        <ModeCard onClick={locked ? onNoHearts : onRanked} locked={locked} onInfo={() => onInfo('ranked')} label="Ranked Match" infoCls="bg-[#010A13]/25 text-[#010A13]"
+          cls="flex flex-col gap-1.5 rounded-xl bg-[#C89B3C] p-3 text-left text-[#010A13] shadow-[0_0_16px_rgba(200,155,60,.5)] transition hover:brightness-110 active:scale-[.98]">
           <Icon n="swords" size={26} />
           <span className="font-serif font-extrabold leading-tight">Ranked Match</span>
-          <span className="text-xs font-semibold text-[#010A13]/70">Match oder Quiz, Herz nur bei Niederlage</span>
-        </button>
-        <button onClick={onPractice}
-          className="flex flex-col gap-1.5 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3 text-left transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
+          <span className="text-xs font-semibold text-[#010A13]/70">5-Phasen-Simulation eines vollen Ranked Matches um LP.</span>
+        </ModeCard>
+        <ModeCard onClick={onPractice} onInfo={() => onInfo('practice')} label="Übungsmodus"
+          cls="flex flex-col gap-1.5 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3 text-left transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
           <Icon n="target" size={26} className="text-[#0AC8B9]" />
           <span className="font-serif font-extrabold text-white leading-tight">Übungsmodus</span>
-          <span className="text-xs text-gray-400">Ohne LP-Risiko</span>
-        </button>
-        <button onClick={locked ? onNoHearts : onMastery} disabled={!masteryN} aria-disabled={locked}
-          className="col-span-2 aria-disabled:opacity-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-3 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2.5 text-left transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
+          <span className="text-xs text-gray-400">Üben ohne LP-Risiko, mit Filtern.</span>
+        </ModeCard>
+        <ModeCard wrap="col-span-2" onClick={locked ? onNoHearts : onMastery} locked={locked} onInfo={() => onInfo('mastery')} label="Champion Mastery"
+          cls="flex items-center gap-3 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2.5 text-left transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
           <ChampAvatar name={profile.champion || 'Heimerdinger'} className="w-10 h-10" />
-          <span className="min-w-0">
+          <span className="min-w-0 pr-8">
             <span className="block font-serif font-extrabold leading-tight text-white">Champion Mastery</span>
-            <span className="block truncate text-xs text-gray-400">
-              {masteryN ? `${profile.champion}: ${Math.min(QUIZ_LENGTH, masteryN)} Fragen, Herz nur bei Niederlage` : `Keine Szenarien für ${profile.champion} (${profile.role})`}
-            </span>
+            <span className="block truncate text-xs text-gray-400">Szenarien rund um {champLabel(profile.champion)} ({profile.role}).</span>
           </span>
-        </button>
+        </ModeCard>
       </div>
 
       <Divider />
@@ -1587,6 +1747,7 @@ function RankedSetup({ rank, onStart, onClose }) {
   const pool = rankedPool(rank.step);          // Tier-Lock
   const quizCount = Math.min(QUIZ_LENGTH, pool.length);
   const ready = way === 'quiz' || (way === 'match' && !!role);
+  const picked = role ? matchPool(role, rank.step)[0] : null;
   return (
     <div className="absolute inset-0 z-40 flex items-end justify-center p-3" style={{ background: 'rgba(1,10,19,.85)' }} onClick={onClose}>
       <div role="dialog" aria-modal="true" aria-label="Ranked Match einrichten" onClick={e => e.stopPropagation()}
@@ -1609,7 +1770,7 @@ function RankedSetup({ rank, onStart, onClose }) {
             <div className="flex flex-wrap gap-2">
               {RANKED_ROLES.map(([l, v]) => <Chip key={l} active={role === v} disabled={!matchPool(v, rank.step).length} onClick={() => setRole(v)}>{l}</Chip>)}
             </div>
-            <div className="text-xs text-gray-400 mt-2">Ausgegraute Rollen haben in deiner Liga noch kein Match. Fehler beenden das Match nicht.</div>
+            <div className="text-xs text-gray-400 mt-2">Fehler beenden das Match nicht.{picked && picked.difficulty !== pool[0].difficulty ? ` Für diese Rolle gibt es in deiner Liga kein eigenes Match, du spielst das nächstpassende (${picked.difficulty}).` : ''}</div>
           </div>
         )}
         {way === 'quiz' && (
@@ -1635,6 +1796,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
   const [typing, setTyping] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [leave, setLeave] = useState(false);   // Bestätigung zum Abbrechen
+  const [full, setFull] = useState(false);     // kurz auf die Gesamtkarte schalten
   const [showMom, setShowMom] = useState(true);   // Momentum-Banner am Phasenstart
   const [msgs, setMsgs] = useState([{ from: 'coach', t: 'Ich gebe dir Hinweise, aber nie die Lösung. Was willst du wissen?' }]);
   const [draft, setDraft] = useState('');
@@ -1652,6 +1814,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
 
   useEffect(() => () => clearTimeout(replyTimer.current), []);
   useEffect(() => { if (pick) setMapOpen(false); }, [pick]);
+  useEffect(() => { if (!full) return; const t = setTimeout(() => setFull(false), 5000); return () => clearTimeout(t); }, [full]);
   useEffect(() => { const t = setTimeout(() => setShowMom(false), 5000); return () => clearTimeout(t); }, []);
   // Auflösung: kurz nach dem Lock-in erklingt Erfolg oder Fehler (bei Timeout sofort)
   useEffect(() => {
@@ -1697,6 +1860,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
   const choice = pick ? (pick.opt ? stripLetter(pick.opt.label) : 'Keine Entscheidung (Zeit abgelaufen)') : '';
   const chain = pick ? ((pick.opt && pick.opt.chain) || TIMEOUT_CHAIN) : null;
   const fx = pick ? effectsFor(pick.opt, scenario, ok) : null;
+  const focus = focusFor(scenario.markers);
   const goNext = () => { if (adv.current || !pick) return; adv.current = true; onNext(pick.opt || null); };
 
   return (
@@ -1734,11 +1898,13 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
         </div>
 
         {/* Minimap mit Markern (Zoom per Klick) */}
-        <button type="button" onClick={() => setMapOpen(true)} aria-label="Minimap vergrößern"
+        <div role="button" tabIndex={0} onClick={() => setMapOpen(true)} aria-label="Minimap vergrößern"
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMapOpen(true); } }}
           className="relative h-36 shrink-0 rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13] cursor-pointer transition hover:border-[#0AC8B9]">
-          <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} result={pick ? (ok ? 'good' : 'bad') : null} fx={fx} />
-          <span className="absolute top-1.5 right-1.5 rounded-md bg-black/40 p-1 text-white/80"><Icon n="zoom" size={16} /></span>
-        </button>
+          <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} result={pick ? (ok ? 'good' : 'bad') : null} fx={fx}
+                   focus={focus} full={full} onToggleView={() => setFull(f => !f)} />
+          <span className="pointer-events-none absolute top-1.5 right-1.5 rounded-md bg-black/40 p-1 text-white/80"><Icon n="zoom" size={16} /></span>
+        </div>
 
         {/* Champion & Rolle */}
         <div className="flex items-center gap-2.5 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 px-2.5 py-1.5">
@@ -1842,7 +2008,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, onNext, onAbort 
             <button onClick={() => setMapOpen(false)} aria-label="Karte schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
           </div>
           <div className="w-full max-w-[380px] aspect-square mx-auto rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13]">
-            <Minimap markers={scenario.markers} champion={scenario.champion} showLabels />
+            <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} showLabels focus={focus} full={full} onToggleView={() => setFull(f => !f)} />
           </div>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
             {[['hero', 'Du / Team'], ['enemy', 'Gegner'], ['objective', 'Objective'], ['fog', 'Ungesichtet']].map(([t, l]) => (
@@ -2057,6 +2223,39 @@ const ROLES = [['Top', 'Toplane'], ['Jungle', 'Jungle'], ['Mid', 'Midlane'], ['B
 const normName = n => (n || '').toLowerCase().replace(/[^a-z]/g, '');
 const masteryPool = (champ, role) => RUNS.filter(r => normName(r.champion) === normName(champ) && r.role === role);
 const CHAMP_NAMES = [...new Set(RUNS.map(r => r.champion))].sort();
+const escapeRe = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const titleCase = n => n.trim().split(/\s+/).filter(Boolean).map(w => w[0].toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+const champLabel = n => CHAMP_NAMES.find(c => normName(c) === normName(n)) || titleCase(n || '') || 'Champion';
+
+// Adaptives Rollen-Template: Szenarien ohne champion-spezifische Fähigkeiten, die für jeden Champion der Rolle passen
+const GENERIC = {
+  Toplane: ['top_smaragd_01', 'top_smaragd_02', 'top_smaragd_03', 'top_smaragd_05', 'top_bronze_02', 'top_bronze_03', 'top_bronze_04', 'quiz_eisen_01', 'quiz_gold_01', 'quiz_diamant_01'],
+  Jungle: ['jng_dia_01', 'jng_dia_02', 'jng_dia_03', 'jng_dia_04', 'jng_dia_05', 'jng_platin_01', 'jng_platin_02', 'jng_platin_04', 'quiz_gold_03'],
+  Midlane: ['mid_gold_02', 'mid_gold_03', 'mid_gold_04', 'mid_gold_05', 'mid_master_01', 'mid_master_03', 'mid_master_05', 'quiz_eisen_02', 'quiz_smaragd_01', 'quiz_diamant_02'],
+  Botlane: ['bot_eisen_01', 'bot_eisen_02', 'bot_eisen_03', 'bot_eisen_04', 'bot_eisen_05', 'quiz_eisen_03', 'quiz_smaragd_03', 'quiz_diamant_03'],
+  Support: ['sup_silber_02', 'sup_silber_03', 'quiz_gold_02', 'quiz_smaragd_02', 'quiz_bronze_01', 'quiz_platin_01', 'quiz_master_01'],
+};
+function adaptScenario(sc, champ) {
+  const from = new RegExp(escapeRe(sc.champion), 'g');
+  const sub = t => t.replace(from, champ);
+  const out = { ...sc, id: `${sc.id}~${normName(champ)}`, champion: champ, context: sub(sc.context), coachHint: sub(sc.coachHint),
+    markers: sc.markers.map(m => ({ ...m, label: sub(m.label) })),
+    options: sc.options.map(o => ({ ...o, label: sub(o.label), feedback: sub(o.feedback), chain: o.chain && o.chain.map(sub), nextId: 'end' })) };
+  delete out.phase;
+  DYN[out.id] = out;
+  return out;
+}
+// Mastery für jeden Champion: handgeschriebenes Set, wenn es mindestens 5 Szenarien hat, sonst ergänzt um adaptive Rollen-Szenarien
+function masteryScenarios(champ, role) {
+  const name = champLabel(champ);
+  const own = RUNS.filter(r => normName(r.champion) === normName(name) && r.role === role);
+  if (own.length >= QUIZ_LENGTH) return own;
+  const clash = new RegExp('\\b' + escapeRe(name) + '\\b', 'i');   // Champion kommt schon als Gegner im Text vor: überspringen
+  const adaptive = (GENERIC[role] || []).map(id => RUNS.find(r => r.id === id))
+    .filter(sc => sc && normName(sc.champion) !== normName(name) && !clash.test(JSON.stringify(sc)))
+    .map(sc => adaptScenario(sc, name));
+  return [...own, ...adaptive];
+}
 const fieldCls = 'rounded-lg border border-[#C89B3C]/40 bg-[#010A13] px-3 py-2 text-sm text-white placeholder:text-slate-500 outline-none focus:border-[#0AC8B9]';
 
 const MASTERY_TILES = [['Jax', 'Toplane', 'Top'], ['Lee Sin', 'Jungle', 'Jungle'], ['Ahri', 'Midlane', 'Mid'], ['Jinx', 'Botlane', 'Bot'], ['Thresh', 'Support', 'Support']];
@@ -2064,7 +2263,6 @@ const MASTERY_TILES = [['Jax', 'Toplane', 'Top'], ['Lee Sin', 'Jungle', 'Jungle'
 function MainPicker({ role, champion, onRole, onChampion }) {
   const n = masteryPool(champion, role).length;
   const name = champion.trim();
-  const tileHint = MASTERY_TILES.find(([c]) => normName(c) === normName(name));
   return (
     <div className="flex flex-col gap-3">
       <div>
@@ -2095,8 +2293,8 @@ function MainPicker({ role, champion, onRole, onChampion }) {
         <datalist id="champ-names">{CHAMP_NAMES.map(c => <option key={c} value={c} />)}</datalist>
         {name && (
           <div className={`mt-1.5 text-xs ${n ? 'text-[#0AC8B9]' : 'text-gray-400'}`} role="status">
-            {n ? `Mastery verfügbar: ${n} Szenarien für ${name}`
-               : <>Für diesen Champion ist aktuell noch kein dedizierter Mastery-Run verfügbar.{tileHint ? ` Tipp: ${tileHint[0]} ist als ${tileHint[2]} spielbar.` : ''}</>}
+            {n > 0 ? `Handgeschriebenes Mastery-Set: ${n} Szenarien für ${name}${n < QUIZ_LENGTH ? ', ergänzt durch adaptive Rollen-Szenarien' : ''}.`
+               : `Kein handgeschriebenes Set für ${name}: Mastery nutzt das adaptive ${role}-Template mit deinem Champion.`}
           </div>
         )}
       </div>
@@ -2116,8 +2314,7 @@ function Onboarding({ onDone }) {
   const submit = e => {
     e.preventDefault();
     if (!valid) return;
-    const canon = CHAMP_NAMES.find(c => normName(c) === normName(champion));
-    onDone({ name: name.trim(), step, role, champion: canon || champion.trim() });
+    onDone({ name: name.trim(), step, role, champion: champLabel(champion) });
   };
   return (
     <form onSubmit={submit} className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
@@ -2196,7 +2393,38 @@ const TabBar = ({ tabs, value, onChange }) => (
   </div>
 );
 
-function Profile({ profile, rank, friends, onChange, onAddFriend, onRemoveFriend, onLogout }) {
+function Requests({ requests, onAccept, onDecline }) {
+  if (!requests.length) return <div className="rounded-lg border border-dashed border-[#C89B3C]/40 p-4 text-center text-sm text-slate-500">Keine offenen Anfragen.</div>;
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="text-xs text-gray-500">Simulierte Anfragen: Es gibt noch keinen Server, die Daten liegen nur lokal.</div>
+      {requests.map(r => (
+        <div key={r.name} className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 p-3">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankIcon tier={tierOf(r.step)} size={22} /></span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5"><span aria-hidden="true">{STATUS[r.status].emoji}</span><span className="truncate font-semibold">{r.name}</span></div>
+              <div className="text-xs text-gray-400">{rankName(r.step)} · {r.lp} LP · {STATUS[r.status].label}</div>
+            </div>
+          </div>
+          {r.note && <div className="mt-1.5 text-xs italic text-gray-400">„{r.note}“</div>}
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <button onClick={() => onAccept(r.name)} aria-label={`${r.name} annehmen`}
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-emerald-400/60 bg-emerald-500/15 py-2 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/25">
+              <Icon n="check" size={16} /> Annehmen
+            </button>
+            <button onClick={() => onDecline(r.name)} aria-label={`${r.name} ablehnen`}
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-red-400/60 bg-red-500/15 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-500/25">
+              <Icon n="x" size={16} /> Ablehnen
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Profile({ profile, rank, friends, requests, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout }) {
   const [tab, setTab] = useState('me');
   const [confirm, setConfirm] = useState(false);
   const tier = tierOf(rank.step);
@@ -2215,8 +2443,12 @@ function Profile({ profile, rank, friends, onChange, onAddFriend, onRemoveFriend
           {profile.note && <div className="mt-0.5 truncate text-xs italic text-gray-400">„{profile.note}“</div>}
         </div>
       </div>
-      <TabBar tabs={[['me', 'Profil'], ['friends', `Freunde (${friends.length})`]]} value={tab} onChange={setTab} />
-      {tab === 'friends' ? (
+      <TabBar tabs={[['me', 'Profil'], ['friends', `Freunde (${friends.length})`],
+        ['requests', <span className="inline-flex items-center justify-center gap-1.5">Anfragen{requests.length > 0 && <span className="rounded-full bg-red-500 px-1.5 text-[10px] font-bold leading-4 text-white" aria-label={`${requests.length} offene Anfragen`}>{requests.length}</span>}</span>]]}
+        value={tab} onChange={setTab} />
+      {tab === 'requests' ? (
+        <Requests requests={requests} onAccept={onAccept} onDecline={onDecline} />
+      ) : tab === 'friends' ? (
         <Friends friends={friends} selfName={profile.name} onAdd={onAddFriend} onRemove={onRemoveFriend} />
       ) : (
         <>
@@ -2378,6 +2610,8 @@ function App() {
   const [heartsOpen, setHeartsOpen] = useState(false);
   const [profile, setProfile] = useState(init.profile || null);   // null = noch nicht registriert
   const [friends, setFriends] = useState(init.friends || [MOCK_FRIEND]);
+  const [requests, setRequests] = useState(init.requests || MOCK_REQUESTS);
+  const [infoMode, setInfoMode] = useState(null);
   const [rank, setRank] = useState(init.rank);
   const [history, setHistory] = useState(init.history);
   const [hearts, setHearts] = useState(Number.isInteger(init.hearts) ? Math.max(0, Math.min(MAX_HEARTS, init.hearts)) : MAX_HEARTS);
@@ -2386,12 +2620,12 @@ function App() {
   const [rs, setRs] = useState({ id: START_IDS[0], format: 'tree', correct: 0, log: [], champion: '', role: '', stage: 0, stages: 1, queue: [] });
   const [result, setResult] = useState(null);     // { from, to } bei Daily und Ranked
 
-  useEffect(() => { writeSave({ rank, history, hearts, profile, friends }); }, [rank, history, hearts, profile, friends]);
+  useEffect(() => { writeSave({ rank, history, hearts, profile, friends, requests }); }, [rank, history, hearts, profile, friends, requests]);
 
   // Jeder Button klickt (Optionen ausgenommen: sie lösen lock_in aus)
   useEffect(() => {
     const onClick = e => {
-      const b = e.target && e.target.closest ? e.target.closest('button') : null;
+      const b = e.target && e.target.closest ? e.target.closest('button,[role="button"]') : null;
       if (b && !b.disabled && !b.hasAttribute('data-silent')) playHextechSound('click');
     };
     document.addEventListener('click', onClick);
@@ -2400,7 +2634,7 @@ function App() {
 
   // Startet einen Lauf. Ein Herz kostet nur eine Niederlage oder ein Abbruch, nicht der Start.
   const begin = (nextMode, cfg) => {
-    const sc = RUNS.find(r => r.id === cfg.id);
+    const sc = getScenario(cfg.id);
     setMode(nextMode); setRun(n => n + 1); setResult(null); setSetupOpen(false); setRankedOpen(false); setHeartsOpen(false);
     setRs({ format: 'tree', correct: 0, log: [], champion: sc.champion, role: sc.role, stage: 0, stages: matchStages(cfg.id), queue: [], ...cfg });
     setScreen('scenario');
@@ -2425,7 +2659,7 @@ function App() {
   const mmr = profile && profile.hiddenMmr != null ? profile.hiddenMmr : rank.step * 100 + rank.lp;
 
   const next = opt => {
-    const cur = RUNS.find(r => r.id === rs.id);
+    const cur = getScenario(rs.id);
     const ok = !!opt && opt.lpChange > 0;                 // richtig = beste Option, keine LP pro Phase
     const best = cur.options.find(o => o.lpChange > 0);
     const log = [...rs.log, {
@@ -2440,7 +2674,7 @@ function App() {
     if (rs.queue.length) nextId = rs.queue[rs.stage + 1] || null;   // Quiz, Mastery, Drill: feste Frageliste
     else {
       nextId = opt ? opt.nextId : mainLine(cur);          // Timeout wirkt wie eine Fehlentscheidung: das Spiel geht weiter
-      if (nextId === 'end' || !RUNS.some(r => r.id === nextId)) nextId = null;
+      if (nextId === 'end' || !getScenario(nextId)) nextId = null;
     }
     if (nextId) { setRs({ ...rs, id: nextId, stage: rs.stage + 1, correct, log }); return; }
 
@@ -2479,7 +2713,7 @@ function App() {
 
   const playMastery = () => {
     if (!canPlay || !profile) return;
-    const pool = masteryPool(profile.champion, profile.role);   // nur Szenarien deines Champions und deiner Rolle
+    const pool = masteryScenarios(profile.champion, profile.role);   // eigenes Set oder adaptives Rollen-Template
     if (!pool.length) return;
     const queue = shuffle(pool.map(r => r.id)).slice(0, QUIZ_LENGTH);
     begin('ranked', { format: 'mastery', id: queue[0], queue, stages: queue.length });
@@ -2493,14 +2727,23 @@ function App() {
 
   const register = ({ name, step, role, champion }) => {
     setProfile({ name, role, champion, status: 'online', note: '', startStep: step, hiddenMmr: step * 100 + 50 });
-    setRank({ step, lp: 0 }); setHistory([]); setHearts(MAX_HEARTS); setFriends([MOCK_FRIEND]); setScreen('home');
+    setRank({ step, lp: 0 }); setHistory([]); setHearts(MAX_HEARTS); setFriends([MOCK_FRIEND]); setRequests(MOCK_REQUESTS); setScreen('home');
   };
+  // Anfrage annehmen: Spieler wandert in die Freundesliste (und damit ins Freunde-Leaderboard)
+  const acceptRequest = name => {
+    const r = requests.find(x => x.name === name);
+    if (!r) return;
+    setFriends(l => (l.some(f => f.name === name) || l.length >= 20) ? l : [...l, { name: r.name, step: r.step, lp: r.lp, status: r.status, note: r.note }]);
+    setRequests(l => l.filter(x => x.name !== name));
+    playHextechSound('correct');
+  };
+  const declineRequest = name => setRequests(l => l.filter(x => x.name !== name));
   const updateProfile = patch => setProfile(p => ({ ...p, ...patch }));
   const logout = () => { setProfile(null); setScreen('home'); };
 
   const reset = () => { setRank({ step: profile && profile.startStep ? profile.startStep : 0, lp: 0 }); setHistory([]); setHearts(MAX_HEARTS); };
 
-  const scenario = RUNS.find(r => r.id === rs.id);
+  const scenario = getScenario(rs.id);
   const phaseTag = scenario ? `${scenario.phase} (${rs.stage + 1}/${rs.stages})` : '';
   const tag = rs.format === 'quiz' ? `Quiz (${rs.stage + 1}/${rs.stages})` : rs.format === 'mastery' ? `Mastery (${rs.stage + 1}/${rs.stages})`
     : rs.format === 'drill' ? `Recovery Drill (${rs.stage + 1}/${rs.stages})` : phaseTag;
@@ -2533,10 +2776,11 @@ function App() {
       {(screen === 'home' || screen === 'board' || screen === 'profile' || screen === 'premium') && (
         <div key={screen} className="fade-in flex-1 min-h-0 flex flex-col">
           {screen === 'home' && <Dashboard rank={rank} history={history} hearts={hearts} profile={profile} onDaily={playDaily} onRanked={() => setRankedOpen(true)}
-            onPractice={() => setSetupOpen(true)} onMastery={playMastery} onNoHearts={() => setHeartsOpen(true)} onShop={() => setScreen('premium')} onReset={reset} />}
+            onPractice={() => setSetupOpen(true)} onMastery={playMastery} onInfo={setInfoMode} onNoHearts={() => setHeartsOpen(true)} onShop={() => setScreen('premium')} onReset={reset} />}
           {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} />}
           {screen === 'profile' && <Profile profile={profile} rank={rank} friends={friends} onChange={updateProfile} onLogout={logout}
-            onAddFriend={f => setFriends(l => [...l, f])} onRemoveFriend={name => setFriends(l => l.filter(x => x.name !== name))} />}
+            onAddFriend={f => setFriends(l => [...l, f])} onRemoveFriend={name => setFriends(l => l.filter(x => x.name !== name))}
+            requests={requests} onAccept={acceptRequest} onDecline={declineRequest} />}
           {screen === 'premium' && <Premium hearts={hearts} onRefill={() => setHearts(MAX_HEARTS)} />}
         </div>
       )}
@@ -2551,7 +2795,7 @@ function App() {
           {tabs.map(([id, ic, label]) => (
             <button key={id} onClick={() => setScreen(id)} aria-current={screen === id}
               className={`py-3 flex flex-col items-center gap-1 text-xs ${screen === id ? 'text-[#0AC8B9]' : 'text-slate-500'}`}>
-              <Icon n={ic} size={22} />{label}
+              <span className="relative"><Icon n={ic} size={22} />{id === 'profile' && requests.length > 0 && <span className="absolute -right-2 -top-1.5 rounded-full bg-red-500 px-1 text-[9px] font-bold leading-3 text-white" aria-label={`${requests.length} offene Anfragen`}>{requests.length}</span>}</span>{label}
             </button>
           ))}
         </nav>
@@ -2559,6 +2803,7 @@ function App() {
 
       {setupOpen && <PracticeSetup onStart={playPractice} onClose={() => setSetupOpen(false)} />}
       {rankedOpen && <RankedSetup rank={rank} onStart={playRanked} onClose={() => setRankedOpen(false)} />}
+      {infoMode && <ModeInfo mode={infoMode} onClose={() => setInfoMode(null)} />}
       {heartsOpen && <NoHearts onDrill={startDrill} onShop={() => { setHeartsOpen(false); setScreen('premium'); }} onClose={() => setHeartsOpen(false)} />}
     </div>
   );
