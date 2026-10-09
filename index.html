@@ -4439,8 +4439,16 @@ function SvgPortrait({ m, champion, cx, cy, r, sc, showLabels }) {
 // Ebenen von unten nach oben: Fallback-Zeichnung -> offizielle Summoner's-Rift-Karte (map11.png) mit Color-Grading -> Marker -> Effekte.
 // Landmarken der Karte: Baron-Pit ca. (34|30), Drachen-Pit ca. (66|70), Lanes entlang der Ränder, Fluss auf der Diagonale oben links nach unten rechts.
 // Türme (Rot oben rechts, Blau unten links; Blau = Rot gespiegelt an der Hauptdiagonale) und Minion-Wellen
-const TW_RED = { top: [[40, 8], [66, 8], [80, 9]], mid: [[60, 41], [70, 31], [78, 22]], bot: [[93, 64], [93, 38], [92, 22]] };
-const TOWER_LIST = ['red', 'blue'].flatMap(side => Object.keys(TW_RED).flatMap(lane => TW_RED[lane].map(([x, y], i) => ({ id: `${side}_${lane}${i + 1}`, side, lane, x: side === 'red' ? x : y, y: side === 'red' ? y : x }))));
+const TW_RED = { top: [[42, 13], [62, 13], [78, 13]], mid: [[58, 42], [67, 33], [74, 26]], bot: [[87, 58], [87, 38], [87, 22]] };   // Rot: T1 außen, T2 innen, T3 Inhibitor
+const NEX_RED = [[82, 16], [84, 18]];                                                                                          // 2 Nexus-Türme je Team
+const TOWER_LIST = ['red', 'blue'].flatMap(side => {   // Blau = Rot gespiegelt an der Hauptdiagonale: 11 + 11 = 22 Türme
+  const sw = ([x, y]) => (side === 'red' ? [x, y] : [y, x]);
+  return [
+    ...Object.keys(TW_RED).flatMap(lane => TW_RED[lane].map((q, i) => { const [x, y] = sw(q); return { id: `${side}_${lane}${i + 1}`, side, lane, x, y }; })),
+    ...NEX_RED.map((q, i) => { const [x, y] = sw(q); return { id: `${side}_nex${i + 1}`, side, lane: 'nex', x, y, nexus: true }; }),
+  ];
+});
+const TOWER_BY_ID = Object.fromEntries(TOWER_LIST.map(t => [t.id, t]));
 const TW_LANES = { Toplane: 'top', Jungle: 'mid', Midlane: 'mid', Botlane: 'bot', Support: 'bot' };
 const fallTower = (tw, side, lane) => {
   for (const l of [lane, 'mid', 'top', 'bot'].filter((x, i, a) => a.indexOf(x) === i)) for (let n = 1; n <= 3; n++) { const id = `${side}_${l}${n}`; if (!tw[side].includes(id)) return { ...tw, [side]: [...tw[side], id] }; }
@@ -4453,10 +4461,10 @@ function applyTowers(tw, ev, ok, role, phase) {
   const fall = e.tw || (ok ? (/TURM/.test(e.obj || '') && !/PLATES/.test(e.obj || '') ? (/TAUSCH/.test(e.obj) ? 'both' : 'red') : null) : (phase >= 3 || (phase === 2 && (e.ek || 0) >= 2) ? 'blue' : null));
   if (fall === 'red' || fall === 'both') t = fallTower(t, 'red', lane);
   if (fall === 'blue' || fall === 'both') t = fallTower(t, 'blue', lane);
-  if (ok && /NEXUS/.test(e.obj || '')) t = { ...t, red: [...t.red, 'red_nexus'] };
+  if (ok && /NEXUS/.test(e.obj || '')) t = { ...t, red: [...new Set([...t.red, 'red_nex1', 'red_nex2'])] };
   return t;
 }
-const LANE_PTS = { top: [[7, 93], [7, 7], [93, 7]], mid: [[7, 93], [93, 7]], bot: [[7, 93], [93, 93], [93, 7]] };
+const LANE_PTS = { top: [[13, 86], [13, 13], [86, 13]], mid: [[14, 86], [86, 14]], bot: [[14, 87], [87, 87], [87, 14]] };   // Lanes laufen exakt durch die Turmkoordinaten; die Lane-Mitte liegt auf der Flusslinie (x = y)
 const lanePoint = (lane, s) => {
   const pts = LANE_PTS[lane], seg = pts.slice(1).map((q, i) => Math.hypot(q[0] - pts[i][0], q[1] - pts[i][1])), tot = seg.reduce((a, b) => a + b, 0);
   let d = Math.max(0, Math.min(1, s)) * tot;
@@ -4473,25 +4481,21 @@ const laneS = (lane, x, y) => {
   });
   return best[1];
 };
+const lanePose = (lane, s) => { const a = lanePoint(lane, s - 0.004), b = lanePoint(lane, s + 0.004), l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, p = lanePoint(lane, s); return [p[0], p[1], -(b[1] - a[1]) / l, (b[0] - a[0]) / l]; };
 const laneLen = lane => { const pts = LANE_PTS[lane]; return pts.slice(1).reduce((a, q, i) => a + Math.hypot(q[0] - pts[i][0], q[1] - pts[i][1]), 0); };
 const T_S = {};   // T_S[Team][Lane] = Lane-Position von T1, T2, T3
 ['red', 'blue'].forEach(sd => { T_S[sd] = {}; Object.keys(TW_RED).forEach(l => { T_S[sd][l] = TOWER_LIST.filter(t => t.side === sd && t.lane === l).sort((a, b) => a.id.localeCompare(b.id)).map(t => laneS(l, t.x, t.y)); }); });
 // Welche Türme sieht man? Fokus-Lane: T1/T2 prominent; andere Lanes nur T1 gedämpft; Nexus als Anker; zerstörte bleiben als blasse Marke
-const towerTier = (t, lane, dead) => {
-  if (t.nexus) return 'context';
-  const n = +t.id.slice(-1);
-  if (t.lane === lane && n <= 2) return 'prominent';
-  if (dead || n === 1) return 'context';
-  return null;
-};
+const towerTier = (t, lane) => (t.lane === lane && +t.id.slice(-1) <= 2 ? 'prominent' : 'context');
 // Wellen-Muster auf der aktiven Lane: Position der blauen und roten Minions (Anteil entlang der Lane)
 function waveDots(kind, lane) {
-  const rs = T_S.red[lane][0], bs = T_S.blue[lane][0], d = [], add = (side, s) => d.push({ side, s });
-  if (kind === 'WAVE_CRASH_ENEMY') { [0, 1, 2, 3].forEach(i => add('blue', rs - 0.035 - i * 0.02)); [0, 1].forEach(i => add('red', rs - 0.012 + i * 0.012)); }   // blaue Welle an der Turmkante, rote sterben darunter
-  else if (kind === 'WAVE_CRASH_ALLY') { [0, 1, 2, 3].forEach(i => add('red', bs + 0.035 + i * 0.02)); [0, 1].forEach(i => add('blue', bs + 0.012 - i * 0.012)); }
-  else if (kind === 'WAVE_FREEZE_ALLY') { const L = laneLen(lane); [0, 1, 2].forEach(i => add('blue', bs + (11 + i * 2) / L)); [0, 1, 2].forEach(i => add('red', bs + (16 + i * 2) / L)); }   // eingefroren knapp außerhalb der Turmreichweite
-  else if (kind === 'SLOW_PUSH') { [0, 1, 2, 3].forEach(i => add('blue', 0.44 - i * 0.02)); [0, 1].forEach(i => add('red', 0.48 + i * 0.02)); }              // große blaue Welle schiebt Richtung Fluss
-  else { [0, 1, 2].forEach(i => add('blue', 0.48 - i * 0.022)); [0, 1, 2].forEach(i => add('red', 0.52 + i * 0.022)); }                                      // NEUTRAL: Wellen treffen sich in der Lane-Mitte
+  const rs = T_S.red[lane][0], bs = T_S.blue[lane][0], L = laneLen(lane), d = [];
+  const wave = (side, s0, step, n) => { for (let i = 0; i < n; i++) d.push({ side, s: s0 + step * i, melee: i < Math.ceil(n / 2) }); };   // vorne Nahkämpfer, hinten Fernkämpfer
+  if (kind === 'WAVE_CRASH_ENEMY') { wave('blue', rs - 0.004, -0.008, 4); wave('red', rs + 0.004, 0.008, 3); }         // blaue Welle direkt am Gegner-T1, rote Minions sterben darunter
+  else if (kind === 'WAVE_CRASH_ALLY') { wave('red', bs + 0.004, 0.008, 4); wave('blue', bs - 0.004, -0.008, 3); }
+  else if (kind === 'WAVE_FREEZE_ALLY') { wave('blue', bs + 10 / L, -0.8 / L, 3); wave('red', bs + 12 / L, 0.8 / L, 3); }   // 8 bis 10 Karteneinheiten vor dem eigenen T1, außerhalb der Turmreichweite
+  else if (kind === 'SLOW_PUSH') { wave('blue', 0.62, -0.007, 4); wave('red', 0.68, 0.009, 3); }                       // dichte blaue Gruppe im vorderen Lane-Abschnitt
+  else { wave('blue', 0.494, -0.008, 3); wave('red', 0.506, 0.008, 3); }                                                // NEUTRAL: treffen sich auf der Flusslinie
   return d;
 }
 // Jedes Szenario legt die Welle passend zu seinem Text fest: Schlüssel "Phase:Variante[:Zustand/Rolle]" -> Muster[@Lane]
@@ -4507,6 +4511,27 @@ function waveFor(key, phase, state, role) {
   const v = WAVE_SCENE[`${phase}:${key}:${phase === 1 ? role : state}`] || WAVE_SCENE[`${phase}:${key}`] || 'NEUTRAL';
   const [kind, lane] = v.split('@');
   return { kind, lane: lane || TW_LANES[role] || 'mid' };
+}
+// Stilisierte Minion-Sprites: Nahkämpfer = Helm mit Hörnern, Fernkämpfer = Kapuze mit leuchtenden Augen
+function MinionSprite({ x, y, side, melee, s, ...rest }) {
+  const col = side === 'blue' ? '#60a5fa' : '#f87171', dark = '#0b1220', eye = side === 'blue' ? '#fde68a' : '#fbcfe8';
+  return (
+    <g transform={`translate(${x} ${y}) scale(${s})`} data-minion={melee ? 'melee' : 'caster'} opacity=".95" {...rest}>
+      {melee ? (
+        <>
+          <path d="M-1.1 -0.45 L-1.95 -1.5 L-0.7 -1.0 Z M1.1 -0.45 L1.95 -1.5 L0.7 -1.0 Z" fill="#e5e7eb" stroke={dark} strokeWidth=".22" />
+          <path d="M-1.15 0.9 V-0.1 Q-1.15 -1.25 0 -1.25 Q1.15 -1.25 1.15 -0.1 V0.9 Z" fill={col} stroke={dark} strokeWidth=".25" />
+          <rect x="-0.7" y="-0.1" width="1.4" height="0.35" fill={dark} />
+        </>
+      ) : (
+        <>
+          <path d="M0 -1.6 Q1.35 -0.4 1.2 0.9 H-1.2 Q-1.35 -0.4 0 -1.6 Z" fill={col} stroke={dark} strokeWidth=".25" />
+          <ellipse cx="0" cy="0.15" rx="0.55" ry="0.5" fill={dark} />
+          <circle cx="-0.2" cy="0.12" r="0.12" fill={eye} /><circle cx="0.2" cy="0.12" r="0.12" fill={eye} />
+        </>
+      )}
+    </g>
+  );
 }
 const MARKER_COLOR = { hero: '#3b82f6', enemy: '#ef4444', objective: '#C89B3C', fog: '#94a3b8' };
 const Minimap = ({ markers = [], champion, role, showLabels = false, result = null, fx = null, focus = null, full = false, onToggleView, towers = null, wave = null }) => {
@@ -4587,25 +4612,25 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
             <rect width="100" height="100" fill="#010A13" fillOpacity=".18" />
             <rect width="100" height="100" fill={`url(#vig-${uid})`} />
             <rect x=".4" y=".4" width="99.2" height="99.2" fill="none" stroke="#C89B3C" strokeOpacity=".65" strokeWidth=".8" />
-            {/* Türme: kleine Hextech-Punkte (Blau mit goldenem, Rot mit rotem Ring). Fokus-Lane: T1/T2 prominent, sonst nur T1 gedämpft, zerstörte verblassen auf 25 % */}
+            {/* 22 Türme als kleine Hextech-Obelisken: Blau goldener Kern mit azurblauem Glanz, Rot rubinroter Kern mit purpurnem Glanz. Fokus-Lane T1/T2 prominent, zerstörte grau mit 20 % Deckkraft */}
             <g data-towers={wv.lane} aria-hidden="true">
-              {[...TOWER_LIST, { id: 'blue_nexus', side: 'blue', x: 8, y: 92, nexus: true }, { id: 'red_nexus', side: 'red', x: 92, y: 8, nexus: true }].map(t => {
-                const dead = !!towers && towers[t.side].includes(t.id), tier = towerTier(t, wv.lane, dead);
-                if (!tier) return null;
-                const rr = (t.nexus ? 3.6 : tier === 'prominent' ? 3.3 : 2.3) * u, ring = t.side === 'blue' ? '#C89B3C' : '#E84057', core = t.side === 'blue' ? '#60a5fa' : '#f87171';
+              {TOWER_LIST.map(t => {
+                const dead = !!towers && towers[t.side].includes(t.id), tier = towerTier(t, wv.lane), ts = 1.45 * u, blue = t.side === 'blue';
+                const body = dead ? '#9ca3af' : blue ? '#E0B552' : '#D6104F', edge = dead ? '#4b5563' : blue ? '#7a5a14' : '#5b0c2b';
                 return (
-                  <g key={t.id} data-tower={t.id} data-alive={dead ? 'false' : 'true'} data-tier={tier} opacity={dead ? 0.25 : tier === 'prominent' ? 1 : 0.45}>
-                    <circle cx={t.x} cy={t.y} r={rr} fill="#0A1428" stroke={ring} strokeWidth={0.9 * u} />
-                    <circle cx={t.x} cy={t.y} r={rr * 0.45} fill={core} />
+                  <g key={t.id} data-tower={t.id} data-alive={dead ? 'false' : 'true'} data-tier={tier} opacity={dead ? 0.2 : tier === 'prominent' ? 1 : 0.6} transform={`translate(${t.x} ${t.y})`}>
+                    {!dead && <circle r={1.9 * ts} fill={blue ? '#38bdf8' : '#a855f7'} opacity=".3" data-glow="true" />}
+                    <path d={`M0 ${-1.9 * ts} L${0.75 * ts} ${-0.7 * ts} V${1.1 * ts} H${-0.75 * ts} V${-0.7 * ts} Z`} fill={body} stroke={edge} strokeWidth=".2" data-core="true" />
+                    {!dead && <path d={`M0 ${-1.3 * ts} L${0.3 * ts} ${-0.5 * ts} V${0.5 * ts} H${-0.3 * ts} V${-0.5 * ts} Z`} fill={blue ? '#FFF3C4' : '#FF8FB1'} opacity=".7" />}
                   </g>
                 );
               })}
             </g>
-            {/* Minion-Welle auf der aktiven Lane: Position passend zum Szenariotext */}
+            {/* Minion-Wellen als Sprites (Nahkämpfer mit Hörnerhelm, Fernkämpfer mit Kapuze) in Formationen von 3 bis 4 */}
             <g data-waves={wv.kind} data-wave-lane={wv.lane} aria-hidden="true">
               {waveDots(wv.kind, wv.lane).map((d, i) => {
-                const [x, y] = lanePoint(wv.lane, d.s), j = (i % 2 ? 0.7 : -0.7) * u * 1.4;
-                return <circle key={i} data-wave={`${d.side}_${wv.lane}`} cx={x + j} cy={y - j} r={1.8 * u} fill={d.side === 'blue' ? '#93c5fd' : '#fca5a5'} stroke={d.side === 'blue' ? '#1e3a8a' : '#7f1d1d'} strokeWidth=".18" opacity=".9" />;
+                const [x, y, nx, ny] = lanePose(wv.lane, d.s), off = (i % 2 ? 0.9 : -0.9) * Math.max(u, 0.35) * 1.3;
+                return <MinionSprite key={i} x={x + nx * off} y={y + ny * off} side={d.side} melee={d.melee} s={1.15 * u} data-wave={`${d.side}_${wv.lane}`} />;
               })}
             </g>
             {markers.filter(m => !m.isPlayer && (m.type === 'fog' || m.type === 'objective')).map((m, i) => {
@@ -5048,7 +5073,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
           onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMap(); } }}
           className="relative h-36 shrink-0 rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13] cursor-pointer transition hover:border-[#0AC8B9]">
           <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} result={pick ? (ok ? 'good' : 'bad') : null} fx={fx}
-                   focus={focus} full={full} onToggleView={toggleFull} towers={hudTowers} wave={scenario.wave} />
+                   focus={focus} full={full} onToggleView={toggleFull} towers={hudTowers || scenario.towers || null} wave={scenario.wave} />
           <span className="pointer-events-none absolute top-1.5 right-1.5 rounded-md bg-black/40 p-1 text-white/80"><Icon n="zoom" size={16} /></span>
         </div>
 
@@ -5128,7 +5153,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
           </div>
           <div role="status" className="rounded-md border border-[#C89B3C]/50 bg-[#C89B3C]/10 px-2 py-1 text-center text-xs font-semibold text-[#C89B3C]">⏸️ Taktik-Analyse (Timer pausiert)</div>
           <div className="w-full max-w-[380px] aspect-square mx-auto rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13]">
-            <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} showLabels focus={focus} full={full} onToggleView={toggleFull} towers={hudTowers} wave={scenario.wave} />
+            <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} showLabels focus={focus} full={full} onToggleView={toggleFull} towers={hudTowers || scenario.towers || null} wave={scenario.wave} />
           </div>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
             {[['hero', 'Du / Team'], ['enemy', 'Gegner'], ['objective', 'Objective'], ['fog', 'Ungesichtet']].map(([t, l]) => (
@@ -5289,7 +5314,7 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
           <div className="flex items-center gap-3">
             <div className="relative flex h-[56px] w-[56px] shrink-0 items-center justify-center">
               {promoted && <span className="rankglow absolute inset-0 rounded-full bg-yellow-400/50 blur-lg" aria-hidden="true" />}
-              <span className="relative [@media(min-height:800px)]:scale-125"><RankIcon tier={tierOf(to.step)} size={56} /></span>
+              <span className="relative [@media(min-height:800px)]:scale-125"><RankEmblem tier={tierOf(to.step)} size={56} className="w-14 h-14" /></span>
             </div>
             <div className="min-w-0 flex-1 text-left leading-tight">
               <div className="text-base font-bold"><span className={cls}>{rankName(to.step)}</span> <span className="block font-normal tabular-nums text-slate-400">({to.lp} LP)</span></div>
@@ -5637,7 +5662,7 @@ function Friends({ friends, selfName, onAdd, onRemove }) {
       {friends.length === 0 && <div className="rounded-lg border border-dashed border-[#C89B3C]/40 p-3 text-center text-sm text-slate-500">Noch keine Freunde. Füge oben einen Beschwörernamen hinzu.</div>}
       {friends.map(f => (
         <div key={f.name} className="flex items-center gap-3 rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankIcon tier={tierOf(f.step)} size={22} /></span>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankEmblem tier={tierOf(f.step)} size={22} /></span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5"><span aria-hidden="true">{STATUS[f.status].emoji}</span><span className="truncate font-semibold">{f.name}</span></div>
             <div className="text-xs text-gray-400">{rankName(f.step)} · {f.lp} LP · {STATUS[f.status].label}</div>
@@ -5758,7 +5783,7 @@ function Requests({ requests, onAccept, onDecline }) {
       {requests.map(r => (
         <div key={r.name} className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 p-3">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankIcon tier={tierOf(r.step)} size={22} /></span>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankEmblem tier={tierOf(r.step)} size={22} /></span>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5"><span aria-hidden="true">{STATUS[r.status].emoji}</span><span className="truncate font-semibold">{r.name}</span></div>
               <div className="text-xs text-gray-400">{rankName(r.step)} · {r.lp} LP · {STATUS[r.status].label}</div>
@@ -5930,7 +5955,7 @@ function Leaderboard({ rank, profile, friends }) {
       {tab === 'global' ? (
         <>
           <div className="flex items-center gap-2 my-1">
-            <RankIcon tier={tierOf(rank.step)} size={26} />
+            <RankEmblem tier={tierOf(rank.step)} size={26} />
             <div className="font-serif font-bold text-lg">{rankName(rank.step)} Leaderboard</div>
           </div>
           <div className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2 text-sm text-gray-300 mb-1">
@@ -5965,7 +5990,7 @@ function Leaderboard({ rank, profile, friends }) {
           {crew.map((r, i) => (
             <div key={r.name} ref={r.me ? meRef : null} className={rowCls(r.me)}>
               <Pos n={i + 1} />
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankIcon tier={tierOf(r.step)} size={20} /></span>
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankEmblem tier={tierOf(r.step)} size={20} /></span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span aria-label={STATUS[r.status].label}>{STATUS[r.status].emoji}</span>
@@ -6049,7 +6074,7 @@ const PLAYSTYLE = {
   SPLIT: '1-3-1 mit Sidelane-Druck: Cross-Map-Play, bei dem ein Splitpusher Gegner bindet und der Rest dem 5v5 ausweicht.',
 };
 // Analyse der 5 gegnerischen Champions -> Kern-Frage, Antworten und Coaching-Feedback mit den konkreten Champions
-function analyzeMatchup(lu) {
+function analyzeMatchupRaw(lu) {
   const red = lu.red, blue = lu.blue;
   const dp = damageProfile(red);
   const cc = ROLES_ORDER.map(r => red[r]).filter(isHardCc);
@@ -6113,6 +6138,12 @@ function analyzeMatchup(lu) {
     question: `Das Schadensprofil der Gegner ist nicht extrem (${dp.apCount} von 5 mit magischem Schaden), es gibt keine Draft-Schwäche, die ihr mit einem einzelnen Item-Pfad bestrafen könnt. Welcher Makro-Plan passt zur Hauptstärke eures Teams?`,
     options: Object.keys(ARCH).map(k => O(k, PLAYSTYLE[k])),
     explain: { ok: `Richtig gedacht! ${tagged} geben euch ${ARCH[win].label}: ${ARCH[win].why}. Der passende Plan: ${PLAYSTYLE[win]} Die Gegner setzen auf ${ARCH[enemyArch].label}.`, bad } };
+}
+function analyzeMatchup(lu) {
+  const r = analyzeMatchupRaw(lu);
+  if (r.kind === 'ARCH') return r;
+  const texts = balanceTexts(r.options.map(o => ({ text: o.label, ok: o.key === r.correct })), 'plan' + r.kind + r.options[0].key, true);   // nur ganze Sätze anhängen: der vorgegebene Wortlaut bleibt unverändert am Anfang
+  return { ...r, options: r.options.map((o, i) => ({ ...o, label: texts[i] })) };
 }
 // Frisches 5v5-Lineup für jedes Match: eigenes Team (Blau) und Gegner (Rot), 10 verschiedene Champions.
 // Der gegnerische Draft ist je nach Match Heavy AP, Full AD, CC-Lockdown oder ausgeglichen (klassischer Archetyp).
@@ -6488,6 +6519,117 @@ const MV2X = {
         [[50, 50, 'hero', 'ME'], [84, 26, 'hero', 'A1'], [88, 12, 'objective', 'Gegner-Inhibitor'], [58, 44, 'enemy', 'E_TOP']], { ok: { tk: 2, ek: 1, a: 1, gold: 1000, obj: 'INHIBITOR ZERSTÖRT!' }, bad: { tk: 1, ek: 3, d: 1, gold: -1000, death: true } })],
   },
 };
+/* ---- Längen-Balance: richtige und falsche Antworten sind gleich lang (±~15 %), falsche sind ausformulierte Alternativzüge ---- */
+const BAL_CL = {
+  agg: [', um den Gegnern sofort die Initiative zu nehmen', ', damit die Gegner keine Zeit zum Reagieren bekommen', ', weil ein früher Zug meist mehr bringt als Abwarten', ', denn jede Sekunde Zögern überlässt den Gegnern das Tempo', ', um das Tempo hochzuhalten und den Vorteil sofort in Gold zu verwandeln', ', weil die Gegner gerade wichtige Fähigkeiten auf Abklingzeit haben könnten', ', damit die Gegner zuerst Fähigkeiten verbrauchen und ihr direkt nachsetzen könnt', ', um den Druck auf der Karte zu erhöhen', ', weil das Zeitfenster dafür gerade günstig ist'],
+  pas: [', um kein unnötiges Risiko einzugehen', ', weil ein sicheres Spiel selten direkt bestraft wird', ', und wartet darauf, dass die Gegner den ersten Zug machen', ', damit nichts schiefgehen kann und der Stand stabil bleibt', ', denn Geduld zahlt sich in solchen Lagen oft aus', ', um erst zu sehen, wie die Gegner reagieren, bevor ihr euch festlegt', ', weil ihr so keine Ressourcen verschwendet', ', um die eigene Position nicht unnötig zu gefährden'],
+  neu: [', weil das der kürzeste Weg zum Ziel ist', ', da dieser Zug in vielen ähnlichen Lagen gut funktioniert', ', weil ihr damit Gold und Tempo gewinnt', ', um den Moment zu nutzen, bevor sich die Lage ändert', ', weil es mit wenig Aufwand verbunden ist', ', damit ihr flexibel bleibt, falls sich etwas ändert', ', weil die Gegner damit am wenigsten rechnen', ', und behaltet dabei die Karte und die Positionen im Blick', ', sodass ihr auf jede Reaktion der Gegner vorbereitet seid', ', um den nächsten Schritt in Ruhe planen zu können', ', damit die Lage übersichtlich bleibt', ', ohne Zeit zu verlieren', ', so schnell wie möglich', ', wie es die Lage verlangt', ', ohne lange Vorbereitung', ', um nichts zu verschenken', ', soweit es die Lage erlaubt', ', ganz ohne Umwege'],
+};
+const BAL_SE = {
+  agg: [' Damit bleibt die Initiative bei euch, und die Gegner müssen zuerst reagieren.', ' So wird der Druck auf der Karte sofort spürbar.', ' Das hält das Tempo hoch und verhindert, dass die Gegner sich sammeln.', ' Wer jetzt zögert, gibt dem Gegner Zeit, sich neu aufzustellen.'],
+  pas: [' So nehmt ihr den Druck aus der Situation und bleibt flexibel für den nächsten Schritt.', ' Das schützt eure Ressourcen und lässt die Gegner den ersten Schritt machen.', ' Ein ruhiges Vorgehen ist hier die verlässlichste Wahl.', ' Das hält das Risiko niedrig, solange die Lage unklar ist.'],
+  neu: [' Der Plan ist leicht zu kommunizieren und für alle nachvollziehbar.', ' Der Zug spart Zeit und hält die Optionen für später offen.', ' Damit bleibt das Team beweglich und kann sich auf die nächste Situation einstellen.', ' Wichtig ist dabei, dass alle denselben Zeitpunkt und dieselbe Absicht kennen.', ' So behaltet ihr den Überblick über die Karte und die nächsten Objectives.', ' Danach lässt sich die Lage neu bewerten und der nächste Schritt planen.', ' Das spart Zeit.', ' Das ist schnell umgesetzt.', ' So bleibt der Plan einfach.', ' Das hält die Optionen offen.', ' Damit bleibt das Team flexibel.', ' Die Lage bleibt so übersichtlich.', ' Alle können dem Plan leicht folgen.'],
+};
+const balStance = t => (/(liegen lassen|abwart|warten|aufgeben|abgeben|ignorier|\bnicht\b|\bkein|zurück|recall|passiv|stehen bleiben|farmen|meiden|verlassen)/i.test(t) ? 'pas' : /(angreif|tauch|dive|sofort|frontal|allein|stürm|erzwing|laufen|starten|jag|rein|forcier)/i.test(t) ? 'agg' : 'neu');
+const balRnd = seed => { let h = hashStr(String(seed)); h = Math.imul(h ^ (h >>> 16), 0x45d9f3b); h = Math.imul(h ^ (h >>> 16), 0x45d9f3b); h ^= h >>> 16; return ((h >>> 0) % 1000) / 1000; };   // gut gemischter Pseudo-Zufall
+// Hängt passende Begründungs-Klauseln/-Sätze an einen Text, bis er die Ziellänge erreicht (sentOnly: nur ganze Sätze, damit keine Klauseln gestapelt werden)
+function balPad(text, target, pools, seed, used, sentOnly) {
+  const m = text.match(/[.!?]+\s*$/), end = m ? m[0].trim() : '.', base = text.replace(/[.!?]+\s*$/, '');
+  const C = sentOnly ? [] : pools.cl.filter(c => !used.has(c)), S = pools.se.filter(c => !used.has(c)), cand = [];
+  const push = (str, parts) => cand.push({ str, parts, d: Math.abs(str.length - target) });
+  C.forEach(c => push(base + c + end, [c]));
+  S.forEach(x => push(base + end + x, [x]));
+  C.forEach(c => S.forEach(x => push(base + c + end + x, [c, x])));
+  S.forEach((x, i) => S.forEach((y, j) => { if (i < j) push(base + end + x + y, [x, y]); }));
+  C.forEach(c => S.forEach((x, j) => S.forEach((y, k) => { if (j < k) push(base + c + end + x + y, [c, x, y]); })));
+  cand.sort((a, b) => a.d - b.d);
+  const top = cand.slice(0, 3).filter(c => c.d < Math.abs(text.length - target)), pick = top[Math.floor(balRnd(seed + 'pick') * top.length)];   // nur auffüllen, wenn es dem Ziel näherkommt
+  if (!pick) return text;
+  pick.parts.forEach(x => used.add(x));
+  return pick.str;
+}
+// items: [{ text, ok }]  ->  neue Texte in derselben Reihenfolge. Alle Optionen nutzen dieselben Pools, auch die richtige wird oft erweitert:
+// Zusatzklauseln verraten damit nicht die falsche Antwort, und keine Option ist ein kurzer Alibi-Einzeiler (Mindestlänge ca. 85 Zeichen).
+function balanceTexts(items, seed, keepSentence) {
+  const out = items.map(o => o.text), used = new Set(), padded = new Set(), n = items.length;
+  const pools = o => { const st = balStance(o.text); return { cl: [...BAL_CL[st], ...BAL_CL.neu], se: [...BAL_SE[st], ...BAL_SE.neu] }; };
+  const ci = items.findIndex(o => o.ok);
+  if (ci >= 0 && out[ci].length < 120 && balRnd(seed + '|c') < 0.85) { out[ci] = balPad(out[ci], out[ci].length + 40 + Math.round(balRnd(seed + '|d') * 40), pools(items[ci]), seed + '|c', used, !!keepSentence); padded.add(ci); }
+  // Rangverteilung: jede Option (auch die richtige) bekommt zufällig einen Längen-Slot (95 % bis 105 %), damit die Länge nichts verrät
+  const slots = Array.from({ length: n }, (_, i) => (n === 1 ? 1 : 0.95 + (0.1 * i) / (n - 1))).map((v, i) => [balRnd(`${seed}|slot${i}`), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+  const base = Math.max(...out.map((t, i) => t.length / slots[i]), 88 / 1.05);   // kleinste Bezugslänge, bei der keine Option über ihrem Slot liegt
+  for (let pass = 0; pass < 3; pass++) {
+    items.forEach((o, i) => {
+      const target = Math.round(base * slots[i]);
+      if (target - out[i].length < 12) return;
+      out[i] = balPad(out[i], target, pools(o), `${seed}|${i}|${pass}`, used, padded.has(i) || !!keepSentence);
+      padded.add(i);
+    });
+  }
+  return out;
+}
+function balanceScenario(sc) {
+  if (sc.balanced || !sc.options || sc.options.length < 2) return;
+  const parts = sc.options.map(o => { const m = o.label.match(/^([ABC]:\s*)(.*)$/s); return { pre: m ? m[1] : '', text: m ? m[2] : o.label, ok: o.lpChange > 0 }; });
+  const texts = balanceTexts(parts, sc.id);
+  sc.options.forEach((o, i) => { o.label = parts[i].pre + texts[i]; });
+  sc.balanced = true;
+}
+function balanceTpl(t) {
+  if (t.balanced) return;
+  const items = [{ text: t.good[0], ok: true }, ...t.bad.map(b => ({ text: b[0], ok: false }))];
+  const texts = balanceTexts(items, t.ctx.slice(0, 40) + t.good[0].slice(0, 20));
+  t.good[0] = texts[0]; t.bad.forEach((b, i) => { b[0] = texts[i + 1]; });
+  t.balanced = true;
+}
+
+/* ---- Daten-Audit beim Start: Marker auf echte Turmkoordinaten, Pit-Kämpfe im Pit, Wellen/Türme aus dem Text, Längen balanciert ---- */
+function snapTowerMarker(m) {
+  const L = m.label || '';
+  if (m.type !== 'objective' || !/turm|inhibitor/i.test(L)) return m;
+  const side = /eigen|euer|unser/i.test(L) ? 'blue' : /gegner/i.test(L) ? 'red' : null;
+  const tier = /T([123])/.test(L) ? +L.match(/T([123])/)[1] : /inhibitor/i.test(L) ? 3 : /inner/i.test(L) ? 2 : /äußer/i.test(L) ? 1 : null;
+  const lane = /top/i.test(L) ? 'top' : /mid/i.test(L) ? 'mid' : /bot/i.test(L) ? 'bot' : null;
+  const ok = (t, useLane, useTier) => !t.nexus && (!side || t.side === side) && (!useLane || !lane || t.lane === lane) && (!useTier || !tier || +t.id.slice(-1) === tier);
+  let c = TOWER_LIST.filter(t => ok(t, true, true));
+  if (!c.length) c = TOWER_LIST.filter(t => ok(t, false, true));
+  if (!c.length) c = TOWER_LIST.filter(t => ok(t, false, false));
+  const t = c.sort((a, b) => Math.hypot(a.x - m.x, a.y - m.y) - Math.hypot(b.x - m.x, b.y - m.y))[0];
+  return t ? { ...m, x: t.x, y: t.y, towerId: t.id } : m;
+}
+// Pit-Kämpfe: Helden und Gegner stehen im Pit, wenn der Text dort spielt
+const MARKER_FIX = {
+  lo_diamond_elder_execute: [[60, 66], [57, 70], [71, 64], [73, 69], [66, 70]],
+  lo_master_bot_elder_safety: [[58, 66], [56, 70], [71, 64], [73, 69], [66, 70]],
+  lo_master_bot_zhonya_window: [[59, 66], [57, 70], [71, 64], [73, 69], [66, 70]],
+  jng_dia_05: [[41, 40], [38, 41], [33, 30], [36, 35], [38, 38]],
+  bot_eisen_05: [[38, 37], [36, 40], [33, 30], [80, 30]],
+};
+function waveFromText(sc) {
+  const lane = TW_LANES[sc.role] || 'mid', t = ((sc.context || '').match(/[^.!?]*[Ww]elle[^.!?]*[.!?]/g) || []).join(' '), all = sc.context || '';
+  let kind = 'NEUTRAL';
+  if (/Freeze|eingefroren|einfrier/.test(all)) kind = 'WAVE_FREEZE_ALLY';
+  else if (/(gegnerische|feindliche|ihre|seine) \w*[Ww]elle[^.!?]*(euren?|deinen?) (Turm|T[123]|Inhibitor)|[Ww]elle trifft bald euren Turm|schiebt gerade zu euch zurück|[Ww]elle steht neben deinem Turm/.test(t)) kind = 'WAVE_CRASH_ALLY';
+  else if (/gecrasht|crasht|in den gegnerischen Turm|(vor|am|an) (dem )?(gegnerischen|ihrem|seinem) (Turm|T[123])|an ihrem T[123]/.test(t)) kind = 'WAVE_CRASH_ENEMY';
+  else if (/Slow Push|slow push|langsam pushen|(groß|größer)[^.!?]*schiebt|schiebt auf (den gegnerischen Turm|die Gegner) zu/.test(t)) kind = 'SLOW_PUSH';
+  return { kind, lane };
+}
+function towersFromText(sc) {
+  const m = (sc.context || '').match(/Euer Team hat den (äußeren |inneren )?(Top|Mid|Bot)-(Turm|Inhibitor) zerstört/);
+  if (!m) return null;
+  const lane = m[2].toLowerCase(), n = /Inhibitor/.test(m[3]) ? 3 : /inneren/.test(m[1] || '') ? 2 : 1;
+  return { blue: [], red: [`red_${lane}${n}`] };
+}
+RUNS.forEach(sc => {
+  balanceScenario(sc);
+  if (MARKER_FIX[sc.id]) sc.markers = sc.markers.map((m, i) => (MARKER_FIX[sc.id][i] ? { ...m, x: MARKER_FIX[sc.id][i][0], y: MARKER_FIX[sc.id][i][1] } : m));
+  sc.markers = sc.markers.map(snapTowerMarker);
+  sc.wave = waveFromText(sc);
+  const tw = towersFromText(sc); if (tw) sc.towers = tw;
+});
+{ const ks = Object.keys(PLAYSTYLE), ps = balanceTexts(ks.map(k => ({ text: PLAYSTYLE[k], ok: false })), 'archplan'); ks.forEach((k, i) => { PLAYSTYLE[k] = ps[i]; }); }   // Makro-Pläne des Gameplans gleich lang
+Object.values(MV2).forEach(g => Object.values(g).forEach(balanceTpl));
+Object.values(MV2X).forEach(g => Object.values(g).forEach(arr => arr.forEach(balanceTpl)));
 const mv2Variants = (phase, state, role) => [phase === 1 ? MV2[1][role] : MV2[phase][state], ...((MV2X[phase] || {})[phase === 1 ? role : state] || [])];
 const mv2Template = (phase, state, role, slot = 0) => { const v = mv2Variants(phase, state, role); return v[(slot || 0) % v.length]; };
 // Vielfalts-Garantie: pro Champion, Rolle und Phase wird nie dieselbe Variante wie im letzten Match gespielt (Gedächtnis im Browser)
@@ -6549,7 +6691,7 @@ function buildMv2Scenario(tpl, ctx, phase, state) {
     const slot = /^(ME|OPP|A\d|E_[A-Z]+)$/.test(s);
     const mk = { x, y, type, label: slot ? m[s] : s };
     if (slot) { if (s === 'ME') mk.isPlayer = true; else mk.champion = m[s]; }
-    return mk;
+    return snapTowerMarker(mk);
   });
   const enemies = ROLES_ORDER.map(r => ctx.lineup.red[r]);
   const victim = phase === 1 ? m.OPP : enemies[(phase + 1) % 5];
@@ -6669,22 +6811,33 @@ function IconPicker({ current, onPick, onClose }) {
   );
 }
 // Offizielle Rang-Wappen (CommunityDragon) mit Fallback-Kette: zweiter Pfad, dann iron.png, dann das eingebaute Wappen
-const emblemSrc = t => [
-  `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/${t}.png`,
-  `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/ranked-emblem/emblem-${t}.png`,
-  'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png',
-];
+const RANK_EMBLEMS = {
+  iron: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png',
+  bronze: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/bronze.png',
+  silver: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/silver.png',
+  gold: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/gold.png',
+  platinum: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png',
+  emerald: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/emerald.png',
+  diamond: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png',
+  master: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png',
+  grandmaster: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png',
+  challenger: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png',
+};
+const EMBLEM_GLOW = { iron: '#9ca3af', bronze: '#b45309', silver: '#cbd5e1', gold: '#facc15', platinum: '#5eead4', emerald: '#10b981', diamond: '#60a5fa', master: '#a855f7', grandmaster: '#ef4444', challenger: '#fef08a' };
+// Robuste Tier-Erkennung: Zeichenkette ("Gold 4") oder Objekt mit tier/name; unbekannt = iron
+const emblemKey = x => { const k = ((typeof x === 'string' ? x : (x && (x.tier || x.name))) || 'iron').toLowerCase().split(' ')[0]; return RANK_EMBLEMS[k] ? k : 'iron'; };
+const emblemSrc = t => [RANK_EMBLEMS[emblemKey(t)], `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/ranked-emblem/emblem-${emblemKey(t)}.png`, RANK_EMBLEMS.iron];
 function RankEmblem({ tier, size = 64, glow = false, className = '' }) {
-  const t = tier.toLowerCase(), srcs = emblemSrc(t);
+  const t = emblemKey(tier), srcs = emblemSrc(tier), name = Object.keys(RANK_ICON).find(n => n.toLowerCase() === t) || 'Iron';
   const [i, setI] = useState(0);
   useEffect(() => { setI(0); }, [t]);
-  const cls = RANK_ICON[tier].cls;
+  const cls = RANK_ICON[name].cls;
   return (
     <span className={`relative inline-flex shrink-0 items-center justify-center ${cls} ${className}`} style={{ width: size, height: size }} data-emblem={t}>
       {glow && <span className="rankglow absolute inset-0 rounded-full bg-current opacity-40 blur-xl" aria-hidden="true" />}
       {i < srcs.length
-        ? <img src={srcs[i]} alt={`Rang-Wappen ${tier}`} width={size} height={size} className="relative object-contain drop-shadow-[0_0_8px_currentColor]" onError={() => setI(n => n + 1)} />
-        : <span className="relative" data-emblem-fallback="true"><RankIcon tier={tier} size={Math.round(size * 0.8)} /></span>}
+        ? <img src={srcs[i]} alt={`Rang-Wappen ${name}`} width={size} height={size} className="relative h-full w-full object-contain" style={{ filter: `drop-shadow(0 0 7px ${EMBLEM_GLOW[t]})` }} onError={() => setI(n => n + 1)} />
+        : <span className="relative" data-emblem-fallback="true"><RankIcon tier={name} size={Math.round(size * 0.8)} /></span>}
     </span>
   );
 }
