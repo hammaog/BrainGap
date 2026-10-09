@@ -17,6 +17,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root { --bg:#0A1428; --panel:rgba(1,10,19,.8); --line:rgba(200,155,60,.4); --track:#1E2D4A; --gold:#C89B3C; --teal:#0AC8B9; --red:#E84057; box-sizing:border-box;
           padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
@@ -4156,6 +4157,54 @@ const resetAllData = () => {
 };
 const writeSave = d => { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) {} };
 
+/* ===================== Supabase: Cloud-Save und globale Rangliste ===================== */
+// Der publishable Key ist für den Einsatz im Browser gedacht. Ohne geladenes SDK (offline, blockiert) bleibt alles wie bisher im localStorage (Gast-Modus).
+const SUPABASE_URL = 'https://lpumfwuaururbzabqldx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_93e1xE6M51j3sBABijC9nA_BXJCD9mI';
+const sb = (() => { try { return window.supabase && window.supabase.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null; } catch (e) { console.error('BrainGap: Supabase nicht verfügbar', e); return null; } })();
+const SAVED_AT_KEY = 'braingap.savedAt', SYNCED_AT_KEY = 'braingap.syncedAt';   // letzte lokale Änderung / letzter erfolgreicher Abgleich mit der Cloud
+const lsNum = k => { try { return Number(localStorage.getItem(k)) || 0; } catch (e) { return 0; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, String(v)); } catch (e) {} };
+let CLOUD_NO_SAVE_DATA = false;   // true, wenn die Spalte profiles.save_data fehlt: dann werden nur die Kernspalten synchronisiert
+const missingSaveCol = err => !!err && /save_data/.test(`${err.message || ''} ${err.details || ''}`);
+const errText = e => String((e && (e.message || e.error_description)) || e || 'Unbekannter Fehler').slice(0, 140);
+// Kernspalten der Tabelle profiles. lp = Gesamt-Rangpunkte (Rangstufe x 100 + LP), damit "order by lp" über alle Ränge hinweg korrekt sortiert
+const cloudCore = save => { const step = save.rank.step; return { username: save.profile.name, rank_tier: rankName(step), lp: step * 100 + save.rank.lp, account_level: xpLevel(save.xp || 0).level, summoner_icon: save.profile.icon != null ? save.profile.icon : ICON_IDS[0] }; };
+async function cloudFetchProfile(userId) {
+  const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+// Aktualisiert die eigene Zeile (update ... eq id); gibt es sie noch nicht, wird sie angelegt
+async function cloudPushSave(userId, save, savedAt) {
+  const core = cloudCore(save), body = () => (CLOUD_NO_SAVE_DATA ? core : { ...core, save_data: { ...save, savedAt } });
+  let r = await sb.from('profiles').update(body()).eq('id', userId).select('id');
+  if (r.error && !CLOUD_NO_SAVE_DATA && missingSaveCol(r.error)) { CLOUD_NO_SAVE_DATA = true; r = await sb.from('profiles').update(body()).eq('id', userId).select('id'); }
+  if (r.error) throw r.error;
+  if (!r.data || r.data.length === 0) {
+    let ins = await sb.from('profiles').insert({ id: userId, ...body() });
+    if (ins.error && !CLOUD_NO_SAVE_DATA && missingSaveCol(ins.error)) { CLOUD_NO_SAVE_DATA = true; ins = await sb.from('profiles').insert({ id: userId, ...body() }); }
+    if (ins.error) throw ins.error;
+  }
+  return true;
+}
+async function cloudTop20() {
+  const { data, error } = await sb.from('profiles').select('id, username, rank_tier, lp, account_level, summoner_icon').order('lp', { ascending: false }).limit(20);
+  if (error) throw error;
+  return (data || []).map(r => ({ id: r.id, name: String(r.username || 'Spieler').slice(0, 16), tier: String(r.rank_tier || 'Iron 4'), points: Number(r.lp) || 0, level: Number(r.account_level) || 1, icon: Number.isInteger(r.summoner_icon) ? r.summoner_icon : ICON_IDS[0] }));
+}
+const authError = e => {
+  const m = String((e && e.message) || ''), c = String((e && (e.code || e.status)) || '');
+  if (/invalid login credentials/i.test(m)) return 'E-Mail oder Passwort stimmt nicht.';
+  if (/already registered|already been registered/i.test(m)) return 'Diese E-Mail ist bereits registriert. Bitte logge dich ein.';
+  if (/at least|weak/i.test(m)) return 'Das Passwort braucht mindestens 6 Zeichen.';
+  if (/not confirmed/i.test(m)) return 'Bitte bestätige zuerst deine E-Mail (Link im Postfach).';
+  if (/rate limit|too many/i.test(m) || c === '429') return 'Zu viele Versuche. Bitte warte kurz und probiere es erneut.';
+  if (/network|fetch|failed/i.test(m)) return 'Keine Verbindung zum Server. Prüfe dein Netz und versuche es erneut.';
+  if (/valid email|invalid.*email/i.test(m)) return 'Bitte gib eine gültige E-Mail-Adresse ein.';
+  return 'Das hat nicht geklappt: ' + errText(e);
+};
+
 /* ---------- Modi ---------- */
 const fmt = n => (n > 0 ? '+' : '') + n;
 const ROLE_FILTERS = [['Alle', null], ['Top', 'Toplane'], ['Mid', 'Midlane'], ['Jungle', 'Jungle'], ['Bot', 'Botlane'], ['Support', 'Support']];
@@ -5577,7 +5626,7 @@ function MainPicker({ role, champion, onRole, onChampion, mastery }) {
   );
 }
 
-function Onboarding({ onDone }) {
+function Onboarding({ onDone, onAuth }) {
   const [name, setName] = useState('');
   const [tier, setTier] = useState(0);                 // Standard: Iron
   const [div, setDiv] = useState(4);                   // Standard: IV
@@ -5634,6 +5683,7 @@ function Onboarding({ onDone }) {
       {error && <div role="alert" className="rounded-lg border border-red-500/80 bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-300">{error}</div>}
       <button type="button" onClick={handleCreateAccount}
         className="mt-1 rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13] shadow-[0_0_14px_rgba(200,155,60,.45)] active:scale-[.98]">Account erstellen</button>
+      {onAuth && <button type="button" onClick={onAuth} data-onboarding-login="true" className="rounded-xl border border-[#C89B3C]/60 py-2.5 text-sm font-bold text-[#C89B3C] transition hover:border-[#0AC8B9]">☁️ Schon einen Account? Einloggen</button>}
       <button type="button" onClick={resetAllData} className="self-center text-xs text-slate-500 underline hover:text-slate-300">Daten zurücksetzen &amp; neu starten</button>
     </div>
   );
@@ -5894,7 +5944,7 @@ function StatusNote({ profile, onChange }) {
     </div>
   );
 }
-function Profile({ profile, rank, mastery, friends, requests, history, xp, shieldUntil, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout, onIcon, onShieldAd }) {
+function Profile({ profile, rank, mastery, friends, requests, history, xp, shieldUntil, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout, onIcon, onShieldAd, cloud, onAuth, onCloudLogout, onCloudRetry }) {
   const [tab, setTab] = useState('me');
   const [confirm, setConfirm] = useState(false);
   const tier = tierOf(rank.step);
@@ -5941,6 +5991,7 @@ function Profile({ profile, rank, mastery, friends, requests, history, xp, shiel
           <Divider />
           <div className="flex flex-col gap-3" data-settings="true">
             <div className="font-serif font-bold">Einstellungen</div>
+            <CloudCard cloud={cloud || { user: null, status: 'off' }} available={!!sb} onLogin={onAuth} onLogout={onCloudLogout} onRetry={onCloudRetry} />
             <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />
             <div>
               <label htmlFor="pname" className="mb-1.5 block text-sm font-semibold">Account-Name</label>
@@ -5972,8 +6023,143 @@ function PlayerCount() {
   );
 }
 
-function Leaderboard({ rank, profile, friends }) {
+function AuthModal({ onSubmit, onClose }) {
+  const [tab, setTab] = useState('login');   // login | signup
+  const [email, setEmail] = useState(''), [pw, setPw] = useState('');
+  const [busy, setBusy] = useState(false), [err, setErr] = useState(''), [info, setInfo] = useState('');
+  const go = async () => {
+    if (busy) return;
+    setErr(''); setInfo('');
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) { setErr('Bitte gib eine gültige E-Mail-Adresse ein.'); return; }
+    if (pw.length < 6) { setErr('Das Passwort braucht mindestens 6 Zeichen.'); return; }
+    setBusy(true);
+    let r; try { r = await onSubmit(tab, email.trim(), pw); } catch (e) { r = { ok: false, error: authError(e) }; }
+    setBusy(false);
+    if (!r.ok) { setErr(r.error); return; }
+    if (r.confirm) { setInfo('Fast geschafft: Wir haben dir eine E-Mail geschickt. Bestätige sie und logge dich danach ein.'); setTab('login'); setPw(''); return; }
+    onClose();
+  };
+  const key = e => { if (e.key === 'Enter') { e.preventDefault(); go(); } };
+  const tabCls = on => `flex-1 rounded-lg border px-3 py-2 text-sm font-bold transition ${on ? 'border-[#C89B3C] bg-[#C89B3C] text-[#010A13]' : 'border-[#C89B3C]/40 text-slate-300 hover:border-[#0AC8B9]'}`;
+  return (
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Cloud-Account" data-auth="true">
+      <div className="fade-in flex w-full max-w-[360px] flex-col gap-3 overflow-y-auto rounded-2xl border-2 border-[#C89B3C] bg-[#06111F] p-5 shadow-[0_0_30px_rgba(200,155,60,.35)]" style={{ maxHeight: 'calc(100dvh - 32px)' }}>
+        <div className="font-serif text-xl font-black text-[#C89B3C]">☁️ Cloud-Account</div>
+        <p className="text-sm leading-snug text-slate-300">Sichere deinen Fortschritt, spiele auf jedem Gerät weiter und erscheine in der globalen Rangliste.</p>
+        <div className="flex gap-2" role="tablist" aria-label="Anmelden oder registrieren">
+          <button type="button" role="tab" aria-selected={tab === 'login'} onClick={() => { setTab('login'); setErr(''); }} className={tabCls(tab === 'login')}>Einloggen</button>
+          <button type="button" role="tab" aria-selected={tab === 'signup'} onClick={() => { setTab('signup'); setErr(''); setInfo(''); }} className={tabCls(tab === 'signup')}>Registrieren</button>
+        </div>
+        <div>
+          <label htmlFor="auth-email" className="mb-1 block text-xs font-semibold text-slate-400">E-Mail</label>
+          <input id="auth-email" type="email" inputMode="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={key} placeholder="du@beispiel.de" className={`w-full ${fieldCls}`} />
+        </div>
+        <div>
+          <label htmlFor="auth-pw" className="mb-1 block text-xs font-semibold text-slate-400">Passwort (mind. 6 Zeichen)</label>
+          <input id="auth-pw" type="password" autoComplete={tab === 'login' ? 'current-password' : 'new-password'} value={pw} onChange={e => setPw(e.target.value)} onKeyDown={key} className={`w-full ${fieldCls}`} />
+        </div>
+        {info && <div role="status" className="rounded-lg border border-[#0AC8B9]/60 bg-[#0AC8B9]/10 px-3 py-2 text-sm text-[#0AC8B9]">{info}</div>}
+        {err && <div role="alert" className="rounded-lg border border-red-500/80 bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-300">{err}</div>}
+        <button type="button" onClick={go} disabled={busy} data-auth-submit="true" className="rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 py-3 font-serif font-extrabold text-slate-950 shadow-md transition active:scale-[.98] disabled:opacity-60">{busy ? 'Einen Moment …' : tab === 'login' ? 'Einloggen' : 'Account erstellen'}</button>
+        <button type="button" onClick={onClose} data-auth-guest="true" className="rounded-xl border border-[#C89B3C]/50 py-2.5 text-sm font-bold text-[#C89B3C] transition hover:border-[#0AC8B9]">Als Gast spielen</button>
+        <div className="text-center text-[11px] leading-snug text-slate-500">Gäste speichern ihren Fortschritt nur auf diesem Gerät. Niemand muss sich anmelden.</div>
+      </div>
+    </div>
+  );
+}
+// Gerät und Cloud haben unterschiedliche Spielstände: der Spieler entscheidet, nichts wird stillschweigend überschrieben
+function ConflictModal({ local, cloudSave, onCloud, onLocal }) {
+  const sum = sv => `${rankName(sv.rank.step)} · ${sv.rank.lp} LP · Lv. ${xpLevel(sv.xp || 0).level} · ${sv.matchCount || 0} Matches`;
+  return (
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Spielstand wählen" data-conflict="true">
+      <div className="fade-in flex w-full max-w-[360px] flex-col gap-3 rounded-2xl border-2 border-[#C89B3C] bg-[#06111F] p-5 shadow-[0_0_30px_rgba(200,155,60,.35)]">
+        <div className="font-serif text-xl font-black text-[#C89B3C]">Welcher Spielstand zählt?</div>
+        <p className="text-sm text-slate-300">Auf diesem Gerät und in deinem Account liegen unterschiedliche Spielstände.</p>
+        <button type="button" onClick={onCloud} data-conflict-cloud="true" className="rounded-xl border border-[#0AC8B9]/70 bg-[#0AC8B9]/10 p-3 text-left"><div className="text-sm font-bold text-[#0AC8B9]">☁️ Cloud-Spielstand laden</div><div className="text-xs text-slate-300">{sum(cloudSave)}</div></button>
+        <button type="button" onClick={onLocal} data-conflict-local="true" className="rounded-xl border border-[#C89B3C]/70 bg-[#C89B3C]/10 p-3 text-left"><div className="text-sm font-bold text-[#C89B3C]">📱 Dieses Gerät behalten</div><div className="text-xs text-slate-300">{sum(local)}</div><div className="text-[11px] text-slate-500">Überschreibt den Cloud-Spielstand.</div></button>
+      </div>
+    </div>
+  );
+}
+function CloudCard({ cloud, available, onLogin, onLogout, onRetry }) {
+  const box = 'rounded-xl border px-3 py-2.5 text-xs leading-snug';
+  if (!available) return <div className={`${box} border-[#C89B3C]/30 text-slate-400`} data-cloud="off">☁️ Cloud nicht erreichbar: Du spielst als Gast, dein Fortschritt bleibt auf diesem Gerät.</div>;
+  if (!cloud.user) return (
+    <div className={`${box} flex items-center gap-2.5 border-[#C89B3C]/40 bg-[#010A13]/80 text-slate-300`} data-cloud="guest">
+      <div className="flex-1">☁️ Gast-Modus: Dein Fortschritt liegt nur auf diesem Gerät. Mit Account sicherst du ihn und erscheinst in der globalen Rangliste.</div>
+      <button type="button" onClick={onLogin} className="shrink-0 rounded-lg bg-[#C89B3C] px-3 py-1.5 font-bold text-[#010A13]">Einloggen</button>
+    </div>
+  );
+  const L = { loading: ['☁️ Lade Spielstand …', 'border-amber-400/50 text-amber-300'], syncing: ['☁️ Synchronisiere …', 'border-[#0AC8B9]/50 text-[#0AC8B9]'], synced: ['☁️ Account synchronisiert', 'border-emerald-500/60 bg-emerald-500/10 text-emerald-400'], error: ['⚠️ Sync fehlgeschlagen', 'border-red-500/60 bg-red-500/10 text-red-300'] }[cloud.status] || ['☁️ Verbunden', 'border-emerald-500/60 text-emerald-400'];
+  return (
+    <div className={`${box} flex flex-col gap-1.5 ${L[1]}`} data-cloud={cloud.status} role="status">
+      <div className="text-sm font-bold">{L[0]}</div>
+      <div className="truncate text-slate-400">{cloud.user.email}</div>
+      {cloud.status === 'error' && <div className="text-red-300">{cloud.msg} Neuer Versuch folgt automatisch.</div>}
+      {cloud.status === 'synced' && cloud.msg === 'core' && <div className="text-amber-300">Gesichert werden Rang, Level und Icon. Für den vollen Spielstand fehlt in der Datenbank die Spalte save_data.</div>}
+      <div className="flex gap-2">
+        {cloud.status === 'error' && <button type="button" onClick={onRetry} className="rounded-lg border border-red-400/60 px-3 py-1.5 font-bold text-red-200">Erneut versuchen</button>}
+        <button type="button" onClick={onLogout} data-cloud-logout="true" className="rounded-lg border border-[#C89B3C]/60 px-3 py-1.5 font-bold text-[#C89B3C]">Abmelden</button>
+      </div>
+    </div>
+  );
+}
+// Echte globale Top 20 aus Supabase; bei weniger als 5 Spielern füllen dezente Beispielspieler die Liste auf
+function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh }) {
+  const meId = cloud.user && cloud.user.id, real = remote.rows;
+  const fill = real.length < 5 ? buildLeaderboard(rank, profile.name).filter(r => !r.me).slice(0, 20 - real.length) : [];
+  const meIdx = real.findIndex(r => r.id === meId);
+  const podium = ['text-yellow-400', 'text-slate-300', 'text-amber-700'];
+  const Pos = ({ n }) => <div className={`w-7 text-center font-extrabold tabular-nums ${n <= 3 ? podium[n - 1] : 'text-slate-400'}`}>{n}</div>;
+  const box = 'rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2 text-sm text-gray-300 mb-1';
+  return (
+    <div className="flex flex-col gap-1.5" data-live-board="true">
+      <div className="flex items-center gap-2 my-1">
+        <div className="flex-1 font-serif font-bold text-lg">🌍 Globale Rangliste · Top 20</div>
+        <button type="button" onClick={onRefresh} aria-label="Rangliste aktualisieren" className="rounded-lg border border-[#C89B3C]/50 px-2.5 py-1 text-xs font-bold text-[#C89B3C]">↻</button>
+      </div>
+      <div className={box} data-live-info="true">
+        {remote.status === 'loading' ? 'Lade Rangliste …'
+          : !cloud.user ? <>Als Gast erscheinst du nicht in der Rangliste. <button type="button" onClick={onAuth} className="font-bold text-[#C89B3C] underline">Einloggen</button>, um mitzuspielen.</>
+          : meIdx >= 0 ? <>Dein Platz: <span className="font-bold text-white">{meIdx + 1}</span> von {real.length}.</>
+          : 'Du bist noch nicht in den Top 20. Spiele weiter, bis dein Rang hier erscheint.'}
+      </div>
+      {real.map((r, i) => {
+        const me = r.id === meId;
+        return (
+          <div key={r.id || i} data-live-row="true" className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${me ? 'border-2 border-[#C89B3C] bg-[#1A2A48] shadow-[0_0_14px_rgba(200,155,60,.35)]' : 'bg-[var(--panel)] border-[var(--line)]'}`}>
+            <Pos n={i + 1} />
+            <SummonerIcon id={r.icon} name={r.name} className="w-9 h-9" label={r.name} />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2"><span className={`truncate ${me ? 'font-extrabold text-white' : 'font-semibold'}`}>{r.name}</span>{me && <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}</div>
+              <div className="flex items-center gap-1.5 truncate text-xs text-gray-400"><RankEmblem tier={r.tier} size={16} />{r.tier} · Lv. {r.level}</div>
+            </div>
+            <div className={`font-bold tabular-nums ${me ? 'text-[#C89B3C]' : ''}`}>{r.points % 100} LP</div>
+          </div>
+        );
+      })}
+      {fill.length > 0 && <div className="mt-1 text-center text-[11px] text-slate-500" data-fill-note="true">{real.length === 0 ? 'Noch keine registrierten Spieler.' : 'Noch wenig registrierte Spieler.'} Beispielspieler füllen die Liste auf.</div>}
+      {fill.map((r, i) => (
+        <div key={'f' + r.pos} data-fill-row="true" className="flex items-center gap-3 rounded-lg border bg-[var(--panel)] border-[var(--line)] px-3 py-2 opacity-50">
+          <Pos n={real.length + i + 1} />
+          <div className="min-w-0 flex-1 truncate font-semibold">{r.name}</div>
+          <div className="font-bold tabular-nums">{r.lp} LP</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+function Leaderboard({ rank, profile, friends, cloud, onAuth }) {
   const [tab, setTab] = useState('global');
+  const [remote, setRemote] = useState({ status: sb ? 'loading' : 'off', rows: [] });
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    if (!sb || tab !== 'global') return;
+    let alive = true;
+    setRemote(r => ({ ...r, status: 'loading' }));
+    cloudTop20().then(rows => { if (alive) setRemote({ status: 'ok', rows }); }).catch(e => { console.warn('BrainGap: Rangliste nicht ladbar', e); if (alive) setRemote({ status: 'error', rows: [] }); });
+    return () => { alive = false; };
+  }, [tab, tick, cloud && cloud.status]);
   const rows = buildLeaderboard(rank, profile.name);
   const meIdx = rows.findIndex(r => r.me);
   const target = meIdx > 0 ? rows[meIdx - 1] : null;      // Bot direkt über dir
@@ -5996,11 +6182,14 @@ function Leaderboard({ rank, profile, friends }) {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-1.5">
-      <PlayerCount />
+      {!(sb && remote.status === 'ok') && <PlayerCount />}   {/* simulierter Zähler nur im Gast-/Offline-Modus; die Live-Liste zeigt echte Spieler */}
       <div className="my-1"><TabBar tabs={[['global', 'Global'], ['friends', 'Freunde']]} value={tab} onChange={setTab} /></div>
 
-      {tab === 'global' ? (
+      {tab === 'global' && sb && remote.status !== 'error' && remote.status !== 'off' ? (
+        <LiveBoard remote={remote} profile={profile} rank={rank} cloud={cloud || { user: null }} onAuth={onAuth} onRefresh={() => setTick(n => n + 1)} />
+      ) : tab === 'global' ? (
         <>
+          {sb && remote.status === 'error' && <div className="rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-200" data-live-error="true">Die Live-Rangliste ist gerade nicht erreichbar. Du siehst Beispielspieler.</div>}
           <div className="flex items-center gap-2 my-1">
             <RankEmblem tier={tierOf(rank.step)} size={26} />
             <div className="font-serif font-bold text-lg">{rankName(rank.step)} Leaderboard</div>
@@ -7272,8 +7461,99 @@ function App() {
   const xpRef = useRef(xp), questsRef = useRef(quests), matchRef = useRef(matchCount);
   xpRef.current = xp; questsRef.current = quests; matchRef.current = matchCount;
 
-  useEffect(() => { writeSave({ rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd }); },
-    [rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd]);
+  const SAVE_DEPS = [rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd];
+  const buildSave = () => ({ rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd });
+  const saveRef = useRef(null); saveRef.current = buildSave();
+  // ----- Cloud (Supabase) -----
+  const [cloud, setCloud] = useState({ user: null, status: sb ? 'guest' : 'off', msg: '' });   // off | guest | loading | synced | syncing | error
+  const [ready, setReady] = useState(false), [authOpen, setAuthOpen] = useState(false), [conflict, setConflict] = useState(null), [retry, setRetry] = useState(0);
+  const cloudUid = useRef(null), stamp = useRef(null), firstWrite = useRef(true), lastPushed = useRef(''), pushing = useRef(false), again = useRef(false), retryTimer = useRef(null);
+  useEffect(() => {
+    writeSave(buildSave());
+    const had = lsNum(SAVED_AT_KEY);
+    if (firstWrite.current && had) { firstWrite.current = false; return; }   // reines Laden ist keine Änderung
+    firstWrite.current = false;
+    lsSet(SAVED_AT_KEY, stamp.current != null ? stamp.current : Date.now()); stamp.current = null;
+  }, SAVE_DEPS);
+  // Cloud-Spielstand in den App-State übernehmen
+  const applyCloud = (cs, cloudAt) => {
+    stamp.current = cloudAt; lsSet(SYNCED_AT_KEY, cloudAt);
+    setRank(cs.rank); setHistory(cs.history); setHearts(Number.isInteger(cs.hearts) ? Math.max(0, Math.min(MAX_HEARTS, cs.hearts)) : MAX_HEARTS); setProfile(cs.profile);
+    setFriends(cs.friends || [MOCK_FRIEND]); setRequests(cs.requests || MOCK_REQUESTS); setRecent(cs.recent || []); setMastery(normalizeMastery(cs.mastery));
+    setXp(cs.xp); xpRef.current = cs.xp; setQuests(freshQuests(cs.quests)); setSrs(cs.srs || {}); setMatchCount(cs.matchCount); setShieldUntil(cs.shieldUntil); setSinceAd(cs.sinceAd);
+    setNotice('☁️ Cloud-Spielstand geladen');
+  };
+  // Nach dem Login: Cloud-Profil laden und mit dem Gerät abgleichen (nichts wird stillschweigend überschrieben)
+  const handleSignedIn = async user => {
+    if (!sb || !user || cloudUid.current === user.id) return;
+    cloudUid.current = user.id; setReady(false);
+    setCloud({ user: { id: user.id, email: user.email || '' }, status: 'loading', msg: '' });
+    try {
+      const row = await cloudFetchProfile(user.id);
+      const cs = row && row.save_data && typeof row.save_data === 'object' ? sanitizeSave(row.save_data) : null;
+      const cloudAt = cs ? Number(row.save_data.savedAt) || 0 : 0, cloudHas = !!(cs && cs.profile);
+      const local = saveRef.current, hasLocal = !!local.profile, localAt = lsNum(SAVED_AT_KEY), syncedAt = lsNum(SYNCED_AT_KEY);
+      const finish = () => { setCloud(c => ({ ...c, status: 'synced' })); setReady(true); };
+      if (cloudHas && !hasLocal) { applyCloud(cs, cloudAt); finish(); }
+      else if (!cloudHas) { finish(); }                                   // nichts in der Cloud: das Gerät lädt hoch (Sync-Effekt)
+      else {
+        const localDirty = localAt > syncedAt, cloudNewer = cloudAt > syncedAt;
+        if (!localDirty && cloudNewer) { applyCloud(cs, cloudAt); finish(); }
+        else if (localDirty && !cloudNewer) { finish(); }
+        else if (!localDirty && !cloudNewer) { finish(); }
+        else { setConflict({ cloudSave: cs, cloudAt }); setCloud(c => ({ ...c, status: 'loading' })); }
+      }
+    } catch (e) {
+      console.warn('BrainGap: Cloud-Laden fehlgeschlagen', e);
+      cloudUid.current = null; setCloud(c => ({ ...c, status: 'error', msg: errText(e) }));
+    }
+  };
+  const chooseCloud = () => { const c = conflict; setConflict(null); if (c) { applyCloud(c.cloudSave, c.cloudAt); setCloud(x => ({ ...x, status: 'synced' })); setReady(true); } };
+  const chooseLocal = () => { setConflict(null); lsSet(SAVED_AT_KEY, Date.now()); lastPushed.current = ''; setCloud(x => ({ ...x, status: 'synced' })); setReady(true); setRetry(n => n + 1); };
+  const authSubmit = async (kind, email, password) => {
+    if (!sb) return { ok: false, error: 'Die Cloud ist gerade nicht erreichbar.' };
+    if (kind === 'login') {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) return { ok: false, error: authError(error) };
+      await handleSignedIn(data.user); return { ok: true };
+    }
+    const { data, error } = await sb.auth.signUp({ email, password, options: { data: { username: profile ? profile.name : 'Beschwörer' } } });
+    if (error) return { ok: false, error: authError(error) };
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) return { ok: false, error: 'Diese E-Mail ist bereits registriert. Bitte logge dich ein.' };
+    if (!data.session) return { ok: true, confirm: true };                // E-Mail-Bestätigung nötig
+    await handleSignedIn(data.user); return { ok: true };                 // legt über den Sync die Zeile in public.profiles an
+  };
+  const cloudSignOut = async () => {
+    try { if (sb) await sb.auth.signOut(); } catch (e) { console.warn(e); }
+    cloudUid.current = null; setReady(false); setConflict(null); lastPushed.current = '';
+    setCloud({ user: null, status: sb ? 'guest' : 'off', msg: '' });
+    setNotice('Abgemeldet. Dein Fortschritt bleibt auf diesem Gerät gespeichert.');
+  };
+  useEffect(() => {
+    if (!sb) return;
+    let alive = true;
+    sb.auth.getSession().then(({ data }) => { if (alive && data && data.session) handleSignedIn(data.session.user); }).catch(e => console.warn(e));
+    const sub = sb.auth.onAuthStateChange((ev, session) => {
+      if (ev === 'SIGNED_OUT') { cloudUid.current = null; setReady(false); setCloud({ user: null, status: 'guest', msg: '' }); }
+      else if (session && session.user) setTimeout(() => { if (alive) handleSignedIn(session.user); }, 0);   // nie direkt in der Callback-Funktion auf Supabase warten
+    });
+    return () => { alive = false; clearTimeout(retryTimer.current); try { sub && sub.data && sub.data.subscription && sub.data.subscription.unsubscribe(); } catch (e) {} };
+  }, []);
+  // Sync: gebündelt (1,5 s nach der letzten Änderung) bei Match, Rang, XP, Icon, Mastery und allem anderen im Spielstand
+  useEffect(() => {
+    if (!sb || !cloud.user || !ready || !profile) return;
+    const uid = cloud.user.id;
+    const t = setTimeout(async () => {
+      if (pushing.current) { again.current = true; return; }
+      const save = saveRef.current, ser = JSON.stringify(save), ts = lsNum(SAVED_AT_KEY) || Date.now();
+      if (ser === lastPushed.current) return;
+      pushing.current = true; setCloud(c => ({ ...c, status: 'syncing' }));
+      try { await cloudPushSave(uid, save, ts); lastPushed.current = ser; lsSet(SYNCED_AT_KEY, ts); setCloud(c => ({ ...c, status: 'synced', msg: CLOUD_NO_SAVE_DATA ? 'core' : '' })); }
+      catch (e) { console.warn('BrainGap: Sync fehlgeschlagen', e); setCloud(c => ({ ...c, status: 'error', msg: errText(e) })); clearTimeout(retryTimer.current); retryTimer.current = setTimeout(() => setRetry(n => n + 1), 20000); }
+      finally { pushing.current = false; if (again.current) { again.current = false; setRetry(n => n + 1); } }
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [...SAVE_DEPS, cloud.user, ready, retry]);
 
   // Jeder Button klickt (Optionen ausgenommen: sie lösen lock_in aus)
   useEffect(() => {
@@ -7512,7 +7792,7 @@ function App() {
   };
   const declineRequest = name => setRequests(l => l.filter(x => x.name !== name));
   const updateProfile = patch => setProfile(p => ({ ...p, ...patch }));
-  const logout = () => { setProfile(null); setScreen('home'); };
+  const logout = () => { if (sb && cloud.user) cloudSignOut(); setProfile(null); setScreen('home'); };   // löscht nur das lokale Profil; der Cloud-Account bleibt bestehen
 
   const reset = () => { setRank({ step: profile && profile.startStep ? profile.startStep : 0, lp: 0 }); setHistory([]); setHearts(MAX_HEARTS); };
 
@@ -7533,7 +7813,9 @@ function App() {
           <div className="font-serif font-extrabold tracking-wide">BrainGap<span className="text-[#C89B3C]">.gg</span></div>
         <div className="ml-auto"><SoundToggle /></div>
         </header>
-        <Onboarding onDone={register} />
+        <Onboarding onDone={register} onAuth={sb ? () => setAuthOpen(true) : null} />
+        {authOpen && <AuthModal onSubmit={authSubmit} onClose={() => setAuthOpen(false)} />}
+        {conflict && <ConflictModal local={saveRef.current} cloudSave={conflict.cloudSave} onCloud={chooseCloud} onLocal={chooseLocal} />}
       </div>
     );
   }
@@ -7559,9 +7841,10 @@ function App() {
           {screen === 'home' && <Dashboard rank={rank} hearts={hearts} profile={profile} mastery={mastery} xp={xp} quests={quests} friends={friends} shieldUntil={shieldUntil}
             onDaily={playDaily} onRanked={() => setRankedOpen(true)} onPractice={() => setSetupOpen(true)} onMastery={playMastery} onInfo={setInfoMode}
             onNoHearts={() => setHeartsOpen(true)} onHeartAd={() => setAd({ kind: 'heart' })} onShieldAd={() => setAd({ kind: 'shield' })} onIcon={() => setIconOpen(true)} onReset={reset} />}
-          {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} />}
+          {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} cloud={cloud} onAuth={() => setAuthOpen(true)} />}
           {screen === 'profile' && <Profile profile={profile} rank={rank} mastery={mastery} friends={friends} history={history} xp={xp} shieldUntil={shieldUntil}
             onChange={updateProfile} onLogout={logout} onIcon={() => setIconOpen(true)} onShieldAd={() => setAd({ kind: 'shield' })}
+            cloud={cloud} onAuth={() => setAuthOpen(true)} onCloudLogout={cloudSignOut} onCloudRetry={() => setRetry(n => n + 1)}
             onAddFriend={f => setFriends(l => [...l, f])} onRemoveFriend={name => setFriends(l => l.filter(x => x.name !== name))}
             requests={requests} onAccept={acceptRequest} onDecline={declineRequest} />}
         </div>
@@ -7596,6 +7879,8 @@ function App() {
       {lvlUp && <SummonerLevelUp level={lvlUp.level} onClose={() => setLvlUp(null)} />}
       {ad && <AdModal kind={ad.kind} onDone={adDone} onClose={() => setAd(null)} />}
       {gloss && <GlossSheet k={gloss} onClose={() => setGloss(null)} />}
+      {authOpen && <AuthModal onSubmit={authSubmit} onClose={() => setAuthOpen(false)} />}
+      {conflict && <ConflictModal local={saveRef.current} cloudSave={conflict.cloudSave} onCloud={chooseCloud} onLocal={chooseLocal} />}
     </div>
     </GlossCtx.Provider>
   );
