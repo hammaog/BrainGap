@@ -1,14 +1,19 @@
 {
   "id": "/",
-  "name": "BrainGap - LoL Decision Trainer",
+  "name": "BrainGap.gg",
   "short_name": "BrainGap",
-  "short_name": "BrainGap",
-  "description": "Meistere Entscheidungen, Wave-Management und Makro-Taktiken in League of Legends.",
+  "description": "Trainiere League-of-Legends-Makro",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#010a13",
-  "theme_color": "#010a13",
+  "background_color": "#010A13",
+  "theme_color": "#010A13",
+  "lang": "de",
+  "categories": [
+    "education",
+    "games"
+  ],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -17,19 +22,13 @@
       "purpose": "any"
     },
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
