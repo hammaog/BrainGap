@@ -2282,7 +2282,7 @@ const RUNS = [
     ]
   },
 
-  /* ===== Szenario-Pakete lo_: Low-Elo, Jungle, Gold/Platin, Diamant/Master+ sowie neutrale Eisen-Vorlagen. Mechaniken gegen Wiki und Guides geprüft (Patch 26.x) ===== */
+  /* ===== Szenario-Pakete lo_: Low-Elo, Jungle, Gold/Platin, Diamant/Master+ sowie neutrale Vorlagen für dünne Rolle-Liga-Zellen. Mechaniken gegen Wiki und Guides geprüft (Patch 26.x) ===== */
   {
     "id": "lo_iron_mitte_aram", "gameTime": "27:30", "timeLimit": 30,
     "champion": "Garen", "role": "Toplane", "difficulty": "Eisen",
@@ -2296,9 +2296,9 @@ const RUNS = [
     "coachHint": "Wer sitzt tatenlos in der Mitte, während ein Turm fällt?",
     "context": "Du bist Garen (Top), Minute 27:30. Beide Teams stehen 5v5 in der Midlane und warten darauf, dass der andere zuerst angreift. Währenddessen reißen Super-Minions in der Toplane euren T2-Turm ein. Dein Teleport ist bereit, bei beiden Teams sind alle wichtigen Fähigkeiten bereit.",
     "options": [
-      { "label": "A: In der Mitte stehen bleiben und warten, bis die Gegner einen Fehler machen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Super-Minions zerstören den T2-Turm und marschieren weiter Richtung Inhibitor.", "Ihr verliert Map-Druck und Gold, und die Gegner müssen nie einen Fehler machen."] },
-      { "label": "B: Mit Teleport mitten in die Mitte springen und den 5v5 selbst starten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team ist nicht bereit und ihr kämpft in schlechter Position, bevor eure Abklingzeiten stehen.", "Ihr verliert den Kampf und danach auch den Turm und den Inhibitor."] },
-      { "label": "C: Mit Teleport zur Toplane gehen, die Welle kontrolliert wegräumen und rausschieben, während dein Team in der Mitte auf Distanz bleibt, die Minions clear't und sich nicht initiieren lässt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du zwingst die Gegner zu reagieren, und dein 4er-Team verliert dabei nichts." }
+      { "label": "A: Mit Teleport zur Toplane gehen, die Welle kontrolliert wegräumen und rausschieben, während dein Team in der Mitte auf Distanz bleibt, die Minions clear't und sich nicht initiieren lässt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du zwingst die Gegner zu reagieren, und dein 4er-Team verliert dabei nichts." },
+      { "label": "B: In der Mitte stehen bleiben und warten, bis die Gegner einen Fehler machen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Super-Minions zerstören den T2-Turm und marschieren weiter Richtung Inhibitor.", "Ihr verliert Map-Druck und Gold, und die Gegner müssen nie einen Fehler machen."] },
+      { "label": "C: Mit Teleport mitten in die Mitte springen und den 5v5 selbst starten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team ist nicht bereit und ihr kämpft in schlechter Position, bevor eure Abklingzeiten stehen.", "Ihr verliert den Kampf und danach auch den Turm und den Inhibitor."] }
     ]
   },
   {
@@ -2315,8 +2315,8 @@ const RUNS = [
     "context": "Du bist Ahri (Mid), Minute 32:10. Ihr habt gerade vier Gegner getötet, sie kommen erst in gut einer halben Minute zurück. Eure Midwelle steht an ihrem T2-Turm, ihre Base ist offen. Der Baron ist ebenfalls verfügbar.",
     "options": [
       { "label": "A: Zum Baron abdrehen und ihn in Ruhe machen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Baron kostet Zeit, und währenddessen laufen die Gegner wieder zu ihrer Base.", "Ihr gebt den offenen Weg zum Nexus auf und müsst danach gegen ein vollständiges Team pushen."] },
-      { "label": "B: Sofort mit allen fünf die Midlane durchpushen, Turm und Inhibitor nehmen und das Nexus beenden.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nutzt das Fenster, bevor die Gegner zurück sind, und beendet das Spiel." },
-      { "label": "C: Euch auf die Sidelanes verteilen und alle Wellen farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr steht verstreut, als die Gegner zurückkehren.", "Sie fangen euch einzeln ab und drehen das Spiel mit euren Kills."] }
+      { "label": "B: Euch auf die Sidelanes verteilen und alle Wellen farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr steht verstreut, als die Gegner zurückkehren.", "Sie fangen euch einzeln ab und drehen das Spiel mit euren Kills."] },
+      { "label": "C: Sofort mit allen fünf die Midlane durchpushen, Turm und Inhibitor nehmen und das Nexus beenden.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nutzt das Fenster, bevor die Gegner zurück sind, und beendet das Spiel." }
     ]
   },
   {
@@ -2332,8 +2332,8 @@ const RUNS = [
     "coachHint": "Wo stehen die Gegner, wenn du den Baron startest?",
     "context": "Du bist Thresh (Support), Minute 26:40. Der Baron ist seit 20:00 verfügbar, euer Team will ihn starten. Die Gegner wurden zuletzt im dunklen Fluss gesehen. Du hast ein Control Ward (75 Gold) und dein Sweeper-Trinket bereit.",
     "options": [
-      { "label": "A: Mit dem Sweeper die Umgebung des Pits räumen, ein Control Ward am Pit-Eingang setzen und erst dann den Baron starten.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr seht den Engage kommen und der Baron ist sicher." },
-      { "label": "B: Den Baron sofort starten, Vision brauchen wir nicht.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner warten unentdeckt im Busch und greifen an, als der Baron halb leer ist.", "Ihr verliert den Kampf und der Baron geht an die Gegner."] },
+      { "label": "A: Den Baron sofort starten, Vision brauchen wir nicht.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner warten unentdeckt im Busch und greifen an, als der Baron halb leer ist.", "Ihr verliert den Kampf und der Baron geht an die Gegner."] },
+      { "label": "B: Mit dem Sweeper die Umgebung des Pits räumen, ein Control Ward am Pit-Eingang setzen und erst dann den Baron starten.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr seht den Engage kommen und der Baron ist sicher." },
       { "label": "C: Das Control Ward mitten in den Pit legen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Es deckt weder den Eingang noch den Busch ab, in dem die Gegner stehen.", "Ihr werdet trotzdem überrascht und verliert Baron und Kampf."] }
     ]
   },
@@ -2350,9 +2350,9 @@ const RUNS = [
     "coachHint": "Wer hat zuerst Level 2, und was heißt das für einen All-in?",
     "context": "Du bist Leona (Support) mit Caitlyn gegen Ashe und Lulu, Minute 02:05. Ihr habt die erste Welle und die ersten drei Nahkampf-Minions der zweiten Welle erledigt (in der Botlane sind das die 9 Minions für Level 2). Ihr seid Level 2, die Gegner noch Level 1, dein E und Q sind bereit.",
     "options": [
-      { "label": "A: Hinter den eigenen Minions stehen bleiben und zuschauen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner erreichen kurz danach ihr Level 2 und euer Vorsprung ist weg.", "Du hast den stärksten Moment der Lane verschenkt und die Gegner gewinnen Lane-Priorität."] },
-      { "label": "B: Allein mit E hineinspringen, ohne dass Caitlyn nachsetzt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Schaden von Caitlyn überlebt Ashe, und Lulu verwandelt dich.", "Du stirbst, und die Gegner gewinnen Gold und Level-Vorsprung."] },
-      { "label": "C: Sofort vorlaufen: mit E auf Ashe springen, Q-Stun setzen und gemeinsam mit Caitlyn den All-in erzwingen, bevor die Gegner Level 2 erreichen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nutzt das Level-Fenster, bevor die Gegner nachziehen." }
+      { "label": "A: Sofort vorlaufen: mit E auf Ashe springen, Q-Stun setzen und gemeinsam mit Caitlyn den All-in erzwingen, bevor die Gegner Level 2 erreichen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nutzt das Level-Fenster, bevor die Gegner nachziehen." },
+      { "label": "B: Hinter den eigenen Minions stehen bleiben und zuschauen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner erreichen kurz danach ihr Level 2 und euer Vorsprung ist weg.", "Du hast den stärksten Moment der Lane verschenkt und die Gegner gewinnen Lane-Priorität."] },
+      { "label": "C: Allein mit E hineinspringen, ohne dass Caitlyn nachsetzt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Schaden von Caitlyn überlebt Ashe, und Lulu verwandelt dich.", "Du stirbst, und die Gegner gewinnen Gold und Level-Vorsprung."] }
     ]
   },
   {
@@ -2368,8 +2368,8 @@ const RUNS = [
     "context": "Du bist Nautilus (Support) mit Ashe gegen Blitzcrank und Jinx, Minute 03:40, beide Level 3. Blitzcrank hat gerade seinen Rocket Grab in die Minions gesetzt und verfehlt. Auf Rang 1 dauert es rund 20 Sekunden, bis der Haken zurück ist. Deine Fähigkeiten sind bereit.",
     "options": [
       { "label": "A: Ängstlich hinter den Minions bleiben, obwohl sein Haken nicht bereit ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Blitzcrank bekommt seine Abklingzeit gratis zurück, ohne dass du etwas gewinnst.", "Die Gegner farmen frei und euer Fenster schließt sich nach rund 20 Sekunden."] },
-      { "label": "B: Das Fenster nutzen: vorgehen, mit Q auf Jinx oder Blitzcrank setzen und gemeinsam mit Ashe den Trade jetzt erzwingen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Haken kann Blitzcrank dich nicht bestrafen." },
-      { "label": "C: Alle Fähigkeiten blind in die Minion-Welle werfen, ohne auf Ashe zu warten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Q trifft nur Minions und deine Fähigkeiten sind verbraucht.", "Wenn der Haken zurück ist, hast du nichts mehr und musst dich zurückziehen."] }
+      { "label": "B: Alle Fähigkeiten blind in die Minion-Welle werfen, ohne auf Ashe zu warten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Q trifft nur Minions und deine Fähigkeiten sind verbraucht.", "Wenn der Haken zurück ist, hast du nichts mehr und musst dich zurückziehen."] },
+      { "label": "C: Das Fenster nutzen: vorgehen, mit Q auf Jinx oder Blitzcrank setzen und gemeinsam mit Ashe den Trade jetzt erzwingen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Haken kann Blitzcrank dich nicht bestrafen." }
     ]
   },
   {
@@ -2385,8 +2385,8 @@ const RUNS = [
     "coachHint": "Wer sieht zuerst, wenn der Drache spawnt?",
     "context": "Du bist Karma (Support), Minute 14:10. Der Drache erscheint in etwa 30 Sekunden. Du hast ein Control Ward (75 Gold) und dein Sweeper-Trinket. Die Gegner haben die Flussmündung zuletzt mit Wards abgedeckt.",
     "options": [
-      { "label": "A: Mit dem Sweeper die gegnerischen Wards in der Flussmündung räumen und dort ein Control Ward setzen, bevor der Drache spawnt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Euer Team sieht, was die Gegner tun, und sie sehen nichts." },
-      { "label": "B: Ein normales Ward direkt ins Sichtfeld der Gegner stellen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner entdecken und zerstören das Ward sofort.", "Ihr habt keine Vision und die Gegner starten den Drachen unbemerkt."] },
+      { "label": "A: Ein normales Ward direkt ins Sichtfeld der Gegner stellen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner entdecken und zerstören das Ward sofort.", "Ihr habt keine Vision und die Gegner starten den Drachen unbemerkt."] },
+      { "label": "B: Mit dem Sweeper die gegnerischen Wards in der Flussmündung räumen und dort ein Control Ward setzen, bevor der Drache spawnt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Euer Team sieht, was die Gegner tun, und sie sehen nichts." },
       { "label": "C: Das Control Ward in dein eigenes Lager legen, weil es dort sicher ist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dort liefert es keine Info über den Fluss.", "Ihr werdet am Drachen überrascht und verliert den Kampf."] }
     ]
   },
@@ -2402,9 +2402,9 @@ const RUNS = [
     "coachHint": "Wohin bounct die Welle, und wer kennt deine Position?",
     "context": "Du bist Sett (Top) gegen Renekton, Minute 04:30, Level 5. Du hast die Welle bis an ihren T1 geschoben. Der gegnerische Jungler wurde vor etwa 50 Sekunden Bot gesehen, im Fluss habt ihr keine Vision.",
     "options": [
-      { "label": "A: Die Welle komplett in den Turm schieben und tief in ihrem Gebiet stehen bleiben.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler kommt aus dem Fog und ganked dich weit weg von deinem Turm.", "Du stirbst oder verlierst Flash, die Welle bounct zu den Gegnern und sie gewinnen Top-Prio."] },
-      { "label": "B: Ohne Vision hinter Renekton in den Dschungel laufen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst allein in unbekanntes Gebiet.", "Du wirst gefangen und dein Team verliert Top-Prio und einen Spieler."] },
-      { "label": "C: Die Welle nicht weiter in den Turm drücken, sondern wieder zu dir ziehen, ein Ward im Fluss setzen und nur traden, wenn der Jungler sicher woanders ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du behältst Wellenkontrolle und gehst kein Risiko ein." }
+      { "label": "A: Die Welle nicht weiter in den Turm drücken, sondern wieder zu dir ziehen, ein Ward im Fluss setzen und nur traden, wenn der Jungler sicher woanders ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du behältst Wellenkontrolle und gehst kein Risiko ein." },
+      { "label": "B: Die Welle komplett in den Turm schieben und tief in ihrem Gebiet stehen bleiben.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler kommt aus dem Fog und ganked dich weit weg von deinem Turm.", "Du stirbst oder verlierst Flash, die Welle bounct zu den Gegnern und sie gewinnen Top-Prio."] },
+      { "label": "C: Ohne Vision hinter Renekton in den Dschungel laufen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst allein in unbekanntes Gebiet.", "Du wirst gefangen und dein Team verliert Top-Prio und einen Spieler."] }
     ]
   },
   {
@@ -2419,8 +2419,8 @@ const RUNS = [
     "context": "Du bist Lux (Mid), Minute 06:40. Der gegnerische Midlaner (Zed) ist seit einigen Sekunden von der Karte verschwunden. Deine Welle schiebt gerade nach vorn, Top und Bot haben keine Info.",
     "options": [
       { "label": "A: Weiter nach vorn farmen, weil er ja ohnehin weg ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Zed taucht aus dem Fog auf und trifft dich weit von deinem Turm entfernt.", "Du stirbst und euer Team verliert Mid-Prio und Gold."] },
-      { "label": "B: Die Welle nicht weiter pushen, einen Schritt hinter deine Vision zurückgehen und Top und Bot mit einem Ping warnen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verhinderst einen Überraschungs-Angriff und hältst dein Team informiert." },
-      { "label": "C: Ihm hinterherlaufen, um ihn zu finden.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst allein ohne Vision durch den Fluss.", "Du wirst von mehreren Gegnern gestellt und gibst einen Kill ab."] }
+      { "label": "B: Ihm hinterherlaufen, um ihn zu finden.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst allein ohne Vision durch den Fluss.", "Du wirst von mehreren Gegnern gestellt und gibst einen Kill ab."] },
+      { "label": "C: Die Welle nicht weiter pushen, einen Schritt hinter deine Vision zurückgehen und Top und Bot mit einem Ping warnen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verhinderst einen Überraschungs-Angriff und hältst dein Team informiert." }
     ]
   },
   {
@@ -2436,8 +2436,8 @@ const RUNS = [
     "coachHint": "Wen erreichst du, ohne selbst erreichbar zu sein?",
     "context": "Du bist Jinx (Bot), Minute 26:30. Teamfight am Baron-Eingang. Euer Tank Ornn steht vorn, der gegnerische Malphite ist die nächste sichere Einheit in deiner Reichweite. Hinter ihm steht Lux, die dich mit ihrer Bindung fangen könnte.",
     "options": [
-      { "label": "A: Hinter Ornn bleiben und den nächsten sicher erreichbaren Gegner (Malphite) mit Autoangriffen beschießen, bis eure Frontline hält.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du machst stetigen Schaden und bleibst für Lux unerreichbar." },
-      { "label": "B: Dich allein an der Frontline vorbeischlängeln, um sofort Lux zu erreichen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Lux' Bindung und die Frontline der Gegner erwischen dich ohne Schutz.", "Du stirbst früh und euer Team verliert seinen Hauptschaden."] },
+      { "label": "A: Dich allein an der Frontline vorbeischlängeln, um sofort Lux zu erreichen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Lux' Bindung und die Frontline der Gegner erwischen dich ohne Schutz.", "Du stirbst früh und euer Team verliert seinen Hauptschaden."] },
+      { "label": "B: Hinter Ornn bleiben und den nächsten sicher erreichbaren Gegner (Malphite) mit Autoangriffen beschießen, bis eure Frontline hält.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du machst stetigen Schaden und bleibst für Lux unerreichbar." },
       { "label": "C: Außerhalb der Reichweite bleiben und keinen Schaden machen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Eure Frontline kämpft allein ohne deinen Schaden.", "Der Kampf geht verloren, bevor du wirkst."] }
     ]
   },
@@ -2454,9 +2454,9 @@ const RUNS = [
     "coachHint": "Wer muss zuerst in den dunklen Fluss, damit er sieht?",
     "context": "Du bist Viego (Jungle), Minute 31:40. Die Gegner haben die Dragon Soul. Der Elder Dragon erscheint in etwa 30 Sekunden. Die Gegner halten sich im dunklen Fluss vor dem Pit auf.",
     "options": [
-      { "label": "A: Allein in den dunklen Fluss laufen, um die Büsche per Facecheck zu prüfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst ohne Vision in mehrere Gegner.", "Du stirbst, und ihr verliert den Elder und den Kampf in Unterzahl."] },
-      { "label": "B: Direkt in die Grube gehen und den Elder starten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner sehen jeden Schritt und greifen an, während der Elder halb leer ist.", "Ihr verliert den Kampf und der Elder-Buff geht an die Gegner."] },
-      { "label": "C: Mit Control Wards an den Engpässen Vision sichern, Abstand zum Pit halten und auf den Engage der Gegner am Pit warten.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr seht ihren Engage und kämpft zu euren Bedingungen." }
+      { "label": "A: Mit Control Wards an den Engpässen Vision sichern, Abstand zum Pit halten und auf den Engage der Gegner am Pit warten.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr seht ihren Engage und kämpft zu euren Bedingungen." },
+      { "label": "B: Allein in den dunklen Fluss laufen, um die Büsche per Facecheck zu prüfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst ohne Vision in mehrere Gegner.", "Du stirbst, und ihr verliert den Elder und den Kampf in Unterzahl."] },
+      { "label": "C: Direkt in die Grube gehen und den Elder starten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner sehen jeden Schritt und greifen an, während der Elder halb leer ist.", "Ihr verliert den Kampf und der Elder-Buff geht an die Gegner."] }
     ]
   },
   {
@@ -2472,8 +2472,8 @@ const RUNS = [
     "context": "Du bist Jinx (Bot), Minute 29:30. Der gegnerische Malphite hat vor 25 Sekunden seine Ultimate (Unstoppable Force, auf Rang 3 etwa 80 Sekunden Abklingzeit) in einem Kampf verbraucht. Euer Team ist gleich stark, und ihr könntet jetzt einen Kampf annehmen.",
     "options": [
       { "label": "A: Den Kampf meiden und warten, bis ihr mehr Gold habt.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Nach rund einer Minute ist Malphites Ultimate wieder bereit.", "Ihr verschenkt euer Fenster und kämpft später gegen den vollen Engage."] },
-      { "label": "B: Den Kampf jetzt suchen: Malphites Ultimate ist noch rund eine Minute nicht bereit, also kann er euch nicht mit einem Engage aufspalten.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr kämpft in dem Fenster, in dem ihr seinen Engage nicht fürchten müsst." },
-      { "label": "C: Allein in die Seitenlane gehen und Wellen farmen, bis der Baron spawnt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich in Unterzahl.", "Ihr verliert den Kampf und danach den Baron."] }
+      { "label": "B: Allein in die Seitenlane gehen und Wellen farmen, bis der Baron spawnt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich in Unterzahl.", "Ihr verliert den Kampf und danach den Baron."] },
+      { "label": "C: Den Kampf jetzt suchen: Malphites Ultimate ist noch rund eine Minute nicht bereit, also kann er euch nicht mit einem Engage aufspalten.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr kämpft in dem Fenster, in dem ihr seinen Engage nicht fürchten müsst." }
     ]
   },
   {
@@ -2486,8 +2486,8 @@ const RUNS = [
     "coachHint": "Was bringt dir ein Item, das du erst später kaufst?",
     "context": "Du bist Caitlyn (Bot), Minute 08:50, Level 7, mit 1.350 Gold. Deine Welle crasht gerade an ihrem Turm. Das B.F. Sword kostet 1.300 Gold und gibt 40 Angriffsschaden.",
     "options": [
-      { "label": "A: Die Welle crashen lassen, zur Base recallen und das B.F. Sword kaufen, um mit dem Schadens-Spike zurückzukommen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nutzt den Moment der gecrashten Welle und kommst stärker zurück." },
-      { "label": "B: Weiter farmen, bis du 2.500 Gold hast, bevor du zurückgehst.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bleibst ohne Item, und die Welle bounct zu dir zurück.", "Die Gegner trifft du ohne Spike, und du riskierst, mit Gold zu sterben."] },
+      { "label": "A: Weiter farmen, bis du 2.500 Gold hast, bevor du zurückgehst.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bleibst ohne Item, und die Welle bounct zu dir zurück.", "Die Gegner trifft du ohne Spike, und du riskierst, mit Gold zu sterben."] },
+      { "label": "B: Die Welle crashen lassen, zur Base recallen und das B.F. Sword kaufen, um mit dem Schadens-Spike zurückzukommen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nutzt den Moment der gecrashten Welle und kommst stärker zurück." },
       { "label": "C: Mit dem Gold nur Kleinigkeiten kaufen und sofort wieder in die Lane laufen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verbrauchst die Welle, ohne den Schadens-Spike zu holen.", "Deine Lane verliert Druck, und die Gegner gewinnen die nächste Welle."] }
     ]
   },
@@ -2502,9 +2502,9 @@ const RUNS = [
     "coachHint": "Wohin läuft er, wenn er keinen Flash hat, und womit holst du ihn zurück?",
     "context": "Du bist Darius (Top) gegen Teemo, Minute 07:50, Level 7. Teemo hat sich an der Turmkante überextended und seinen Flash vor etwa einer Minute benutzt (300 Sekunden Abklingzeit). Dein Ghost ist bereit, dein E (Apprehend, auf Rang 1 rund 26 Sekunden Abklingzeit) auch.",
     "options": [
-      { "label": "A: Sofort das E auf maximaler Reichweite werfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Pull bringt ihn kurz zu dir, doch danach läuft er mit Vorsprung zum Turm und dein E ist weg.", "Er entkommt ohne Verlust und du verlierst Wellenposition und Zeit."] },
-      { "label": "B: Ohne Ghost hinterherlaufen und auf einen Q-Treffer hoffen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Er ist schneller als du und weicht dem Q aus.", "Du stehst unter seinem Turm und verlierst Leben und Wellenposition."] },
-      { "label": "C: Ghost aktivieren, mit einem W-Treffer (Crippling Strike) auf Teemo zulaufen und das E für den Fluchtversuch aufsparen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Flash muss er laufen, und dein E zieht ihn im richtigen Moment zurück." }
+      { "label": "A: Ghost aktivieren, mit einem W-Treffer (Crippling Strike) auf Teemo zulaufen und das E für den Fluchtversuch aufsparen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Flash muss er laufen, und dein E zieht ihn im richtigen Moment zurück." },
+      { "label": "B: Sofort das E auf maximaler Reichweite werfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Pull bringt ihn kurz zu dir, doch danach läuft er mit Vorsprung zum Turm und dein E ist weg.", "Er entkommt ohne Verlust und du verlierst Wellenposition und Zeit."] },
+      { "label": "C: Ohne Ghost hinterherlaufen und auf einen Q-Treffer hoffen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Er ist schneller als du und weicht dem Q aus.", "Du stehst unter seinem Turm und verlierst Leben und Wellenposition."] }
     ]
   },
   {
@@ -2520,8 +2520,8 @@ const RUNS = [
     "context": "Du bist Thresh (Support) mit Ashe gegen Morgana und Jinx, Minute 05:40. Morgana hat vor 8 Sekunden ihren Schwarzen Schild (E, auf Rang 1 rund 26 Sekunden Abklingzeit) auf Jinx gesetzt und verbraucht. Der Schild hätte deinen Haken blockiert.",
     "options": [
       { "label": "A: Den Haken erst werfen, wenn Morgana ihren Schild wieder bereit hat.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Schild verhindert den Zug und absorbiert den Magieschaden.", "Dein Haken ist verbraucht und die Gegner gewinnen die Initiative."] },
-      { "label": "B: Jetzt den Haken (Q) auf Jinx oder Morgana werfen und Ashe nachsetzen lassen, solange der Schild noch rund 18 Sekunden nicht bereit ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Schild trifft dein Haken und die Gegner sind gefangen." },
-      { "label": "C: Hinter den Minions stehen bleiben und gar nichts tun.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst das Zeitfenster ohne Schild.", "Die Gegner farmen frei und Morganas Schild ist nach rund 18 Sekunden zurück."] }
+      { "label": "B: Hinter den Minions stehen bleiben und gar nichts tun.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst das Zeitfenster ohne Schild.", "Die Gegner farmen frei und Morganas Schild ist nach rund 18 Sekunden zurück."] },
+      { "label": "C: Jetzt den Haken (Q) auf Jinx oder Morgana werfen und Ashe nachsetzen lassen, solange der Schild noch rund 18 Sekunden nicht bereit ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Schild trifft dein Haken und die Gegner sind gefangen." }
     ]
   },
   {
@@ -2537,8 +2537,8 @@ const RUNS = [
     "coachHint": "Wo steht das Gegnerteam, wenn du von der Seite kommst?",
     "context": "Du bist Ornn (Top), Minute 25:40. Der Baron ist seit 20:00 verfügbar. Dein Team wird am Pit von den Gegnern angegriffen. Dein Teleport ist bereit, und ihr habt ein Ward in der Flanke des Pits.",
     "options": [
-      { "label": "A: Per Teleport auf das Ward an der Flanke des Pits gehen und von der Seite in den Kampf einsteigen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du triffst die Gegner im Rücken, während sie auf deine Teamkollegen schauen." },
-      { "label": "B: Mit Teleport in die Sidelane gehen und dort die Welle farmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich in Unterzahl.", "Ihr verliert den Kampf, und der Baron geht an die Gegner."] },
+      { "label": "A: Mit Teleport in die Sidelane gehen und dort die Welle farmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich in Unterzahl.", "Ihr verliert den Kampf, und der Baron geht an die Gegner."] },
+      { "label": "B: Per Teleport auf das Ward an der Flanke des Pits gehen und von der Seite in den Kampf einsteigen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du triffst die Gegner im Rücken, während sie auf deine Teamkollegen schauen." },
       { "label": "C: Mit Teleport direkt auf einen Verbündeten in der Front springen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du landest gerade dort, wo alle Gegner hinschauen.", "Du wirst als Erstes gefokust und der Kampf kippt."] }
     ]
   },
@@ -2555,9 +2555,9 @@ const RUNS = [
     "coachHint": "Wie lange hat Zed seine Stasis nicht?",
     "context": "Du bist Leona (Support), Minute 27:10. Der gegnerische Zed hat vor 25 Sekunden Zhonya's Hourglass (2,5 Sekunden Stasis, 120 Sekunden Abklingzeit) in einem Kampf benutzt. Euer Team kämpft am Drachen, Zed ist in Reichweite.",
     "options": [
-      { "label": "A: Zed ignorieren, weil Zhonya's ja immer da ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Er bekommt in Ruhe seine Fähigkeiten raus, obwohl er verwundbar ist.", "Er tötet euren Carry, und ihr verliert den Kampf."] },
-      { "label": "B: Alle Fähigkeiten auf den Tank statt auf den verwundbaren Zed.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Tank überlebt, Zed bleibt unbeschädigt.", "Euer Team verliert die Chance auf den leichtesten Kill und den Kampf."] },
-      { "label": "C: Zed jetzt mit E und Q anspringen und stunnen, weil er seine Stasis noch rund anderthalb Minuten nicht benutzen kann.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Er kann sich nicht retten, und euer Team gewinnt den Kampf." }
+      { "label": "A: Zed jetzt mit E und Q anspringen und stunnen, weil er seine Stasis noch rund anderthalb Minuten nicht benutzen kann.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Er kann sich nicht retten, und euer Team gewinnt den Kampf." },
+      { "label": "B: Zed ignorieren, weil Zhonya's ja immer da ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Er bekommt in Ruhe seine Fähigkeiten raus, obwohl er verwundbar ist.", "Er tötet euren Carry, und ihr verliert den Kampf."] },
+      { "label": "C: Alle Fähigkeiten auf den Tank statt auf den verwundbaren Zed.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Tank überlebt, Zed bleibt unbeschädigt.", "Euer Team verliert die Chance auf den leichtesten Kill und den Kampf."] }
     ]
   },
   {
@@ -2573,8 +2573,8 @@ const RUNS = [
     "context": "Du bist Ahri (Mid), Minute 15:30. Deine Welle ist an ihrem Turm gecrasht, ihr Midlaner ist zurückgegangen. Eure Botlane steht 2v2 am Drachen, der in etwa 20 Sekunden erscheint, und braucht Hilfe.",
     "options": [
       { "label": "A: Roamen, bevor die Welle gecrasht ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Minions sterben allein am Turm, und du verlierst Gold und Erfahrung.", "Der gegnerische Midlaner kommt zurück und gewinnt die Welle und Prio."] },
-      { "label": "B: Die Welle crashen lassen und dann über den Fluss zur Botlane roamen, um mit Vision den Drachen zu sichern.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verlierst keine Minions und verstärkst die Botlane zur richtigen Zeit." },
-      { "label": "C: Hinter der Welle stehen bleiben und gar nicht helfen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Botlane steht allein ohne dich am Drachen.", "Die Gegner gewinnen den Drachen mit einem Vorteil in Unterzahl."] }
+      { "label": "B: Hinter der Welle stehen bleiben und gar nicht helfen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Botlane steht allein ohne dich am Drachen.", "Die Gegner gewinnen den Drachen mit einem Vorteil in Unterzahl."] },
+      { "label": "C: Die Welle crashen lassen und dann über den Fluss zur Botlane roamen, um mit Vision den Drachen zu sichern.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verlierst keine Minions und verstärkst die Botlane zur richtigen Zeit." }
     ]
   },
   {
@@ -2587,8 +2587,8 @@ const RUNS = [
     "coachHint": "Was fehlt Ahri gerade, um zu entkommen?",
     "context": "Du bist Syndra (Mid) gegen Ahri, Minute 11:20, Level 8. Ahri hat ihre Ultimate eben in einem Teamfight verbraucht, und ihr Flash ist seit etwa einer Minute auf Abklingzeit (300 Sekunden). Dein Q, E und R sind bereit.",
     "options": [
-      { "label": "A: Sofort mit Q (Dark Sphere) und E (Scatter the Weak) den Stun setzen und mit R (Unleashed Power) den Burst legen: das Fenster ist offen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Ultimate und Flash kann Ahri nicht entkommen." },
-      { "label": "B: Passiv weiter farmen, weil man Ahri nicht angreifen sollte.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ahris Abklingzeiten laufen ab, und das Fenster schließt sich.", "Du verschenkst einen sicheren Kill und die Gegner holen auf."] },
+      { "label": "A: Passiv weiter farmen, weil man Ahri nicht angreifen sollte.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ahris Abklingzeiten laufen ab, und das Fenster schließt sich.", "Du verschenkst einen sicheren Kill und die Gegner holen auf."] },
+      { "label": "B: Sofort mit Q (Dark Sphere) und E (Scatter the Weak) den Stun setzen und mit R (Unleashed Power) den Burst legen: das Fenster ist offen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Ultimate und Flash kann Ahri nicht entkommen." },
       { "label": "C: Zuerst R werfen und danach versuchen, den Stun zu setzen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Burst kommt, bevor sie festgehalten ist, und sie weicht aus.", "Du verlierst Mana und Abklingzeiten, und Ahri entkommt."] }
     ]
   },
@@ -2603,9 +2603,9 @@ const RUNS = [
     "coachHint": "Wer überlebt, wenn der Sweetspot trifft und Triumph heilt?",
     "context": "Du bist Aatrox (Top), Minute 08:30, Level 6. Der gegnerische Jungler Kayn ganked zusammen mit Garen: 1v2. Deine Ultimate (World Ender) ist bereit, Q hat noch zwei Würfe, E ist bereit. Du hast die Rune Triumph.",
     "options": [
-      { "label": "A: Panisch mit Flash in Richtung Turm fliehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Flash ist weg, und du bist trotzdem im Schaden der beiden.", "Du stirbst oder verlierst Flash ohne Gegenwert, und Top gehört den Gegnern."] },
-      { "label": "B: Alle Fähigkeiten in den Tank statt in den verwundbaren Jungler werfen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Jungler überlebt und lässt dich nicht entkommen.", "Du stirbst und Kayn kommt gestärkt zurück."] },
-      { "label": "C: Nicht wegflashen: mit dem Q-Sweetspot hochschleudern, E zum Neu-Positionieren nutzen, die Ultimate zünden und mit Kill und Triumph-Heilung das 1v2 umdrehen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Dein Spacing und die Ultimate gewinnen das 1v2." }
+      { "label": "A: Nicht wegflashen: mit dem Q-Sweetspot hochschleudern, E zum Neu-Positionieren nutzen, die Ultimate zünden und mit Kill und Triumph-Heilung das 1v2 umdrehen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Dein Spacing und die Ultimate gewinnen das 1v2." },
+      { "label": "B: Panisch mit Flash in Richtung Turm fliehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Flash ist weg, und du bist trotzdem im Schaden der beiden.", "Du stirbst oder verlierst Flash ohne Gegenwert, und Top gehört den Gegnern."] },
+      { "label": "C: Alle Fähigkeiten in den Tank statt in den verwundbaren Jungler werfen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Jungler überlebt und lässt dich nicht entkommen.", "Du stirbst und Kayn kommt gestärkt zurück."] }
     ]
   },
   {
@@ -2619,8 +2619,8 @@ const RUNS = [
     "context": "Du bist Zed (Mid), Minute 24:10. Dein Gegner Ahri hat Zhonya's Hourglass aktiviert: Sie ist 2,5 Sekunden lang unverwundbar und untargetable. Du stehst mit Schatten (W), Q und Ultimate bereit direkt vor ihr.",
     "options": [
       { "label": "A: Q und E sofort in die Stasis hineinwerfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Während der Stasis ist Ahri nicht angreifbar, die Fähigkeiten treffen nicht.", "Deine Energie ist leer, wenn sie aufwacht, und du kannst nichts mehr auf sie setzen."] },
-      { "label": "B: Warten, bis die Stasis nach 2,5 Sekunden endet, und Schatten und Shuriken genau auf den Zeitpunkt des Erwachens legen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Deine Fähigkeiten treffen in dem Moment, in dem sie verwundbar ist." },
-      { "label": "C: In der Stasis die Ultimate auf Ahri versuchen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ein untargetable Ziel kann nicht mit der Ultimate angesprungen werden.", "Du verlierst Zeit und Position, und Ahri wacht mit ihren Fähigkeiten bereit auf."] }
+      { "label": "B: In der Stasis die Ultimate auf Ahri versuchen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ein untargetable Ziel kann nicht mit der Ultimate angesprungen werden.", "Du verlierst Zeit und Position, und Ahri wacht mit ihren Fähigkeiten bereit auf."] },
+      { "label": "C: Warten, bis die Stasis nach 2,5 Sekunden endet, und Schatten und Shuriken genau auf den Zeitpunkt des Erwachens legen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Deine Fähigkeiten treffen in dem Moment, in dem sie verwundbar ist." }
     ]
   },
   {
@@ -2635,8 +2635,8 @@ const RUNS = [
     "coachHint": "Wann ist ein Sprung angreifbar, und womit?",
     "context": "Du bist Thresh (Support) mit Ashe gegen Tristana und Leona, Minute 14:50. Tristana springt mit Rocket Jump (W) auf Ashe zu. Dein Flay (E) und deine Laterne (W) sind bereit, dein Haken ist auf Abklingzeit.",
     "options": [
-      { "label": "A: Das Flay (E) reaktiv nutzen: Mit dem Flay mitten im Sprung unterbrichst du Tristanas Dash und wirfst sie zurück.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Sprung wird abgebrochen, bevor Tristana landet." },
-      { "label": "B: Die Laterne (W) auf Ashe werfen und hoffen, dass sie überlebt.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Tristana landet trotzdem und macht Schaden.", "Ashe liegt tief im Leben und euer Team verliert den Kampf."] },
+      { "label": "A: Die Laterne (W) auf Ashe werfen und hoffen, dass sie überlebt.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Tristana landet trotzdem und macht Schaden.", "Ashe liegt tief im Leben und euer Team verliert den Kampf."] },
+      { "label": "B: Das Flay (E) reaktiv nutzen: Mit dem Flay mitten im Sprung unterbrichst du Tristanas Dash und wirfst sie zurück.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Sprung wird abgebrochen, bevor Tristana landet." },
       { "label": "C: Mit dem Haken (Q) reagieren, obwohl er auf Abklingzeit ist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Haken ist nicht bereit und der Sprung läuft durch.", "Tristana landet auf Ashe und euer Carry stirbt."] }
     ]
   },
@@ -2650,9 +2650,9 @@ const RUNS = [
     "coachHint": "Welcher Spike kommt nur, wenn du jetzt zur Base gehst?",
     "context": "Du bist Zed (Mid), Minute 08:40, mit 1.040 Gold. Deine Welle crasht gerade an ihrem Turm. Serrated Dirk kostet 1.000 Gold und gibt 20 Angriffsschaden und 10 Letalität.",
     "options": [
-      { "label": "A: Weiter farmen, bis du deutlich mehr als 1.000 Gold hast.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Gold liegt ungenutzt herum, und die Welle bounct zu dir zurück.", "Du bleibst ohne Spike, und die Gegner trade'n stärker als nötig."] },
-      { "label": "B: Mit dem Gold nur Kleinteile kaufen und sofort in die Lane laufen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du holst den Spike nicht und deine Welle läuft ohne dich.", "Dein Burst ist zu schwach, und der Gegner gewinnt Lane-Prio."] },
-      { "label": "C: Die Welle crashen lassen, zur Base recallen und Serrated Dirk kaufen, um mit dem Letalität-Spike zurückzukommen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nutzt dein Gold und kommst mit stärkerem Burst zurück." }
+      { "label": "A: Die Welle crashen lassen, zur Base recallen und Serrated Dirk kaufen, um mit dem Letalität-Spike zurückzukommen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nutzt dein Gold und kommst mit stärkerem Burst zurück." },
+      { "label": "B: Weiter farmen, bis du deutlich mehr als 1.000 Gold hast.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Gold liegt ungenutzt herum, und die Welle bounct zu dir zurück.", "Du bleibst ohne Spike, und die Gegner trade'n stärker als nötig."] },
+      { "label": "C: Mit dem Gold nur Kleinteile kaufen und sofort in die Lane laufen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du holst den Spike nicht und deine Welle läuft ohne dich.", "Dein Burst ist zu schwach, und der Gegner gewinnt Lane-Prio."] }
     ]
   },
   {
@@ -2669,8 +2669,8 @@ const RUNS = [
     "context": "Du bist Blitzcrank (Support) mit Jinx gegen Ashe und Lulu, Minute 05:10, Level 4. Eine Minion-Welle steht direkt zwischen dir und Ashe. Dein Rocket Grab (Q) hat auf Rang 1 rund 20 Sekunden Abklingzeit und kostet früh viel Mana.",
     "options": [
       { "label": "A: Den Haken durch die Minion-Welle auf Ashe werfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Haken trifft zuerst eine Minion und zieht keinen Champion.", "Du hast rund 20 Sekunden keinen Haken und viel Mana verbraucht, die Gegner traden ungestraft."] },
-      { "label": "B: Den Haken nur bei freier Schusslinie werfen, etwa wenn die Minions tot oder zur Seite gelaufen sind, damit er einen Champion trifft.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ein getroffener Haken gewinnt die Lane, ein blockierter verschenkt 20 Sekunden." },
-      { "label": "C: Immer wieder aufs Geratewohl in Richtung der Gegner haken.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Jeder Fehlschuss kostet Mana und 20 Sekunden Abklingzeit.", "Im entscheidenden Moment hast du keinen Haken, und Jinx steht allein da."] }
+      { "label": "B: Immer wieder aufs Geratewohl in Richtung der Gegner haken.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Jeder Fehlschuss kostet Mana und 20 Sekunden Abklingzeit.", "Im entscheidenden Moment hast du keinen Haken, und Jinx steht allein da."] },
+      { "label": "C: Den Haken nur bei freier Schusslinie werfen, etwa wenn die Minions tot oder zur Seite gelaufen sind, damit er einen Champion trifft.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ein getroffener Haken gewinnt die Lane, ein blockierter verschenkt 20 Sekunden." }
     ]
   },
   {
@@ -2684,8 +2684,8 @@ const RUNS = [
     "coachHint": "Wer hat Prio auf den Lanes, wenn du ganken willst?",
     "context": "Du bist Lee Sin (Jungle), Minute 02:40, Level 3. Du stehst mitten im Clear, mit dem Abschluss kommst du in etwa 30 Sekunden auf Level 4. Der Scuttle Crab spawnt um 2:55. Eure Laner haben keine Prio: Top und Bot werden von den Gegnern gepusht.",
     "options": [
-      { "label": "A: Den Clear sauber beenden, Level 4 holen und erst danach zum Scuttle oder zu einem Gank gehen, wenn die Welle auf deiner Seite steht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verlierst keine Camps und gehst erst mit Level 4 und Prio in den Fluss." },
-      { "label": "B: Den Clear abbrechen und mit Level 3 einen Gank auf die gedrückte Toplane versuchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Welle auf eurer Seite hat dein Laner keinen Spielraum, und der Gegner entkommt.", "Du verlierst Camps und Zeit, und der Gegner-Jungler holt Level 4 vor dir."] },
+      { "label": "A: Den Clear abbrechen und mit Level 3 einen Gank auf die gedrückte Toplane versuchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Welle auf eurer Seite hat dein Laner keinen Spielraum, und der Gegner entkommt.", "Du verlierst Camps und Zeit, und der Gegner-Jungler holt Level 4 vor dir."] },
+      { "label": "B: Den Clear sauber beenden, Level 4 holen und erst danach zum Scuttle oder zu einem Gank gehen, wenn die Welle auf deiner Seite steht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verlierst keine Camps und gehst erst mit Level 4 und Prio in den Fluss." },
       { "label": "C: Zum Scuttle laufen, obwohl du ohne Level 4 und ohne Vision kommst.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler ist mit Level 4 früher am Crab als du.", "Du verlierst den Kampf um den Scuttle und gibst Vision und Tempo ab."] }
     ]
   },
@@ -2702,9 +2702,9 @@ const RUNS = [
     "coachHint": "Wer kann dir in den ersten Sekunden helfen?",
     "context": "Du bist Viego (Jungle), Minute 03:10, Level 4. Der Scuttle Crab ist seit 2:55 im Fluss. Eure Mid- und Toplane haben ihre Welle geschoben und können sofort in den Fluss nachrücken. Der gegnerische Nocturne steht ebenfalls am Crab.",
     "options": [
-      { "label": "A: Den Scuttle kampflos abgeben und im eigenen Dschungel weiterfarmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Nocturne nimmt den Crab und bekommt Vision im Fluss.", "Mid und Top haben ihre Prio ohne Nutzen verbraucht, und die Gegner kontrollieren den Fluss."] },
-      { "label": "B: Ohne Mid und Top allein auf den Crab gehen und das 1v1 erzwingen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kämpfst allein, während deine Laner noch Wellen schieben.", "Nocturne gewinnt das Duell, und ihr verliert Crab und Tempo."] },
-      { "label": "C: Den Kampf am Scuttle annehmen, weil Mid und Top Prio haben und sofort nachrücken können.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Mit Prio auf zwei Lanes gewinnst du den Fluss." }
+      { "label": "A: Den Kampf am Scuttle annehmen, weil Mid und Top Prio haben und sofort nachrücken können.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Mit Prio auf zwei Lanes gewinnst du den Fluss." },
+      { "label": "B: Den Scuttle kampflos abgeben und im eigenen Dschungel weiterfarmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Nocturne nimmt den Crab und bekommt Vision im Fluss.", "Mid und Top haben ihre Prio ohne Nutzen verbraucht, und die Gegner kontrollieren den Fluss."] },
+      { "label": "C: Ohne Mid und Top allein auf den Crab gehen und das 1v1 erzwingen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kämpfst allein, während deine Laner noch Wellen schieben.", "Nocturne gewinnt das Duell, und ihr verliert Crab und Tempo."] }
     ]
   },
   {
@@ -2720,8 +2720,8 @@ const RUNS = [
     "context": "Du bist Kayn (Jungle), Minute 04:20. Der gegnerische Jungler hat seine Krugs Topside geräumt und wurde zuletzt auf dem Weg zu den Raptoren gesehen. Du hast dieselben Camps schon zweimal geräumt, ein drittes Mal würde Zeit kosten. Deine Toplane steht ohne Wellenvorteil an der Turmkante.",
     "options": [
       { "label": "A: Zum dritten Mal denselben Camp farmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bist beschäftigt, während der gegnerische Jungler die Toplane ganked.", "Du kommst zu spät, Top stirbt, und die Gegner gewinnen Prio und Gold."] },
-      { "label": "B: Seinen Pfad lesen und im Busch neben der Toplane warten, um einen Gank zu kontern, statt dasselbe Camp ein drittes Mal zu farmen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du triffst den Gank mit Überraschung und lässt kein Tempo liegen." },
-      { "label": "C: Blind in den gegnerischen Dschungel laufen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du hast keine Vision und läufst in den gegnerischen Jungler.", "Du verlierst Leben und Tempo, und er ganked trotzdem."] }
+      { "label": "B: Blind in den gegnerischen Dschungel laufen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du hast keine Vision und läufst in den gegnerischen Jungler.", "Du verlierst Leben und Tempo, und er ganked trotzdem."] },
+      { "label": "C: Seinen Pfad lesen und im Busch neben der Toplane warten, um einen Gank zu kontern, statt dasselbe Camp ein drittes Mal zu farmen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du triffst den Gank mit Überraschung und lässt kein Tempo liegen." }
     ]
   },
   {
@@ -2735,8 +2735,8 @@ const RUNS = [
     "coachHint": "Wie viel Leben darf der Drache noch haben, wenn du Smite drückst?",
     "context": "Du bist Lee Sin (Jungle), Minute 10:20. Der Drache hat noch 1.500 Lebenspunkte. Dein Challenging Smite macht 900 wahren Schaden, dein Q (Sonic Wave) und dein R sind bereit. Der gegnerische Nocturne steht in der Nähe und hat ebenfalls Smite.",
     "options": [
-      { "label": "A: Den Drachen mit Q und Auto-Angriffen unter 900 Leben bringen und dann Smite zusammen mit dem Burst-Spell setzen, damit der Smite sitzt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Smite beendet den Drachen, bevor Nocturne etwas stehlen kann." },
-      { "label": "B: Bei 1.500 Leben sofort Smite drücken.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Smite macht nur 900 wahren Schaden, der Drache lebt noch.", "Nocturne smitet den Rest und stiehlt den Drachen."] },
+      { "label": "A: Bei 1.500 Leben sofort Smite drücken.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Smite macht nur 900 wahren Schaden, der Drache lebt noch.", "Nocturne smitet den Rest und stiehlt den Drachen."] },
+      { "label": "B: Den Drachen mit Q und Auto-Angriffen unter 900 Leben bringen und dann Smite zusammen mit dem Burst-Spell setzen, damit der Smite sitzt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Smite beendet den Drachen, bevor Nocturne etwas stehlen kann." },
       { "label": "C: Smite aufsparen und den Drachen nur mit Fähigkeiten und Auto-Angriffen töten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Kampf dauert lange, und Nocturne bekommt Zeit für einen Steal.", "Du verlierst den Drachen oder zahlst dafür viel Leben."] }
     ]
   },
@@ -2752,9 +2752,9 @@ const RUNS = [
     "coachHint": "Wo ist der gegnerische Jungler gerade gebunden?",
     "context": "Du bist Viego (Jungle), Minute 06:40. Der gegnerische Nocturne ganked gerade eure Botlane, die Flashs sind bereits verbraucht. Du stehst Topside, die Voidgrubs sind seit 6:00 da, und sein Topside-Dschungel ist unbesetzt.",
     "options": [
-      { "label": "A: Panisch über die halbe Karte zur Botlane laufen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kommst zu spät, der Gank ist vorbei.", "Du hast Camps und Zeit verloren, und der Gegner hat Bot und Tempo gewonnen."] },
-      { "label": "B: Nichts ändern und die eigenen Camps weiterfarmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du nutzt das Fenster in seinem Dschungel nicht.", "Der Gegner holt Bot und Camps in Ruhe und geht in Führung."] },
-      { "label": "C: Nicht über die halbe Karte nach Bot rennen, sondern seinen Topside-Jungle leerräumen oder die Voidgrubs starten, solange er Bot gebunden ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du tauschst einen verlorenen Gank gegen Ressourcen auf der anderen Seite." }
+      { "label": "A: Nicht über die halbe Karte nach Bot rennen, sondern seinen Topside-Jungle leerräumen oder die Voidgrubs starten, solange er Bot gebunden ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du tauschst einen verlorenen Gank gegen Ressourcen auf der anderen Seite." },
+      { "label": "B: Panisch über die halbe Karte zur Botlane laufen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kommst zu spät, der Gank ist vorbei.", "Du hast Camps und Zeit verloren, und der Gegner hat Bot und Tempo gewonnen."] },
+      { "label": "C: Nichts ändern und die eigenen Camps weiterfarmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du nutzt das Fenster in seinem Dschungel nicht.", "Der Gegner holt Bot und Camps in Ruhe und geht in Führung."] }
     ]
   },
   {
@@ -2769,8 +2769,8 @@ const RUNS = [
     "context": "Du bist Kayn (Jungle), Minute 07:30. Der gegnerische Jungler hat seine Raptoren vor etwa 2 Minuten geräumt und wurde zuletzt Bot gesehen. Camps respawnen rund 2:15 nach dem Clear, also in etwa 15 Sekunden. Du hast ein Ward am Eingang.",
     "options": [
       { "label": "A: Zu früh in das leere Camp laufen und dort auf den Respawn warten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst lange sichtbar in seinem Dschungel.", "Sein Jungler entdeckt dich und stellt dich."] },
-      { "label": "B: Bis zum Respawn am Ward warten, das Camp direkt beim Spawn räumen und danach sofort wieder aus seinem Dschungel verschwinden.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nimmst Ressourcen, ohne dich zu exponieren." },
-      { "label": "C: Das gegnerische Camp ignorieren und nur zur Base resetten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst das Zeitfenster in seinem Dschungel.", "Der Gegner behält seine Ressourcen, und du verlierst Tempo."] }
+      { "label": "B: Das gegnerische Camp ignorieren und nur zur Base resetten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst das Zeitfenster in seinem Dschungel.", "Der Gegner behält seine Ressourcen, und du verlierst Tempo."] },
+      { "label": "C: Bis zum Respawn am Ward warten, das Camp direkt beim Spawn räumen und danach sofort wieder aus seinem Dschungel verschwinden.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nimmst Ressourcen, ohne dich zu exponieren." }
     ]
   },
   {
@@ -2785,8 +2785,8 @@ const RUNS = [
     "coachHint": "Was passiert, wenn dein Smite zu früh kommt?",
     "context": "Du bist Viego (Jungle), Minute 24:30. Euer Team schlägt den Baron (seit 20:00 verfügbar), er hat noch 1.350 Lebenspunkte. Dein Smite macht 900 wahren Schaden, deine Burst-Fähigkeiten sind bereit. Der gegnerische Nocturne wartet mit Smite am Rand des Pits.",
     "options": [
-      { "label": "A: Warten, bis der Baron durch dein Team und deine Fähigkeiten unter 900 fällt, und dann Smite und Burst gleichzeitig setzen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Smite entscheidet den Baron, bevor Nocturne reagieren kann." },
-      { "label": "B: Bei 1.350 Leben sofort Smite drücken, um sicher zu gehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Smite zieht nur 900 ab, der Baron bleibt bei 450.", "Nocturne kann mit seinem Smite stehlen, und ihr verliert Baron und Buff."] },
+      { "label": "A: Bei 1.350 Leben sofort Smite drücken, um sicher zu gehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Smite zieht nur 900 ab, der Baron bleibt bei 450.", "Nocturne kann mit seinem Smite stehlen, und ihr verliert Baron und Buff."] },
+      { "label": "B: Warten, bis der Baron durch dein Team und deine Fähigkeiten unter 900 fällt, und dann Smite und Burst gleichzeitig setzen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Smite entscheidet den Baron, bevor Nocturne reagieren kann." },
       { "label": "C: Smite aufsparen und den Baron nur mit Auto-Angriffen töten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Baron lebt lange und teilt Schaden aus.", "Der Kampf zieht sich, und der Gegner startet einen Steal."] }
     ]
   },
@@ -2803,9 +2803,9 @@ const RUNS = [
     "coachHint": "Was nimmst du stattdessen mit, wenn du den Baron nicht mehr verhindern kannst?",
     "context": "Du bist Viego (Jungle), Minute 27:40. Die Gegner haben den Baron mit fünf Spielern fast fertig, ihr könnt ihn nicht mehr stoppen (der Hand-of-Baron-Buff hält 180 Sekunden). Der Drache an der anderen Seite des Flusses ist bereit und unbewacht.",
     "options": [
-      { "label": "A: Stur in den Baron-Kampf laufen und stehlen versuchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Fünf Gegner stehen bereit, und ihr kommt in Unterzahl.", "Ihr verliert Spieler und gebt Baron und Drachen ab."] },
-      { "label": "B: Beides abgeben und in der Seitenlane farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner bekommen den Baron ohne Gegenleistung.", "Sie sichern danach auch den Drachen und pushen mit dem Buff."] },
-      { "label": "C: Den Baron abgeben und stattdessen mit dem Team den Drachen nehmen (Objective-Trade), danach die Wellen verteidigen, bevor der Baron-Buff wirkt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr tauscht Objectives, statt einen verlorenen Kampf zu führen." }
+      { "label": "A: Den Baron abgeben und stattdessen mit dem Team den Drachen nehmen (Objective-Trade), danach die Wellen verteidigen, bevor der Baron-Buff wirkt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr tauscht Objectives, statt einen verlorenen Kampf zu führen." },
+      { "label": "B: Stur in den Baron-Kampf laufen und stehlen versuchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Fünf Gegner stehen bereit, und ihr kommt in Unterzahl.", "Ihr verliert Spieler und gebt Baron und Drachen ab."] },
+      { "label": "C: Beides abgeben und in der Seitenlane farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner bekommen den Baron ohne Gegenleistung.", "Sie sichern danach auch den Drachen und pushen mit dem Buff."] }
     ]
   },
   {
@@ -2821,8 +2821,8 @@ const RUNS = [
     "context": "Du bist Ahri (Mid), Minute 26:20. Der Baron ist seit 20:00 verfügbar. Die Gegner haben keine Vision im Pit und stehen verteilt im Fluss. Ihr habt Vision am Eingang, und euer Team steht geschlossen.",
     "options": [
       { "label": "A: Den Baron stur weiterschlagen, auch wenn die Gegner kommen, und auf ein 50/50 hoffen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr schlagt den Baron mit dem Rücken zu den Gegnern.", "Ihr verliert den Kampf, und der Baron geht an die Gegner."] },
-      { "label": "B: Den Baron anfangen, um die Gegner anzulocken, und sobald sie sich nähern, geschlossen umdrehen und den Kampf annehmen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Baron wird zum Köder, und ihr kämpft in Formation." },
-      { "label": "C: Den Baron gar nicht anfassen und im Fluss auf einen Fehler warten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner stehen ohne Vision und müssen nicht reagieren.", "Ihr verschenkt den Vorteil, und die Gegner überraschen euch später."] }
+      { "label": "B: Den Baron gar nicht anfassen und im Fluss auf einen Fehler warten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner stehen ohne Vision und müssen nicht reagieren.", "Ihr verschenkt den Vorteil, und die Gegner überraschen euch später."] },
+      { "label": "C: Den Baron anfangen, um die Gegner anzulocken, und sobald sie sich nähern, geschlossen umdrehen und den Kampf annehmen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Baron wird zum Köder, und ihr kämpft in Formation." }
     ]
   },
   {
@@ -2838,8 +2838,8 @@ const RUNS = [
     "coachHint": "Wer muss reagieren, wenn eine Seitenlane fällt?",
     "context": "Du bist Jax (Top), Minute 28:10. Dein Team steht Mid und verteidigt diszipliniert, die Gegner zögern. Deine Welle steht an ihrem T2-Turm, dein Teleport ist bereit.",
     "options": [
-      { "label": "A: Die Seitenlane bis zum Inhibitor pushen, während das Team Mid diszipliniert verteidigt und keinen Kampf erzwingt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du zwingst die Gegner, auf zwei Fronten zu reagieren." },
-      { "label": "B: Die Seitenlane ignorieren und mit dem Team einen 5v5 um nichts suchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr kämpft ohne klares Ziel und ohne Vorteil.", "Ihr riskiert Spieler und Position, ohne Turm oder Inhibitor zu gewinnen."] },
+      { "label": "A: Die Seitenlane ignorieren und mit dem Team einen 5v5 um nichts suchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr kämpft ohne klares Ziel und ohne Vorteil.", "Ihr riskiert Spieler und Position, ohne Turm oder Inhibitor zu gewinnen."] },
+      { "label": "B: Die Seitenlane bis zum Inhibitor pushen, während das Team Mid diszipliniert verteidigt und keinen Kampf erzwingt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du zwingst die Gegner, auf zwei Fronten zu reagieren." },
       { "label": "C: Mit Teleport in die Mitte springen und die Seitenlane verlassen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Welle bounct zurück und dein Druck verschwindet.", "Die Gegner können sich in Ruhe auf die Mitte konzentrieren."] }
     ]
   },
@@ -2856,9 +2856,9 @@ const RUNS = [
     "coachHint": "Wo seht ihr den Gegner zuerst?",
     "context": "Du bist Nautilus (Support), Minute 31:50. Der Elder Dragon erscheint in etwa 30 Sekunden. Du hast zwei Control Wards (je 75 Gold). Die Gegner sind noch nicht am Pit.",
     "options": [
-      { "label": "A: Ohne Vision in den gegnerischen Dschungel laufen, um sie zu suchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst allein ohne Info in mehrere Gegner.", "Du stirbst, und euer Team startet den Elder in Unterzahl."] },
-      { "label": "B: Die Control Wards im Inventar lassen und am Pit abwarten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr seht die Gegner erst, wenn sie schon am Pit sind.", "Ihr werdet überrascht und verliert den Elder und den Kampf."] },
-      { "label": "C: Den Fluss-Eingang mit Control Wards sperren, bevor die Gegner eintreffen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr seht den Gegner früh und kämpft zu euren Bedingungen." }
+      { "label": "A: Den Fluss-Eingang mit Control Wards sperren, bevor die Gegner eintreffen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr seht den Gegner früh und kämpft zu euren Bedingungen." },
+      { "label": "B: Ohne Vision in den gegnerischen Dschungel laufen, um sie zu suchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst allein ohne Info in mehrere Gegner.", "Du stirbst, und euer Team startet den Elder in Unterzahl."] },
+      { "label": "C: Die Control Wards im Inventar lassen und am Pit abwarten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr seht die Gegner erst, wenn sie schon am Pit sind.", "Ihr werdet überrascht und verliert den Elder und den Kampf."] }
     ]
   },
   {
@@ -2874,8 +2874,8 @@ const RUNS = [
     "context": "Du bist Syndra (Mid), Minute 27:30. Euer Team will in etwa 40 Sekunden den Baron starten. Deine Midwelle steht mitten in der Lane, die gegnerische Welle läuft auf euren Turm zu.",
     "options": [
       { "label": "A: Die Welle stehen lassen und sofort zum Baron gehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die gegnerische Welle drückt euren Mid-Turm, während ihr am Pit seid.", "Ihr verliert Turmschaden und Position und seid nach dem Baron unter Druck."] },
-      { "label": "B: Erst die eigene Welle in den gegnerischen Turm pushen und dann zum Baron rotieren, damit die gegnerische Welle euch nicht im Rücken drückt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle ist gelöst und ihr startet den Baron ohne Druck im Rücken." },
-      { "label": "C: Die Welle in euren eigenen Turm ziehen, um sie sicher zu farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kommst zu spät zum Baron.", "Euer Team startet in Unterzahl und riskiert den Baron."] }
+      { "label": "B: Die Welle in euren eigenen Turm ziehen, um sie sicher zu farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kommst zu spät zum Baron.", "Euer Team startet in Unterzahl und riskiert den Baron."] },
+      { "label": "C: Erst die eigene Welle in den gegnerischen Turm pushen und dann zum Baron rotieren, damit die gegnerische Welle euch nicht im Rücken drückt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle ist gelöst und ihr startet den Baron ohne Druck im Rücken." }
     ]
   },
   {
@@ -2890,8 +2890,8 @@ const RUNS = [
     "coachHint": "Wer fehlt auf der Minimap, und wo könnten sie sein?",
     "context": "Du bist Kai'Sa (Bot), Minute 29:10. Du pushst allein die Seitenlane an ihrem T2. Auf der Minimap fehlen seit etwa 20 Sekunden drei Gegner, dein Team steht in der Mitte.",
     "options": [
-      { "label": "A: Die Welle crashen lassen, dann zurück zur Gruppe gehen und Vision setzen, weil drei Gegner fehlen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du gehst kein Risiko ein und bleibst mit dem Team verbunden." },
-      { "label": "B: Weiter allein tiefer pushen, um den Turm zu bekommen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die drei fehlenden Gegner fangen dich ab.", "Du stirbst allein, und euer Team steht in Unterzahl."] },
+      { "label": "A: Weiter allein tiefer pushen, um den Turm zu bekommen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die drei fehlenden Gegner fangen dich ab.", "Du stirbst allein, und euer Team steht in Unterzahl."] },
+      { "label": "B: Die Welle crashen lassen, dann zurück zur Gruppe gehen und Vision setzen, weil drei Gegner fehlen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du gehst kein Risiko ein und bleibst mit dem Team verbunden." },
       { "label": "C: Mit Flash nach vorn an den Turm gehen und ihn schneller fällen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Flash ist weg, und du stehst tief in ihrem Gebiet.", "Du wirst gefangen und gibst einen Kill und Flash ab."] }
     ]
   },
@@ -2908,9 +2908,9 @@ const RUNS = [
     "coachHint": "Wen beschießt der Turm zuerst?",
     "context": "Du bist Jax (Top), Minute 10:40, Level 6. Du hast drei Wellen langsam gesammelt, sie crashen gleich unter den gegnerischen T1. Dein Jungler Lee Sin ist in zwei Sekunden bei dir. Renekton steht an der Turmkante.",
     "options": [
-      { "label": "A: Die Minions einfach ablaufen lassen und weiter in der Lane stehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Welle crasht ohne Gegenwert, und der Turm räumt sie.", "Renekton bleibt am Leben und holt die gebouncte Welle zurück."] },
-      { "label": "B: Allein ohne Lee Sin hineintauchen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm wechselt auf dich, sobald du Renekton triffst.", "Du stirbst ohne Kill, und Renekton gewinnt Tempo."] },
-      { "label": "C: Die große Welle crashen lassen, sodass der Turm Minions beschießt, und dann gemeinsam mit Lee Sin einsteigen und Renekton töten, bevor der Turm auf euch wechselt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle bindet den Turm, und der Dive sitzt." }
+      { "label": "A: Die große Welle crashen lassen, sodass der Turm Minions beschießt, und dann gemeinsam mit Lee Sin einsteigen und Renekton töten, bevor der Turm auf euch wechselt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle bindet den Turm, und der Dive sitzt." },
+      { "label": "B: Die Minions einfach ablaufen lassen und weiter in der Lane stehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Welle crasht ohne Gegenwert, und der Turm räumt sie.", "Renekton bleibt am Leben und holt die gebouncte Welle zurück."] },
+      { "label": "C: Allein ohne Lee Sin hineintauchen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm wechselt auf dich, sobald du Renekton triffst.", "Du stirbst ohne Kill, und Renekton gewinnt Tempo."] }
     ]
   },
   {
@@ -2926,8 +2926,8 @@ const RUNS = [
     "context": "Du bist Ornn (Top) gegen Fiora, Minute 08:10, Level 6. Du hast die Welle bis an ihren Turm geschoben, der Turm kann sie bald räumen. Der gegnerische Jungler wurde Bot gesehen.",
     "options": [
       { "label": "A: Die Welle weiter pushen und unter ihrem Turm warten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm räumt deine Minions, du verlierst Farm und stehst ungeschützt.", "Fiora übernimmt die Welle, und ihr Jungler kann ganken."] },
-      { "label": "B: Die Welle crashen lassen (der Turm räumt sie, die Welle bounct zu dir), sie dann knapp außerhalb deiner Turmreichweite einfrieren und Fiora von den Minions zonen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Bounce kommt zu dir, und das Freeze hält Fiora von der Welle fern." },
-      { "label": "C: Die Welle direkt unter deinem eigenen Turm einfrieren.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Turm beschießt die Minions und löst das Freeze auf.", "Die Zone ist weg, und die Welle schiebt zu dir."] }
+      { "label": "B: Die Welle direkt unter deinem eigenen Turm einfrieren.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Turm beschießt die Minions und löst das Freeze auf.", "Die Zone ist weg, und die Welle schiebt zu dir."] },
+      { "label": "C: Die Welle crashen lassen (der Turm räumt sie, die Welle bounct zu dir), sie dann knapp außerhalb deiner Turmreichweite einfrieren und Fiora von den Minions zonen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Bounce kommt zu dir, und das Freeze hält Fiora von der Welle fern." }
     ]
   },
   {
@@ -2942,8 +2942,8 @@ const RUNS = [
     "coachHint": "Wann bist du fertig mit Einkaufen und zurück am Pit?",
     "context": "Du bist Leona (Support), Minute 18:05. Der Drache erscheint in etwa 55 Sekunden. Du hast 1.600 Gold im Beutel und kein Control Ward im Inventar. Ein Recall dauert 8 Sekunden, und dein Rückweg zum Pit rund 30 Sekunden.",
     "options": [
-      { "label": "A: Jetzt recallen, Gold ausgeben, zwei Control Wards kaufen und rechtzeitig vor dem Spawn zurück am Pit sein.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du bist ausgerüstet und mit Vision am Pit, bevor der Drache spawnt." },
-      { "label": "B: Bis 15 Sekunden vor dem Spawn warten und dann erst shoppen gehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Recall und Rückweg dauern länger als 15 Sekunden.", "Du kommst nach dem Spawn zurück, und ihr startet ohne Vision und Engage."] },
+      { "label": "A: Bis 15 Sekunden vor dem Spawn warten und dann erst shoppen gehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Recall und Rückweg dauern länger als 15 Sekunden.", "Du kommst nach dem Spawn zurück, und ihr startet ohne Vision und Engage."] },
+      { "label": "B: Jetzt recallen, Gold ausgeben, zwei Control Wards kaufen und rechtzeitig vor dem Spawn zurück am Pit sein.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du bist ausgerüstet und mit Vision am Pit, bevor der Drache spawnt." },
       { "label": "C: Gar nicht recallen und ohne Control Ward zum Pit gehen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du hast kein Vision-Werkzeug und kein Gold-Upgrade.", "Ihr werdet überrascht, und die Gegner gewinnen den Drachen."] }
     ]
   },
@@ -2961,9 +2961,9 @@ const RUNS = [
     "coachHint": "Wer schießt, wenn du den Tank beschäftigst?",
     "context": "Du bist Zed (Mid), Minute 24:50. Euer Team engaget von vorn mit Ornn. Die gegnerische Backline (Jinx und Lux) steht hinter Malphite. Dein Schatten (W) und deine Ultimate sind bereit, du stehst auf der Flanke.",
     "options": [
-      { "label": "A: Malphite attackieren, weil er am nächsten steht.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du steckst im Tank, während die Backline frei schießt.", "Euer Team verliert den Schadenskampf."] },
-      { "label": "B: Auf der Flanke stehen bleiben und warten, bis der Kampf entschieden ist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich.", "Die Gegner gewinnen, bevor du eingreifst."] },
-      { "label": "C: Nicht den Tank angreifen, sondern über die Flanke auf die Backline springen und Jinx und Lux am Beitreten zum Kampf hindern.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die gegnerische Backline fällt aus, und eure Front gewinnt den Kampf." }
+      { "label": "A: Nicht den Tank angreifen, sondern über die Flanke auf die Backline springen und Jinx und Lux am Beitreten zum Kampf hindern.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die gegnerische Backline fällt aus, und eure Front gewinnt den Kampf." },
+      { "label": "B: Malphite attackieren, weil er am nächsten steht.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du steckst im Tank, während die Backline frei schießt.", "Euer Team verliert den Schadenskampf."] },
+      { "label": "C: Auf der Flanke stehen bleiben und warten, bis der Kampf entschieden ist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich.", "Die Gegner gewinnen, bevor du eingreifst."] }
     ]
   },
   {
@@ -2979,8 +2979,8 @@ const RUNS = [
     "context": "Du bist Kai'Sa (Bot), Minute 14:30. Der Drache erscheint in etwa einer Minute. Deine Bot-Welle steht neutral in der Mitte der Lane, Nautilus ist bereit zu rotieren.",
     "options": [
       { "label": "A: Die Welle liegen lassen und sofort zum Drachen rotieren.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die gegnerische Welle drückt euren Turm, während ihr am Pit seid.", "Ihr verliert Turmschaden und Gold, und die Gegner haben danach Prio."] },
-      { "label": "B: Etwa eine Minute vor dem Spawn die Welle langsam pushen, damit sie crasht, wenn ihr zum Drachen geht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle bindet den Gegner, während ihr am Drachen seid." },
-      { "label": "C: Die Welle schnell in den Turm schieben und dann stehen bleiben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst allein, wenn der Drache erscheint.", "Ihr rotiert zu spät und gebt den Drachen ab."] }
+      { "label": "B: Die Welle schnell in den Turm schieben und dann stehen bleiben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst allein, wenn der Drache erscheint.", "Ihr rotiert zu spät und gebt den Drachen ab."] },
+      { "label": "C: Etwa eine Minute vor dem Spawn die Welle langsam pushen, damit sie crasht, wenn ihr zum Drachen geht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle bindet den Gegner, während ihr am Drachen seid." }
     ]
   },
   {
@@ -2995,8 +2995,8 @@ const RUNS = [
     "coachHint": "Was kann Ashe in den nächsten Minuten nicht mehr?",
     "context": "Du bist Thresh (Support) mit Jinx gegen Ashe und Lulu, Minute 12:30. Ashe hat vor 30 Sekunden ihren Flash benutzt (300 Sekunden Abklingzeit), um einem All-in zu entkommen. Dein Q und E sind bereit.",
     "options": [
-      { "label": "A: Aggressiv spielen: Haken auf Ashe, mit dem Flay nachsetzen und mit Jinx den All-in erzwingen, weil sie nicht mehr flashen kann.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Flash kann Ashe dem Haken nicht ausweichen." },
-      { "label": "B: Defensiv hinter den Minions bleiben, obwohl Ashe keinen Flash hat.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du lässt das größte Fenster der Lane verstreichen.", "Ashe bekommt in Ruhe ihren Flash zurück, und eure Lane verliert Druck."] },
+      { "label": "A: Defensiv hinter den Minions bleiben, obwohl Ashe keinen Flash hat.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du lässt das größte Fenster der Lane verstreichen.", "Ashe bekommt in Ruhe ihren Flash zurück, und eure Lane verliert Druck."] },
+      { "label": "B: Aggressiv spielen: Haken auf Ashe, mit dem Flay nachsetzen und mit Jinx den All-in erzwingen, weil sie nicht mehr flashen kann.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ohne Flash kann Ashe dem Haken nicht ausweichen." },
       { "label": "C: Den Haken blind in die Minions werfen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Haken trifft nur Minions und ist verbraucht.", "Ohne Haken kannst du den All-in nicht erzwingen."] }
     ]
   },
@@ -3013,9 +3013,9 @@ const RUNS = [
     "coachHint": "Wen beschießt euer Turm, sobald er einen Verbündeten trifft?",
     "context": "Du bist Jinx (Bot) mit Leona, Minute 07:20. Der gegnerische Nocturne und Viktor tauchen auf euren Turm. Euer Turm schießt noch auf Minions, dein Flash ist bereit.",
     "options": [
-      { "label": "A: Aus der Turmreichweite fliehen und die Angreifer freilassen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Turm kämpfst du 2v2 gegen Nocturne und Viktor.", "Ihr verliert den Kampf und den Turm."] },
-      { "label": "B: Mit Flash nach vorn in die Gegner springen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlässt die Turmreichweite und stehst allein vor beiden.", "Du stirbst, und Leona kämpft allein weiter."] },
-      { "label": "C: In Turmreichweite bleiben und die Angreifer beschießen, sodass euer Turm auf sie wechselt, während Leona sie festhält.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Turm hilft euch und der Dive scheitert." }
+      { "label": "A: In Turmreichweite bleiben und die Angreifer beschießen, sodass euer Turm auf sie wechselt, während Leona sie festhält.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Turm hilft euch und der Dive scheitert." },
+      { "label": "B: Aus der Turmreichweite fliehen und die Angreifer freilassen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Turm kämpfst du 2v2 gegen Nocturne und Viktor.", "Ihr verliert den Kampf und den Turm."] },
+      { "label": "C: Mit Flash nach vorn in die Gegner springen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlässt die Turmreichweite und stehst allein vor beiden.", "Du stirbst, und Leona kämpft allein weiter."] }
     ]
   },
   {
@@ -3031,8 +3031,8 @@ const RUNS = [
     "context": "Du bist Nautilus (Support) mit Caitlyn, Minute 06:30, Level 6. Eure Welle steht kurz vor dem gegnerischen Turm, Caitlyn kann sie allein sauber crashen. Mid braucht Hilfe gegen einen Roam der Gegner.",
     "options": [
       { "label": "A: Sofort losroamen, während die Welle noch nicht gecrasht ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Caitlyn muss die Welle allein schieben und verliert Minions.", "Die Welle bounct zu euch, und ihr verliert Druck in der Lane."] },
-      { "label": "B: Die Welle erst in den gegnerischen Turm crashen lassen und dann zur Mid roamen (Rebound-Roam), damit Caitlyn nichts verliert.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle ist gelöst, und du verstärkst Mid zur richtigen Zeit." },
-      { "label": "C: In der Lane bleiben und Mid allein lassen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Mid steht gegen den Roam in Unterzahl.", "Ihr verliert Mid-Prio und gebt Gold ab."] }
+      { "label": "B: In der Lane bleiben und Mid allein lassen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Mid steht gegen den Roam in Unterzahl.", "Ihr verliert Mid-Prio und gebt Gold ab."] },
+      { "label": "C: Die Welle erst in den gegnerischen Turm crashen lassen und dann zur Mid roamen (Rebound-Roam), damit Caitlyn nichts verliert.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle ist gelöst, und du verstärkst Mid zur richtigen Zeit." }
     ]
   },
   {
@@ -3047,8 +3047,8 @@ const RUNS = [
     "coachHint": "Wann wechselt der Turm von den Minions auf dich?",
     "context": "Du bist Aatrox (Top) gegen Darius, Minute 11:20, Level 8. Du hast drei Wellen gesammelt, sie crashen unter ihren T1. Dein Jungler Sejuani steht in Position. Dein Q und E sind bereit, deine Ultimate noch nicht.",
     "options": [
-      { "label": "A: Erst einsteigen, wenn die Welle den Turm bindet, mit E nachsetzen, den Q-Sweetspot auf Darius legen und den Kill schnell holen, bevor der Turm auf dich wechselt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Minions binden den Turm, und der Kill fällt, bevor er dich trifft." },
-      { "label": "B: Schon vor dem Crash aus der Distanz mit Q poken, während der Turm noch nicht von Minions gebunden ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm wechselt auf dich, sobald du Darius triffst.", "Du verlierst Leben, bevor Sejuani da ist, und der Dive scheitert."] },
+      { "label": "A: Schon vor dem Crash aus der Distanz mit Q poken, während der Turm noch nicht von Minions gebunden ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm wechselt auf dich, sobald du Darius triffst.", "Du verlierst Leben, bevor Sejuani da ist, und der Dive scheitert."] },
+      { "label": "B: Erst einsteigen, wenn die Welle den Turm bindet, mit E nachsetzen, den Q-Sweetspot auf Darius legen und den Kill schnell holen, bevor der Turm auf dich wechselt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Minions binden den Turm, und der Kill fällt, bevor er dich trifft." },
       { "label": "C: Allein den Turm angreifen und den Dive abbrechen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du nimmst Turmschaden ohne Gegenwert.", "Die Welle bounct zu den Gegnern, und Darius gewinnt Tempo."] }
     ]
   },
@@ -3063,9 +3063,9 @@ const RUNS = [
     "coachHint": "Welche Welle bekommt dein Turm, wenn du jetzt gehst?",
     "context": "Du bist Syndra (Mid), Minute 06:30, mit 1.100 Gold. Deine Welle ist groß und steht kurz vor dem gegnerischen Turm, die gegnerische Welle läuft auf euren Turm zu. Du willst zur Base.",
     "options": [
-      { "label": "A: Sofort recallen, während die gegnerische Welle auf deinen Turm zuläuft.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner drücken ohne Gegenwehr in euren Turm.", "Ihr gebt Turmschaden und Gold ab, und sie können einen Freeze gegen euch aufbauen."] },
-      { "label": "B: Die Welle in euren eigenen Turm ziehen und dort farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlierst die Zeit und das Gold des Resets.", "Die Gegner gewinnen Prio, und deine Items kommen später."] },
-      { "label": "C: Erst die Welle in den gegnerischen Turm crashen lassen und dann recallen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Turm räumt deine Welle, und du verlierst keine Minions und keinen Turmschaden." }
+      { "label": "A: Erst die Welle in den gegnerischen Turm crashen lassen und dann recallen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Turm räumt deine Welle, und du verlierst keine Minions und keinen Turmschaden." },
+      { "label": "B: Sofort recallen, während die gegnerische Welle auf deinen Turm zuläuft.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner drücken ohne Gegenwehr in euren Turm.", "Ihr gebt Turmschaden und Gold ab, und sie können einen Freeze gegen euch aufbauen."] },
+      { "label": "C: Die Welle in euren eigenen Turm ziehen und dort farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlierst die Zeit und das Gold des Resets.", "Die Gegner gewinnen Prio, und deine Items kommen später."] }
     ]
   },
   {
@@ -3081,8 +3081,8 @@ const RUNS = [
     "context": "Du bist Soraka (Support), Minute 04:50, Level 4. Du willst über den Fluss zum Busch an der Mündung laufen, siehst dort aber nichts. Der gegnerische Jungler wurde vor etwa 40 Sekunden Bot gesehen. Du hast ein Ward bereit, Ezreal wartet in der Lane.",
     "options": [
       { "label": "A: Direkt in den Busch laufen, um nachzusehen (Facecheck).", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler wartet im Busch und trifft dich ohne Schutz.", "Du stirbst als Support, und Ezreal steht allein in der Lane."] },
-      { "label": "B: Das Ward aus sicherer Distanz in den Busch legen und erst hineingehen, wenn er leer ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du siehst die Gegner, bevor sie dich sehen." },
-      { "label": "C: Ezreal vorschicken, damit er den Busch zuerst betritt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ezreal läuft ohne Vision in den Busch und wird gefangen.", "Ihr verliert euren Hauptschaden und die Lane."] }
+      { "label": "B: Ezreal vorschicken, damit er den Busch zuerst betritt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ezreal läuft ohne Vision in den Busch und wird gefangen.", "Ihr verliert euren Hauptschaden und die Lane."] },
+      { "label": "C: Das Ward aus sicherer Distanz in den Busch legen und erst hineingehen, wenn er leer ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du siehst die Gegner, bevor sie dich sehen." }
     ]
   },
   {
@@ -3097,8 +3097,8 @@ const RUNS = [
     "coachHint": "Wer macht den meisten Schaden, wenn der All-in beginnt?",
     "context": "Du bist Nautilus (Support) mit Ashe gegen Draven und Soraka, Minute 05:30, Level 5. Du hast Exhaust und Ignite. Exhaust ist danach rund dreieinhalb Minuten nicht verfügbar. Ihr startet gleich den All-in, Draven ist ihr Burst-Carry.",
     "options": [
-      { "label": "A: Exhaust gleich zu Beginn des All-ins auf Draven setzen und Ignite für den Kill auf ihn aufsparen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Draven macht weniger Schaden, und der All-in gelingt." },
-      { "label": "B: Exhaust erst auf Soraka werfen, wenn sie nur noch 5 % Leben hat.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Soraka wäre ohnehin gestorben, und Draven hat vollen Schaden gemacht.", "Exhaust ist rund dreieinhalb Minuten weg, und der All-in kippt zu euren Ungunsten."] },
+      { "label": "A: Exhaust erst auf Soraka werfen, wenn sie nur noch 5 % Leben hat.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Soraka wäre ohnehin gestorben, und Draven hat vollen Schaden gemacht.", "Exhaust ist rund dreieinhalb Minuten weg, und der All-in kippt zu euren Ungunsten."] },
+      { "label": "B: Exhaust gleich zu Beginn des All-ins auf Draven setzen und Ignite für den Kill auf ihn aufsparen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Draven macht weniger Schaden, und der All-in gelingt." },
       { "label": "C: Exhaust und Ignite schon vor dem All-in aufs Geratewohl einsetzen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Beide Fähigkeiten sind verbraucht, bevor der All-in beginnt.", "Ihr könnt den All-in nicht mehr gewinnen und müsst zurück."] }
     ]
   },
@@ -3113,9 +3113,9 @@ const RUNS = [
     "coachHint": "Welche Minion bringt am meisten Gold, und wie oft laden die Ladungen nach?",
     "context": "Du bist Lulu (Support) mit Caitlyn, Minute 03:30, Level 3. Dein World Atlas hat 3 Ladungen (alle 20 Sekunden lädt eine neue). Die Kanonen-Minion der nächsten Welle erreicht die Lane in etwa 15 Sekunden.",
     "options": [
-      { "label": "A: Alle drei Ladungen sofort auf Caster-Minions verbrauchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Ladungen sind weg, wenn die Kanonen-Minion ankommt.", "Du verschenkst den höchsten Goldwert, und die Quest lädt nur alle 20 Sekunden nach."] },
-      { "label": "B: Die Caster-Minions mit Autoangriffen vor Caitlyn niederschlagen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du schiebst die Welle und nimmst Caitlyn die Last-Hits.", "Du verlierst die Wellenkontrolle und Caitlyn verliert Gold."] },
-      { "label": "C: Eine Ladung für die Kanonen-Minion aufheben und die Welle nicht mit Autoangriffen pushen, damit Caitlyn farmen kann.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nutzt die Ladung für den höchsten Goldwert und lässt Caitlyn die Last-Hits." }
+      { "label": "A: Eine Ladung für die Kanonen-Minion aufheben und die Welle nicht mit Autoangriffen pushen, damit Caitlyn farmen kann.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nutzt die Ladung für den höchsten Goldwert und lässt Caitlyn die Last-Hits." },
+      { "label": "B: Alle drei Ladungen sofort auf Caster-Minions verbrauchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Ladungen sind weg, wenn die Kanonen-Minion ankommt.", "Du verschenkst den höchsten Goldwert, und die Quest lädt nur alle 20 Sekunden nach."] },
+      { "label": "C: Die Caster-Minions mit Autoangriffen vor Caitlyn niederschlagen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du schiebst die Welle und nimmst Caitlyn die Last-Hits.", "Du verlierst die Wellenkontrolle und Caitlyn verliert Gold."] }
     ]
   },
   {
@@ -3131,8 +3131,8 @@ const RUNS = [
     "context": "Du bist Thresh (Support), Minute 22:40. Dein ADC Jinx steht bei 8/1. Der gegnerische Master Yi springt mit Alpha Strike (dabei untargetable) in euer Team und hat Highlander (Immunität gegen Verlangsamungen) bereit. Dein Haken und dein Flay sind bereit.",
     "options": [
       { "label": "A: Die gegnerische Backline jagen und Jinx sich selbst überlassen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Master Yi erreicht Jinx ohne Gegenwehr.", "Euer Carry stirbt, und ihr verliert den Kampf."] },
-      { "label": "B: Bei Jinx bleiben und harte Kontrolle (Haken, Flay) konsequent auf Master Yi setzen, sobald er wieder angreifbar ist, statt auf Verlangsamungen zu setzen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du schützt deinen Carry gegen den einzigen, der ihn erreicht." },
-      { "label": "C: Master Yi mit Verlangsamungen aufhalten wollen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Highlander macht ihn immun gegen Verlangsamungen.", "Er erreicht Jinx trotzdem und tötet euren Carry."] }
+      { "label": "B: Master Yi mit Verlangsamungen aufhalten wollen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Highlander macht ihn immun gegen Verlangsamungen.", "Er erreicht Jinx trotzdem und tötet euren Carry."] },
+      { "label": "C: Bei Jinx bleiben und harte Kontrolle (Haken, Flay) konsequent auf Master Yi setzen, sobald er wieder angreifbar ist, statt auf Verlangsamungen zu setzen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du schützt deinen Carry gegen den einzigen, der ihn erreicht." }
     ]
   },
   {
@@ -3148,8 +3148,8 @@ const RUNS = [
     "coachHint": "Wann ist ein gewonnener Kampf noch ein gewonnener Kampf?",
     "context": "Du bist Sona (Support) mit Ashe, Minute 08:20. Ihr habt gerade die gegnerische Jinx getötet, Ashe hat nur noch 15 % Leben. Ihr steht am gegnerischen Turm. Euer Team pingt, dass der gegnerische Jungler unterwegs ist.",
     "options": [
-      { "label": "A: Sofort zurückziehen, den Turm nicht weiter schlagen und Ashe sichern, weil der Jungler kommt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr behaltet den Kill und gebt keinen zurück." },
-      { "label": "B: Am Turm stehen bleiben und weiter Turmschaden machen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler kommt über den Fluss und trifft euch mit Ashe auf 15 % Leben.", "Ihr gebt den Kill zurück, und der Vorteil ist weg."] },
+      { "label": "A: Am Turm stehen bleiben und weiter Turmschaden machen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler kommt über den Fluss und trifft euch mit Ashe auf 15 % Leben.", "Ihr gebt den Kill zurück, und der Vorteil ist weg."] },
+      { "label": "B: Sofort zurückziehen, den Turm nicht weiter schlagen und Ashe sichern, weil der Jungler kommt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr behaltet den Kill und gebt keinen zurück." },
       { "label": "C: Der gegnerischen Soraka hinterherjagen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst tief in ihr Gebiet, ohne Ashe zu schützen.", "Der Jungler fängt Ashe ab, und ihr verliert beide."] }
     ]
   },
@@ -3165,9 +3165,9 @@ const RUNS = [
     "coachHint": "Wann kostet dich ein Recall keine Minions?",
     "context": "Du bist Jax (Top) gegen Gnar, Minute 03:10, Level 3. Du hast die ersten zwei Wellen langsam gesammelt, die dritte Welle mit der ersten Kanonen-Minion steht kurz vor dem gegnerischen Turm. Du hast etwa 1.000 Gold: Boots kosten 300, ein Long Sword 350.",
     "options": [
-      { "label": "A: Recallen, bevor die Welle gecrasht ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Welle crasht ohne dich, und Gnar farmt sie sicher.", "Du verlierst die Kanonen-Minion und Erfahrung und bist später zurück."] },
-      { "label": "B: Die Welle in euren Turm ziehen und dort recallen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Gnar bekommt freies Pushen gegen dich.", "Du verlierst Wellenkontrolle und Gold, und Gnar übernimmt die Lane."] },
-      { "label": "C: Die dritte Welle hart unter den gegnerischen Turm crashen lassen und sofort recallen, um Boots und Long Sword zu kaufen, während Gnar sie am Turm abräumt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verlierst keine Minions und kommst mit Items zurück." }
+      { "label": "A: Die dritte Welle hart unter den gegnerischen Turm crashen lassen und sofort recallen, um Boots und Long Sword zu kaufen, während Gnar sie am Turm abräumt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verlierst keine Minions und kommst mit Items zurück." },
+      { "label": "B: Recallen, bevor die Welle gecrasht ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Welle crasht ohne dich, und Gnar farmt sie sicher.", "Du verlierst die Kanonen-Minion und Erfahrung und bist später zurück."] },
+      { "label": "C: Die Welle in euren Turm ziehen und dort recallen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Gnar bekommt freies Pushen gegen dich.", "Du verlierst Wellenkontrolle und Gold, und Gnar übernimmt die Lane."] }
     ]
   },
   {
@@ -3183,8 +3183,8 @@ const RUNS = [
     "context": "Du bist Aatrox (Top) gegen Gnar, Minute 05:50, Level 5. Gnar hat die Welle nahe an seinem Turm eingefroren, sodass du nur unter Turmreichweite farmen könntest. Dein Jungler Sejuani steht in deiner Nähe.",
     "options": [
       { "label": "A: Solo vorlaufen und die Minions unter dem Turm farmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm und Gnar treffen dich ohne Hilfe.", "Du wirst gegankt, stirbst und verlierst Top-Prio."] },
-      { "label": "B: Sejuani anpingen und gemeinsam die Welle crashen, um das Freeze zu brechen, statt allein tief vorzulaufen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Das Freeze bricht, und ihr gewinnt die Wellenkontrolle zurück." },
-      { "label": "C: Weiter am Rand stehen und gar nichts tun.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Gnar behält sein Freeze und deine Erfahrung bleibt aus.", "Er zieht an Level und Gold vorbei, und du fällst zurück."] }
+      { "label": "B: Weiter am Rand stehen und gar nichts tun.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Gnar behält sein Freeze und deine Erfahrung bleibt aus.", "Er zieht an Level und Gold vorbei, und du fällst zurück."] },
+      { "label": "C: Sejuani anpingen und gemeinsam die Welle crashen, um das Freeze zu brechen, statt allein tief vorzulaufen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Das Freeze bricht, und ihr gewinnt die Wellenkontrolle zurück." }
     ]
   },
   {
@@ -3199,8 +3199,8 @@ const RUNS = [
     "coachHint": "Kommst du an, bevor der Kampf entschieden ist?",
     "context": "Du bist Ornn (Top) gegen Gnar, Minute 12:40. Eure Botlane kämpft 2v2 im Fluss und ist in etwa 3 Sekunden entschieden. Dein Teleport ist bereit, braucht aber mehrere Sekunden Kanalisierung. Deine Welle steht an deinem Turm und crasht gleich.",
     "options": [
-      { "label": "A: Den Teleport aufsparen und die eigene Welle sichern, weil du für den Botlane-Kampf zu spät kommen würdest.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du behältst Teleport und Welle und verlierst keinen Wert." },
-      { "label": "B: Den Teleport trotzdem starten, obwohl du zu spät ankommst.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du landest, wenn der Kampf schon entschieden ist.", "Teleport ist lange weg, und deine Welle crasht unter den Turm."] },
+      { "label": "A: Den Teleport trotzdem starten, obwohl du zu spät ankommst.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du landest, wenn der Kampf schon entschieden ist.", "Teleport ist lange weg, und deine Welle crasht unter den Turm."] },
+      { "label": "B: Den Teleport aufsparen und die eigene Welle sichern, weil du für den Botlane-Kampf zu spät kommen würdest.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du behältst Teleport und Welle und verlierst keinen Wert." },
       { "label": "C: Die eigene Welle ignorieren und zu Fuß zur Botlane laufen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kommst zu spät und verlierst die Welle.", "Gnar nutzt die freie Lane, und du verlierst Erfahrung und Gold."] }
     ]
   },
@@ -3215,9 +3215,9 @@ const RUNS = [
     "coachHint": "Wer hat die Ultimate zuerst, und wie viele Minions fehlen dir?",
     "context": "Du bist Sett (Top) gegen Darius, Minute 08:20, Level 5. Darius erreicht eine Minion vor dir Level 6 und hat dann seine Ultimate. Dein Level 6 kommt erst mit der nächsten Welle.",
     "options": [
-      { "label": "A: Für eine Melee-Minion in den All-in laufen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Darius hat Level 6 und gewinnt den Trade mit seiner Ultimate.", "Du verlierst Leben und Flash, und Darius übernimmt die Lane."] },
-      { "label": "B: Mit Flash vorlaufen, um zuerst Level 6 zu bekommen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verbrauchst Flash für eine Minion.", "Darius punisht dich im Level-6-Vorteil und die Welle ist trotzdem verloren."] },
-      { "label": "C: Respektabstand halten und nicht auf den garantierten All-in einlassen, bis du ebenfalls Level 6 hast.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verhinderst den All-in und verlierst keine Welle." }
+      { "label": "A: Respektabstand halten und nicht auf den garantierten All-in einlassen, bis du ebenfalls Level 6 hast.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verhinderst den All-in und verlierst keine Welle." },
+      { "label": "B: Für eine Melee-Minion in den All-in laufen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Darius hat Level 6 und gewinnt den Trade mit seiner Ultimate.", "Du verlierst Leben und Flash, und Darius übernimmt die Lane."] },
+      { "label": "C: Mit Flash vorlaufen, um zuerst Level 6 zu bekommen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verbrauchst Flash für eine Minion.", "Darius punisht dich im Level-6-Vorteil und die Welle ist trotzdem verloren."] }
     ]
   },
   {
@@ -3233,8 +3233,8 @@ const RUNS = [
     "context": "Du bist Sion (Top), Minute 22:30. Du hast Hullbreaker (3.000 Gold). Boarding Party wirkt nur, wenn kein verbündeter Champion innerhalb von 1.400 Einheiten steht. Dein Team hat Mid-Prio, geht aber gerade zum Einkaufen in die Base. Du pushst die Seitenlane allein an ihrem T2.",
     "options": [
       { "label": "A: Tief ohne Vision pushen, um den Turm unbedingt zu bekommen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Mehrere Gegner fangen dich ab, während dein Team in der Base ist.", "Du stirbst allein und gibst Tempo und Baron-Kontrolle ab."] },
-      { "label": "B: Weiter pushen, solange du Vision hast, aber beim Auftauchen mehrerer Gegner sofort zurückziehen, statt den Turm zu erzwingen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du erzeugst Druck und stirbst nicht, während dein Team einkauft." },
-      { "label": "C: Die Seitenlane verlassen und im Team Mid farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlierst den Druck, den Hullbreaker allein erzeugt.", "Die Gegner können ihr Team ungestört gruppieren."] }
+      { "label": "B: Die Seitenlane verlassen und im Team Mid farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlierst den Druck, den Hullbreaker allein erzeugt.", "Die Gegner können ihr Team ungestört gruppieren."] },
+      { "label": "C: Weiter pushen, solange du Vision hast, aber beim Auftauchen mehrerer Gegner sofort zurückziehen, statt den Turm zu erzwingen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du erzeugst Druck und stirbst nicht, während dein Team einkauft." }
     ]
   },
   {
@@ -3249,8 +3249,8 @@ const RUNS = [
     "coachHint": "Wer steht zuerst in Reichweite, ohne dass du dich exponierst?",
     "context": "Du bist Jinx (Bot), Minute 27:30. Euer Team spielt eine Front-to-Back-Komposition. Die gegnerische Frontline (Ornn und Malphite) steht vorn, vier Gegner in der Backline dahinter. Dein Flash ist bereit.",
     "options": [
-      { "label": "A: In sicherer Reichweite hinter eurer Frontline bleiben und gemeinsam den gegnerischen Frontliner niedermähen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Front-to-Back-Komposition arbeitet, wie sie soll." },
-      { "label": "B: Mit Flash in die gegnerische Backline springen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst allein vor vier Gegnern und ihrer Kontrolle.", "Du stirbst sofort, und eure Front kämpft ohne Schaden weiter."] },
+      { "label": "A: Mit Flash in die gegnerische Backline springen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst allein vor vier Gegnern und ihrer Kontrolle.", "Du stirbst sofort, und eure Front kämpft ohne Schaden weiter."] },
+      { "label": "B: In sicherer Reichweite hinter eurer Frontline bleiben und gemeinsam den gegnerischen Frontliner niedermähen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Front-to-Back-Komposition arbeitet, wie sie soll." },
       { "label": "C: Hinter der Frontline stehen bleiben und keinen Schaden machen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Eure Front kämpft allein gegen die ganze gegnerische Komposition.", "Ihr verliert den Kampf, bevor du eingreifst."] }
     ]
   },
@@ -3264,9 +3264,9 @@ const RUNS = [
     "coachHint": "Wann ist Viktor wieder angreifbar, und wann landet dein Stun?",
     "context": "Du bist Syndra (Mid), Minute 24:10. Der gegnerische Viktor hat Zhonya's Hourglass aktiviert (2,5 Sekunden Stasis), in etwa 0,3 Sekunden wacht er auf. Dein Q, E und R sind bereit, sein Flash ist bereit.",
     "options": [
-      { "label": "A: E und Q zu früh in die Stasis feuern.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["In der Stasis ist Viktor untargetable, die Fähigkeiten treffen nicht.", "Deine Fähigkeiten sind verbraucht, wenn er aufwacht, und er flasht weg."] },
-      { "label": "B: Erst nach dem Aufwachen anfangen zu zielen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Viktor reagiert zuerst und weicht aus oder flasht.", "Dein Burst trifft zu spät, und er überlebt."] },
-      { "label": "C: Q und E so legen, dass der Stun genau im Moment des Aufwachens landet, und die Ultimate direkt danach.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Burst trifft den ersten Frame, in dem er angreifbar ist." }
+      { "label": "A: Q und E so legen, dass der Stun genau im Moment des Aufwachens landet, und die Ultimate direkt danach.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Burst trifft den ersten Frame, in dem er angreifbar ist." },
+      { "label": "B: E und Q zu früh in die Stasis feuern.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["In der Stasis ist Viktor untargetable, die Fähigkeiten treffen nicht.", "Deine Fähigkeiten sind verbraucht, wenn er aufwacht, und er flasht weg."] },
+      { "label": "C: Erst nach dem Aufwachen anfangen zu zielen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Viktor reagiert zuerst und weicht aus oder flasht.", "Dein Burst trifft zu spät, und er überlebt."] }
     ]
   },
   {
@@ -3282,8 +3282,8 @@ const RUNS = [
     "context": "Du bist Ahri (Mid), Minute 26:30. Die gegnerische Jinx hat Guardian Angel (4 Sekunden Stasis, danach 300 Sekunden Abklingzeit). Euer Team hat sie gerade erstmals getötet, der Kampf läuft weiter. Dein Charm ist bereit.",
     "options": [
       { "label": "A: Alle Fähigkeiten sofort auf Jinx' Stasis feuern.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Während der Stasis ist sie untargetable, die Fähigkeiten treffen nicht.", "Du hast deinen Burst verschwendet, und die anderen Gegner überleben."] },
-      { "label": "B: Die Fähigkeiten zuerst auf die anderen Gegner legen und den Charm auf Jinx erst setzen, wenn sie nach 4 Sekunden wieder aufsteht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Burst trifft sie, wenn ihr Guardian Angel verbraucht ist." },
-      { "label": "C: Den Kampf verlassen, weil Jinx ohnehin zurückkommt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich in Unterzahl.", "Die anderen Gegner gewinnen den Kampf, bevor Jinx zurück ist."] }
+      { "label": "B: Den Kampf verlassen, weil Jinx ohnehin zurückkommt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich in Unterzahl.", "Die anderen Gegner gewinnen den Kampf, bevor Jinx zurück ist."] },
+      { "label": "C: Die Fähigkeiten zuerst auf die anderen Gegner legen und den Charm auf Jinx erst setzen, wenn sie nach 4 Sekunden wieder aufsteht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Burst trifft sie, wenn ihr Guardian Angel verbraucht ist." }
     ]
   },
   {
@@ -3299,8 +3299,8 @@ const RUNS = [
     "coachHint": "Was passiert, wenn ein Gegner unter 20 % Leben getroffen wird?",
     "context": "Du bist Kai'Sa (Bot), Minute 33:20. Euer Team hat den Elder Dragon. Die gegnerische Jinx steht bei 22 % Leben. Wird sie unter 20 % Leben getroffen, richtet sie Elder Immolation nach 0,5 Sekunden mit wahrem Schaden hin. Deine Ultimate und dein Flash sind bereit.",
     "options": [
-      { "label": "A: Einen einzelnen Treffer auf Jinx setzen und Elder Immolation sie nach 0,5 Sekunden hinrichten lassen, statt Ultimate und Flash zu riskieren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Elder erledigt sie, und du bleibst sicher." },
-      { "label": "B: Mit Flash und Ultimate in die Frontline springen, um sie zu töten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlässt die sichere Position und stehst vor vier Gegnern.", "Du stirbst für einen Kill, den der Elder ohnehin bekommen hätte."] },
+      { "label": "A: Mit Flash und Ultimate in die Frontline springen, um sie zu töten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verlässt die sichere Position und stehst vor vier Gegnern.", "Du stirbst für einen Kill, den der Elder ohnehin bekommen hätte."] },
+      { "label": "B: Einen einzelnen Treffer auf Jinx setzen und Elder Immolation sie nach 0,5 Sekunden hinrichten lassen, statt Ultimate und Flash zu riskieren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Elder erledigt sie, und du bleibst sicher." },
       { "label": "C: Aufhören zu kämpfen, weil Jinx fast tot ist.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Jinx bleibt über 20 % Leben und bekommt Heilung.", "Ihr verschenkt den Elder-Vorteil und den Kill."] }
     ]
   },
@@ -3315,9 +3315,9 @@ const RUNS = [
     "coachHint": "Wo steht deine Welle, wenn der Baron spawnt?",
     "context": "Du bist Ahri (Mid), Minute 18:55. Der Baron spawnt um 20:00, also in etwa 65 Sekunden. Deine Mid-Welle steht neutral, die gegnerische Welle ist ausgewogen. Euer Team will den Baron kontrollieren.",
     "options": [
-      { "label": "A: Die Welle neutral lassen und erst bei 20:00 rotieren.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die gegnerische Welle drückt euren Turm, während ihr am Pit seid.", "Ihr verliert Turmschaden und Position und startet den Baron unter Druck."] },
-      { "label": "B: Die Welle schnell in den Turm schieben und dann untätig stehen bleiben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst allein, wenn der Baron spawnt.", "Ihr rotiert zu spät und verliert die Kontrolle am Pit."] },
-      { "label": "C: Jetzt die Welle slow pushen, damit sie rechtzeitig vor dem Baron-Spawn crasht, und Vision um den Pit sichern.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Deine Welle bindet die Gegner, während ihr den Baron vorbereitet." }
+      { "label": "A: Jetzt die Welle slow pushen, damit sie rechtzeitig vor dem Baron-Spawn crasht, und Vision um den Pit sichern.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Deine Welle bindet die Gegner, während ihr den Baron vorbereitet." },
+      { "label": "B: Die Welle neutral lassen und erst bei 20:00 rotieren.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die gegnerische Welle drückt euren Turm, während ihr am Pit seid.", "Ihr verliert Turmschaden und Position und startet den Baron unter Druck."] },
+      { "label": "C: Die Welle schnell in den Turm schieben und dann untätig stehen bleiben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst allein, wenn der Baron spawnt.", "Ihr rotiert zu spät und verliert die Kontrolle am Pit."] }
     ]
   },
   {
@@ -3333,8 +3333,8 @@ const RUNS = [
     "context": "Du bist Jinx (Bot), Minute 27:50. Euer Team hat vor 20 Sekunden den Baron getötet und trägt den Hand-of-Baron-Buff (180 Sekunden, stärkt auch nahe Minions). Die Gegner sind noch nicht zurück in Position.",
     "options": [
       { "label": "A: Gruppiert im Fluss stehen bleiben und warten, bis der Buff abläuft.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Buff verfliegt ungenutzt.", "Die Gegner finden Zeit, sich zu sammeln, und der Vorteil des Barons ist weg."] },
-      { "label": "B: Den Buff nutzen: mit den gestärkten Minions mehrere Lanes gleichzeitig pushen, bevor er abläuft.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr zwingt die Gegner, auf mehreren Fronten zu verteidigen." },
-      { "label": "C: Allein ohne Vision in die gegnerische Base tauchen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst allein vor ihren Türmen und Spielern.", "Du stirbst, verlierst den Buff und der Baron war umsonst."] }
+      { "label": "B: Allein ohne Vision in die gegnerische Base tauchen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst allein vor ihren Türmen und Spielern.", "Du stirbst, verlierst den Buff und der Baron war umsonst."] },
+      { "label": "C: Den Buff nutzen: mit den gestärkten Minions mehrere Lanes gleichzeitig pushen, bevor er abläuft.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr zwingt die Gegner, auf mehreren Fronten zu verteidigen." }
     ]
   },
   {
@@ -3350,8 +3350,8 @@ const RUNS = [
     "coachHint": "Wann reicht dein Smite für den Baron, und wann nicht?",
     "context": "Du bist Kayn (Jungle), Minute 29:40. Euer Team schlägt den Baron (er hat noch 2.500 Lebenspunkte), dein Smite macht 900 wahren Schaden. Die Gegner laufen gerade durch den Engpass in den Pit.",
     "options": [
-      { "label": "A: Sofort vom Baron auf die Gegner turnen und den Teamfight gewinnen, weil dein Smite bei 2.500 Leben noch nicht reicht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr kämpft in Formation, und der Baron bleibt für danach." },
-      { "label": "B: Den Baron weiterschlagen und bei 900 auf ein 50/50 Smite drücken.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner schlagen euch im Rücken, während ihr den Baron beschäftigt.", "Ihr werdet gewiped, und der Baron geht an die Gegner."] },
+      { "label": "A: Den Baron weiterschlagen und bei 900 auf ein 50/50 Smite drücken.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner schlagen euch im Rücken, während ihr den Baron beschäftigt.", "Ihr werdet gewiped, und der Baron geht an die Gegner."] },
+      { "label": "B: Sofort vom Baron auf die Gegner turnen und den Teamfight gewinnen, weil dein Smite bei 2.500 Leben noch nicht reicht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr kämpft in Formation, und der Baron bleibt für danach." },
       { "label": "C: Alle wegrennen und den Baron stehen lassen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner nehmen den Baron in Ruhe.", "Ihr gebt Baron und Buff ohne Kampf ab."] }
     ]
   },
@@ -3368,9 +3368,9 @@ const RUNS = [
     "coachHint": "Wer muss als Erster in den Busch, damit ihr den Pick bekommt?",
     "context": "Du bist Thresh (Support), Minute 31:10. Der Elder Dragon spawnt in etwa 60 Sekunden. Ihr habt mit dem Sweeper alle gegnerischen Wards im Buff-Busch geräumt, drei von euch stehen dort. Die gegnerische Leona holt Wards für den Elder.",
     "options": [
-      { "label": "A: Einzeln durch den Dschungel laufen und nach Wards suchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst ohne Info in mehrere Gegner.", "Ihr verliert Spieler und gebt den Elder ab."] },
-      { "label": "B: Direkt zum Elder gehen, ohne auf den Pick zu warten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner haben Vision und Position am Pit.", "Ihr kämpft ohne Vorteil und verliert den Elder."] },
-      { "label": "C: Zu dritt im Busch warten und beim Auftauchen der Leona den Pick erzwingen (Haken), bevor der Elder spawnt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nehmt ihren Support aus dem Spiel, bevor der Elder kommt." }
+      { "label": "A: Zu dritt im Busch warten und beim Auftauchen der Leona den Pick erzwingen (Haken), bevor der Elder spawnt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nehmt ihren Support aus dem Spiel, bevor der Elder kommt." },
+      { "label": "B: Einzeln durch den Dschungel laufen und nach Wards suchen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst ohne Info in mehrere Gegner.", "Ihr verliert Spieler und gebt den Elder ab."] },
+      { "label": "C: Direkt zum Elder gehen, ohne auf den Pick zu warten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner haben Vision und Position am Pit.", "Ihr kämpft ohne Vorteil und verliert den Elder."] }
     ]
   },
   {
@@ -3387,8 +3387,8 @@ const RUNS = [
     "context": "Du bist Janna (Support), Minute 28:20. Die Gegner zünden gleichzeitig Lulus Ultimate (Bonus-Leben für 7 Sekunden), Ghost und Sivirs Ultimate (Tempo für das Team). Deine Ultimate (Monsoon) ist bereit, euer Team hat Disengage und Reichweite.",
     "options": [
       { "label": "A: Hart in den unvorteilhaften Buff hineinfighten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner haben mehr Leben und mehr Tempo.", "Ihr verliert den Kampf und den Carry."] },
-      { "label": "B: Mit Disengage und Monsoon kiten, bis die Buffs auslaufen, und erst dann kämpfen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr kämpft ohne ihren Spike und gewinnt den Kampf." },
-      { "label": "C: Monsoon sofort verbrauchen und danach nahe stehen bleiben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner haben noch Tempo und überrennen euch.", "Du hast keine Disengage-Fähigkeit mehr, wenn sie wirklich eintreffen."] }
+      { "label": "B: Monsoon sofort verbrauchen und danach nahe stehen bleiben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner haben noch Tempo und überrennen euch.", "Du hast keine Disengage-Fähigkeit mehr, wenn sie wirklich eintreffen."] },
+      { "label": "C: Mit Disengage und Monsoon kiten, bis die Buffs auslaufen, und erst dann kämpfen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr kämpft ohne ihren Spike und gewinnt den Kampf." }
     ]
   },
   {
@@ -3402,8 +3402,8 @@ const RUNS = [
     "coachHint": "Wann kann Master Yi von deinem Charm getroffen werden?",
     "context": "Du bist Ahri (Mid), Minute 28:40. Der gegnerische Master Yi springt mit Alpha Strike auf euren Carry Jinx. Während des Sprungs ist er untargetable. Dein Charm ist bereit.",
     "options": [
-      { "label": "A: Den Charm nicht in den Alpha Strike werfen, sondern auf sein Auftauchen warten und ihn danach charmen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Charm trifft ihn, wenn er angreifbar ist." },
-      { "label": "B: Den Charm sofort während des Alpha Strike werfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Master Yi ist untargetable, der Charm trifft nicht.", "Dein Charm ist weg, und er kommt ungehindert zu Jinx."] },
+      { "label": "A: Den Charm sofort während des Alpha Strike werfen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Master Yi ist untargetable, der Charm trifft nicht.", "Dein Charm ist weg, und er kommt ungehindert zu Jinx."] },
+      { "label": "B: Den Charm nicht in den Alpha Strike werfen, sondern auf sein Auftauchen warten und ihn danach charmen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Charm trifft ihn, wenn er angreifbar ist." },
       { "label": "C: Den Charm aufsparen und gar nichts tun.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Master Yi erreicht Jinx ohne jede Gegenwehr.", "Euer Carry stirbt, und der Kampf kippt."] }
     ]
   },
@@ -3574,6 +3574,314 @@ const RUNS = [
       { "label": "A: Warten, bis die Welle gecrasht ist, und dann zur Mid roamen, damit Ashe nichts verliert.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle ist gelöst, und du hilfst Mid zur richtigen Zeit." },
       { "label": "B: Sofort losroamen, während die Welle noch nicht gecrasht ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ashe muss die Welle allein schieben und verliert Minions.", "Die Welle bounct zu euch, und ihr verliert Druck in der Lane."] },
       { "label": "C: In der Lane bleiben und Mid allein lassen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Mid steht gegen den Roam in Unterzahl.", "Ihr verliert Mid-Prio und gebt Gold ab."] }
+    ]
+  },
+  {
+    "id": "lo_master_bot_elder_safety", "gameTime": "34:10", "timeLimit": 60,
+    "champion": "Ashe", "role": "Botlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 46, "y": 52, "type": "hero", "isPlayer": true, "label": "Ashe" },
+      { "x": 44, "y": 56, "type": "hero", "label": "Team (4)", "champion": "Ornn" },
+      { "x": 56, "y": 46, "type": "enemy", "label": "Zeri", "champion": "Zeri" },
+      { "x": 60, "y": 42, "type": "enemy", "label": "Gegner (4)", "champion": "Zed" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Elder Dragon" }
+    ],
+    "coachHint": "Wie nah an der Schwelle darfst du dem Gegner kommen?",
+    "context": "Du bist Ashe (Bot), Minute 34:10. Die Gegner haben den Elder Dragon. Wer unter 20 % Leben getroffen wird, wird von Elder Immolation nach 0,5 Sekunden hingerichtet. Du stehst bei 24 % Leben hinter eurer Frontline, der Kampf läuft noch.",
+    "options": [
+      { "label": "A: Weiterkämpfen und auf einen letzten Treffer hoffen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ein einzelner Treffer bringt dich unter 20 % Leben.", "Elder Immolation richtet dich nach 0,5 Sekunden hin, und eurem Team fehlt der Schaden."] },
+      { "label": "B: Vor die Frontline laufen, um mehr Schaden zu machen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst in Reichweite der Gegner und nimmst sofort Schaden.", "Du fällst unter 20 % und wirst hingerichtet."] },
+      { "label": "C: Hinter die Frontline zurückziehen und keinen Schaden mehr nehmen, solange du knapp über 20 % Leben bist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du bleibst über der Schwelle und überlebst den Execute." }
+    ]
+  },
+  {
+    "id": "lo_master_bot_ga_wakeup", "gameTime": "31:20", "timeLimit": 60,
+    "champion": "Ashe", "role": "Botlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Ashe" },
+      { "x": 42, "y": 54, "type": "hero", "label": "Team (4)", "champion": "Ornn" },
+      { "x": 58, "y": 44, "type": "enemy", "label": "Zeri (hat GA)", "champion": "Zeri" },
+      { "x": 62, "y": 40, "type": "enemy", "label": "Gegner (4)", "champion": "Zed" }
+    ],
+    "coachHint": "Wann ist die Gegnerin nach ihrem Tod wieder angreifbar?",
+    "context": "Du bist Ashe (Bot), Minute 31:20. Die gegnerische Zeri hat Guardian Angel (4 Sekunden Stasis, danach 300 Sekunden Abklingzeit). Euer Team hat sie gerade getötet, sie steht in 4 Sekunden wieder auf. Der Rest der Gegner kämpft weiter.",
+    "options": [
+      { "label": "A: Alles sofort auf ihre Stasis feuern.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["In der Stasis ist sie untargetable, die Fähigkeiten treffen nicht.", "Dein Schaden ist verschwendet, und die anderen Gegner überleben."] },
+      { "label": "B: Die Fähigkeiten zuerst auf die anderen Gegner legen und erst nach den 4 Sekunden wieder auf Zeri schießen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Dein Schaden trifft die, die angreifbar sind." },
+      { "label": "C: Den Kampf verlassen, weil Zeri gleich zurückkommt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Team kämpft ohne dich in Unterzahl.", "Die anderen Gegner gewinnen den Kampf, bevor Zeri zurück ist."] }
+    ]
+  },
+  {
+    "id": "lo_master_bot_wave_before_baron", "gameTime": "18:50", "timeLimit": 60,
+    "champion": "Ashe", "role": "Botlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 86, "y": 84, "type": "hero", "isPlayer": true, "label": "Ashe" },
+      { "x": 82, "y": 86, "type": "hero", "label": "Nautilus (Support)", "champion": "Nautilus" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 92, "y": 62, "type": "objective", "label": "Gegner-Turm T1 (Bot)" }
+    ],
+    "coachHint": "Wo steht deine Welle, wenn der Baron spawnt?",
+    "context": "Du bist Ashe (Bot), Minute 18:50. Der Baron spawnt um 20:00, in etwa 70 Sekunden. Deine Bot-Welle steht neutral in der Mitte der Lane, dein Team will den Baron kontrollieren.",
+    "options": [
+      { "label": "A: Jetzt die Welle langsam pushen, damit sie vor dem Baron-Spawn crasht, und danach mit Vision zum Team rotieren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle bindet die Gegner, während ihr den Baron vorbereitet." },
+      { "label": "B: Die Welle liegen lassen und sofort rotieren.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die gegnerische Welle drückt euren Turm, während ihr am Pit seid.", "Ihr verliert Turmschaden und startet den Baron unter Druck."] },
+      { "label": "C: Die Welle in den eigenen Turm ziehen und dort farmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kommst zu spät zum Pit.", "Euer Team steht in Unterzahl, wenn der Baron spawnt."] }
+    ]
+  },
+  {
+    "id": "lo_master_bot_zhonya_window", "gameTime": "29:40", "timeLimit": 60,
+    "champion": "Ashe", "role": "Botlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 46, "y": 52, "type": "hero", "isPlayer": true, "label": "Ashe" },
+      { "x": 42, "y": 56, "type": "hero", "label": "Team (4)", "champion": "Ornn" },
+      { "x": 58, "y": 46, "type": "enemy", "label": "Syndra", "champion": "Syndra" },
+      { "x": 62, "y": 42, "type": "enemy", "label": "Gegner (4)", "champion": "Zed" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache" }
+    ],
+    "coachHint": "Wie lange hat der gegnerische Mid keine Stasis?",
+    "context": "Du bist Ashe (Bot), Minute 29:40. Der gegnerische Mid hat vor 30 Sekunden Zhonya's Hourglass (2,5 Sekunden Stasis, 120 Sekunden Abklingzeit) in einem Kampf benutzt. Ein neuer Kampf am Drachen beginnt.",
+    "options": [
+      { "label": "A: Mit dem Kampf warten, bis Zhonya's wieder bereit ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Nach rund 90 Sekunden hat er seine Stasis zurück.", "Ihr verschenkt euren sichersten Moment und kämpft gegen den vollen Schutz."] },
+      { "label": "B: Alle Fähigkeiten auf den Tank statt auf den verwundbaren Mid legen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Tank überlebt, der Mid bleibt unbeschädigt.", "Ihr verliert den leichtesten Kill und den Kampf."] },
+      { "label": "C: Den Kampf jetzt annehmen und den Mid priorisieren, weil seine Stasis noch rund anderthalb Minuten nicht bereit ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Er kann sich nicht retten, und euer Team gewinnt den Kampf." }
+    ]
+  },
+  {
+    "id": "lo_master_bot_baron_vs_inhib", "gameTime": "30:30", "timeLimit": 60,
+    "champion": "Ashe", "role": "Botlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 40, "y": 46, "type": "hero", "isPlayer": true, "label": "Ashe" },
+      { "x": 38, "y": 40, "type": "hero", "label": "Team (4)", "champion": "Ornn" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 92, "y": 8, "type": "fog", "label": "Gegner respawnen" }
+    ],
+    "coachHint": "Wie lange hält der Baron-Buff, und wann sind die Gegner zurück?",
+    "context": "Du bist Ashe (Bot), Minute 30:30. Ihr habt drei Gegner getötet, sie kommen erst in gut einer halben Minute zurück. Ihre Base ist nicht offen, ihr würdet den Inhibitor nicht mehr rechtzeitig erreichen. Der Baron ist verfügbar (der Hand-of-Baron-Buff hält 180 Sekunden).",
+    "options": [
+      { "label": "A: Alle drei Lanes einzeln pushen, ohne den Baron zu nehmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ihr seid verstreut, wenn die Gegner zurückkommen.", "Sie fangen euch einzeln ab und gleichen aus."] },
+      { "label": "B: Den Baron nehmen, solange die drei Gegner tot sind, und danach mit dem Buff die Lanes pushen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nutzt die Totzeit für das wertvollste Objective." },
+      { "label": "C: Zur Base recallen und einkaufen, ohne etwas zu nehmen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner sind rechtzeitig zurück und nehmen den Baron selbst.", "Ihr gebt Baron und Tempo ab."] }
+    ]
+  },
+  {
+    "id": "lo_silver_jg_scuttle_respawn", "gameTime": "05:15", "timeLimit": 35,
+    "champion": "Warwick", "role": "Jungle", "difficulty": "Silber",
+    "markers": [
+      { "x": 58, "y": 62, "type": "hero", "isPlayer": true, "label": "Warwick" },
+      { "x": 62, "y": 66, "type": "objective", "label": "Scuttle-Respawn-Markierung" },
+      { "x": 54, "y": 46, "type": "hero", "label": "Lux (Mid)", "champion": "Lux" },
+      { "x": 30, "y": 12, "type": "fog", "label": "Gegner-Jungler zuletzt Top" }
+    ],
+    "coachHint": "Wann ist der Scuttle wieder da, und wer sieht ihn zuerst?",
+    "context": "Du bist Warwick (Jungle), Minute 05:15. Der Scuttle Crab wurde um 03:05 getötet und respawnt rund 2:30 später, also um 05:35, in 20 Sekunden. Der Respawn-Punkt ist auf der Minimap markiert. Der gegnerische Jungler wurde zuletzt Top gesehen.",
+    "options": [
+      { "label": "A: Mit Vision am markierten Respawn-Punkt Position beziehen und den Scuttle direkt beim Spawn nehmen, solange der gegnerische Jungler Top gebunden ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nimmst den Crab, ohne dich zu exponieren." },
+      { "label": "B: Zu früh in den Fluss laufen und ohne Vision warten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler sieht dich zuerst.", "Du wirst gestellt und verlierst Leben, Tempo und den Scuttle."] },
+      { "label": "C: Den Scuttle ignorieren und zur Base resetten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler nimmt den Scuttle ohne Gegenwehr.", "Er bekommt die Flussvision und das Tempo."] }
+    ]
+  },
+  {
+    "id": "lo_silver_jg_voidgrubs_prio", "gameTime": "06:15", "timeLimit": 35,
+    "champion": "Warwick", "role": "Jungle", "difficulty": "Silber",
+    "markers": [
+      { "x": 34, "y": 40, "type": "hero", "isPlayer": true, "label": "Warwick" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Voidgrubs" },
+      { "x": 12, "y": 24, "type": "hero", "label": "Garen (Top)", "champion": "Garen" },
+      { "x": 46, "y": 54, "type": "hero", "label": "Lux (Mid)", "champion": "Lux" },
+      { "x": 84, "y": 80, "type": "fog", "label": "Gegner-Jungler zuletzt Bot" }
+    ],
+    "coachHint": "Wer hilft dir bei den Grubs, und wo ist der Gegner gebunden?",
+    "context": "Du bist Warwick (Jungle), Minute 06:15. Die Voidgrubs sind seit 6:00 da. Eure Top- und Midlane haben Welle und Prio, der gegnerische Jungler wurde zuletzt Bot gesehen.",
+    "options": [
+      { "label": "A: Die Grubs ignorieren und weiter Camps farmen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der gegnerische Jungler nimmt die Grubs später ohne Gegenwehr.", "Ihr verliert die Ressource am Pit."] },
+      { "label": "B: Allein ohne Hilfe von Top und Mid starten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bist langsam, und der gegnerische Jungler kann dazukommen.", "Du verlierst Leben und die Grubs."] },
+      { "label": "C: Die Voidgrubs mit Top und Mid starten, solange der gegnerische Jungler Bot gebunden ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr nehmt die Ressource, ohne gestört zu werden." }
+    ]
+  },
+  {
+    "id": "lo_silver_jg_reset_dragon", "gameTime": "09:05", "timeLimit": 35,
+    "champion": "Warwick", "role": "Jungle", "difficulty": "Silber",
+    "markers": [
+      { "x": 30, "y": 60, "type": "hero", "isPlayer": true, "label": "Warwick" },
+      { "x": 8, "y": 92, "type": "objective", "label": "Eigene Base" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache" },
+      { "x": 60, "y": 72, "type": "hero", "label": "Team (4)", "champion": "Ornn" }
+    ],
+    "coachHint": "Wann bist du fertig mit Einkaufen und zurück am Pit?",
+    "context": "Du bist Warwick (Jungle), Minute 09:05. Der Drache erscheint in etwa 55 Sekunden. Du hast 1.350 Gold im Beutel. Ein Recall dauert 8 Sekunden, dein Rückweg zum Pit etwa 30 Sekunden. Dein Team bereitet den Drachen vor.",
+    "options": [
+      { "label": "A: Noch ein Camp clearen und erst 15 Sekunden vor dem Spawn resetten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Recall und Rückweg dauern länger als 15 Sekunden.", "Du kommst nach dem Spawn zurück, und euer Team startet ohne dich."] },
+      { "label": "B: Jetzt resetten, Gold ausgeben und rechtzeitig vor dem Spawn zurück am Pit sein.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du bist ausgerüstet und rechtzeitig am Pit." },
+      { "label": "C: Ohne Reset mit vollem Beutel zum Pit gehen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du hast keine Items gekauft.", "Du bist im Kampf schwächer als nötig und verlierst den Drachen."] }
+    ]
+  },
+  {
+    "id": "lo_silver_jg_gank_choice", "gameTime": "07:50", "timeLimit": 35,
+    "champion": "Warwick", "role": "Jungle", "difficulty": "Silber",
+    "markers": [
+      { "x": 46, "y": 50, "type": "hero", "isPlayer": true, "label": "Warwick" },
+      { "x": 12, "y": 24, "type": "hero", "label": "Garen (Top)", "champion": "Garen" },
+      { "x": 30, "y": 10, "type": "enemy", "label": "Renekton", "champion": "Renekton" },
+      { "x": 88, "y": 66, "type": "enemy", "label": "Caitlyn", "champion": "Caitlyn" },
+      { "x": 90, "y": 62, "type": "objective", "label": "Eingefrorene Welle (Bot)" }
+    ],
+    "coachHint": "In welcher Lane steht der Gegner weit von seinem Turm entfernt?",
+    "context": "Du bist Warwick (Jungle), Minute 07:50, Level 6. Eure Toplane und eure Botlane warten auf Hilfe. Top: Die Welle drückt zu euch, der Gegner steht weit vor seinem Turm. Bot: Der Gegner hat die Welle nahe an seinem Turm eingefroren.",
+    "options": [
+      { "label": "A: Top ganken, weil der Gegner weit vor seinem Turm steht.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Gegner kann nicht mehr sicher zurück." },
+      { "label": "B: Bot ganken, wo der Gegner am Turm sicher steht.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Gegner steht in Turmreichweite und weicht zurück.", "Du verlierst Zeit und Camps, und der Gank scheitert."] },
+      { "label": "C: Gar nicht ganken und beide Lanes warten lassen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Beide Lanes bleiben unter Druck.", "Ihr verschenkt einen sicheren Gank."] }
+    ]
+  },
+  {
+    "id": "lo_gold_jg_smite_sync", "gameTime": "10:20", "timeLimit": 45,
+    "champion": "Warwick", "role": "Jungle", "difficulty": "Gold",
+    "markers": [
+      { "x": 64, "y": 66, "type": "hero", "isPlayer": true, "label": "Warwick" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache" },
+      { "x": 70, "y": 62, "type": "enemy", "label": "Nocturne", "champion": "Nocturne" },
+      { "x": 60, "y": 68, "type": "hero", "label": "Team (3)", "champion": "Ornn" }
+    ],
+    "coachHint": "Wie viel Leben darf der Drache noch haben, wenn du Smite drückst?",
+    "context": "Du bist Warwick (Jungle), Minute 10:20. Der Drache hat noch 1.500 Lebenspunkte. Dein Challenging Smite macht 900 wahren Schaden. Der gegnerische Nocturne steht in der Nähe und hat ebenfalls Smite. Dein Team hilft beim Drachen.",
+    "options": [
+      { "label": "A: Bei 1.500 Leben sofort Smite drücken.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Smite macht nur 900 wahren Schaden, der Drache lebt noch.", "Nocturne smitet den Rest und stiehlt den Drachen."] },
+      { "label": "B: Den Smite aufsparen und den Drachen nur mit Auto-Angriffen töten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Kampf dauert lange.", "Nocturne bekommt Zeit für einen Steal."] },
+      { "label": "C: Mit dem Team den Drachen unter 900 Leben bringen und dann Smite drücken, damit er sicher sitzt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Der Smite beendet den Drachen, bevor Nocturne etwas stehlen kann." }
+    ]
+  },
+  {
+    "id": "lo_gold_jg_dive_top", "gameTime": "11:30", "timeLimit": 45,
+    "champion": "Warwick", "role": "Jungle", "difficulty": "Gold",
+    "markers": [
+      { "x": 30, "y": 24, "type": "hero", "isPlayer": true, "label": "Warwick" },
+      { "x": 34, "y": 12, "type": "hero", "label": "Garen (Top)", "champion": "Garen" },
+      { "x": 40, "y": 11, "type": "enemy", "label": "Renekton", "champion": "Renekton" },
+      { "x": 40, "y": 9, "type": "objective", "label": "Gegner-Turm (T1)" },
+      { "x": 36, "y": 10, "type": "objective", "label": "3 Minion-Wellen" }
+    ],
+    "coachHint": "Wen beschießt der Turm zuerst?",
+    "context": "Du bist Warwick (Jungle), Minute 11:30, Level 8. Eure Toplane hat drei Wellen gesammelt, sie crashen gleich unter den gegnerischen Turm. Renekton steht an der Turmkante. Eure Botlane ist ruhig.",
+    "options": [
+      { "label": "A: Die Botlane ganken, obwohl dort kein Setup besteht.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dort gibt es keine große Welle und keinen Vorteil.", "Der Gank scheitert, und die Toplane steht allein."] },
+      { "label": "B: Zur Toplane gehen und mit ihr den Dive koordinieren, solange die Welle den Turm bindet.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Minions binden den Turm, und der Dive sitzt." },
+      { "label": "C: Zu spät einsteigen, wenn der Turm die Welle schon geräumt hat.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm beschießt nun euch statt der Minions.", "Ihr verliert Leben ohne Kill."] }
+    ]
+  },
+  {
+    "id": "lo_gold_jg_soul_vision", "gameTime": "14:20", "timeLimit": 45,
+    "champion": "Warwick", "role": "Jungle", "difficulty": "Gold",
+    "markers": [
+      { "x": 60, "y": 62, "type": "hero", "isPlayer": true, "label": "Warwick" },
+      { "x": 58, "y": 68, "type": "hero", "label": "Team (4)", "champion": "Ornn" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache (Dragon Soul)" },
+      { "x": 72, "y": 58, "type": "fog", "label": "Gegnerische Wards" }
+    ],
+    "coachHint": "Wer sieht, wenn der Drache spawnt?",
+    "context": "Du bist Warwick (Jungle), Minute 14:20. Die Gegner haben drei Drachen, der nächste würde ihnen die Dragon Soul geben und erscheint in etwa 50 Sekunden. Eure Vision am Pit ist gering, die Gegner haben Wards in der Umgebung.",
+    "options": [
+      { "label": "A: Mit dem ganzen Team die Vision-Kontrolle um den Pit erkämpfen, bevor der Drache spawnt.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr seht die Gegner früher und verhindert die Soul." },
+      { "label": "B: Die Vision ignorieren und den Drachen ohne Info starten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner sehen euch und greifen aus dem Dunkeln an.", "Ihr verliert den Kampf und gebt die Dragon Soul ab."] },
+      { "label": "C: Allein ihre Wards im Dschungel jagen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst ohne Info in mehrere Gegner.", "Du stirbst, und die Gegner nehmen den Drachen."] }
+    ]
+  },
+  {
+    "id": "lo_gold_jg_camp_respawn", "gameTime": "08:30", "timeLimit": 45,
+    "champion": "Warwick", "role": "Jungle", "difficulty": "Gold",
+    "markers": [
+      { "x": 68, "y": 24, "type": "hero", "isPlayer": true, "label": "Warwick" },
+      { "x": 64, "y": 26, "type": "objective", "label": "Gegner-Krugs (Respawn jetzt)" },
+      { "x": 60, "y": 30, "type": "objective", "label": "Ward am Eingang" },
+      { "x": 82, "y": 72, "type": "fog", "label": "Gegner-Jungler zuletzt Bot" }
+    ],
+    "coachHint": "Wann ist das Camp wieder da, und wo ist sein Besitzer?",
+    "context": "Du bist Warwick (Jungle), Minute 08:30. Der gegnerische Jungler hat seine Krugs um 06:15 geräumt, sie respawnen rund 2:15 später, also genau jetzt. Er wurde zuletzt Bot gesehen. Du hast ein Ward am Eingang.",
+    "options": [
+      { "label": "A: Das Camp ignorieren und im eigenen Dschungel stehen bleiben.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verschenkst das Zeitfenster.", "Der Gegner behält seine Ressourcen, und du verlierst Tempo."] },
+      { "label": "B: Lange im Camp bleiben, obwohl der Gegner zurückkommen kann.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst sichtbar in seinem Dschungel.", "Sein Jungler stellt dich, und du gibst einen Kill ab."] },
+      { "label": "C: Direkt beim Respawn das Camp nehmen und danach sofort wieder aus seinem Dschungel verschwinden.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du nimmst Ressourcen, ohne dich zu exponieren." }
+    ]
+  },
+  {
+    "id": "lo_plat_mid_roam_crash", "gameTime": "12:20", "timeLimit": 45,
+    "champion": "Lux", "role": "Midlane", "difficulty": "Platin",
+    "markers": [
+      { "x": 56, "y": 44, "type": "hero", "isPlayer": true, "label": "Lux" },
+      { "x": 60, "y": 41, "type": "objective", "label": "Gegner-Turm T1 (Mid)" },
+      { "x": 12, "y": 30, "type": "hero", "label": "Garen (Top)", "champion": "Garen" },
+      { "x": 18, "y": 26, "type": "enemy", "label": "Renekton", "champion": "Renekton" }
+    ],
+    "coachHint": "Wann kostet dich ein Roam keine Minions?",
+    "context": "Du bist Lux (Mid), Minute 12:20, Level 9. Deine Welle ist an ihrem Turm gecrasht, ihr Midlaner ist zurückgegangen. Eure Toplane ist in einem Kampf unterlegen. Dein Teleport ist nicht verfügbar.",
+    "options": [
+      { "label": "A: Roamen, bevor die Welle gecrasht ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Minions sterben allein am Turm.", "Du verlierst Gold und Erfahrung, und der gegnerische Mid bekommt die Welle."] },
+      { "label": "B: Die Welle crashen lassen und dann zur Toplane roamen, um zu helfen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verlierst keine Minions und verstärkst Top zur richtigen Zeit." },
+      { "label": "C: In der Lane bleiben und der Toplane nicht helfen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Top steht gegen den Gegner in Unterzahl.", "Ihr verliert Top-Prio und gebt Gold ab."] }
+    ]
+  },
+  {
+    "id": "lo_plat_mid_freeze_jungler", "gameTime": "09:50", "timeLimit": 45,
+    "champion": "Lux", "role": "Midlane", "difficulty": "Platin",
+    "markers": [
+      { "x": 48, "y": 52, "type": "hero", "isPlayer": true, "label": "Lux" },
+      { "x": 40, "y": 58, "type": "objective", "label": "Eigener Turm (T1 Mid)" },
+      { "x": 30, "y": 60, "type": "fog", "label": "Gegner-Jungler zuletzt in deiner Hälfte" }
+    ],
+    "coachHint": "Wo stehst du, wenn der gegnerische Jungler auftaucht?",
+    "context": "Du bist Lux (Mid), Minute 09:50. Der gegnerische Jungler wurde zuletzt in deiner Hälfte gesehen. Die gegnerische Welle ist etwas größer als deine und drückt zu dir.",
+    "options": [
+      { "label": "A: Die Welle knapp außerhalb deiner Turmreichweite einfrieren, statt sie zu pushen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du bleibst nah am Turm und der Gegner kann nicht sicher farmen." },
+      { "label": "B: Die Welle hart pushen und tief stehen bleiben.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst weit weg von deinem Turm, während der Jungler in deiner Hälfte ist.", "Du wirst ganked und gibst Kill und Prio ab."] },
+      { "label": "C: Die Welle direkt unter deinem Turm halten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Der Turm beschießt die Minions und löst das Freeze auf.", "Die Zone ist weg, und die Welle schiebt zu dir."] }
+    ]
+  },
+  {
+    "id": "lo_plat_mid_cannon_recall", "gameTime": "04:20", "timeLimit": 45,
+    "champion": "Lux", "role": "Midlane", "difficulty": "Platin",
+    "markers": [
+      { "x": 56, "y": 44, "type": "hero", "isPlayer": true, "label": "Lux" },
+      { "x": 60, "y": 41, "type": "objective", "label": "Gegner-Turm T1 (Mid)" },
+      { "x": 52, "y": 48, "type": "objective", "label": "Welle mit Kanonen-Minion" }
+    ],
+    "coachHint": "Wann kostet dich ein Recall keine Minions?",
+    "context": "Du bist Lux (Mid), Minute 04:20, Level 4, mit etwa 1.000 Gold. Du hast die ersten Wellen langsam gesammelt, die Welle mit der ersten Kanonen-Minion steht kurz vor dem gegnerischen Turm. Boots kosten 300 Gold.",
+    "options": [
+      { "label": "A: Recallen, bevor die Welle gecrasht ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Welle crasht ohne dich.", "Du verlierst die Kanonen-Minion und Erfahrung."] },
+      { "label": "B: Weiter in der Lane bleiben und erst bei einem Kill zurückgehen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du verbrauchst deine Chance, sicher einzukaufen.", "Die Welle bounct zu dir, und du bist ohne Items schwächer."] },
+      { "label": "C: Die Welle unter den gegnerischen Turm crashen lassen und sofort recallen, um Boots und Kaufteile zu kaufen.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Du verlierst keine Minions und kommst mit Items zurück." }
+    ]
+  },
+  {
+    "id": "lo_plat_mid_slowpush_dragon", "gameTime": "13:50", "timeLimit": 45,
+    "champion": "Lux", "role": "Midlane", "difficulty": "Platin",
+    "markers": [
+      { "x": 52, "y": 48, "type": "hero", "isPlayer": true, "label": "Lux" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache" },
+      { "x": 60, "y": 41, "type": "objective", "label": "Gegner-Turm T1 (Mid)" }
+    ],
+    "coachHint": "Wo steht deine Welle, wenn ihr zum Drachen rotiert?",
+    "context": "Du bist Lux (Mid), Minute 13:50. Der Drache erscheint in etwa 70 Sekunden. Deine Mid-Welle steht neutral in der Mitte der Lane.",
+    "options": [
+      { "label": "A: Die Welle liegen lassen und sofort rotieren.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die gegnerische Welle drückt euren Turm, während ihr am Pit seid.", "Ihr verliert Turmschaden, und die Gegner haben danach Prio."] },
+      { "label": "B: Jetzt die Welle langsam pushen, damit sie rechtzeitig crasht, und dann zum Drachen rotieren.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Die Welle bindet den Gegner, während ihr am Drachen seid." },
+      { "label": "C: Die Welle schnell in den Turm schieben und dann stehen bleiben.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du stehst allein, wenn der Drache erscheint.", "Ihr rotiert zu spät und gebt den Drachen ab."] }
+    ]
+  },
+  {
+    "id": "lo_plat_mid_baron_setup", "gameTime": "24:10", "timeLimit": 45,
+    "champion": "Annie", "role": "Midlane", "difficulty": "Platin",
+    "markers": [
+      { "x": 44, "y": 50, "type": "hero", "isPlayer": true, "label": "Annie" },
+      { "x": 38, "y": 38, "type": "hero", "label": "Team (4)", "champion": "Ornn" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 50, "y": 40, "type": "fog", "label": "Gegner zuletzt im Fluss" }
+    ],
+    "coachHint": "Wer sieht zuerst, wenn der Baron angefangen wird?",
+    "context": "Du bist Annie (Mid), Minute 24:10. Der Baron ist seit 20:00 verfügbar, dein Team will ihn starten. Deine Welle ist gecrasht, die Gegner wurden zuletzt im Fluss gesehen, und ihr habt keine Vision im Pit.",
+    "options": [
+      { "label": "A: Erst mit dem Team Vision um den Pit sichern und dann den Baron starten, solange deine Welle gecrasht ist.", "lpChange": 20, "nextId": "end", "feedback": "Perfekt! Ihr seht den Engage der Gegner und startet den Baron sicher." },
+      { "label": "B: Den Baron sofort ohne Vision starten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner greifen aus dem Dunkeln an, während der Baron halb leer ist.", "Ihr verliert den Kampf und den Baron."] },
+      { "label": "C: Allein vorlaufen und die Büsche prüfen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst ohne Info in mehrere Gegner.", "Du stirbst, und euer Team startet den Baron in Unterzahl."] }
     ]
   }
 ];
@@ -4249,7 +4557,7 @@ const MODE_INFO = {
     risk: 'Kein Risiko: keine LP, kein MMR, keine Herzen und kein Eintrag in der Historie. Am Ende siehst du nur, wie viele LP es gewesen wären.',
     focus: 'Gezieltes Training einzelner Rollen und Schwierigkeitsstufen, vom Early Game bis zum Closing.' },
   mastery: { icon: 'crown', title: 'Champion Mastery',
-    goal: 'Level deinen Main-Champion von Stufe 1 bis 7. Für 15 Kern-Champions (Jax, Aatrox, Darius, Lee Sin, Viego, Kayn, Ahri, Zed, Yasuo, Jinx, Kai\'Sa, Ezreal, Thresh, Leona, Nautilus) gibt es handgeschriebene Szenarien, jeder andere Champion nutzt das adaptive Rollen-Template.',
+    goal: 'Level deinen Main-Champion von Stufe 1 bis 7. Für 16 Kern-Champions (Jax, Aatrox, Darius, Lee Sin, Viego, Kayn, Ahri, Zed, Yasuo, Jinx, Kai\'Sa, Ezreal, Draven, Thresh, Leona, Nautilus) gibt es handgeschriebene Szenarien, jeder andere Champion nutzt das adaptive Rollen-Template.',
     duration: '5 Fragen (ca. 2 bis 3 Minuten)',
     risk: 'Gewertet wie Ranked (LP, Hidden MMR, Herz nur bei Niederlage oder Abbruch). Zusätzlich gibt es Mastery-Punkte: Sieg mit 4 bis 5 richtig +300 bis +350 MP, 3 von 5 richtig +150 MP, Niederlage +50 MP (nie ein Stufenverlust). Stufen ab 300, 750, 1.400, 2.200 (Hextech-Emblem), 3.200 und 4.500 MP (Meister-Wappen).',
     focus: 'Stufe 1 bis 2: Grundlagen und Trading-Fenster. Stufe 3 bis 4: Matchups, Wave-Control und Setups. Stufe 5 bis 7: Late-Game, Flanken und Clutch-Entscheidungen. Du spielst ausschließlich deinen gewählten Champion: handgeschriebene Szenarien plus Rollen-Vorlagen, in die dein Name eingesetzt wird. Bevorzugt kommen Szenarien deiner Liga; reichen sie nicht, rücken die nächsten Ligen derselben Rolle nach, nie ein fremder Champion.' },
@@ -4957,6 +5265,10 @@ GENERIC.Jungle.push('lo_jg_iron_full_clear', 'lo_iron_jg_first_dragon', 'lo_iron
 GENERIC.Midlane.push('lo_iron_nexus_rush', 'lo_iron_mid_mia', 'lo_iron_mid_scuttle_help', 'lo_iron_mid_objective_rotate', 'lo_bronze_mid_roam', 'lo_gold_first_back_crash', 'lo_diamond_slowpush_baron');
 GENERIC.Botlane.push('lo_iron_adc_positioning', 'lo_bronze_bf_sword', 'lo_silver_missing_enemies', 'lo_plat_wave_before_drake', 'lo_gold_dive_defense', 'lo_diamond_jinx_front_to_back', 'lo_diamond_hand_of_baron');
 GENERIC.Support.push('lo_iron_baron_vision', 'lo_iron_vision_dragon', 'lo_iron_sup_bush_facecheck', 'lo_iron_sup_retreat', 'lo_iron_sup_ward_timing', 'lo_iron_sup_roam_bounce', 'lo_silver_elder_chokepoints', 'lo_gold_rebound_roam');
+// Neutrale Vorlagen für dünn besetzte Rolle-Liga-Zellen (Botlane Master+, Jungle Silber und Gold, Midlane Platin)
+GENERIC.Botlane.push('lo_master_bot_elder_safety', 'lo_master_bot_ga_wakeup', 'lo_master_bot_wave_before_baron', 'lo_master_bot_zhonya_window', 'lo_master_bot_baron_vs_inhib');
+GENERIC.Jungle.push('lo_silver_jg_scuttle_respawn', 'lo_silver_jg_voidgrubs_prio', 'lo_silver_jg_reset_dragon', 'lo_silver_jg_gank_choice', 'lo_gold_jg_smite_sync', 'lo_gold_jg_dive_top', 'lo_gold_jg_soul_vision', 'lo_gold_jg_camp_respawn');
+GENERIC.Midlane.push('lo_plat_mid_roam_crash', 'lo_plat_mid_freeze_jungler', 'lo_plat_mid_cannon_recall', 'lo_plat_mid_slowpush_dragon', 'lo_plat_mid_baron_setup');
 function adaptScenario(sc, champ) {
   const from = new RegExp(escapeRe(sc.champion), 'g');
   const sub = t => t.replace(from, champ);
@@ -5030,11 +5342,11 @@ const fieldCls = 'rounded-lg border border-[#C89B3C]/40 bg-[#010A13] px-3 py-2 t
 const MASTERY_TILES = [['Jax', 'Toplane', 'Top'], ['Aatrox', 'Toplane', 'Top'], ['Darius', 'Toplane', 'Top'],
   ['Lee Sin', 'Jungle', 'Jungle'], ['Viego', 'Jungle', 'Jungle'], ['Kayn', 'Jungle', 'Jungle'],
   ['Ahri', 'Midlane', 'Mid'], ['Zed', 'Midlane', 'Mid'], ['Yasuo', 'Midlane', 'Mid'],
-  ['Jinx', 'Botlane', 'Bot'], ["Kai'Sa", 'Botlane', 'Bot'], ['Ezreal', 'Botlane', 'Bot'],
+  ['Jinx', 'Botlane', 'Bot'], ["Kai'Sa", 'Botlane', 'Bot'], ['Ezreal', 'Botlane', 'Bot'], ['Draven', 'Botlane', 'Bot'],
   ['Thresh', 'Support', 'Support'], ['Leona', 'Support', 'Support'], ['Nautilus', 'Support', 'Support']];
 
 const MASTERY_TAGS = { 'Jax': 'Duellant', 'Aatrox': 'Kämpfer', 'Darius': 'Juggernaut', 'Lee Sin': 'Skirmisher', 'Viego': 'Duellant', 'Kayn': 'Flanker',
-  'Ahri': 'Burst-Magierin', 'Zed': 'Assassine', 'Yasuo': 'Skirmisher', 'Jinx': 'Hypercarry', "Kai'Sa": 'Hybrid-Carry', 'Ezreal': 'Poke-Carry',
+  'Ahri': 'Burst-Magierin', 'Zed': 'Assassine', 'Yasuo': 'Skirmisher', 'Jinx': 'Hypercarry', "Kai'Sa": 'Hybrid-Carry', 'Ezreal': 'Poke-Carry', 'Draven': 'Noxus-Marksman',
   'Thresh': 'Playmaker', 'Leona': 'Engage-Tank', 'Nautilus': 'Hook-Tank' };
 const ROLE_TABS = [['all', 'Alle'], ['Toplane', '🛡️ Top'], ['Jungle', '🌲 Jungle'], ['Midlane', '⚡ Mid'], ['Botlane', '🏹 Bot'], ['Support', '🔮 Support']];
 
@@ -5091,7 +5403,8 @@ function MainPicker({ role, champion, onRole, onChampion, mastery }) {
                       ring={active ? 'border-2 border-[#C89B3C] shadow-[0_0_0_2px_rgba(10,200,185,.75),0_0_14px_rgba(10,200,185,.55)]' : 'border-2 border-[#C89B3C]/40 group-hover:border-[#C89B3C]'} />
                     {active && <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#0AC8B9] text-[#010A13]" aria-hidden="true"><Icon n="check" size={10} /></span>}
                   </span>
-                  <span className={`max-w-full truncate text-[11px] font-semibold leading-none ${active ? 'text-[#C89B3C]' : 'text-slate-300'}`}>{c}</span>
+                  <span className="max-w-full truncate text-[11px] font-semibold leading-none text-[#C89B3C]">{c}</span>
+                  <span className="max-w-full truncate text-[9px] leading-none text-slate-500">{MASTERY_TAGS[c]}</span>
                 </button>
               );
             })}
