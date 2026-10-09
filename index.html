@@ -3912,6 +3912,210 @@ const RUNS = [
       { "label": "B: Den Baron sofort ohne Vision starten.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner greifen aus dem Dunkeln an, während der Baron halb leer ist.", "Ihr verliert den Kampf und den Baron."] },
       { "label": "C: Allein vorlaufen und die Büsche prüfen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du läufst ohne Info in mehrere Gegner.", "Du stirbst, und euer Team startet den Baron in Unterzahl."] }
     ]
+  },
+  {
+    "id": "lo_cu_top_freeze_behind", "gameTime": "05:50", "timeLimit": 35,
+    "champion": "Aatrox", "role": "Toplane", "difficulty": "Silber",
+    "markers": [
+      { "x": 13, "y": 22, "type": "hero", "label": "Aatrox", "isPlayer": true},
+      { "x": 22, "y": 14, "type": "enemy", "label": "Renekton", "champion": "Renekton" },
+      { "x": 13, "y": 42, "type": "objective", "label": "Eigener Turm T1 (Top)" },
+      { "x": 42, "y": 13, "type": "objective", "label": "Gegner-Turm T1 (Top)" },
+      { "x": 56, "y": 76, "type": "hero", "label": "Viego (zuletzt Bot)", "champion": "Viego" },
+      { "x": 46, "y": 26, "type": "fog", "label": "Gegner-Jungler (unbekannt)" }
+    ],
+    "coachHint": "Was hilft dir, wenn der Gegner stärker ist und dein Jungler noch weit entfernt ist?",
+    "context": "Du bist Aatrox (Top), Minute 05:50. Du bist Level 4, Renekton ist schon Level 5, und seine Welle ist so groß wie deine. Die Welle steht neutral in der Mitte der Lane. Dein Jungler Viego wurde zuletzt Bot gesehen und ist mindestens 40 Sekunden entfernt.",
+    "options": [
+      {"label": "A: Die Welle sofort in den gegnerischen Turm schieben und Druck aufbauen, ehe Renekton Level 6 erreicht und gefährlicher wird.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Renekton bekommt freie Minions und nutzt sein Level-6-Fenster, um dich an seinem Turm zu bestrafen.", "Du verlierst Leben und Wellenkontrolle, und euer Jungler kommt zu einer verlorenen Lane."]},
+      {"label": "B: Die Welle knapp vor deinem Turm halten (Freeze), nur noch sichere Last Hits holen und auf die Hilfe deines Junglers warten.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Beim Freeze steht die Welle knapp vor deinem Turm, aber außerhalb seiner Reichweite. Renekton muss sich vorwagen, um Gold zu holen, und genau dort kann dein Jungler ihn fangen. Deshalb verlierst du kaum Farm, vermeidest einen Kampf mit Rückstand und kaufst Zeit, bis der Level-Unterschied nicht mehr zählt. Merke: Bist du schwächer, kontrolliere die Wellenposition statt den Kampf zu suchen."},
+      {"label": "C: Aus dem Turmschutz vorlaufen und Renekton jagen, solange sein Level-Vorsprung gering ist und die Welle ausgeglichen bleibt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Renekton trifft dich mit seinem Level-Vorteil außerhalb des Turmschutzes und gewinnt den Trade deutlich.", "Du verlierst Gold und Prio, und der Gegner-Jungler kann die Lane ohne Risiko angehen."]}
+    ],
+    "wave": {"kind": "NEUTRAL", "lane": "top"}, "balanced": true
+  },
+  {
+    "id": "lo_cu_top_crash_before_tp", "gameTime": "14:10", "timeLimit": 45,
+    "champion": "Jax", "role": "Toplane", "difficulty": "Platin",
+    "markers": [
+      { "x": 36, "y": 13, "type": "hero", "label": "Jax", "isPlayer": true},
+      { "x": 42, "y": 13, "type": "objective", "label": "Gegner-Turm T1 (Top)" },
+      { "x": 60, "y": 66, "type": "hero", "label": "Team (4)", "champion": "Ornn" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache (in 30 s)" },
+      { "x": 50, "y": 50, "type": "fog", "label": "Gnar (zuletzt Mitte)", "champion": "Gnar" },
+      { "x": 78, "y": 76, "type": "enemy", "label": "Gegner-Bot (3)", "champion": "Caitlyn" }
+    ],
+    "coachHint": "Was solltest du erledigen, bevor du die Lane mit deinem Teleport verlässt?",
+    "context": "Du bist Jax (Top), Minute 14:10, Level 11, dein Teleport ist bereit. Der Drache erscheint in 30 Sekunden, und dein Team sammelt sich dort. Deine Welle ist groß und steht vor dem gegnerischen T1. Der gegnerische Toplaner Gnar wurde zuletzt in der Mitte gesehen.",
+    "options": [
+      {"label": "A: Die Welle zuerst in den feindlichen Turm crashen lassen und erst danach teleportieren, damit sie nicht zurückläuft.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Eine gecrashte Welle bindet den Gegner: Gnar muss sie räumen, sonst verliert er Gold, während du schon beim Team bist. Deine nächste Welle kommt erst später an, also verlierst du keine Farm und der Gegner kann deinen Turm nicht unter Druck setzen. So kostet dich der Teleport keinen Lane-Vorteil. Merke: Erst die Welle lösen, dann die Lane verlassen."},
+      {"label": "B: Umgehend zum Team teleportieren und um den Drachen kämpfen, denn jede Sekunde Verzögerung kann im Teamfight fehlen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Welle läuft hinter dir zurück und drückt deinen Turm, während Gnar sie ohne Druck farmt.", "Dein Team bekommt Hilfe, verliert aber Top-Prio und der Gegner holt sich Gold und Tempo."]},
+      {"label": "C: Die Welle stehen lassen und mit dem Teleport warten, bis der Drache beginnt, um den Gegnern keine Info zu verraten.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du bleibst auf der Lane gebunden, und dein Team startet den Drachen in Unterzahl.", "Ohne dich verliert das Team den Kampf um die Karte und der Drache geht verloren."]}
+    ],
+    "wave": {"kind": "WAVE_CRASH_ENEMY", "lane": "top"}, "balanced": true
+  },
+  {
+    "id": "lo_cu_jng_invade_split_start", "gameTime": "01:35", "timeLimit": 45,
+    "champion": "Lee Sin", "role": "Jungle", "difficulty": "Gold",
+    "markers": [
+      { "x": 30, "y": 60, "type": "hero", "label": "Lee Sin", "isPlayer": true},
+      { "x": 48, "y": 52, "type": "hero", "label": "Mid-Laner", "champion": "Ahri" },
+      { "x": 76, "y": 64, "type": "enemy", "label": "Viego (Start Bot-Seite)", "champion": "Viego" },
+      { "x": 58, "y": 24, "type": "objective", "label": "Unberührte Camps (Top-Seite)" },
+      { "x": 42, "y": 58, "type": "objective", "label": "Eigener Turm T1 (Mid)" },
+      { "x": 58, "y": 42, "type": "objective", "label": "Gegner-Turm T1 (Mid)" },
+      { "x": 18, "y": 30, "type": "fog", "label": "Gegner-Toplaner (unbekannt)", "champion": "Renekton" }
+    ],
+    "coachHint": "Wo steht Viego, und was bedeutet das für die andere Hälfte seines Dschungels?",
+    "context": "Du bist Lee Sin (Jungle), Minute 01:35, Level 2. Euer Mid sieht, wie der gegnerische Jungler Viego bei seinem Rotbuff auf der Bot-Seite startet. Die Camps auf seiner Top-Seite sind noch unberührt, und euer Mid hat die Wellenkontrolle.",
+    "options": [
+      {"label": "A: Zur Botlane gehen und Viego direkt an seinem Rotbuff angreifen, ehe er sein erstes Camp abgeschlossen hat.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Viego steht mit seiner Botlane zusammen und gewinnt den Kampf gegen dich allein.", "Du stirbst früh, euer Dschungel bleibt unbewacht und der Gegner übernimmt das Tempo."]},
+      {"label": "B: Den eigenen Dschungel zu Ende clearen und erst nach dem Scuttle-Spawn um 2:55 wieder nach Gegnern schauen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Viego clearet seine Camps ungestört und erreicht den Scuttle vor dir.", "Euer Team verliert Flusskontrolle und die Chance auf einen frühen Tempo-Vorteil."]},
+      {"label": "C: Mit der Vision deines Mids auf seine freie Top-Seite invaden, dort Camps nehmen und den Rückweg absichern.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Du weißt, wo Viego startet, also ist die andere Seite sein blinder Fleck. Jedes gestohlene Camp bringt dir Gold und Erfahrung und kostet ihn Level und Tempo. Die Vision deines Mids sagt dir, ob er umdreht, und der Rückweg über den Fluss schützt dich vor einem Gegenzug. Merke: Wer die Startposition des Gegner-Junglers kennt, spielt auf der anderen Seite."}
+    ],
+    "wave": {"kind": "NEUTRAL", "lane": "mid"}, "balanced": true
+  },
+  {
+    "id": "lo_cu_jng_cross_drake", "gameTime": "12:20", "timeLimit": 60,
+    "champion": "Kayn", "role": "Jungle", "difficulty": "Smaragd",
+    "markers": [
+      { "x": 52, "y": 58, "type": "hero", "label": "Kayn", "isPlayer": true},
+      { "x": 72, "y": 70, "type": "hero", "label": "Bot + Support", "champion": "Jinx" },
+      { "x": 66, "y": 70, "type": "objective", "label": "Drache (in 25 s)" },
+      { "x": 22, "y": 16, "type": "fog", "label": "Viego (zuletzt Top)", "champion": "Viego" },
+      { "x": 13, "y": 42, "type": "objective", "label": "Eigener Turm T1 (Top)" },
+      { "x": 13, "y": 32, "type": "hero", "label": "Toplaner", "champion": "Jax" }
+    ],
+    "coachHint": "Wo ist der Gegner-Jungler, wenn der Drache erscheint?",
+    "context": "Du bist Kayn (Jungle), Minute 12:20, Level 9. Viego wurde vor 10 Sekunden auf der Toplane gesehen und gankt dort. Der Drache erscheint in 25 Sekunden, und eure Botlane steht mit gecrashter Welle am Fluss bereit.",
+    "options": [
+      {"label": "A: Nach Top rotieren und Viego beim Gank kontern, damit der Gegner im Fog keinen freien Kill bekommt und sein Gank verpufft.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du kommst zu spät, denn der Gank ist schon entschieden, und Viego verschwindet im Fog.", "Der Drache geht kampflos an die Gegner, während deine Botlane ungenutzt am Fluss wartet."]},
+      {"label": "B: Den Top-Gank ignorieren, mit Bot und Support den Drachen sichern und starten, solange Viego auf der Toplane gebunden ist.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Ein Jungler kann nur an einem Ort sein. Solange Viego oben ganked, ist der Drache für ihn kaum erreichbar, und deine Botlane steht schon bereit. Du tauschst die Hilfe auf Top gegen ein sicheres Objective und hältst Vision, damit du ihn kommen siehst. Merke: Bindet dich der Gegner an einer Stelle, nimm das Objective auf der anderen Seite der Karte."},
+      {"label": "C: Allein zum Drachen laufen und ihn mit Smite beginnen, damit der Gegner nach dem Gank noch keine Zeit zum Contest bekommt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Ohne Bot und Support schlägst du den Drachen langsam und stehst ungeschützt im Pit.", "Viego rotiert zurück, fängt dich ab oder stiehlt den Drachen, und euer Team verliert das Objective."]}
+    ],
+    "wave": {"kind": "WAVE_CRASH_ENEMY", "lane": "bot"}, "balanced": true
+  },
+  {
+    "id": "lo_cu_mid_push_roam", "gameTime": "08:30", "timeLimit": 45,
+    "champion": "Ahri", "role": "Midlane", "difficulty": "Platin",
+    "markers": [
+      { "x": 48, "y": 52, "type": "hero", "label": "Ahri", "isPlayer": true},
+      { "x": 54, "y": 46, "type": "enemy", "label": "Orianna", "champion": "Orianna" },
+      { "x": 58, "y": 42, "type": "objective", "label": "Gegner-Turm T1 (Mid)" },
+      { "x": 87, "y": 58, "type": "objective", "label": "Gegner-Turm T1 (Bot)" },
+      { "x": 80, "y": 66, "type": "hero", "label": "Euer Jungler", "champion": "Viego" },
+      { "x": 84, "y": 52, "type": "enemy", "label": "Caitlyn", "champion": "Caitlyn" },
+      { "x": 38, "y": 22, "type": "fog", "label": "Gegner-Jungler (unbekannt)", "champion": "Nocturne" }
+    ],
+    "coachHint": "Was musst du mit der Welle tun, bevor du die Lane verlässt?",
+    "context": "Du bist Ahri (Mid), Minute 08:30, Level 7. Die Welle steht neutral in der Mitte der Lane. Auf der Botlane sind die Gegner Caitlyn und Leona weit vorgerückt, und euer Jungler ist dort zum Gank bereit. Orianna steht neben dir und hat Flash.",
+    "options": [
+      {"label": "A: Die Welle in den gegnerischen Turm schieben und erst danach über den Fluss zur Botlane roamen und Charm nutzen.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Eine gepushte Welle verlässt die Lane mit dir, denn Orianna muss sie räumen, kann dir nicht folgen und verliert Farm. Du roamst ohne Verlust und mit Zeit auf deiner Seite, und dein Charm trifft die vorgerückten Gegner genau im Gank-Fenster. Ohne den Push läuft die Welle zu deinem Turm und du büßt Gold und Prio ein. Merke: Erst die Welle drücken, dann roamen."},
+      {"label": "B: Jetzt über den Fluss zur Botlane roamen, damit der Gank überrascht, und die Welle unbeaufsichtigt zurücklassen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Welle läuft in deinen Turm, und du verlierst Minions, während Orianna sie ohne Druck farmt.", "Der Roam kommt ohne Mid-Prio, und der Gegner nutzt deine Abwesenheit, um den Mid-Turm anzugreifen."]},
+      {"label": "C: Auf der Lane bleiben und die Welle weiter farmen, bis Orianna den Flash verbraucht und du sicher roamen kannst.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Das Gank-Fenster auf der Botlane schließt sich, weil die Gegner zurückweichen.", "Euer Jungler und die Botlane bekommen keine Unterstützung und der mögliche Kill bleibt aus."]}
+    ],
+    "wave": {"kind": "NEUTRAL", "lane": "mid"}, "balanced": true
+  },
+  {
+    "id": "lo_cu_mid_roam_flash", "gameTime": "15:40", "timeLimit": 60,
+    "champion": "Zed", "role": "Midlane", "difficulty": "Diamant",
+    "markers": [
+      { "x": 50, "y": 50, "type": "hero", "label": "Zed", "isPlayer": true},
+      { "x": 58, "y": 42, "type": "objective", "label": "Gegner-Turm T1 (Mid)" },
+      { "x": 54, "y": 17, "type": "enemy", "label": "Fiora (Flash weg)", "champion": "Fiora" },
+      { "x": 62, "y": 13, "type": "objective", "label": "Gegner-Turm T2 (Top)" },
+      { "x": 72, "y": 62, "type": "fog", "label": "Nocturne (zuletzt unterer Dschungel)", "champion": "Nocturne" },
+      { "x": 30, "y": 13, "type": "hero", "label": "Euer Toplaner", "champion": "Jax" }
+    ],
+    "coachHint": "Wann ist ein Roam am sichersten, und woran erkennst du das?",
+    "context": "Du bist Zed (Mid), Minute 15:40, Level 11. Deine Welle ist in den gegnerischen Turm gecrasht. Der Toplaner Fiora hat vor 90 Sekunden Flash benutzt (Abklingzeit 300 Sekunden), steht allein vor ihrem Turm, und ihr Jungler Nocturne wurde zuletzt im unteren Dschungel gesehen.",
+    "options": [
+      {"label": "A: Auf der Lane bleiben und den nächsten Wellenpush abwarten, weil ein Roam ohne Absprache mit dem Team zu riskant ist.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Das Zeitfenster schließt sich, denn Fiora bekommt ihren Flash zurück oder zieht sich zum Turm.", "Euer Toplaner steht allein gegen Fiora, und ihr verschenkt den Vorteil des gecrashten Wellenstands."]},
+      {"label": "B: Zur Botlane roamen, wo mehr Gegner stehen, damit der Kill gleich mehrere erwischt und Flash dort keine Rolle spielt.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Auf der Botlane haben die Gegner alle Summoner-Spells, und du läufst ohne Info in ihre Vision.", "Du verlierst Zeit und Position, und das einzige echte Fenster auf Top bleibt ungenutzt."]},
+      {"label": "C: Direkt über den oberen Fluss zu Fiora roamen, sie ohne Flash isolieren und den Rückweg mit Vision zur Mitte sichern.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Du kennst drei Fakten: Deine Welle ist gecrasht, Fiora hat noch etwa 210 Sekunden keinen Flash, und Nocturne ist weit weg. Das ist ein planbarer Roam mit hoher Erfolgschance, denn mit eurem Toplaner entsteht ein 2v1. Die Vision auf dem Rückweg verhindert, dass Nocturne dich bestraft. Merke: Roame, wenn Welle, Gegner-Summoner und Gegner-Jungler dafür sprechen."}
+    ],
+    "wave": {"kind": "WAVE_CRASH_ENEMY", "lane": "mid"}, "balanced": true
+  },
+  {
+    "id": "lo_cu_bot_recall_spike", "gameTime": "07:10", "timeLimit": 45,
+    "champion": "Jinx", "role": "Botlane", "difficulty": "Gold",
+    "markers": [
+      { "x": 87, "y": 68, "type": "hero", "label": "Jinx", "isPlayer": true},
+      { "x": 86, "y": 72, "type": "hero", "label": "Thresh", "champion": "Thresh" },
+      { "x": 87, "y": 58, "type": "objective", "label": "Gegner-Turm T1 (Bot)" },
+      { "x": 89, "y": 53, "type": "enemy", "label": "Ezreal", "champion": "Ezreal" },
+      { "x": 84, "y": 50, "type": "enemy", "label": "Rakan", "champion": "Rakan" },
+      { "x": 58, "y": 87, "type": "objective", "label": "Eigener Turm T1 (Bot)" },
+      { "x": 72, "y": 40, "type": "fog", "label": "Gegner-Jungler (unbekannt)", "champion": "Viego" }
+    ],
+    "coachHint": "Wann ist der beste Moment, um Gold in einen Item-Spike zu verwandeln?",
+    "context": "Du bist Jinx (Bot) mit Thresh gegen Ezreal und Rakan, Minute 07:10, Level 6. Du hast 1.300 Gold, genug für ein B.F. Schwert. Eure Welle ist gerade in den gegnerischen Turm gecrasht, die nächste Welle trifft in etwa 25 Sekunden ein.",
+    "options": [
+      {"label": "A: Weiter auf der Lane bleiben und auf mehr Gold sparen, damit später ein größeres Item auf einmal geholt werden kann.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Dein Schaden bleibt ohne neues Item niedrig, und Ezreal gewinnt die nächsten Trades.", "Der Spike verschiebt sich, und Gegner und Jungler bekommen ein Fenster gegen eure schwächere Lane."]},
+      {"label": "B: Jetzt zur Base zurückkehren, das B.F. Schwert kaufen und mit Thresh zurück sein, bevor die nächste Welle eintrifft.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Die Welle ist gecrasht, also verlierst du beim Recall kaum Farm, und das Item bringt dir sofort mehr Schaden. Mit Thresh zurück sein heißt, dass ihr die nächste Welle gemeinsam übernehmt und nicht in Unterzahl verteidigen müsst. Gold im Inventar bringt keinen Vorteil, erst das gekaufte Item. Merke: Recalle direkt nach dem Crash, wenn genug Gold für einen Spike da ist."},
+      {"label": "C: Erst die nächste Welle farmen und danach zur Base gehen, weil sonst wertvolle Erfahrung und Minions verloren gehen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die zweite Welle trifft ein, du kommst zu spät zurück und zahlst mit Farm und Position.", "Thresh steht allein gegen zwei Gegner und muss ohne dich Druck abfangen."]}
+    ],
+    "wave": {"kind": "WAVE_CRASH_ENEMY", "lane": "bot"}, "balanced": true
+  },
+  {
+    "id": "lo_cu_bot_support_roam_2v1", "gameTime": "04:05", "timeLimit": 35,
+    "champion": "Thresh", "role": "Support", "difficulty": "Silber",
+    "markers": [
+      { "x": 84, "y": 84, "type": "hero", "label": "Thresh", "isPlayer": true},
+      { "x": 80, "y": 87, "type": "hero", "label": "Jinx", "champion": "Jinx" },
+      { "x": 90, "y": 76, "type": "enemy", "label": "Caitlyn", "champion": "Caitlyn" },
+      { "x": 50, "y": 50, "type": "fog", "label": "Nautilus (zuletzt Mitte)", "champion": "Nautilus" },
+      { "x": 87, "y": 58, "type": "objective", "label": "Gegner-Turm T1 (Bot)" },
+      { "x": 58, "y": 87, "type": "objective", "label": "Eigener Turm T1 (Bot)" }
+    ],
+    "coachHint": "Was bedeutet es für die Lane, wenn der Gegner-Support verschwindet?",
+    "context": "Du bist Thresh (Support) mit Jinx gegen Caitlyn und Nautilus, Minute 04:05, Level 4. Nautilus wurde vor 10 Sekunden in der Mitte gesehen und hat die Botlane verlassen. Die Welle ist neutral, und Caitlyn steht allein an ihrer Seite.",
+    "options": [
+      {"label": "A: Mit Jinx die Welle drücken und Caitlyn im 2v1 unter Druck setzen, solange Nautilus fehlt, und den Fluss sichern.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Mit Nautilus in der Mitte steht Caitlyn allein gegen euch zwei. Die Welle zu pushen zwingt sie zum Turm, und dein Flay und Jinx-Schaden geben euch ein sicheres Kill-Fenster oder viel Druck. Die Vision im Fluss zeigt dir, wann Nautilus zurückkehrt. Merke: Fehlt ein Gegner, spielt ihr in Überzahl, also nutzt den Moment aktiv."},
+      {"label": "B: Nautilus folgen und ihn in der Mitte jagen, damit euer Mid und ihr zusammen einen schnellen Kill erzielen könnt.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Jinx bleibt allein gegen Caitlyn zurück, und Nautilus ist im Fog längst weitergezogen.", "Die Botlane verliert Welle und Gold, und du stehst in der Mitte ohne Plan und ohne Vision."]},
+      {"label": "C: Hinter der Welle stehen und passiv warten, bis Nautilus zurückkehrt, damit niemand unnötig Risiko eingehen muss.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Caitlyn farmt ungestört, weil ihr den Druck freiwillig abgebt.", "Das 2v1 Fenster geht ungenutzt vorbei, und Nautilus kehrt ohne Nachteil zurück."]}
+    ],
+    "wave": {"kind": "NEUTRAL", "lane": "bot"}, "balanced": true
+  },
+  {
+    "id": "lo_cu_late_splitpush", "gameTime": "25:10", "timeLimit": 60,
+    "champion": "Fiora", "role": "Toplane", "difficulty": "Diamant",
+    "markers": [
+      { "x": 56, "y": 15, "type": "hero", "label": "Fiora", "isPlayer": true},
+      { "x": 62, "y": 13, "type": "objective", "label": "Gegner-Turm T2 (Top)" },
+      { "x": 48, "y": 50, "type": "enemy", "label": "Gegner (4)", "champion": "Orianna" },
+      { "x": 34, "y": 36, "type": "hero", "label": "Euer Team (4)", "champion": "Jinx" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 72, "y": 32, "type": "fog", "label": "Fünfter Gegner (unbekannt)", "champion": "Jinx" }
+    ],
+    "coachHint": "Wie bindest du mehrere Gegner an dich, ohne selbst gefangen zu werden?",
+    "context": "Du bist Fiora (Top), Minute 25:10, Level 16, dein Teleport ist bereit. Der Baron ist verfügbar. Die Gegner stehen mit vier Spielern in der Mitte, eure Welle steht groß vor ihrem T2 auf der Toplane, und euer Team wartet am Fluss.",
+    "options": [
+      {"label": "A: Zum Team wechseln und den 5v5 in der Mitte annehmen, weil Fiora im Teamfight mehr Wert hat als allein auf der Toplane.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du gibst deinen Druck auf, und die Gegner können in Ruhe den Baron vorbereiten.", "Der Kampf findet auf ihren Bedingungen statt, und deine Stärke als Duellantin bleibt ungenutzt."]},
+      {"label": "B: Die Welle stehen lassen und die Gegner in der Mitte suchen, um die gegnerische Backline von der Flanke aus zu treffen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Allein im Fog gejagt zu werden kostet dich Leben, und du läufst in ihre Vision und Fähigkeiten.", "Die Welle verliert Wert, und ihr verschenkt die Chance, einen Turm zu nehmen."]},
+      {"label": "C: Den T2 nehmen und weiter splitten, damit zwei Gegner reagieren müssen, und bei Gefahr per Teleport zum Team entkommen.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Ein Splitpusher macht Druck, ohne zu kämpfen: Der Turm fällt, und die Gegner müssen entweder Türme opfern oder zwei Spieler schicken. Schicken sie zwei, ist euer Team in der Mitte in Überzahl, deshalb wird der Baron möglich. Der Teleport ist dein Notausgang und dein Weg zum Team. Merke: Splitpush heißt, Druck erzeugen und Fluchtwege behalten."}
+    ],
+    "wave": {"kind": "WAVE_CRASH_ENEMY", "lane": "top"}, "balanced": true
+  },
+  {
+    "id": "lo_cu_late_ga_cooldown", "gameTime": "31:50", "timeLimit": 60,
+    "champion": "Jinx", "role": "Botlane", "difficulty": "Master+",
+    "markers": [
+      { "x": 40, "y": 40, "type": "hero", "label": "Jinx", "isPlayer": true},
+      { "x": 38, "y": 43, "type": "hero", "label": "Euer Team (4)", "champion": "Thresh" },
+      { "x": 33, "y": 30, "type": "objective", "label": "Baron" },
+      { "x": 36, "y": 36, "type": "enemy", "label": "Gegner (5)", "champion": "Orianna" },
+      { "x": 74, "y": 26, "type": "objective", "label": "Gegner-Turm T3 (Mid)" },
+      { "x": 62, "y": 13, "type": "objective", "label": "Gegner-Turm T2 (Top)" },
+      { "x": 37, "y": 33, "type": "fog", "label": "Mögliche Gegner-Wards (Pit-Eingang)" }
+    ],
+    "coachHint": "Welche Informationen über Cooldowns solltest du vor einem großen Kampf nutzen?",
+    "context": "Du bist Jinx (Bot), Minute 31:50. Guardian Angel hast du vor 100 Sekunden verbraucht (300 Sekunden Abklingzeit), also fehlen noch 200 Sekunden. Die Gegner sammeln sich am Baron-Pit, um Vision zu legen. Euer Team lebt komplett, und eure Wellen sind in die gegnerischen Türme gecrasht.",
+    "options": [
+      {"label": "A: Sofort zum Baron-Pit laufen und den Kampf aktiv erzwingen, bevor die Gegner Vision legen und besser stehen.", "lpChange": -15, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Du gehst ohne Guardian Angel in den Kampf, und ein einziger Fehler kostet dich das Leben.", "Stirbt euer Carry früh, gewinnen die Gegner den Kampf und holen sich den Baron."]},
+      {"label": "B: Mit dem Team im Fog warten und gar nichts tun, bis die Gegner den Baron beginnen, und erst dann zuschlagen.", "lpChange": -10, "nextId": "end", "feedback": "Fehlentscheidung.", "chain": ["Die Gegner legen in Ruhe Vision und stehen am Ende besser als ihr.", "Ihr gebt die Initiative ab und reagiert nur noch, statt den Zeitpunkt des Kampfes zu bestimmen."]},
+      {"label": "C: Den Baron auslassen, stattdessen Seitenlane-Türme nehmen und Vision sichern, bis Guardian Angel bereit ist.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Spiele um Cooldowns: Ohne Guardian Angel ist dein Carry im Kampf deutlich verwundbarer, weil ein einziger Fehler nicht mehr korrigiert wird. Eure gecrashten Wellen geben euch freie Türme, die keinen Kampf brauchen, und die Vision hält den Baron im Auge. Nach 200 Sekunden kehrt ihr mit Guardian Angel und einem Turmvorsprung zurück. Merke: Plane große Kämpfe nach Abklingzeiten und nimm bis dahin kampflose Objectives."}
+    ],
+    "wave": {"kind": "WAVE_CRASH_ENEMY", "lane": "mid"}, "balanced": true
   }
 ];
 const START_IDS = ['top_smaragd_01', 'mid_gold_01', 'jng_dia_01', 'bot_eisen_01', 'top_bronze_01', 'sup_silber_01', 'jng_platin_01', 'mid_master_01'];
@@ -6898,7 +7102,7 @@ RUNS.forEach(sc => {
   balanceScenario(sc);
   if (MARKER_FIX[sc.id]) sc.markers = sc.markers.map((m, i) => (MARKER_FIX[sc.id][i] ? { ...m, x: MARKER_FIX[sc.id][i][0], y: MARKER_FIX[sc.id][i][1] } : m));
   sc.markers = sc.markers.map(snapTowerMarker);
-  sc.wave = waveFromText(sc);
+  sc.wave = sc.wave || waveFromText(sc);   // handgesetzte Welle (neue Szenarien) hat Vorrang vor der Text-Erkennung
   const tw = towersFromText(sc); if (tw) sc.towers = tw;
 });
 { const ks = Object.keys(PLAYSTYLE), ps = balanceTexts(ks.map(k => ({ text: PLAYSTYLE[k], ok: false })), 'archplan'); ks.forEach((k, i) => { PLAYSTYLE[k] = ps[i]; }); }   // Makro-Pläne des Gameplans gleich lang
@@ -7403,6 +7607,8 @@ function FeedbackBanner({ ev, ok, me, victim, champion }) {
 // Feedback nach jeder Entscheidung: zentriertes Pop-up, schließt nur per Klick (kein Timer, kein Runterscrollen)
 function FeedbackModal({ scenario, ok, timeout, choice, fbText, chain, ev, st, hudStats, hudState, nextLabel, onNext }) {
   const mv = scenario.mv2, color = ok ? 'var(--teal)' : 'var(--red)';
+  const [why, setWhy] = useState(false);   // Erklärung der richtigen Antwort, nur nach Fehlentscheidungen
+  const best = !ok && !mv ? (scenario.options || []).find(o => o.lpChange > 0 && o.feedback) : null;
   const story = mv && ev && hudStats ? mapStory(ev, hudStats, hudState) : (st ? `Auf der Map: ${st.text}` : '');
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={ok ? 'Richtige Entscheidung' : 'Bestraft'} data-feedback={ok ? 'ok' : 'bad'}>
@@ -7422,6 +7628,18 @@ function FeedbackModal({ scenario, ok, timeout, choice, fbText, chain, ev, st, h
             </>
           )}
         </div>
+        {best && (
+          <div data-feedback-why={why ? 'open' : 'closed'} className="flex flex-col gap-1.5">
+            <button type="button" onClick={() => setWhy(w => !w)} aria-expanded={why} aria-controls="why-panel"
+              className="rounded-lg border border-[#C89B3C]/50 px-3 py-2 text-left text-xs font-bold text-[#C89B3C] transition hover:border-[#0AC8B9]">{why ? '💡 Erklärung ausblenden ▲' : '💡 Warum ist die richtige Antwort richtig? ▼'}</button>
+            {why && (
+              <div id="why-panel" className="slidedown rounded-lg border border-[#0AC8B9]/50 bg-[#0AC8B9]/10 px-3 py-2 text-sm leading-relaxed text-slate-200">
+                <div className="mb-1 text-xs text-slate-400">Richtig wäre gewesen: <G t={best.label.replace(/^[A-C]: /, '')} /></div>
+                <G t={best.feedback} />
+              </div>
+            )}
+          </div>
+        )}
         <button type="button" autoFocus onClick={onNext} data-feedback-next="true"
           className="w-full rounded-xl bg-gradient-to-b from-[#E0B552] to-[#C89B3C] py-3.5 font-serif text-base font-extrabold tracking-wide text-[#010A13] shadow-[0_0_18px_rgba(200,155,60,.55)] transition active:scale-[.98]">{nextLabel}</button>
       </div>
