@@ -4427,8 +4427,33 @@ function SvgPortrait({ m, champion, cx, cy, r, sc, showLabels }) {
 // Taktik-Karte: ein SVG im Raster 0 0 100 100 (1 Einheit = 1 % der Karte, identisch mit den Marker-Koordinaten).
 // Ebenen von unten nach oben: Fallback-Zeichnung -> offizielle Summoner's-Rift-Karte (map11.png) mit Color-Grading -> Marker -> Effekte.
 // Landmarken der Karte: Baron-Pit ca. (34|30), Drachen-Pit ca. (66|70), Lanes entlang der Ränder, Fluss auf der Diagonale oben links nach unten rechts.
+// Türme (Rot oben rechts, Blau unten links; Blau = Rot gespiegelt an der Hauptdiagonale) und Minion-Wellen
+const TW_RED = { top: [[40, 8], [66, 8], [80, 9]], mid: [[60, 41], [70, 31], [78, 22]], bot: [[93, 64], [93, 38], [92, 22]] };
+const TOWER_LIST = ['red', 'blue'].flatMap(side => Object.keys(TW_RED).flatMap(lane => TW_RED[lane].map(([x, y], i) => ({ id: `${side}_${lane}${i + 1}`, side, lane, x: side === 'red' ? x : y, y: side === 'red' ? y : x }))));
+const TW_LANES = { Toplane: 'top', Jungle: 'mid', Midlane: 'mid', Botlane: 'bot', Support: 'bot' };
+const fallTower = (tw, side, lane) => {
+  for (const l of [lane, 'mid', 'top', 'bot'].filter((x, i, a) => a.indexOf(x) === i)) for (let n = 1; n <= 3; n++) { const id = `${side}_${l}${n}`; if (!tw[side].includes(id)) return { ...tw, [side]: [...tw[side], id] }; }
+  return tw;
+};
+// Welche Türme fallen durch eine Entscheidung? Explizit über ev.tw, sonst: Turm-Objective = Rot fällt, Fehlentscheidung ab Phase 3 = Blau fällt
+function applyTowers(tw, ev, ok, role, phase) {
+  let t = tw || { blue: [], red: [] };
+  const e = ev || {}, lane = TW_LANES[role] || 'mid';
+  const fall = e.tw || (ok ? (/TURM/.test(e.obj || '') && !/PLATES/.test(e.obj || '') ? (/TAUSCH/.test(e.obj) ? 'both' : 'red') : null) : (phase >= 3 || (phase === 2 && (e.ek || 0) >= 2) ? 'blue' : null));
+  if (fall === 'red' || fall === 'both') t = fallTower(t, 'red', lane);
+  if (fall === 'blue' || fall === 'both') t = fallTower(t, 'blue', lane);
+  if (ok && /NEXUS/.test(e.obj || '')) t = { ...t, red: [...t.red, 'red_nexus'] };
+  return t;
+}
+const LANE_PTS = { top: [[7, 93], [7, 7], [93, 7]], mid: [[7, 93], [93, 7]], bot: [[7, 93], [93, 93], [93, 7]] };
+const lanePoint = (lane, s) => {
+  const pts = LANE_PTS[lane], seg = pts.slice(1).map((q, i) => Math.hypot(q[0] - pts[i][0], q[1] - pts[i][1])), tot = seg.reduce((a, b) => a + b, 0);
+  let d = Math.max(0, Math.min(1, s)) * tot;
+  for (let i = 0; i < seg.length; i++) { if (d <= seg[i] || i === seg.length - 1) { const f = seg[i] ? d / seg[i] : 0; return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f]; } d -= seg[i]; }
+};
+const WAVE_T = { EVEN: 0.5, AHEAD: 0.66, BEHIND: 0.34 }, WAVE_OFF = { top: 0.03, mid: 0, bot: -0.03 };
 const MARKER_COLOR = { hero: '#3b82f6', enemy: '#ef4444', objective: '#C89B3C', fog: '#94a3b8' };
-const Minimap = ({ markers = [], champion, role, showLabels = false, result = null, fx = null, focus = null, full = false, onToggleView }) => {
+const Minimap = ({ markers = [], champion, role, showLabels = false, result = null, fx = null, focus = null, full = false, onToggleView, towers = null, waves = null }) => {
   const uid = React.useId().replace(/:/g, '');
   const [mapFailed, setMapFailed] = useState(false);
   const player = markers.find(m => m.isPlayer);
@@ -4505,6 +4530,27 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
             <rect width="100" height="100" fill="#010A13" fillOpacity=".18" />
             <rect width="100" height="100" fill={`url(#vig-${uid})`} />
             <rect x=".4" y=".4" width="99.2" height="99.2" fill="none" stroke="#C89B3C" strokeOpacity=".65" strokeWidth=".8" />
+            {/* Türme: lebende Türme in Teamfarbe, zerstörte ausgegraut mit Bruchlinie */}
+            <g data-towers="true" aria-hidden="true">
+              {[...TOWER_LIST, { id: 'blue_nexus', side: 'blue', x: 8, y: 92, nexus: true }, { id: 'red_nexus', side: 'red', x: 92, y: 8, nexus: true }].map(t => {
+                const dead = !!towers && towers[t.side].includes(t.id), ts = (t.nexus ? 1.7 : 1.25) * u;
+                const col = dead ? '#64748b' : t.side === 'blue' ? '#60a5fa' : '#f87171', edge = dead ? '#334155' : t.side === 'blue' ? '#1e3a8a' : '#7f1d1d';
+                return (
+                  <g key={t.id} data-tower={t.id} data-alive={dead ? 'false' : 'true'} transform={`translate(${t.x} ${t.y}) scale(${ts})`} opacity={dead ? 0.45 : 0.9}>
+                    <path d="M-1.7 1.8 L-1.2 -1.1 H-1.7 V-2.3 H-0.6 V-1.6 H0.6 V-2.3 H1.7 V-1.1 H1.2 L1.7 1.8 Z" fill={col} stroke={edge} strokeWidth=".35" />
+                    {dead && <path d="M-1.4 -1.8 L1.4 1.6" stroke="#0f172a" strokeWidth=".45" />}
+                  </g>
+                );
+              })}
+            </g>
+            {/* Minion-Wellen: die Position zeigt den Wellendruck (Vorsprung = Welle am Gegner-Turm) */}
+            <g data-waves={waves || 'EVEN'} aria-hidden="true">
+              {['top', 'mid', 'bot'].flatMap(lane => ['blue', 'red'].flatMap(side => [0, 1, 2].map(i => {
+                const t0 = WAVE_T[waves || 'EVEN'] + WAVE_OFF[lane], s = side === 'blue' ? t0 - 0.03 - i * 0.022 : t0 + 0.03 + i * 0.022;
+                const [x, y] = lanePoint(lane, s), j = (i % 2 ? 0.7 : -0.7) * u * 1.4;
+                return <circle key={`${lane}${side}${i}`} data-wave={`${side}_${lane}`} cx={x + j} cy={y - j} r={1.5 * u} fill={side === 'blue' ? '#93c5fd' : '#fca5a5'} stroke={side === 'blue' ? '#1e3a8a' : '#7f1d1d'} strokeWidth=".18" opacity=".85" />;
+              })))}
+            </g>
             {markers.filter(m => !m.isPlayer && (m.type === 'fog' || m.type === 'objective')).map((m, i) => {
               const c = MARKER_COLOR[m.type];
               const flip = m.x > 72;
@@ -4896,6 +4942,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
   const mvEv = pick && scenario.mv2 ? scenario.mv2.ev[ok ? 'ok' : 'bad'] : null;   // Spielereignis dieser Entscheidung (Kills, Tod, Gold, Objective)
   const hudStats = hud ? (mvEv ? applyEv(hud.stats, mvEv) : hud.stats) : null;
   const hudState = hud ? (pick ? nextState(hud.state, ok) : hud.state) : null;
+  const hudTowers = hud ? (pick ? applyTowers(hud.towers, mvEv, ok, scenario.role, scenario.mv2 ? scenario.mv2.phase : 0) : hud.towers) : null;   // Turmstand sofort nach der Entscheidung
   const goNext = () => { if (adv.current || !pick) return; adv.current = true; onNext(pick.opt || null); };
 
   return (
@@ -4943,7 +4990,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
           onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMap(); } }}
           className="relative h-36 shrink-0 rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13] cursor-pointer transition hover:border-[#0AC8B9]">
           <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} result={pick ? (ok ? 'good' : 'bad') : null} fx={fx}
-                   focus={focus} full={full} onToggleView={toggleFull} />
+                   focus={focus} full={full} onToggleView={toggleFull} towers={hudTowers} waves={hudState} />
           <span className="pointer-events-none absolute top-1.5 right-1.5 rounded-md bg-black/40 p-1 text-white/80"><Icon n="zoom" size={16} /></span>
         </div>
 
@@ -5023,7 +5070,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
           </div>
           <div role="status" className="rounded-md border border-[#C89B3C]/50 bg-[#C89B3C]/10 px-2 py-1 text-center text-xs font-semibold text-[#C89B3C]">⏸️ Taktik-Analyse (Timer pausiert)</div>
           <div className="w-full max-w-[380px] aspect-square mx-auto rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13]">
-            <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} showLabels focus={focus} full={full} onToggleView={toggleFull} />
+            <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} showLabels focus={focus} full={full} onToggleView={toggleFull} towers={hudTowers} waves={hudState} />
           </div>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
             {[['hero', 'Du / Team'], ['enemy', 'Gegner'], ['objective', 'Objective'], ['fog', 'Ungesichtet']].map(([t, l]) => (
@@ -5169,17 +5216,18 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
     <div className="flex-1 min-h-0 relative flex flex-col">
       {promoted && <Confetti />}
       {lvPopup && result.mastery && <MasteryLevelUp m={result.mastery} onClose={() => setLvPopup(false)} />}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-2 [@media(min-height:700px)]:py-3 flex flex-col justify-evenly gap-2 [@media(min-height:700px)]:gap-3 text-center" data-endscreen="true">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-2 [@media(max-height:620px)]:py-1 [@media(min-height:700px)]:py-3 flex flex-col justify-evenly gap-2 [@media(max-height:620px)]:gap-1 [@media(min-height:700px)]:gap-3 text-center" data-endscreen="true">
         <div>
           <div className="flex items-center justify-center gap-2">
-            <div className="pop font-serif text-4xl font-black leading-none tracking-wider [@media(min-height:760px)]:text-5xl" style={{ color, textShadow: `0 0 26px ${win ? 'rgba(10,200,185,.4)' : 'rgba(232,64,87,.4)'}` }}>{win ? 'VICTORY' : 'DEFEAT'}</div>
+            <div className="pop font-serif text-4xl [@media(max-height:620px)]:text-3xl font-black leading-none tracking-wider [@media(min-height:760px)]:text-5xl" style={{ color, textShadow: `0 0 26px ${win ? 'rgba(10,200,185,.4)' : 'rgba(232,64,87,.4)'}` }}>{win ? 'VICTORY' : 'DEFEAT'}</div>
             {!practice && result.streak >= 2 && <StreakBadge n={result.streak} />}
           </div>
           <div className="mt-2 text-balance text-[13px] text-slate-400">{result.kind} · {unit} Complete · {result.correct} von {result.n} richtig{!practice && !result.win && result.prevStreak >= 2 ? ` · Siegesserie beendet (war ${result.prevStreak}x)` : ''}</div>
+          {result.mv2 && result.mv2.epilog && <div data-epilog="true" className="mx-auto mt-2 [@media(max-height:620px)]:mt-1 max-w-[340px] text-xs [@media(max-height:620px)]:text-[11px] italic leading-snug text-slate-300">🏁 {result.mv2.epilog}</div>}
         </div>
 
         {/* Eine einzige Hextech-Karte: Rang links, LP/MP rechts, dünner Fortschrittsbalken darunter */}
-        <div className="rounded-2xl border p-3.5 [@media(min-height:700px)]:p-4 [@media(min-height:760px)]:p-5 [@media(min-height:800px)]:p-6" style={{ background: 'var(--panel)', borderColor: practice && !result.masteryOnly ? 'var(--line)' : color, boxShadow: practice && !result.masteryOnly ? 'none' : `0 0 22px ${win ? 'rgba(10,200,185,.14)' : 'rgba(232,64,87,.14)'}` }} data-endcard="true">
+        <div className="rounded-2xl border p-3.5 [@media(max-height:620px)]:p-3 [@media(min-height:700px)]:p-4 [@media(min-height:760px)]:p-5 [@media(min-height:800px)]:p-6" style={{ background: 'var(--panel)', borderColor: practice && !result.masteryOnly ? 'var(--line)' : color, boxShadow: practice && !result.masteryOnly ? 'none' : `0 0 22px ${win ? 'rgba(10,200,185,.14)' : 'rgba(232,64,87,.14)'}` }} data-endcard="true">
           <div className="flex items-center gap-3">
             <div className="relative flex h-[56px] w-[56px] shrink-0 items-center justify-center">
               {promoted && <span className="rankglow absolute inset-0 rounded-full bg-yellow-400/50 blur-lg" aria-hidden="true" />}
@@ -5556,7 +5604,7 @@ const TabBar = ({ tabs, value, onChange }) => (
 function MasteryResult({ m }) {
   const pr = masteryProgress(m.after), emb = MASTERY_EMBLEM(pr.level);
   return (
-    <div className="flex h-full min-w-0 flex-col justify-between gap-2.5 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-3 text-left [@media(min-height:700px)]:py-3.5 [@media(min-height:760px)]:py-5 [@media(min-height:800px)]:py-7" data-mastery-tile="true">
+    <div className="flex h-full min-w-0 flex-col justify-between gap-2.5 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-3 text-left [@media(max-height:620px)]:py-2.5 [@media(min-height:700px)]:py-3.5 [@media(min-height:760px)]:py-5 [@media(min-height:800px)]:py-7" data-mastery-tile="true">
       <div className="flex items-center gap-2.5">
         <ChampAvatar name={m.champion} className="w-11 h-11 shrink-0" iconSize={16} ring="border-2 border-[#C89B3C]" />
         <div className="min-w-0 flex-1 text-xs font-bold leading-tight">{m.champion} · Stufe {pr.level} · {masteryTitle(pr.level)}</div>
@@ -6178,7 +6226,251 @@ const MV2 = {
       { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1000, kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1000, death: true } }),
   },
 };
-const mv2Template = (phase, state, role) => (phase === 1 ? MV2[1][role] : MV2[phase][state]);
+/* ---- Zusatz-Varianten: pro Phase und Spielzustand 3 inhaltlich verschiedene Szenarien (Basis + 2) ---- */
+const MK = (key, ...a) => ({ ...MT(...a), key });
+const EVR = { ok: { gold: 250 }, bad: { ek: 1, d: 1, gold: -300, death: true } };                                              // Recall/Tempo statt Kill
+const EVS = { ok: { tk: 1, a: 1, gold: 200, obj: 'SCUTTLE CRAB GESICHERT!' }, bad: { ek: 1, d: 1, gold: -300, death: true } };
+const K1 = { ok: { tk: 1, k: 1, gold: 400, kill: true }, bad: { ek: 1, d: 1, gold: -500, death: true } };
+const MV2X = {
+  1: {
+    Toplane: [
+      MK('L2', '02:10', 'Du bist {ME} (Top) gegen {OPP}, Minute 02:10. Ihr seid beide kurz vor Level 2, die erste Welle trifft sich in der Mitte der Lane. Wer zuerst Level 2 erreicht, bekommt ein kurzes Trade-Fenster. {E_JG} startet auf der anderen Seite.',
+        'Wer erreicht Level 2 zuerst, und was bringt dir das?',
+        ['Die letzten Minions der Welle sichern, mit Level 2 vor {OPP} traden und danach die Welle halten.', 'Perfekt! Du nutzt das Level-2-Fenster und gewinnst Wellenkontrolle.'],
+        [['Ohne Level-Vorteil sofort auf {OPP} gehen.', ['{OPP} hat dieselben Level und gewinnt den Trade.', 'Du verlierst Leben und Wellenkontrolle.']], ['Die letzten Minions verfehlen und zurückfallen.', ['{OPP} erreicht Level 2 zuerst.', 'Er bekommt Prio und den Trade.']]],
+        [[10, 40, 'hero', 'ME'], [14, 32, 'enemy', 'OPP'], [40, 9, 'objective', 'Gegner-Turm (T1)'], [84, 80, 'enemy', 'E_JG']], EV1),
+      MK('SCUTTLE', '03:10', 'Du bist {ME} (Top) gegen {OPP}, Minute 03:10, Level 3. Der Scuttle Crab ist seit 2:55 im Fluss, dein Jungler {A1} geht hin, und {E_JG} kommt von der anderen Seite. Deine Welle steht neutral.',
+        'Wie hilfst du deinem Jungler am Scuttle, ohne die Lane zu verlieren?',
+        ['Die Welle zum Turm schieben (Slow Push), dann Vision im Fluss-Busch setzen und {A1} am Scuttle absichern.', 'Perfekt! Du gibst Vision und verlierst keine Welle.'],
+        [['Die Welle liegen lassen und ohne Vision zum Scuttle laufen.', ['Die Welle drückt deinen Turm.', '{OPP} bekommt Gold und Prio.']], ['Den Scuttle allein stehlen wollen, obwohl {A1} ihn schlägt.', ['Ihr verliert Zeit, und {E_JG} taucht auf.', 'Du stirbst im Fluss.']]],
+        [[10, 40, 'hero', 'ME'], [14, 32, 'enemy', 'OPP'], [36, 38, 'objective', 'Scuttle Crab (2:55)'], [30, 46, 'hero', 'A1']], EVS)],
+    Jungle: [
+      MK('SCUTTLE', '03:10', 'Du bist {ME} (Jungle) gegen {E_JG}, Minute 03:10, Level 3. Der Scuttle Crab ist seit 2:55 im Fluss. {A2} hat die Mid-Welle gepusht und kann dir mit Vision helfen, {E_JG} steckt noch im eigenen Jungle.',
+        'Wer kontrolliert den Fluss, wenn ihr den Scuttle nehmt?',
+        ['Mit {A2} und Vision im Fluss-Busch den Scuttle sichern, bevor {E_JG} ankommt.', 'Perfekt! Ihr holt den Scuttle mit Vision und gewinnt die Flusskontrolle.'],
+        [['Allein ohne Vision zum Scuttle laufen.', ['{E_JG} sieht dich und kommt mit Unterstützung.', 'Du verlierst den Scuttle und die Flusskontrolle.']], ['Den Scuttle ignorieren und im eigenen Jungle weiterfarmen.', ['{E_JG} nimmt den Scuttle und die Vision.', 'Eure Lanes verlieren die Flusskontrolle.']]],
+        [[28, 48, 'hero', 'ME'], [44, 52, 'hero', 'A2'], [36, 40, 'objective', 'Scuttle Crab (2:55)'], [70, 62, 'enemy', 'E_JG']], EVS),
+      MK('L2', '02:30', 'Du bist {ME} (Jungle), Minute 02:30, Level 3. Dein Toplaner {A1} hat Level 2 vor {E_TOP} erreicht, die Welle steht neutral, {E_JG} ist nicht zu sehen.',
+        'Wann lohnt der erste Gank?',
+        ['Den Clear beenden und mit Vision auf die Lane ganken, auf der dein Laner Level-2-Prio hat.', 'Perfekt! Der Gank nutzt die Prio, und {E_TOP} verliert Leben oder Flash.'],
+        [['Ohne Prio und ohne Welle auf eine gedrückte Lane ganken.', ['Der Gegner weicht mit der Welle aus.', 'Ihr verliert Camps und Tempo.']], ['Den Gank sofort starten, ohne den Clear zu beenden.', ['Dir fehlen Level und Camps.', '{E_JG} holt Tempo und Camps.']]],
+        [[28, 56, 'hero', 'ME'], [12, 34, 'hero', 'A1'], [18, 28, 'enemy', 'E_TOP'], [40, 9, 'objective', 'Gegner-Turm (T1)']], EV1)],
+    Midlane: [
+      MK('L2', '02:10', 'Du bist {ME} (Mid) gegen {OPP}, Minute 02:10. {OPP} hat Burst und erreicht Level 2 vor dir, wenn du die Minions nicht sicherst. Dein Jungler {A2} ist auf der anderen Seite.',
+        'Wer hat Level-2-Prio, und wie vermeidest du den Burst?',
+        ['Die Minions sichern, hinter der eigenen Welle bleiben und mit Level 2 erst nach {OPP}s Fähigkeiten traden.', 'Perfekt! Du fängst keinen Burst und gewinnst den Trade danach.'],
+        [['Mit Level 1 vor die Welle laufen und {OPP} reizen.', ['{OPP} trifft mit dem Burst und gewinnt den Trade.', 'Du verlierst Leben und Wellenkontrolle.']], ['Die letzten Minions aufgeben, um Abstand zu halten.', ['{OPP} bekommt Level 2 zuerst.', 'Er hat Prio und kann die Lane pushen.']]],
+        [[48, 52, 'hero', 'ME'], [56, 44, 'enemy', 'OPP'], [60, 41, 'objective', 'Gegner-Turm (T1)'], [30, 12, 'enemy', 'E_JG']], EV1),
+      MK('RECALL', '04:50', 'Du bist {ME} (Mid), Minute 04:50, Level 5. Du hast etwa 1.200 Gold für Lost Chapter. Deine Welle ist gerade in den gegnerischen Turm gelaufen, die nächste Welle trifft in etwa 25 Sekunden ein.',
+        'Wann recallst du, ohne Farm zu verlieren?',
+        ['Die Welle in den Turm laufen lassen und genau jetzt recallen (Cheater Recall), damit sie in deiner Abwesenheit crasht.', 'Perfekt! Du kaufst Lost Chapter und verlierst kaum Farm.'],
+        [['Mitten in der Lane ohne Wellenzustand recallen.', ['Die gegnerische Welle drückt deinen Turm.', 'Du verlierst Farm, Prio und Kartenkontrolle.']], ['Ohne Recall weiterfarmen und das Gold behalten.', ['Du bleibst ohne Item gegen {OPP} im Nachteil.', 'Euer Team verliert Prio in der Mitte.']]],
+        [[50, 50, 'hero', 'ME'], [56, 44, 'enemy', 'OPP'], [60, 41, 'objective', 'Gegner-Turm (T1)'], [8, 92, 'objective', 'Eigene Base']], EVR)],
+    Botlane: [
+      MK('RECALL', '04:20', 'Du bist {ME} (Bot) mit {A4} gegen {OPP} und {E_SUP}, Minute 04:20. Du hast genug Gold für ein erstes Item (etwa 1.000 Gold). Eure Welle erreicht gerade den gegnerischen Turm und crasht.',
+        'Wann recallst du, ohne Farm und Prio zu verlieren?',
+        ['Die Welle crashen lassen und währenddessen recallen (Cheater Recall), bevor die nächste Welle ankommt.', 'Perfekt! Du kaufst dein Item und verlierst kaum Farm.'],
+        [['Recallen, bevor die Welle den Turm erreicht.', ['Die Welle läuft zu euch zurück und drückt euren Turm.', 'Du verlierst Farm und Prio.']], ['Ohne Recall weiterkämpfen und das Gold liegen lassen.', ['Du bleibst ohne Item gegen {OPP} und {E_SUP} im Nachteil.', 'Die Lane verliert Druck.']]],
+        [[72, 90, 'hero', 'ME'], [68, 90, 'hero', 'A4'], [82, 90, 'enemy', 'OPP'], [86, 90, 'enemy', 'E_SUP']], EVR),
+      MK('SCUTTLE', '03:10', 'Du bist {ME} (Bot) mit {A4} gegen {OPP} und {E_SUP}, Minute 03:10, Level 3. Der Scuttle Crab ist seit 2:55 im Fluss, dein Jungler {A2} will ihn nehmen, und {E_JG} ist nicht zu sehen.',
+        'Wie unterstützt du den Scuttle, ohne die Lane zu verlieren?',
+        ['Die Welle halten, mit {A4} Vision im Fluss-Busch setzen und {A2} beim Scuttle absichern.', 'Perfekt! Ihr gebt Vision und behaltet die Welle.'],
+        [['Die Welle liegen lassen und ohne Vision zum Scuttle laufen.', ['Die Welle drückt euren Turm.', '{OPP} und {E_SUP} bekommen Gold und Prio.']], ['Den Scuttle ignorieren und ohne Vision weiterfarmen.', ['{E_JG} nimmt den Scuttle und die Vision.', 'Ihr verliert die Flusskontrolle.']]],
+        [[72, 88, 'hero', 'ME'], [68, 88, 'hero', 'A4'], [64, 62, 'objective', 'Scuttle Crab (2:55)'], [60, 66, 'hero', 'A2']], EVS)],
+    Support: [
+      MK('RECALL', '04:20', 'Du bist {ME} (Support) mit {A4} gegen {OPP} und {E_BOT}, Minute 04:20. {A4} hat Gold für ein Item, eure Welle crasht gerade in den gegnerischen Turm.',
+        'Wer recallt wann, damit niemand allein in der Lane steht?',
+        ['Die Welle crashen lassen und mit {A4} zeitgleich recallen (Cheater Recall), damit niemand allein bleibt.', 'Perfekt! Ihr kauft Items und verliert kaum Farm.'],
+        [['Nur {A4} recallen lassen und allein in der Lane bleiben.', ['Du stehst allein gegen {OPP} und {E_BOT}.', 'Du stirbst, und die Gegner gewinnen die Welle.']], ['Beide in der Lane bleiben und Gold liegen lassen.', ['{A4} bleibt ohne Item unterlegen.', 'Die Lane verliert Druck.']]],
+        [[72, 90, 'hero', 'ME'], [68, 90, 'hero', 'A4'], [82, 90, 'enemy', 'OPP'], [86, 90, 'enemy', 'E_BOT']], EVR),
+      MK('SCUTTLE', '03:10', 'Du bist {ME} (Support) mit {A4} gegen {OPP} und {E_BOT}, Minute 03:10. Der Scuttle Crab ist seit 2:55 im Fluss, dein Jungler {A2} ist in der Nähe, {E_JG} ist nicht zu sehen.',
+        'Wie sicherst du den Scuttle für deinen Jungler?',
+        ['Vision im Fluss-Busch setzen und {A2} beim Scuttle absichern, während {A4} die Welle hält.', 'Perfekt! Ihr holt den Scuttle mit Vision, ohne die Welle zu verlieren.'],
+        [['Die Lane verlassen, ohne dass {A4} die Welle halten kann.', ['{A4} steht allein gegen {OPP} und {E_BOT}.', 'Ihr verliert die Welle und Gold.']], ['Ohne Vision in den Fluss laufen.', ['{E_JG} sieht dich und greift an.', 'Du stirbst, und der Scuttle geht verloren.']]],
+        [[72, 88, 'hero', 'ME'], [68, 88, 'hero', 'A4'], [64, 62, 'objective', 'Scuttle Crab (2:55)'], [58, 66, 'hero', 'A2']], EVS)],
+  },
+  2: {
+    AHEAD: [
+      MK('COUNTER', '11:40', 'Du bist {ME} ({ROLE}), Minute 11:40. Ihr führt. Der gegnerische Jungler {E_JG} wurde zuletzt Bot gesehen und taucht bei euren Teamkollegen auf. Du bist über den Flussweg schnell dort.',
+        'Wie machst du aus dem Gank einen Countergank?',
+        ['Zum Gank rotieren, mit {A1} den Rückweg von {E_JG} abschneiden und den Countergank erzwingen.', 'Perfekt! Der Gank wird zum Countergank, und {E_JG} bezahlt dafür.'],
+        [['Die Lane ignorieren und weiter farmen.', ['{E_JG} kommt unbeschadet durch.', 'Ihr verliert einen Spieler und Vorsprung.']], ['Allein in den Gank laufen, ohne Vision und ohne {A1}.', ['{E_JG} und die Lane fangen dich ab.', 'Du stirbst und gibst den Vorsprung zurück.']]],
+        [[56, 66, 'hero', 'ME'], [62, 72, 'hero', 'A1'], [74, 84, 'enemy', 'E_JG'], [66, 70, 'objective', 'Drache']], K1),
+      MK('PLATES', '12:30', 'Du bist {ME} ({ROLE}), Minute 12:30. Ihr führt. Die Turm-Plates sind noch aktiv (sie fallen um 14:00). Eure Welle steht am gegnerischen Turm, {OPP} ist zum Recall gegangen.',
+        'Wie holst du dir die Plates, bevor sie verfallen?',
+        ['Die Welle am Turm lassen, mit {A1} die Plates abholen und danach sofort wieder Vision legen.', 'Perfekt! Ihr sammelt Plate-Gold und baut den Vorsprung aus.'],
+        [['Den Turm ohne Welle angreifen.', ['Der Turm trifft dich zuerst.', 'Du verlierst Leben, und die Plates bleiben stehen.']], ['Die Plates liegen lassen und zur Mitte laufen.', ['Ihr verschenkt Gold, bevor die Plates um 14:00 fallen.', 'Der Vorsprung wächst nicht.']]],
+        [[58, 42, 'hero', 'ME'], [54, 46, 'hero', 'A1'], [60, 41, 'objective', 'Gegner-Turm (T1)'], [30, 70, 'enemy', 'OPP']], { ok: { tk: 1, a: 1, gold: 700, obj: 'TURM-PLATES GEHOLT!' }, bad: { ek: 1, d: 1, gold: -500, death: true } })],
+    BEHIND: [
+      MK('PLATES', '12:30', 'Du bist {ME} ({ROLE}), Minute 12:30. Ihr liegt zurück. Eure Turm-Plates sind noch aktiv (sie fallen um 14:00), {OPP} und {E_JG} drücken auf euren T1.',
+        'Wie verteidigst du die Plates, ohne den Kampf in Unterzahl zu suchen?',
+        ['Die Welle früh räumen, unter dem Turm mit {A1} verteidigen und die Plates nicht für einen Kampf riskieren.', 'Gut gelöst! Die Plates halten, und der Rückstand wächst nicht.'],
+        [['Vor den Turm laufen und den Kampf in Unterzahl annehmen.', ['{OPP} und {E_JG} gewinnen den Kampf.', 'Du stirbst, und die Plates fallen trotzdem.']], ['Den Turm aufgeben und zur Base recallen.', ['Die Gegner nehmen alle Plates.', 'Ihr verliert Gold und Druck.']]],
+        [[14, 62, 'hero', 'ME'], [18, 58, 'hero', 'A1'], [9, 60, 'objective', 'Eigener Turm (T1)'], [22, 52, 'enemy', 'OPP'], [28, 46, 'enemy', 'E_JG']], { ok: { a: 1, gold: 300 }, bad: { ek: 2, d: 1, gold: -800, death: true } }),
+      MK('GRUBS', '09:40', 'Du bist {ME} ({ROLE}), Minute 09:40. Ihr liegt zurück. Die Gegner schlagen die Voidgrubs, {E_JG} steht allein am Pit, der Rest der Gegner ist verteilt.',
+        'Wann lohnt es sich, die Voidgrubs zu contesten?',
+        ['Mit Vision am Rand warten, bis {E_JG} Leben verloren hat, und die Grubs dann mit {A1} im Kampf stehlen.', 'Gut gelöst! Ihr holt einen Teil der Grubs und trefft nur {E_JG}.'],
+        [['Frontal in den Pit laufen, ohne Vision.', ['Die Gegner reagieren mit allen Spielern.', 'Ihr verliert den Kampf und die Grubs.']], ['Die Grubs komplett abgeben und nicht reagieren.', ['Die Gegner bekommen Gold und Turmdruck.', 'Euer Rückstand wächst.']]],
+        [[36, 36, 'hero', 'ME'], [38, 40, 'hero', 'A1'], [33, 30, 'objective', 'Voidgrubs'], [30, 28, 'enemy', 'E_JG']], { ok: { tk: 1, k: 1, gold: 400, obj: 'VOIDGRUBEN GESTOHLEN!', kill: true }, bad: { ek: 2, d: 1, gold: -800, death: true } })],
+    EVEN: [
+      MK('GRUBS', '09:40', 'Du bist {ME} ({ROLE}), Minute 09:40. Das Spiel ist ausgeglichen. Beide Teams wollen die Voidgrubs, die seit 6:00 frei sind. {E_JG} geht zum Pit, euer Jungler ist unterwegs.',
+        'Wie gewinnst du den Kampf um die Voidgrubs?',
+        ['Mit {A1} früh Vision im Pit legen, die Grubs mit dem Team starten und {E_JG} zurückdrängen.', 'Perfekt! Ihr holt die Grubs mit Vision und Überzahl.'],
+        [['Die Grubs allein starten, ohne dass das Team da ist.', ['{E_JG} und die Gegner kommen dazu.', 'Ihr verliert den Kampf und die Grubs.']], ['Die Grubs den Gegnern überlassen.', ['Die Gegner bekommen Gold und Turmdruck.', 'Euer Team verliert den Anschluss.']]],
+        [[36, 36, 'hero', 'ME'], [38, 40, 'hero', 'A1'], [33, 30, 'objective', 'Voidgrubs'], [28, 26, 'enemy', 'E_JG']], { ok: { tk: 2, ek: 1, k: 1, gold: 600, obj: 'VOIDGRUBEN GESICHERT!', kill: true }, bad: { ek: 1, d: 1, gold: -500, death: true } }),
+      MK('COUNTER', '11:40', 'Du bist {ME} ({ROLE}), Minute 11:40. Das Spiel ist ausgeglichen. {E_JG} wurde zuletzt Bot gesehen, und eure Botlane hat die Welle gedrückt und steht ungeschützt.',
+        'Wie schützt du die Botlane vor dem Gank?',
+        ['Die Botlane mit einem Ping warnen, selbst Vision im Fluss legen und bei einem Gank mit {A1} den Rückweg abschneiden.', 'Perfekt! Der Gank scheitert, und ihr nehmt {E_JG} mit.'],
+        [['Die Botlane nicht warnen und weiterfarmen.', ['{E_JG} ganked ohne Gegenwehr.', 'Ihr verliert einen Spieler und Gold.']], ['Ohne Vision in den Fluss laufen, um zu helfen.', ['Du läufst in die Gegner.', 'Du stirbst, und der Gank gelingt trotzdem.']]],
+        [[58, 62, 'hero', 'ME'], [62, 68, 'hero', 'A1'], [74, 84, 'enemy', 'E_JG'], [70, 90, 'hero', 'A4']], K1)],
+  },
+  3: {
+    AHEAD: [
+      MK('SIEGE', '17:30', 'Du bist {ME} ({ROLE}), Minute 17:30. Ihr führt klar. Eure Mid-Welle ist an ihrem T2 gecrasht, {E_MID} räumt sie, und euer Team steht in der Nähe der Mitte.',
+        'Wie belagerst du die Mitte, ohne zu riskieren?',
+        ['Mit der Welle und {A1} den Mid-Turm belagern (Siege), Vision vorne halten und nur kämpfen, wenn die Gegner einzeln kommen.', 'Perfekt! Der Turm fällt, ohne dass ihr riskieren müsst.'],
+        [['Ohne Welle in die Gegner laufen, um den Turm zu erzwingen.', ['Die gegnerische Welle und {E_MID} fangen euch ab.', 'Ihr verliert Spieler, und der Turm bleibt stehen.']], ['Die Mitte verlassen und einzeln Seitenlanes pushen.', ['Die Gegner haben freie Hand in der Mitte.', 'Der Vorsprung bleibt ungenutzt.']]],
+        [[56, 44, 'hero', 'ME'], [52, 48, 'hero', 'A1'], [70, 31, 'objective', 'Gegner-Turm (T2)'], [76, 26, 'enemy', 'E_MID']], { ok: { tk: 2, ek: 1, a: 1, gold: 900, obj: 'TURM ZERSTÖRT!', tw: 'red' }, bad: { ek: 2, d: 1, gold: -700, death: true } }),
+      MK('COLLAPSE', '17:30', 'Du bist {ME} ({ROLE}), Minute 17:30. Ihr führt. {E_TOP} steht allein an der oberen Seitenlane ohne Vision, eure Mitte hat Prio.',
+        'Wie fängst du den einzelnen Gegner ab?',
+        ['Mit {A1} hinter die Linien rotieren (Collapse) und {E_TOP} von zwei Seiten fangen, bevor er zum Team kommt.', 'Perfekt! Ihr fangt {E_TOP} und nehmt den Turm.'],
+        [['Frontal von einer Seite angreifen, sodass er fliehen kann.', ['{E_TOP} weicht aus und verliert nichts.', 'Ihr verschenkt Tempo.']], ['Allein tauchen, ohne dass {A1} nachrückt.', ['{E_TOP} und der Turm erwischen dich.', 'Du stirbst, und der Vorsprung schrumpft.']]],
+        [[60, 12, 'hero', 'ME'], [56, 16, 'hero', 'A1'], [66, 8, 'objective', 'Gegner-Turm (T2)'], [72, 10, 'enemy', 'E_TOP']], { ok: { tk: 1, k: 1, a: 1, gold: 800, obj: 'TURM ZERSTÖRT!', kill: true, tw: 'red' }, bad: { ek: 1, d: 1, gold: -600, death: true } })],
+    BEHIND: [
+      MK('COLLAPSE', '17:30', 'Du bist {ME} ({ROLE}), Minute 17:30. Ihr liegt zurück. {E_TOP} und {E_JG} wollen euren Sidelaner {A1} einkesseln (Collapse), der Rest der Gegner steht in der Mitte.',
+        'Wie rettest du den Sidelaner?',
+        ['Den Sidelaner nicht allein lassen: die Welle abgeben, mit {A1} zusammenziehen und {E_TOP} nicht in den Kessel folgen.', 'Gut gelöst! {A1} entkommt, und ihr verliert nur die Welle.'],
+        [['Den Sidelaner allein lassen und in der Mitte warten.', ['{A1} stirbt im Kessel.', 'Ihr verliert Spieler und den Turm.']], ['In Unterzahl in den Kessel laufen.', ['Die Gegner fangen euch alle ab.', 'Ihr verliert mehrere Spieler.']]],
+        [[14, 40, 'hero', 'A1'], [18, 46, 'hero', 'ME'], [20, 34, 'enemy', 'E_TOP'], [26, 40, 'enemy', 'E_JG']], { ok: { a: 1, gold: 300 }, bad: { ek: 2, d: 1, gold: -800, death: true, tw: 'blue' } }),
+      MK('SIEGE', '17:30', 'Du bist {ME} ({ROLE}), Minute 17:30. Ihr liegt zurück. Die Gegner belagern die Mitte, {E_MID} drückt mit Minions auf euren T2, und euer Team steht verteilt.',
+        'Wie verteidigst du die Mitte, ohne in die Minions zu laufen?',
+        ['Die Welle unter dem Turm räumen, Vision halten und nur kämpfen, wenn Gegner in den Turmbereich kommen.', 'Gut gelöst! Der Turm hält, und ihr trefft die Ersten.'],
+        [['In die gegnerischen Minions laufen, um {E_MID} zu erreichen.', ['Der Turm und die Welle treffen dich nicht, aber {E_MID} und {E_JG} schon.', 'Du stirbst, und der Turm fällt.']], ['Den Turm ohne Gegenwehr aufgeben.', ['Die Gegner nehmen den Turm kampflos.', 'Der Rückstand wächst.']]],
+        [[30, 70, 'hero', 'ME'], [34, 66, 'hero', 'A1'], [31, 70, 'objective', 'Eigener Turm (T2)'], [44, 58, 'enemy', 'E_MID']], { ok: { tk: 1, k: 1, gold: 400, kill: true }, bad: { ek: 2, d: 1, gold: -800, death: true, tw: 'blue' } })],
+    EVEN: [
+      MK('CROSS', '17:30', 'Du bist {ME} ({ROLE}), Minute 17:30. Das Spiel ist ausgeglichen. Die Gegner sammeln sich in der Mitte, eure Seitenlanes sind frei, und {E_TOP} ist weit von seinem Turm entfernt.',
+        'Wie nutzt du die freie Seitenlane?',
+        ['Mit {A1} einen Turm auf der Gegenseite nehmen (Cross-Map-Trade), während die Gegner die Mitte belagern.', 'Gut gelöst! Ihr tauscht einen Turm für Druck und Gold.'],
+        [['Mit allen in die Mitte laufen und frontal kämpfen.', ['Ihr kämpft gegen aufgebaute Gegner.', 'Ihr verliert den Kampf und Tempo.']], ['Allein auf die Gegenseite gehen, ohne dass das Team Zeit kauft.', ['Du wirst abgefangen.', 'Du stirbst, und der Turm bleibt stehen.']]],
+        [[88, 30, 'hero', 'ME'], [84, 34, 'hero', 'A1'], [93, 38, 'objective', 'Gegner-Turm (andere Lane)'], [50, 50, 'enemy', 'E_MID']], { ok: { tk: 1, gold: 700, obj: 'TURM-TAUSCH GEWONNEN!', tw: 'both' }, bad: { ek: 2, d: 1, gold: -700, death: true } }),
+      MK('COLLAPSE', '17:30', 'Du bist {ME} ({ROLE}), Minute 17:30. Das Spiel ist ausgeglichen. {E_TOP} pusht allein eine Seitenlane ohne Vision, der Baron spawnt in etwa 150 Sekunden.',
+        'Wie bestrafst du den einzelnen Pusher?',
+        ['Vision auf der Seitenlane legen und mit {A1} auf {E_TOP} kollabieren, bevor er zum Team zurückkehrt.', 'Perfekt! Ihr fangt {E_TOP} und geht mit Vorteil in den Baron.'],
+        [['Auf die Welle warten und nichts tun.', ['{E_TOP} drückt unbehelligt den Turm.', 'Ihr verliert Druck vor dem Baron.']], ['Allein ohne Vision auf {E_TOP} tauchen.', ['{E_TOP} und seine Welle fangen dich ab.', 'Du stirbst und gibst Gold ab.']]],
+        [[60, 12, 'hero', 'ME'], [56, 16, 'hero', 'A1'], [66, 8, 'objective', 'Gegner-Turm (T2)'], [72, 10, 'enemy', 'E_TOP']], { ok: { tk: 1, k: 1, a: 1, gold: 600, kill: true }, bad: { ek: 1, d: 1, gold: -500, death: true } })],
+  },
+  4: {
+    AHEAD: [
+      MK('CHOKE', '24:10', 'Du bist {ME} ({ROLE}), Minute 24:10. Ihr führt. Der Eingang zum Baron-Pit ist ein enger Chokepoint, die Gegner stehen mit {E_JG} davor.',
+        'Wie nutzt du den engen Eingang?',
+        ['Den Chokepoint mit Flächenfähigkeiten zonen, die Gegner nicht durchlassen und währenddessen den Baron beginnen.', 'Perfekt! Die Gegner kommen nicht durch, und der Baron fällt.'],
+        [['Ohne Zoning durch den Chokepoint stürmen.', ['Ihr steht einzeln im engen Eingang.', 'Die Gegner fangen euch ab.']], ['Den Chokepoint verlassen und den Baron aufgeben.', ['Die Gegner kommen ungestört herein.', 'Euer Vorsprung bleibt ungenutzt.']]],
+        [[38, 38, 'hero', 'ME'], [36, 42, 'hero', 'A1'], [33, 30, 'objective', 'Baron'], [46, 40, 'enemy', 'E_JG']], { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1200, obj: 'BARON NASHOR GESICHERT!', kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1000, death: true } }),
+      MK('ELDER', '24:10', 'Du bist {ME} ({ROLE}), Minute 24:10. Ihr führt und habt die Drachen-Soul. Der Elder Dragon ist erschienen, die Gegner kommen mit {E_JG} zum Pit.',
+        'Wann startest du den Elder Dragon?',
+        ['Den Elder erst mit Vision und Zonenkontrolle starten und den Buff danach für den Kampf in der gegnerischen Base nutzen.', 'Perfekt! Ihr sichert den Elder ohne Risiko.'],
+        [['Den Elder ohne Vision starten.', ['Die Gegner greifen beim Start an.', 'Ihr verliert Spieler und den Elder.']], ['Den Elder liegen lassen.', ['Die Gegner nehmen ihn ohne Gegenwehr.', 'Ihr gebt den Vorsprung aus der Hand.']]],
+        [[66, 66, 'hero', 'ME'], [62, 70, 'hero', 'A1'], [66, 70, 'objective', 'Elder Dragon'], [76, 62, 'enemy', 'E_JG']], { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1300, obj: 'ELDER DRACHE GESICHERT!', kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1100, death: true } })],
+    BEHIND: [
+      MK('CHOKE', '24:10', 'Du bist {ME} ({ROLE}), Minute 24:10. Ihr liegt zurück. Die Gegner wollen durch den engen Eingang in euren Jungle (Chokepoint) und den Baron mit Druck vorbereiten.',
+        'Wie verteidigst du den Eingang?',
+        ['Den Chokepoint mit {A1} zonen, Flächenfähigkeiten für den Eingang aufheben und nur Gegner angreifen, die hineinlaufen.', 'Gut gelöst! Ihr trefft die Ersten und haltet die Linie.'],
+        [['Die Flächenfähigkeiten früh im leeren Eingang verbrauchen.', ['Beim Engage fehlen sie euch.', 'Die Gegner kommen ohne Gegenwehr herein.']], ['Den Eingang verlassen und im eigenen Jungle warten.', ['Die Gegner schlagen den Baron in Ruhe.', 'Euer Rückstand wächst.']]],
+        [[26, 36, 'hero', 'ME'], [24, 40, 'hero', 'A1'], [33, 30, 'objective', 'Baron'], [42, 36, 'enemy', 'E_TOP'], [44, 30, 'enemy', 'E_JG']], { ok: { tk: 2, ek: 1, k: 1, a: 1, gold: 800, kill: true }, bad: { ek: 3, d: 1, gold: -1200, death: true, tw: 'blue' } }),
+      MK('BAIT', '24:10', 'Du bist {ME} ({ROLE}), Minute 24:10. Ihr liegt zurück. Die Gegner stehen am Baron und warten auf euren Engage. Euer Zhonyas-Träger ist bereit (2,5 Sekunden Stasis, 120 Sekunden Abklingzeit).',
+        'Wie nutzt du die Stasis als Köder?',
+        ['Mit dem Zhonyas-Träger als Köder in den Kampf gehen, die Fähigkeiten der Gegner ziehen und danach mit dem Team zuschlagen.', 'Gut gelöst! Die Gegner verbrauchen ihre Fähigkeiten auf die Stasis.'],
+        [['Zhonyas zu früh vor jeder Fähigkeit drücken.', ['Die Stasis ist vorbei, bevor die Gegner ihre Fähigkeiten nutzen.', 'Die Gegner treffen mit allen Fähigkeiten.']], ['Ohne Plan frontal in fünf Gegner laufen.', ['Ihr steht in Unterzahl.', 'Ihr verliert den Kampf.']]],
+        [[40, 38, 'hero', 'ME'], [38, 42, 'hero', 'A1'], [33, 30, 'objective', 'Baron'], [34, 32, 'enemy', 'E_TOP'], [36, 34, 'enemy', 'E_MID']], { ok: { tk: 2, ek: 1, k: 1, a: 1, gold: 900, kill: true }, bad: { ek: 4, d: 1, gold: -1400, death: true } })],
+    EVEN: [
+      MK('ELDER', '24:10', 'Du bist {ME} ({ROLE}), Minute 24:10. Das Spiel ist ausgeglichen. Der Elder Dragon ist erschienen, die Gegner starten ihn, und {E_JG} steht allein davor.',
+        'Wie contestest du den Elder Dragon?',
+        ['Mit dem Team zum Pit rotieren, {E_JG} abfangen und den Elder verteidigen, statt blind zu starten.', 'Perfekt! Ihr fangt {E_JG} und sichert den Elder.'],
+        [['Allein in den Pit laufen.', ['Die Gegner reagieren mit allen Spielern.', 'Du stirbst, und der Elder geht verloren.']], ['Den Elder kampflos abgeben.', ['Die Gegner bekommen den Buff.', 'Sie haben Vorteil in jedem Kampf.']]],
+        [[62, 66, 'hero', 'ME'], [58, 70, 'hero', 'A1'], [66, 70, 'objective', 'Elder Dragon'], [74, 62, 'enemy', 'E_JG']], { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1200, obj: 'ELDER DRACHE GESICHERT!', kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1000, death: true } }),
+      MK('BAIT', '24:10', 'Du bist {ME} ({ROLE}), Minute 24:10. Das Spiel ist ausgeglichen. Beide Teams stehen am Baron, euer Zhonyas-Träger ist bereit (2,5 Sekunden Stasis, 120 Sekunden Abklingzeit), die Gegner warten auf euren Engage.',
+        'Wie zwingst du die Gegner, zuerst ihre Fähigkeiten zu nutzen?',
+        ['Mit dem Zhonyas-Träger bluffen (Bait): die Gegner ihre Fähigkeiten verbrauchen lassen und dann mit dem Team engagen.', 'Perfekt! Ihr gewinnt den Kampf nach dem Bait.'],
+        [['Sofort engagen, ohne die Fähigkeiten der Gegner zu ziehen.', ['Die Gegner haben alle Fähigkeiten bereit.', 'Ihr verliert den Kampf.']], ['Den Bait ohne Team starten.', ['Der Köder steht allein.', 'Ihr verliert einen Spieler und den Baron.']]],
+        [[42, 40, 'hero', 'ME'], [38, 44, 'hero', 'A1'], [33, 30, 'objective', 'Baron'], [46, 38, 'enemy', 'E_MID']], { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1100, obj: 'BARON NASHOR GESICHERT!', kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1000, death: true } })],
+  },
+  5: {
+    AHEAD: [
+      MK('FLANK', '30:20', 'Du bist {ME} ({ROLE}), Minute 30:20. Ihr habt den Baron und führt. Die Gegner stehen vor ihrem Turm und erwarten euren Frontal-Push, {E_MID} und {E_BOT} halten die Lane.',
+        'Wie brichst du die aufgestellte Linie?',
+        ['Mit {A1} durch den Jungle flanken, die Backline ({E_BOT}, {E_MID}) von der Seite fangen und den Rest folgen lassen.', 'Perfekt! Der Flankenangriff trifft die Backline, und der Nexus fällt.'],
+        [['Frontal in die aufgestellten Gegner laufen.', ['Die Gegner halten die Linie.', 'Ihr verliert den Kampf.']], ['Allein flanken, ohne dass das Team angreift.', ['Du wirst abgefangen.', 'Der Angriff bricht zusammen.']]],
+        [[74, 26, 'hero', 'ME'], [70, 30, 'hero', 'A1'], [84, 17, 'objective', 'Gegner-Inhibitor'], [82, 14, 'enemy', 'E_BOT'], [78, 18, 'enemy', 'E_MID']], { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1500, obj: 'NEXUS ZERSTÖRT!', kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1200, death: true } }),
+      MK('BACKDOOR', '30:20', 'Du bist {ME} ({ROLE}), Minute 30:20. Ihr führt. Die Gegner verteidigen eure Mitte, ihre Seitenlanes sind leer, und {A1} steht ungesehen an der Seitenlane.',
+        'Wie beendest du das Spiel über die Seitenlane?',
+        ['Mit {A1} die Seitenlane splitten und den Backdoor an der unbewachten Seite ansagen, während das Team die Mitte bindet.', 'Perfekt! Die Gegner bemerken den Backdoor zu spät.'],
+        [['Alle zusammen in der Mitte stehen bleiben und warten.', ['Die Gegner sammeln sich und verteidigen.', 'Ihr verschenkt den Vorteil.']], ['Den Backdoor allein ohne Ansage versuchen.', ['{E_SUP} sieht dich, und die Gegner reagieren.', 'Du stirbst, ohne Druck gemacht zu haben.']]],
+        [[56, 46, 'hero', 'ME'], [84, 22, 'hero', 'A1'], [88, 12, 'objective', 'Gegner-Nexus'], [46, 52, 'enemy', 'E_SUP']], { ok: { tk: 2, a: 2, gold: 1500, obj: 'NEXUS ZERSTÖRT!' }, bad: { ek: 2, d: 1, gold: -1200, death: true } })],
+    BEHIND: [
+      MK('FLANK', '30:20', 'Du bist {ME} ({ROLE}), Minute 30:20. Ihr liegt zurück. Die Gegner sind zusammengezogen vor eurem Turm, und ihr könnt aus dem Jungle in ihre Flanke laufen.',
+        'Wie nutzt du den Hinterhalt?',
+        ['Die Gegner mit {A1} aus dem Jungle flankieren (Ambush), sobald sie die Turmkante überschreiten, und {E_BOT} zuerst erreichen.', 'Heroisch! Der Ambush trifft die Backline, und ihr dreht den Kampf.'],
+        [['Zu früh aus dem Jungle laufen.', ['Die Gegner sehen euch und drehen sich.', 'Der Hinterhalt ist verbraucht.']], ['Hinter dem Turm verstecken und nichts tun.', ['Die Gegner brechen den Turm in Ruhe.', 'Der Nexus fällt.']]],
+        [[12, 70, 'hero', 'ME'], [16, 74, 'hero', 'A1'], [10, 82, 'objective', 'Eigener Turm (T3)'], [22, 78, 'enemy', 'E_BOT'], [26, 72, 'enemy', 'E_MID']], { ok: { tk: 3, ek: 2, k: 1, a: 2, gold: 1200, obj: 'HEROISCHES COMEBACK!', kill: true }, bad: { ek: 4, d: 1, gold: -1500, death: true, tw: 'blue' } }),
+      MK('BACKDOOR', '30:20', 'Du bist {ME} ({ROLE}), Minute 30:20. Ihr liegt zurück. Die Gegner hängen an eurem Inhibitor, ihre Seitenlanes sind unbewacht, und {A1} steht allein auf der Gegenseite.',
+        'Wie kaufst du Zeit, damit der Backdoor funktioniert?',
+        ['{A1} den gegnerischen Inhibitor drücken lassen und mit dem Team den Kampf am Turm hinauszögern, damit die Gegner die Base nicht verlassen.', 'Heroisch! Ihr haltet die Gegner und zerstört ihren Inhibitor.'],
+        [['Alle zur Verteidigung ziehen und {A1} zurückrufen.', ['Der Backdoor-Druck verschwindet.', 'Die Gegner brechen den Inhibitor.']], ['Den Kampf offen suchen, statt Zeit zu kaufen.', ['Ihr seid in Unterzahl.', 'Ihr verliert Spieler und den Nexus.']]],
+        [[12, 84, 'hero', 'ME'], [84, 30, 'hero', 'A1'], [88, 12, 'objective', 'Gegner-Inhibitor'], [20, 78, 'enemy', 'E_BOT']], { ok: { tk: 2, ek: 1, k: 1, a: 1, gold: 1200, obj: 'HEROISCHES COMEBACK!', kill: true }, bad: { ek: 3, d: 1, gold: -1400, death: true } })],
+    EVEN: [
+      MK('BASEDEF', '30:20', 'Du bist {ME} ({ROLE}), Minute 30:20. Das Spiel ist ausgeglichen. Die Gegner brechen mit Belagerungs-Minions euren Inhibitor-Turm, und euer Team steht verteilt.',
+        'Wie verteidigst du die Base?',
+        ['Die Welle räumen, das Team zusammenziehen und die Gegner erst im Turmbereich angreifen, wenn sie die Minions verlassen.', 'Perfekt! Ihr gewinnt den Kampf im Turmbereich.'],
+        [['In die Minions laufen, um die Gegner zu erreichen.', ['Der gegnerische Burst trifft euch zuerst.', 'Ihr verliert den Kampf und den Inhibitor.']], ['Die Base aufgeben und einen Gegenpush versuchen.', ['Die Gegner brechen den Nexus schneller.', 'Ihr verliert das Spiel.']]],
+        [[12, 84, 'hero', 'ME'], [16, 80, 'hero', 'A1'], [10, 88, 'objective', 'Eigener Inhibitor'], [24, 74, 'enemy', 'E_MID']], { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1000, kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1000, death: true, tw: 'blue' } }),
+      MK('BACKDOOR', '30:20', 'Du bist {ME} ({ROLE}), Minute 30:20. Das Spiel ist ausgeglichen. Beide Teams stehen sich im Fluss gegenüber, die Gegner haben ihre Seitenlanes nicht gewardet.',
+        'Wie nutzt du die unbewachte Seitenlane?',
+        ['Mit {A1} im Rücken backdoorn, während das Team den Kampf hinauszögert und die Gegner bindet.', 'Perfekt! Der Inhibitor fällt, bevor die Gegner reagieren.'],
+        [['Den Kampf sofort suchen und die Seitenlane ignorieren.', ['Die Gegner haben alle Fähigkeiten bereit.', 'Ihr verliert den Kampf.']], ['Mit allen gemeinsam backdoorn.', ['Die Gegner sehen den ganzen Trupp.', 'Ihr werdet abgefangen.']]],
+        [[50, 50, 'hero', 'ME'], [84, 26, 'hero', 'A1'], [88, 12, 'objective', 'Gegner-Inhibitor'], [58, 44, 'enemy', 'E_TOP']], { ok: { tk: 2, ek: 1, a: 1, gold: 1000, obj: 'INHIBITOR ZERSTÖRT!' }, bad: { tk: 1, ek: 3, d: 1, gold: -1000, death: true } })],
+  },
+};
+const mv2Variants = (phase, state, role) => [phase === 1 ? MV2[1][role] : MV2[phase][state], ...((MV2X[phase] || {})[phase === 1 ? role : state] || [])];
+const mv2Template = (phase, state, role, slot = 0) => { const v = mv2Variants(phase, state, role); return v[(slot || 0) % v.length]; };
+// Vielfalts-Garantie: pro Champion, Rolle und Phase wird nie dieselbe Variante wie im letzten Match gespielt (Gedächtnis im Browser)
+const VARIETY_KEY = 'braingap.variety';
+function pickVariantSlots(me, role) {
+  let h = {};
+  try { h = JSON.parse(localStorage.getItem(VARIETY_KEY) || '{}') || {}; } catch (e) { h = {}; }
+  const out = [];
+  for (let p = 1; p <= 5; p++) {
+    const key = `${normName(me)}|${role}|${p}`, hist = Array.isArray(h[key]) ? h[key] : [], last = hist[hist.length - 1];
+    const cand = [0, 1, 2].filter(i => i !== last), slot = cand[Math.floor(Math.random() * cand.length)];
+    out.push(slot); h[key] = [...hist, slot].slice(-3);
+  }
+  try { localStorage.setItem(VARIETY_KEY, JSON.stringify(h)); } catch (e) { /* Speichern ist optional */ }
+  return out;
+}
+// Match-Epilog: 2 Sätze, wie das Spiel geendet hat (aus Phase-5-Variante, Baron/Elder-Buff und echten Champions)
+const EPI_WIN = {
+  NEXUS: '{CARRY} pusht {BUFF}den Nexus ein, während {A1} und {A2} den Eingang blocken. {E_BOT} kommt erst zurück, als er fällt.',
+  BASEDEF: 'Ihr haltet die Base, und {CARRY} räumt {E_BOT} und {E_MID} im Turmbereich ab. Danach marschiert ihr {BUFF}durch die Mitte zum Nexus.',
+  FRONT: '{A1} hält die Frontline, und {CARRY} gewinnt den Kampf von hinten. {BUFF}Ihr marschiert in die Base und beendet das Spiel.',
+  FLANK: '{A1} flankt durch den Jungle und fängt {E_MID} ab, der Kampf kippt in Sekunden. {BUFF}Der Nexus fällt kurz darauf.',
+  BACKDOOR: '{A1} splittet unbemerkt, während {ME} die Gegner bindet. Der Nexus fällt, bevor {E_SUP} und {E_JG} zurück sind.',
+  P5BAD: 'Der letzte Kampf geht verloren. Doch euer Vorsprung trägt: {CARRY} räumt die Reste ab, und {BUFF}ihr beendet das Spiel.',
+};
+const EPI_LOSE = {
+  NEXUS: 'Der Push ohne Gruppe bricht zusammen, und {E_BOT} räumt {CARRY} ab. Der Gegenpush von {E_MID} und {E_TOP} zerstört euren Nexus.',
+  BASEDEF: '{E_MID} fokussiert {CARRY} im Turmbereich, und der Kampf kippt. Euer Inhibitor fällt, kurz darauf der Nexus.',
+  FRONT: '{E_TOP} und {E_JG} treffen eure Backline zuerst, und der Kampf kippt. {E_BOT} räumt auf, und euer Nexus fällt.',
+  FLANK: 'Der Flankenversuch läuft in die Vision von {E_SUP}, und {E_MID} fängt {A1} ab. Der Kampf ist verloren, und der Nexus fällt.',
+  BACKDOOR: '{E_SUP} entdeckt den Backdoor-Versuch, und {E_JG} schneidet {A1} ab. In Unterzahl fällt euer Nexus.',
+  P5OK: 'Euer letzter Move sitzt. Doch der Rückstand aus den Phasen davor ist zu groß, und {E_BOT} zerstört euren Nexus.',
+};
+function matchEpilog(mv2, win) {
+  const tr = mv2.trail || [], last = tr[tr.length - 1] || { ok: false, key: 'FRONT' };
+  const baron = tr.some(t => t.ok && /BARON/.test(t.obj)), elder = tr.some(t => t.ok && /ELDER/.test(t.obj));
+  const m = { ...slotMap(mv2.ctx.lineup), CARRY: mv2.ctx.lineup.blue.Botlane, BUFF: baron ? 'mit dem Baron-Buff ' : elder ? 'mit dem Elder-Buff ' : '' };
+  const key = EPI_WIN[last.key] ? last.key : 'FRONT';
+  const t = win ? (last.ok ? EPI_WIN[key] : EPI_WIN.P5BAD) : (last.ok ? EPI_LOSE.P5OK : EPI_LOSE[key]);
+  return fillSlots(t, m).replace(/\s+/g, ' ').replace(/ ([.,])/g, '$1').trim();
+}
 const nextState = (s, ok) => (ok ? (s === 'BEHIND' ? 'EVEN' : 'AHEAD') : (s === 'AHEAD' ? 'EVEN' : 'BEHIND'));
 const applyEv = (st, ev) => ({ tk: st.tk + (ev.tk || 0), ek: st.ek + (ev.ek || 0), k: st.k + (ev.k || 0), d: st.d + (ev.d || 0), a: st.a + (ev.a || 0), gold: st.gold + (ev.gold || 0) });
 const MV2_START = { tk: 0, ek: 0, k: 0, d: 0, a: 0, gold: 0 };
@@ -6210,7 +6502,7 @@ function buildMv2Scenario(tpl, ctx, phase, state) {
   const options = arr.map((o, i) => ({ label: `${'ABC'[i]}: ${o.text}`, lpChange: o.lp, nextId: 'end',
     feedback: o.lp > 0 ? o.fb : 'Fehlentscheidung.', ...(o.lp > 0 ? {} : { chain: o.chain }) }));
   const sc = { id, gameTime: tpl.time, timeLimit: TLIM[tier], champion: ctx.me, role: ctx.role, difficulty: DIFF_NAMES[tier], phase: MV2_PHASE[phase],
-    markers, coachHint: f(tpl.hint), context: f(tpl.ctx), options, mv2: { phase, state, ev: tpl.ev, victim, me: ctx.me } };
+    markers, coachHint: f(tpl.hint), context: f(tpl.ctx), options, mv2: { phase, state, ev: tpl.ev, victim, me: ctx.me, vslot: (ctx.vs || [])[phase - 1], key: tpl.key || (phase === 5 ? { AHEAD: 'NEXUS', BEHIND: 'BASEDEF', EVEN: 'FRONT' }[state] : 'BASE') } };
   DYN[id] = sc;
   return sc;
 }
@@ -6663,7 +6955,7 @@ function MatchStats({ r }) {
   const kda = (stats.k + stats.a) / Math.max(1, stats.d);
   const row = (label, val, k) => <div className="flex items-baseline justify-between gap-2"><span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{label}</span><span className="whitespace-nowrap text-sm font-bold tabular-nums text-slate-100 [@media(min-height:800px)]:text-base" data-end={k}>{val}</span></div>;
   return (
-    <div className="flex h-full min-w-0 flex-col justify-between gap-2.5 rounded-xl border border-[#C89B3C]/50 bg-[#010A13]/80 px-3 py-3 text-left [@media(min-height:700px)]:py-3.5 [@media(min-height:760px)]:py-5 [@media(min-height:800px)]:py-7" data-matchstats="true" title={`KDA-Ratio ${kda.toFixed(1)} · Win-Condition: ${ARCH[lineup.win].label}${plan ? ' (erkannt)' : ''}`}>
+    <div className="flex h-full min-w-0 flex-col justify-between gap-2.5 rounded-xl border border-[#C89B3C]/50 bg-[#010A13]/80 px-3 py-3 text-left [@media(max-height:620px)]:py-2.5 [@media(min-height:700px)]:py-3.5 [@media(min-height:760px)]:py-5 [@media(min-height:800px)]:py-7" data-matchstats="true" title={`KDA-Ratio ${kda.toFixed(1)} · Win-Condition: ${ARCH[lineup.win].label}${plan ? ' (erkannt)' : ''}`}>
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold uppercase tracking-wide text-slate-400">Match</span>
         <span className="pop rounded-md border border-[#C89B3C] px-2.5 font-serif text-3xl font-black leading-tight text-[#C89B3C] [@media(min-height:800px)]:text-4xl" data-grade={grade}>{grade}</span>
@@ -6673,7 +6965,7 @@ function MatchStats({ r }) {
         {row('Team', `${stats.tk} : ${stats.ek}`, 'team')}
         {row('Gold', fmtGold(stats.gold), 'gold')}
       </div>
-      <div className="text-[11px] leading-tight text-slate-400">Ende: {STATE_LABEL[state]} · Gameplan {plan ? '✓' : '✗'}{r.xpGain ? ` · +${r.xpGain} XP` : ''}</div>
+      <div className="text-[11px] leading-tight text-slate-400 [@media(max-height:620px)]:hidden">Ende: {STATE_LABEL[state]} · Gameplan {plan ? '✓' : '✗'}{r.xpGain ? ` · +${r.xpGain} XP` : ''}</div>
     </div>
   );
 }
@@ -6796,10 +7088,10 @@ function App() {
   };
   // Ranked Match v2: festes 5v5-Lineup, Spielzustand EVEN / AHEAD / BEHIND, Live-HUD
   const startMv2 = ({ me, role, lineup, planOk }) => {
-    const ctx = { matchId: Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36), lineup, role, me, step: rank.step };
-    const sc = buildMv2Scenario(mv2Template(1, 'EVEN', role), ctx, 1, 'EVEN');
+    const ctx = { matchId: Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36), lineup, role, me, step: rank.step, vs: pickVariantSlots(me, role) };   // vs = Variante je Phase
+    const sc = buildMv2Scenario(mv2Template(1, 'EVEN', role, ctx.vs[0]), ctx, 1, 'EVEN');
     setPregame(null); setMode('ranked'); setRun(n => n + 1); setResult(null);
-    setRs({ id: sc.id, format: 'mv2', correct: 0, log: [], champion: me, role, stage: 0, stages: 5, queue: [], mv2: { ctx, state: 'EVEN', stats: MV2_START, plan: planOk } });
+    setRs({ id: sc.id, format: 'mv2', correct: 0, log: [], champion: me, role, stage: 0, stages: 5, queue: [], mv2: { ctx, state: 'EVEN', stats: MV2_START, plan: planOk, towers: { blue: [], red: [] }, trail: [] } });
     setScreen('scenario');
   };
   const cancelPregame = () => { setPregame(null); setScreen('home'); };
@@ -6826,9 +7118,9 @@ function App() {
     let mv2 = rs.mv2;
     if (rs.format === 'mv2') {   // Spielzustand und KDA fortschreiben, nächste Phase aus dem festen Lineup bauen
       const ev = (cur.mv2 && cur.mv2.ev[ok ? 'ok' : 'bad']) || {};
-      mv2 = { ...mv2, stats: applyEv(mv2.stats, ev), state: nextState(mv2.state, ok) };
+      mv2 = { ...mv2, stats: applyEv(mv2.stats, ev), state: nextState(mv2.state, ok), towers: applyTowers(mv2.towers, ev, ok, mv2.ctx.role, rs.stage + 1), trail: [...(mv2.trail || []), { p: rs.stage + 1, key: cur.mv2.key, ok, obj: ev.obj || '' }] };
       if (rs.stage < 4) {
-        const nsc = buildMv2Scenario(mv2Template(rs.stage + 2, mv2.state, mv2.ctx.role), mv2.ctx, rs.stage + 2, mv2.state);
+        const nsc = buildMv2Scenario(mv2Template(rs.stage + 2, mv2.state, mv2.ctx.role, (mv2.ctx.vs || [])[rs.stage + 1] || 0), mv2.ctx, rs.stage + 2, mv2.state);
         setRs({ ...rs, id: nsc.id, stage: rs.stage + 1, correct, log, mv2 });
         return;
       }
@@ -6860,7 +7152,7 @@ function App() {
         setMastery(m => ({ ...m, [champ]: { mp: after, runs: ((m[champ] || {}).runs || 0) + 1 } }));
         mres = { champion: champ, gain, before, after, lvBefore: masteryLevel(before), lvAfter: masteryLevel(after), levelUp: masteryLevel(after) > masteryLevel(before) };
       }
-      const info = isMv2 ? { stats: mv2.stats, state: mv2.state, grade: mv2Grade(correct, mv2.stats.d), lineup: mv2.ctx.lineup, plan: mv2.plan } : null;
+      const info = isMv2 ? { stats: mv2.stats, state: mv2.state, grade: mv2Grade(correct, mv2.stats.d), lineup: mv2.ctx.lineup, plan: mv2.plan, epilog: matchEpilog(mv2, v.win) } : null;
       if (mode === 'practice') {   // Übungsmodus: nichts aufs Profil, nichts in die Historie
         setResult({ ...v, correct, n, from: rank, to: rank });
       } else if (isMastery) {      // Mastery vergibt NUR MP: nie LP, kein MMR, kein Herz, keine Serie
@@ -7014,7 +7306,7 @@ function App() {
       {screen === 'scenario' && scenario && (
         <Scenario key={`${run}-${scenario.id}-${rs.stage}`} scenario={scenario} practice={mode === 'practice'}
           tag={tag} momentum={momentum} timeCap={rs.format === 'drill' ? 30 : null} format={rs.format} stage={rs.stage} stages={rs.stages}
-          hud={rs.format === 'mv2' && rs.mv2 ? { stats: rs.mv2.stats, state: rs.mv2.state } : null}
+          hud={rs.format === 'mv2' && rs.mv2 ? { stats: rs.mv2.stats, state: rs.mv2.state, towers: rs.mv2.towers } : null}
           record={{ c: rs.log.filter(e => e.ok).length, w: rs.log.filter(e => !e.ok).length }} onNext={next} onAbort={abort} />
       )}
       {screen === 'complete' && result && <RunComplete result={result} log={rs.log} practice={mode === 'practice' || !!result.masteryOnly} format={rs.format} onDone={finishRun} onRetry={startDrill} />}
