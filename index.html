@@ -5517,7 +5517,7 @@ function MainPicker({ role, champion, onRole, onChampion, mastery }) {
           : <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-[#C89B3C]/50 text-slate-500"><Icon n="user" size={20} /></span>}
         <div className="min-w-0 flex-1" role="status" aria-live="polite">
           <div className="truncate font-serif text-base font-bold leading-tight text-[#C89B3C]">{name ? label : 'Kein Main gewählt'}</div>
-          <div className="truncate text-xs text-slate-400">
+          <div className="text-xs leading-snug text-slate-400">
             {name ? `${roleLabel || 'Rolle wählen'} • Stufe ${info.level} • ${info.mp.toLocaleString('de-DE')} MP` : 'Ohne Auswahl: Jax (Top)'}
           </div>
         </div>
@@ -5806,43 +5806,93 @@ function Requests({ requests, onAccept, onDecline }) {
   );
 }
 
-function RunHistory({ history }) {
+function RunHistoryRow({ h, i }) {
+  const mastery = h.mp > 0 && !h.lp, win = mastery ? true : h.lp >= 0, c = win ? 'var(--teal)' : 'var(--red)';
   return (
-    <div className="flex flex-col gap-2" data-history="true">
+    <div key={h.ts + '-' + i} className="flex items-center gap-3 rounded-lg border px-3 py-2" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }} data-history-row="true">
+      <span className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center" style={{ color: c, background: win ? 'rgba(10,200,185,.14)' : 'rgba(232,64,87,.14)' }} aria-label={win ? 'Sieg' : 'Niederlage'}>
+        <Icon n={win ? 'check' : 'x'} size={16} />
+      </span>
+      <div className="flex-1 min-w-0">
+        <div className="font-semibold text-sm truncate">{h.champion}</div>
+        <div className="text-xs text-slate-400">{h.role}</div>
+      </div>
+      <div className="text-right font-extrabold tabular-nums" style={{ color: mastery ? 'var(--gold)' : h.lp === 0 ? 'var(--gold)' : c }}>
+        {mastery ? `+${h.mp} MP` : `${h.lp > 0 ? '+' : ''}${h.lp} LP`}
+        {!mastery && h.mp > 0 && <div className="text-[10px] font-semibold text-[#C89B3C]">+{h.mp} MP</div>}
+      </div>
+    </div>
+  );
+}
+// Standardmäßig nur die letzten 2 Spiele; der Rest klappt per Button auf
+const HISTORY_PREVIEW = 2;
+function RunHistory({ history }) {
+  const [open, setOpen] = useState(false);
+  const extra = history.length - HISTORY_PREVIEW;
+  return (
+    <div className="flex flex-col gap-2" data-history="true" data-history-open={open ? 'true' : 'false'}>
       <div className="font-serif font-bold">Letzte Runs</div>
-      {history.length === 0 && <div className="text-sm text-slate-500 rounded-lg border border-dashed p-3 text-center" style={{ borderColor: 'var(--line)' }}><span aria-hidden="true">🐹</span> Ein Poro schläft hier noch. Spiele deinen ersten Run.</div>}
-      {history.slice(0, 8).map((h, i) => {
-        const mastery = h.mp > 0 && !h.lp, win = mastery ? true : h.lp >= 0, c = win ? 'var(--teal)' : 'var(--red)';
-        return (
-          <div key={h.ts + '-' + i} className="flex items-center gap-3 rounded-lg border px-3 py-2" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-            <span className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center" style={{ color: c, background: win ? 'rgba(10,200,185,.14)' : 'rgba(232,64,87,.14)' }} aria-label={win ? 'Sieg' : 'Niederlage'}>
-              <Icon n={win ? 'check' : 'x'} size={16} />
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold text-sm truncate">{h.champion}</div>
-              <div className="text-xs text-slate-400">{h.role}</div>
-            </div>
-            <div className="text-right font-extrabold tabular-nums" style={{ color: mastery ? 'var(--gold)' : h.lp === 0 ? 'var(--gold)' : c }}>
-              {mastery ? `+${h.mp} MP` : `${h.lp > 0 ? '+' : ''}${h.lp} LP`}
-              {!mastery && h.mp > 0 && <div className="text-[10px] font-semibold text-[#C89B3C]">+{h.mp} MP</div>}
-            </div>
-          </div>
-        );
-      })}
+      {history.length === 0 && <div className="text-sm text-slate-500 rounded-lg border border-dashed p-3 text-center" style={{ borderColor: 'var(--line)' }}><span aria-hidden="true">🐹</span> Ein Pentakill beginnt mit dem ersten Match. Spiele deinen ersten Run!</div>}
+      {history.slice(0, HISTORY_PREVIEW).map((h, i) => <RunHistoryRow key={h.ts + '-' + i} h={h} i={i} />)}
+      {extra > 0 && open && <div id="history-rest" className="slidedown flex flex-col gap-2">{history.slice(HISTORY_PREVIEW).map((h, i) => <RunHistoryRow key={h.ts + '-' + (i + HISTORY_PREVIEW)} h={h} i={i + HISTORY_PREVIEW} />)}</div>}
+      {extra > 0 && (
+        <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open} aria-controls="history-rest" data-history-toggle="true"
+          className="self-center rounded-lg px-3 py-2 text-xs font-semibold text-[#C89B3C] underline decoration-dotted underline-offset-4 transition hover:text-[#F0E6D2]">
+          {open ? '📜 Weniger anzeigen ▲' : '📜 Weitere Spiele anzeigen ▼'}
+        </button>
+      )}
     </div>
   );
 }
 function SupporterCard() {
   return (
-    <div className="rounded-xl border border-[#C89B3C]/70 bg-gradient-to-r from-[#2a1f08] to-[#10213a] p-3" data-supporter="true">
-      <div className="flex items-center gap-3">
-        <Icon n="crown" size={26} className="shrink-0 text-[#C89B3C]" />
+    <div className="relative overflow-hidden rounded-2xl border-2 border-[#C89B3C] bg-gradient-to-r from-[#3a2a08] via-[#2a1f08] to-[#10213a] p-3.5 shadow-[0_0_22px_rgba(200,155,60,.4)]" data-supporter="true">
+      <span className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-[#C89B3C]/25 blur-2xl" aria-hidden="true" />
+      <div className="relative flex items-center gap-3">
+        <Icon n="crown" size={30} className="shrink-0 text-[#F0C75E] drop-shadow-[0_0_8px_rgba(240,199,94,.7)]" />
         <div className="min-w-0 flex-1">
-          <div className="font-serif text-sm font-bold text-[#C89B3C]">Supporter werden: 2 € / Monat</div>
-          <div className="text-xs text-slate-300">Komplett werbefrei lernen und das Projekt unterstützen.</div>
+          <div className="font-serif text-base font-extrabold leading-tight text-[#F0C75E]">🌟 Werde Supporter (2 €)</div>
+          <div className="mt-0.5 text-xs leading-snug text-slate-200">100% werbefrei, goldener Hextech-Rahmen</div>
         </div>
-        <button type="button" className="shrink-0 rounded-lg bg-[#C89B3C] px-3 py-1.5 text-xs font-extrabold text-[#010A13]">Unterstützen</button>
+        <button type="button" className="shrink-0 rounded-xl bg-gradient-to-b from-[#F0C75E] to-[#C89B3C] px-3.5 py-2 text-xs font-extrabold text-[#010A13] shadow-[0_0_12px_rgba(200,155,60,.6)] transition active:scale-95">Unterstützen</button>
       </div>
+    </div>
+  );
+}
+// Status (Auswahl) und persönliche Notiz (Stift zum Bearbeiten, Speichern per Button oder Enter)
+function StatusNote({ profile, onChange }) {
+  const [edit, setEdit] = useState(false);
+  const [draft, setDraft] = useState(profile.note || '');
+  useEffect(() => { if (!edit) setDraft(profile.note || ''); }, [profile.note, edit]);
+  const save = () => { onChange({ note: draft.slice(0, 80) }); setEdit(false); };
+  return (
+    <div className="flex flex-col gap-2 border-t pt-2.5" style={{ borderColor: 'var(--line)' }} data-statusnote="true">
+      <div className="flex items-center gap-2">
+        <label htmlFor="status" className="text-xs font-semibold text-slate-400">Status</label>
+        <select id="status" value={profile.status} onChange={e => onChange({ status: e.target.value })}
+          className="rounded-full border border-[#C89B3C]/50 bg-[#010A13] px-3 py-1 text-xs font-bold text-white outline-none focus:border-[#0AC8B9]" style={{ colorScheme: 'dark' }}>
+          {Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{v.emoji} {v.label}</option>)}
+        </select>
+      </div>
+      {edit ? (
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <label htmlFor="note" className="sr-only">Notiz</label>
+            <input id="note" autoFocus value={draft} maxLength={80} onChange={e => setDraft(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); save(); } if (e.key === 'Escape') setEdit(false); }}
+              placeholder="z. B. Grinde heute Master!" className={`min-w-0 flex-1 ${fieldCls}`} />
+            <button type="button" onClick={save} aria-label="Notiz speichern" className="shrink-0 rounded-lg bg-[#C89B3C] px-3 py-2 text-xs font-extrabold text-[#010A13]">Speichern</button>
+          </div>
+          <div className="text-right text-[11px] tabular-nums text-gray-500">{draft.length}/80</div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <div className={`min-w-0 flex-1 truncate text-sm italic ${profile.note ? 'text-slate-200' : 'text-slate-500'}`} data-note="true">{profile.note ? `„${profile.note}“` : 'Notiz hinzufügen …'}</div>
+          <button type="button" onClick={() => setEdit(true)} aria-label="Notiz bearbeiten" className="shrink-0 rounded-lg border border-[#C89B3C]/50 p-1.5 text-[#C89B3C] transition active:scale-95">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -5852,22 +5902,25 @@ function Profile({ profile, rank, mastery, friends, requests, history, xp, shiel
   const tier = tierOf(rank.step);
   return (
     <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-      <div className="flex items-center gap-3 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3">
-        <RankEmblem tier={tier} size={84} glow />
-        <div className="min-w-0 flex-1 flex flex-col gap-1.5">
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <SummonerIcon id={profile.icon != null ? profile.icon : ICON_IDS[0]} name={profile.name} className="w-12 h-12" onClick={onIcon} />
-              <span className="absolute -bottom-1 -right-1 text-sm" aria-hidden="true">{STATUS[profile.status].emoji}</span>
+      {/* 1) Profil-Header: Icon, Name, Level, Rang, darunter Status und Notiz */}
+      <div className="flex flex-col gap-2.5 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3" data-profile-header="true">
+        <div className="flex items-center gap-3">
+          <RankEmblem tier={tier} size={84} glow />
+          <div className="min-w-0 flex-1 flex flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <SummonerIcon id={profile.icon != null ? profile.icon : ICON_IDS[0]} name={profile.name} className="w-12 h-12" onClick={onIcon} />
+                <span className="absolute -bottom-1 -right-1 text-sm" aria-hidden="true">{STATUS[profile.status].emoji}</span>
+              </div>
+              <div className="min-w-0"><div className="truncate font-serif text-xl font-bold leading-tight">{profile.name}</div></div>
             </div>
-            <div className="min-w-0"><div className="truncate font-serif text-xl font-bold leading-tight">{profile.name}</div></div>
+            <div className={`flex items-center gap-1.5 text-sm font-semibold ${RANK_ICON[tier].cls}`}>
+              <RankEmblem tier={tier} size={22} />{rankName(rank.step)} · {rank.lp} LP
+            </div>
+            <XpBar xp={xp} />
           </div>
-          <div className={`flex items-center gap-1.5 text-sm font-semibold ${RANK_ICON[tier].cls}`}>
-            <RankEmblem tier={tier} size={22} />{rankName(rank.step)} · {rank.lp} LP
-          </div>
-          <XpBar xp={xp} />
-          {profile.note && <div className="truncate text-xs italic text-gray-400">„{profile.note}“</div>}
         </div>
+        <StatusNote profile={profile} onChange={onChange} />
       </div>
       <TabBar tabs={[['me', 'Profil'], ['friends', `Freunde (${friends.length})`],
         ['requests', <span className="inline-flex items-center justify-center gap-1.5">Anfragen{requests.length > 0 && <span className="rounded-full bg-red-500 px-1.5 text-[10px] font-bold leading-4 text-white" aria-label={`${requests.length} offene Anfragen`}>{requests.length}</span>}</span>]]}
@@ -5878,31 +5931,27 @@ function Profile({ profile, rank, mastery, friends, requests, history, xp, shiel
         <Friends friends={friends} selfName={profile.name} onAdd={onAddFriend} onRemove={onRemoveFriend} />
       ) : (
         <>
-          <MasteryShowcase mastery={mastery} />
-          <SupporterCard />
-          <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />
-          <RunHistory history={history} />
-          <Divider />
-          <div>
-            <label htmlFor="status" className="mb-1.5 block text-sm font-semibold">Status</label>
-            <select id="status" value={profile.status} onChange={e => onChange({ status: e.target.value })} className={`w-full ${fieldCls}`} style={{ colorScheme: 'dark' }}>
-              {Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{v.emoji} {v.label}</option>)}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="note" className="mb-1.5 block text-sm font-semibold">Notiz</label>
-            <input id="note" value={profile.note} maxLength={80} onChange={e => onChange({ note: e.target.value })} placeholder="z. B. Grinde heute Master!" className={`w-full ${fieldCls}`} />
-            <div className="mt-1 text-right text-xs text-gray-500 tabular-nums">{profile.note.length}/80</div>
-          </div>
-          <Divider />
-          <div>
-            <label htmlFor="pname" className="mb-1.5 block text-sm font-semibold">Account-Name</label>
-            <input id="pname" value={profile.name} maxLength={16} onChange={e => onChange({ name: e.target.value })}
-                   onBlur={() => { if (profile.name.trim().length < 1) onChange({ name: 'Beschwörer' }); }} className={`w-full ${fieldCls}`} />
-          </div>
+          {/* 2) Main-Champion-Banner mit Klapp-Auswahl */}
           <MainPicker role={profile.role} champion={profile.champion} mastery={mastery} onRole={v => onChange({ role: v })} onChampion={v => onChange({ champion: v })} />
-          <button onClick={() => { if (confirm) onLogout(); else setConfirm(true); }}
-            className="self-center pb-1 text-xs text-slate-500 underline">{confirm ? 'Wirklich abmelden und Profil löschen? Nochmal tippen' : 'Abmelden und Profil löschen'}</button>
+          {/* 3) Mastery-Progression */}
+          <MasteryShowcase mastery={mastery} />
+          {/* 4) VIP / Supporter: Conversion-Spot direkt über der Historie */}
+          <SupporterCard />
+          {/* 5) Match-Historie: 2 Spiele + Aufklappen */}
+          <RunHistory history={history} />
+          {/* 6) Einstellungen */}
+          <Divider />
+          <div className="flex flex-col gap-3" data-settings="true">
+            <div className="font-serif font-bold">Einstellungen</div>
+            <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />
+            <div>
+              <label htmlFor="pname" className="mb-1.5 block text-sm font-semibold">Account-Name</label>
+              <input id="pname" value={profile.name} maxLength={16} onChange={e => onChange({ name: e.target.value })}
+                     onBlur={() => { if (profile.name.trim().length < 1) onChange({ name: 'Beschwörer' }); }} className={`w-full ${fieldCls}`} />
+            </div>
+            <button onClick={() => { if (confirm) onLogout(); else setConfirm(true); }}
+              className="self-center pb-1 text-xs text-slate-500 underline">{confirm ? 'Wirklich abmelden und Profil löschen? Nochmal tippen' : 'Abmelden und Profil löschen'}</button>
+          </div>
         </>
       )}
     </div>
