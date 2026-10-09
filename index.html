@@ -4366,20 +4366,31 @@ const segDist = (p, a, b) => {
   const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / (dx * dx + dy * dy)));
   return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy));
 };
-function focusFor(markers) {
+// Kamera-Ausschnitt: Objective-Gruben mit 2,2x-Zoom, sonst Lane-Fokus (Top: Top-Lane und Fluss samt Grubenpit, Mid: Mitte und Flusseingänge, Bot: Bot-Lane und Drachen-Eingang).
+// Alle Marker liegen immer mit mindestens 15 % Rand im Ausschnitt; der Ausschnitt darf bis 10 Einheiten über den Kartenrand hinausgehen, damit nichts abgeschnitten wird.
+const PITS = [[/baron|void ?grub/i, [33, 30]], [/drache|dragon|elder/i, [66, 70]]];
+const LANE_FOCUS = { Toplane: [30, 30, 56], Jungle: [50, 50, 50], Midlane: [50, 50, 50], Botlane: [70, 70, 56], Support: [70, 70, 56] };
+const FULL_VIEW = { x0: -5, y0: -5, size: 110 };
+function focusFor(markers, role) {
   const core = markers.filter(m => m.type !== 'fog');
   if (!core.length) return null;
   const xs = markers.map(m => m.x), ys = markers.map(m => m.y);
-  const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
-  const size = Math.min(100, Math.max(48, Math.max(w, h) + 24));
+  const bb = [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2];
+  const pit = PITS.find(([re]) => core.some(m => m.type === 'objective' && re.test(m.label)));
+  let cx = bb[0], cy = bb[1], size = 46;
+  if (pit) { cx = pit[1][0]; cy = pit[1][1]; size = 100 / 2.2; }
+  else { const lf = LANE_FOCUS[role]; if (lf && Math.hypot(bb[0] - lf[0], bb[1] - lf[1]) <= 28) { cx = bb[0] * 0.6 + lf[0] * 0.4; cy = bb[1] * 0.6 + lf[1] * 0.4; size = lf[2]; } }
+  for (let i = 0; i < 6; i++) {   // alle Marker mit 15 % Rand im Ausschnitt
+    const need = Math.max(...markers.map(m => Math.max(Math.abs(m.x - cx), Math.abs(m.y - cy)))) / 0.35;
+    if (need <= size + 0.01) break; size = need;
+  }
   if (size > 76) return null;
-  const clamp = v => Math.max(0, Math.min(100 - size, v));
-  const x0 = clamp((Math.max(...xs) + Math.min(...xs)) / 2 - size / 2), y0 = clamp((Math.max(...ys) + Math.min(...ys)) / 2 - size / 2);
+  const x0 = Math.max(-10, Math.min(110 - size, cx - size / 2)), y0 = Math.max(-10, Math.min(110 - size, cy - size / 2));
   const inView = m => m.x >= x0 && m.x <= x0 + size && m.y >= y0 && m.y <= y0 + size;
   const objs = core.filter(m => m.type === 'objective' && inView(m)).map(m => m.label).join(' ');
   const c = [core.reduce((t, m) => t + m.x, 0) / core.length, core.reduce((t, m) => t + m.y, 0) / core.length];
   const lane = Object.entries(LANES).map(([n, pts]) => [n, Math.min(...pts.slice(1).map((q, i) => segDist(c, pts[i], q)))]).sort((a, b) => a[1] - b[1])[0][0];
-  const zone = /drache|elder/i.test(objs) ? 'Dragon-Pit' : /baron|void grubs/i.test(objs) ? 'Baron-Pit' : lane;
+  const zone = /drache|dragon|elder/i.test(objs) ? 'Dragon-Pit' : /baron|void ?grub/i.test(objs) ? 'Baron-Pit' : lane;
   return { x0, y0, size, zone };
 }
 
@@ -4451,13 +4462,59 @@ const lanePoint = (lane, s) => {
   let d = Math.max(0, Math.min(1, s)) * tot;
   for (let i = 0; i < seg.length; i++) { if (d <= seg[i] || i === seg.length - 1) { const f = seg[i] ? d / seg[i] : 0; return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f]; } d -= seg[i]; }
 };
-const WAVE_T = { EVEN: 0.5, AHEAD: 0.66, BEHIND: 0.34 }, WAVE_OFF = { top: 0.03, mid: 0, bot: -0.03 };
+// Position eines Punktes entlang der Lane (0 = blaue Base, 1 = rote Base)
+const laneS = (lane, x, y) => {
+  const pts = LANE_PTS[lane], seg = pts.slice(1).map((q, i) => Math.hypot(q[0] - pts[i][0], q[1] - pts[i][1])), tot = seg.reduce((a, b) => a + b, 0);
+  let best = [1e9, 0], acc = 0;
+  seg.forEach((len, i) => {
+    const [ax, ay] = pts[i], [bx, by] = pts[i + 1], t = Math.max(0, Math.min(1, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / (len * len)));
+    const d = Math.hypot(x - (ax + (bx - ax) * t), y - (ay + (by - ay) * t));
+    if (d < best[0]) best = [d, (acc + t * len) / tot]; acc += len;
+  });
+  return best[1];
+};
+const laneLen = lane => { const pts = LANE_PTS[lane]; return pts.slice(1).reduce((a, q, i) => a + Math.hypot(q[0] - pts[i][0], q[1] - pts[i][1]), 0); };
+const T_S = {};   // T_S[Team][Lane] = Lane-Position von T1, T2, T3
+['red', 'blue'].forEach(sd => { T_S[sd] = {}; Object.keys(TW_RED).forEach(l => { T_S[sd][l] = TOWER_LIST.filter(t => t.side === sd && t.lane === l).sort((a, b) => a.id.localeCompare(b.id)).map(t => laneS(l, t.x, t.y)); }); });
+// Welche Türme sieht man? Fokus-Lane: T1/T2 prominent; andere Lanes nur T1 gedämpft; Nexus als Anker; zerstörte bleiben als blasse Marke
+const towerTier = (t, lane, dead) => {
+  if (t.nexus) return 'context';
+  const n = +t.id.slice(-1);
+  if (t.lane === lane && n <= 2) return 'prominent';
+  if (dead || n === 1) return 'context';
+  return null;
+};
+// Wellen-Muster auf der aktiven Lane: Position der blauen und roten Minions (Anteil entlang der Lane)
+function waveDots(kind, lane) {
+  const rs = T_S.red[lane][0], bs = T_S.blue[lane][0], d = [], add = (side, s) => d.push({ side, s });
+  if (kind === 'WAVE_CRASH_ENEMY') { [0, 1, 2, 3].forEach(i => add('blue', rs - 0.035 - i * 0.02)); [0, 1].forEach(i => add('red', rs - 0.012 + i * 0.012)); }   // blaue Welle an der Turmkante, rote sterben darunter
+  else if (kind === 'WAVE_CRASH_ALLY') { [0, 1, 2, 3].forEach(i => add('red', bs + 0.035 + i * 0.02)); [0, 1].forEach(i => add('blue', bs + 0.012 - i * 0.012)); }
+  else if (kind === 'WAVE_FREEZE_ALLY') { const L = laneLen(lane); [0, 1, 2].forEach(i => add('blue', bs + (11 + i * 2) / L)); [0, 1, 2].forEach(i => add('red', bs + (16 + i * 2) / L)); }   // eingefroren knapp außerhalb der Turmreichweite
+  else if (kind === 'SLOW_PUSH') { [0, 1, 2, 3].forEach(i => add('blue', 0.44 - i * 0.02)); [0, 1].forEach(i => add('red', 0.48 + i * 0.02)); }              // große blaue Welle schiebt Richtung Fluss
+  else { [0, 1, 2].forEach(i => add('blue', 0.48 - i * 0.022)); [0, 1, 2].forEach(i => add('red', 0.52 + i * 0.022)); }                                      // NEUTRAL: Wellen treffen sich in der Lane-Mitte
+  return d;
+}
+// Jedes Szenario legt die Welle passend zu seinem Text fest: Schlüssel "Phase:Variante[:Zustand/Rolle]" -> Muster[@Lane]
+const WAVE_SCENE = {
+  '1:BASE:Toplane': 'WAVE_CRASH_ENEMY', '1:BASE:Jungle': 'WAVE_CRASH_ALLY@top', '1:BASE:Midlane': 'WAVE_CRASH_ENEMY', '1:BASE:Botlane': 'NEUTRAL', '1:BASE:Support': 'NEUTRAL',
+  '1:L2': 'NEUTRAL', '1:L2:Jungle': 'NEUTRAL@top', '1:SCUTTLE': 'NEUTRAL', '1:SCUTTLE:Toplane': 'NEUTRAL', '1:SCUTTLE:Jungle': 'SLOW_PUSH', '1:SCUTTLE:Botlane': 'WAVE_FREEZE_ALLY', '1:SCUTTLE:Support': 'WAVE_FREEZE_ALLY', '1:RECALL': 'WAVE_CRASH_ENEMY',
+  '2:BASE:AHEAD': 'WAVE_CRASH_ENEMY', '2:BASE:BEHIND': 'WAVE_CRASH_ALLY', '2:BASE:EVEN': 'NEUTRAL', '2:COUNTER:AHEAD': 'NEUTRAL@bot', '2:COUNTER:EVEN': 'SLOW_PUSH@bot', '2:PLATES:AHEAD': 'WAVE_CRASH_ENEMY', '2:PLATES:BEHIND': 'WAVE_CRASH_ALLY', '2:GRUBS': 'NEUTRAL@top',
+  '3:BASE:AHEAD': 'WAVE_CRASH_ENEMY', '3:BASE:BEHIND': 'WAVE_CRASH_ALLY', '3:BASE:EVEN': 'SLOW_PUSH', '3:SIEGE:AHEAD': 'WAVE_CRASH_ENEMY@mid', '3:SIEGE:BEHIND': 'WAVE_CRASH_ALLY@mid',
+  '3:COLLAPSE:AHEAD': 'NEUTRAL@top', '3:COLLAPSE:BEHIND': 'WAVE_CRASH_ALLY@top', '3:COLLAPSE:EVEN': 'WAVE_CRASH_ALLY@top', '3:CROSS': 'NEUTRAL@bot',
+  '5:NEXUS': 'WAVE_CRASH_ENEMY', '5:BASEDEF': 'WAVE_CRASH_ALLY', '5:FLANK:AHEAD': 'WAVE_CRASH_ENEMY', '5:FLANK:BEHIND': 'WAVE_CRASH_ALLY', '5:BACKDOOR:AHEAD': 'SLOW_PUSH@top', '5:BACKDOOR:BEHIND': 'WAVE_CRASH_ALLY',
+};
+function waveFor(key, phase, state, role) {
+  const v = WAVE_SCENE[`${phase}:${key}:${phase === 1 ? role : state}`] || WAVE_SCENE[`${phase}:${key}`] || 'NEUTRAL';
+  const [kind, lane] = v.split('@');
+  return { kind, lane: lane || TW_LANES[role] || 'mid' };
+}
 const MARKER_COLOR = { hero: '#3b82f6', enemy: '#ef4444', objective: '#C89B3C', fog: '#94a3b8' };
-const Minimap = ({ markers = [], champion, role, showLabels = false, result = null, fx = null, focus = null, full = false, onToggleView, towers = null, waves = null }) => {
+const Minimap = ({ markers = [], champion, role, showLabels = false, result = null, fx = null, focus = null, full = false, onToggleView, towers = null, wave = null }) => {
   const uid = React.useId().replace(/:/g, '');
   const [mapFailed, setMapFailed] = useState(false);
+  const wv = wave || { kind: 'NEUTRAL', lane: TW_LANES[role] || 'mid' };
   const player = markers.find(m => m.isPlayer);
-  const view = focus && !full ? focus : { x0: 0, y0: 0, size: 100 };
+  const view = focus && !full ? focus : FULL_VIEW;
   const z = 100 / view.size;
   const sc = Math.pow(1 / z, 0.65);                        // Marker wachsen beim Zoom nur dezent mit
   const u = sc / 1.8;                                      // Größen im Raster 0-100 (früher 180er-Raster)
@@ -4507,7 +4564,7 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
       <div className="relative h-full aspect-square overflow-hidden">
         <div className="absolute left-0 top-0 h-full w-full origin-top-left transition-transform duration-700 ease-out motion-reduce:transition-none"
              style={{ transform: `scale(${z}) translate(${-view.x0}%, ${-view.y0}%)` }}>
-          <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" role="img" aria-label="Summoner's Rift mit Taktik-Markern">
+          <svg viewBox="0 0 100 100" style={{ overflow: 'visible' }} className="absolute inset-0 h-full w-full" role="img" aria-label="Summoner's Rift mit Taktik-Markern">
             <defs>
               <radialGradient id={`vig-${uid}`} cx="50%" cy="50%" r="75%">
                 <stop offset="55%" stopColor="#010A13" stopOpacity="0" />
@@ -4530,30 +4587,31 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
             <rect width="100" height="100" fill="#010A13" fillOpacity=".18" />
             <rect width="100" height="100" fill={`url(#vig-${uid})`} />
             <rect x=".4" y=".4" width="99.2" height="99.2" fill="none" stroke="#C89B3C" strokeOpacity=".65" strokeWidth=".8" />
-            {/* Türme: lebende Türme in Teamfarbe, zerstörte ausgegraut mit Bruchlinie */}
-            <g data-towers="true" aria-hidden="true">
+            {/* Türme: kleine Hextech-Punkte (Blau mit goldenem, Rot mit rotem Ring). Fokus-Lane: T1/T2 prominent, sonst nur T1 gedämpft, zerstörte verblassen auf 25 % */}
+            <g data-towers={wv.lane} aria-hidden="true">
               {[...TOWER_LIST, { id: 'blue_nexus', side: 'blue', x: 8, y: 92, nexus: true }, { id: 'red_nexus', side: 'red', x: 92, y: 8, nexus: true }].map(t => {
-                const dead = !!towers && towers[t.side].includes(t.id), ts = (t.nexus ? 1.7 : 1.25) * u;
-                const col = dead ? '#64748b' : t.side === 'blue' ? '#60a5fa' : '#f87171', edge = dead ? '#334155' : t.side === 'blue' ? '#1e3a8a' : '#7f1d1d';
+                const dead = !!towers && towers[t.side].includes(t.id), tier = towerTier(t, wv.lane, dead);
+                if (!tier) return null;
+                const rr = (t.nexus ? 3.6 : tier === 'prominent' ? 3.3 : 2.3) * u, ring = t.side === 'blue' ? '#C89B3C' : '#E84057', core = t.side === 'blue' ? '#60a5fa' : '#f87171';
                 return (
-                  <g key={t.id} data-tower={t.id} data-alive={dead ? 'false' : 'true'} transform={`translate(${t.x} ${t.y}) scale(${ts})`} opacity={dead ? 0.45 : 0.9}>
-                    <path d="M-1.7 1.8 L-1.2 -1.1 H-1.7 V-2.3 H-0.6 V-1.6 H0.6 V-2.3 H1.7 V-1.1 H1.2 L1.7 1.8 Z" fill={col} stroke={edge} strokeWidth=".35" />
-                    {dead && <path d="M-1.4 -1.8 L1.4 1.6" stroke="#0f172a" strokeWidth=".45" />}
+                  <g key={t.id} data-tower={t.id} data-alive={dead ? 'false' : 'true'} data-tier={tier} opacity={dead ? 0.25 : tier === 'prominent' ? 1 : 0.45}>
+                    <circle cx={t.x} cy={t.y} r={rr} fill="#0A1428" stroke={ring} strokeWidth={0.9 * u} />
+                    <circle cx={t.x} cy={t.y} r={rr * 0.45} fill={core} />
                   </g>
                 );
               })}
             </g>
-            {/* Minion-Wellen: die Position zeigt den Wellendruck (Vorsprung = Welle am Gegner-Turm) */}
-            <g data-waves={waves || 'EVEN'} aria-hidden="true">
-              {['top', 'mid', 'bot'].flatMap(lane => ['blue', 'red'].flatMap(side => [0, 1, 2].map(i => {
-                const t0 = WAVE_T[waves || 'EVEN'] + WAVE_OFF[lane], s = side === 'blue' ? t0 - 0.03 - i * 0.022 : t0 + 0.03 + i * 0.022;
-                const [x, y] = lanePoint(lane, s), j = (i % 2 ? 0.7 : -0.7) * u * 1.4;
-                return <circle key={`${lane}${side}${i}`} data-wave={`${side}_${lane}`} cx={x + j} cy={y - j} r={1.5 * u} fill={side === 'blue' ? '#93c5fd' : '#fca5a5'} stroke={side === 'blue' ? '#1e3a8a' : '#7f1d1d'} strokeWidth=".18" opacity=".85" />;
-              })))}
+            {/* Minion-Welle auf der aktiven Lane: Position passend zum Szenariotext */}
+            <g data-waves={wv.kind} data-wave-lane={wv.lane} aria-hidden="true">
+              {waveDots(wv.kind, wv.lane).map((d, i) => {
+                const [x, y] = lanePoint(wv.lane, d.s), j = (i % 2 ? 0.7 : -0.7) * u * 1.4;
+                return <circle key={i} data-wave={`${d.side}_${wv.lane}`} cx={x + j} cy={y - j} r={1.8 * u} fill={d.side === 'blue' ? '#93c5fd' : '#fca5a5'} stroke={d.side === 'blue' ? '#1e3a8a' : '#7f1d1d'} strokeWidth=".18" opacity=".9" />;
+              })}
             </g>
             {markers.filter(m => !m.isPlayer && (m.type === 'fog' || m.type === 'objective')).map((m, i) => {
               const c = MARKER_COLOR[m.type];
-              const flip = m.x > 72;
+              const need = (m.label || '').length * 8 * u * 0.62 + 14 * u, spaceR = view.x0 + view.size - m.x, spaceL = m.x - view.x0;
+              const flip = spaceR < need && spaceL > spaceR;   // Beschriftung auf die Seite mit mehr Platz, damit sie nie am Kartenrand abgeschnitten wird
               return (
                 <g key={i} className={result === 'good' && m.type === 'objective' ? 'blink' : undefined}>
                   {m.type === 'fog' ? (
@@ -4935,7 +4993,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
   const choice = pick ? (pick.opt ? stripLetter(pick.opt.label) : 'Keine Entscheidung (Zeit abgelaufen)') : '';
   const chain = pick ? ((pick.opt && pick.opt.chain) || TIMEOUT_CHAIN) : null;
   const fx = pick ? effectsFor(pick.opt, scenario, ok) : null;
-  const focus = focusFor(scenario.markers);
+  const focus = focusFor(scenario.markers, scenario.role);
   const cc = record.c + (ok ? 1 : 0), nn = record.c + record.w + 1, lead = cc - (nn - cc);
   const st = pick ? ((format === 'match' || format === 'tree') ? standing(lead, ok, stage) : { good: ok, text: `Zwischenstand: ${cc} von ${nn} richtig` }) : null;
   const nextLabel = stage + 1 >= stages ? 'ZUM ENDERGEBNIS ➔' : (format === 'match' || format === 'tree' || format === 'mv2') ? `WEITER ZU PHASE ${stage + 2} ➔` : `WEITER ZU FRAGE ${stage + 2} ➔`;
@@ -4990,7 +5048,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
           onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMap(); } }}
           className="relative h-36 shrink-0 rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13] cursor-pointer transition hover:border-[#0AC8B9]">
           <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} result={pick ? (ok ? 'good' : 'bad') : null} fx={fx}
-                   focus={focus} full={full} onToggleView={toggleFull} towers={hudTowers} waves={hudState} />
+                   focus={focus} full={full} onToggleView={toggleFull} towers={hudTowers} wave={scenario.wave} />
           <span className="pointer-events-none absolute top-1.5 right-1.5 rounded-md bg-black/40 p-1 text-white/80"><Icon n="zoom" size={16} /></span>
         </div>
 
@@ -5070,7 +5128,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
           </div>
           <div role="status" className="rounded-md border border-[#C89B3C]/50 bg-[#C89B3C]/10 px-2 py-1 text-center text-xs font-semibold text-[#C89B3C]">⏸️ Taktik-Analyse (Timer pausiert)</div>
           <div className="w-full max-w-[380px] aspect-square mx-auto rounded-xl overflow-hidden border border-[#C89B3C]/40 bg-[#010A13]">
-            <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} showLabels focus={focus} full={full} onToggleView={toggleFull} towers={hudTowers} waves={hudState} />
+            <Minimap markers={scenario.markers} champion={scenario.champion} role={scenario.role} showLabels focus={focus} full={full} onToggleView={toggleFull} towers={hudTowers} wave={scenario.wave} />
           </div>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
             {[['hero', 'Du / Team'], ['enemy', 'Gegner'], ['objective', 'Objective'], ['fog', 'Ungesichtet']].map(([t, l]) => (
@@ -6503,6 +6561,7 @@ function buildMv2Scenario(tpl, ctx, phase, state) {
     feedback: o.lp > 0 ? o.fb : 'Fehlentscheidung.', ...(o.lp > 0 ? {} : { chain: o.chain }) }));
   const sc = { id, gameTime: tpl.time, timeLimit: TLIM[tier], champion: ctx.me, role: ctx.role, difficulty: DIFF_NAMES[tier], phase: MV2_PHASE[phase],
     markers, coachHint: f(tpl.hint), context: f(tpl.ctx), options, mv2: { phase, state, ev: tpl.ev, victim, me: ctx.me, vslot: (ctx.vs || [])[phase - 1], key: tpl.key || (phase === 5 ? { AHEAD: 'NEXUS', BEHIND: 'BASEDEF', EVEN: 'FRONT' }[state] : 'BASE') } };
+  sc.wave = waveFor(sc.mv2.key, phase, state, ctx.role);   // Wellenposition passend zum Text
   DYN[id] = sc;
   return sc;
 }
@@ -6553,10 +6612,14 @@ const GLOSS = {
   prio: ['Prio', 'Lane-Priorität heißt, dass deine Welle weiter vorn steht und du deshalb zuerst zu Objectives oder in den Fluss rotieren kannst.'],
   cheater: ['Cheater Recall', 'Du crashst eine große Welle und gehst direkt zurück zur Base, um früh Items zu kaufen, während der Gegner die Welle am Turm abräumen muss.'],
   slow: ['Slow Push', 'Du lässt Minions sich zu einer großen Welle aufbauen, die später auf einmal in den gegnerischen Turm crasht.'],
+  collapse: ['Collapse', 'Mehrere Verbündete rotieren gleichzeitig auf eine isolierte Position, um einen Gegner einzukreisen.'],
+  bait: ['Bait', 'Einen Kampf oder ein Objective antäuschen, um den Gegner in eine Falle oder einen Hinterhalt zu locken.'],
+  crossmap: ['Cross-Map', 'Einen Turm oder ein Objective auf der entgegengesetzten Seite der Map forcen, während der Gegner woanders beschäftigt ist.'],
+  dive: ['Dive', 'Einen gegnerischen Champion unter seinem eigenen Turm attackieren und eliminieren.'],
   stasis: ['Stasis', 'Zhonya\'s Hourglass macht dich 2,5 Sekunden lang unverwundbar und unangreifbar, aber du kannst in dieser Zeit nichts tun.'],
 };
-const GLOSS_RE = /(Cheater Recall|Slow Push|slow pushen|langsam pushen|Lane-Prio|Freeze|einfrieren|einfrierst|eingefroren|Stasis|Prio)/g;
-const glossKey = s => { const l = s.toLowerCase(); return /cheater/.test(l) ? 'cheater' : /slow|langsam/.test(l) ? 'slow' : /freeze|einfrier|eingefror/.test(l) ? 'freeze' : /stasis/.test(l) ? 'stasis' : 'prio'; };
+const GLOSS_RE = /(Cheater Recall|Slow Push|slow pushen|langsam pushen|Lane-Prio|Freeze|einfrieren|einfrierst|eingefroren|Stasis|Cross-Map|Collapse|kollabieren|Bait|Turm-Dive|Dive|diven|Prio)/g;
+const glossKey = s => { const l = s.toLowerCase(); return /cross-map/.test(l) ? 'crossmap' : /collapse|kollabier/.test(l) ? 'collapse' : /bait/.test(l) ? 'bait' : /dive|diven/.test(l) ? 'dive' : /cheater/.test(l) ? 'cheater' : /slow|langsam/.test(l) ? 'slow' : /freeze|einfrier|eingefror/.test(l) ? 'freeze' : /stasis/.test(l) ? 'stasis' : 'prio'; };
 const GlossCtx = React.createContext(() => {});
 function G({ t }) {
   const open = React.useContext(GlossCtx);
