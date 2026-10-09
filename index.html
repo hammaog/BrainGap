@@ -5846,16 +5846,14 @@ function RunHistory({ history }) {
 }
 function SupporterCard() {
   return (
-    <div className="relative overflow-hidden rounded-2xl border-2 border-[#C89B3C] bg-gradient-to-r from-[#3a2a08] via-[#2a1f08] to-[#10213a] p-3.5 shadow-[0_0_22px_rgba(200,155,60,.4)]" data-supporter="true">
-      <span className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-[#C89B3C]/25 blur-2xl" aria-hidden="true" />
-      <div className="relative flex items-center gap-3">
-        <Icon n="crown" size={30} className="shrink-0 text-[#F0C75E] drop-shadow-[0_0_8px_rgba(240,199,94,.7)]" />
-        <div className="min-w-0 flex-1">
-          <div className="font-serif text-base font-extrabold leading-tight text-[#F0C75E]">🌟 Werde Supporter (2 €)</div>
-          <div className="mt-0.5 text-xs leading-snug text-slate-200">100% werbefrei, goldener Hextech-Rahmen</div>
-        </div>
-        <button type="button" className="shrink-0 rounded-xl bg-gradient-to-b from-[#F0C75E] to-[#C89B3C] px-3.5 py-2 text-xs font-extrabold text-[#010A13] shadow-[0_0_12px_rgba(200,155,60,.6)] transition active:scale-95">Unterstützen</button>
-      </div>
+    <div className="h-auto w-full shrink-0 rounded-2xl border border-amber-500/40 bg-gradient-to-br from-amber-950/30 via-slate-900/60 to-slate-950/80 p-4 shadow-[0_0_15px_rgba(200,155,60,0.15)]" data-supporter="true">
+      <div className="text-base font-semibold text-amber-400">🌟 Werde Supporter (2 €)</div>
+      <ul className="mt-3 flex flex-col gap-2 text-sm leading-snug text-slate-200" aria-label="Vorteile für Supporter">
+        <li className="flex items-start gap-2"><span aria-hidden="true">✨</span><span>100% werbefrei lernen</span></li>
+        <li className="flex items-start gap-2"><span aria-hidden="true">🛡️</span><span>Goldener Hextech-Profilrahmen</span></li>
+        <li className="flex items-start gap-2"><span aria-hidden="true">👑</span><span>Exklusives Supporter-Badge</span></li>
+      </ul>
+      <button type="button" className="mt-3 w-full rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 px-4 py-2.5 font-bold text-slate-950 shadow-md transition hover:from-amber-500 hover:to-amber-400 active:scale-[.98]">Jetzt Unterstützer werden</button>
     </div>
   );
 }
@@ -5901,7 +5899,7 @@ function Profile({ profile, rank, mastery, friends, requests, history, xp, shiel
   const [confirm, setConfirm] = useState(false);
   const tier = tierOf(rank.step);
   return (
-    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+    <div className="flex-1 min-h-0 overflow-y-auto p-4 flex flex-col gap-4 [&>*]:shrink-0" data-profile-scroll="true">   {/* [&>*]:shrink-0: Karten werden im Scrollbereich nie zusammengedrückt */}
       {/* 1) Profil-Header: Icon, Name, Level, Rang, darunter Status und Notiz */}
       <div className="flex flex-col gap-2.5 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3" data-profile-header="true">
         <div className="flex items-center gap-3">
