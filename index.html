@@ -58,8 +58,10 @@
   .bannerin { animation:bannerin .45s ease-out both; }
   @keyframes goldpop { 0%{transform:translateY(8px) scale(.5);opacity:0} 60%{transform:translateY(-6px) scale(1.25);opacity:1} 100%{transform:none;opacity:1} }
   .goldpop { animation:goldpop .8s ease-out both; }
+  @keyframes vippulse { 0%,100% { box-shadow:0 0 10px rgba(245,158,11,.45), 0 0 0 0 rgba(251,191,36,.35); } 50% { box-shadow:0 0 20px rgba(245,158,11,.85), 0 0 0 4px rgba(251,191,36,.15); } }
+  .vip-pulse { animation:vippulse 2.4s ease-in-out infinite; }
   footer.riot-footer { max-width:400px; margin:6px auto 0; padding:10px 16px calc(14px + env(safe-area-inset-bottom,0px)); font-size:10px; line-height:1.45; color:#7a8294; text-align:center; }
-  @media (prefers-reduced-motion:reduce){ .pulsedot,.bannerpop,.floatgold,.redflash,.bannerin,.goldpop{animation:none} }
+  @media (prefers-reduced-motion:reduce){ .pulsedot,.bannerpop,.floatgold,.redflash,.bannerin,.goldpop,.vip-pulse{animation:none} }
 </style>
 </head>
 <body>
@@ -4144,6 +4146,7 @@ const sanitizeSave = d => {
     matchCount: Number.isFinite(d.matchCount) ? Math.max(0, Math.floor(d.matchCount)) : 0,
     shieldUntil: Number.isFinite(d.shieldUntil) ? d.shieldUntil : 0,
     sinceAd: Number.isFinite(d.sinceAd) ? Math.max(0, Math.floor(d.sinceAd)) : 0,
+    vip: d.vip === true,
   };
 };
 const loadSave = () => {
@@ -4165,33 +4168,34 @@ const sb = (() => { try { return window.supabase && window.supabase.createClient
 const SAVED_AT_KEY = 'braingap.savedAt', SYNCED_AT_KEY = 'braingap.syncedAt';   // letzte lokale Änderung / letzter erfolgreicher Abgleich mit der Cloud
 const lsNum = k => { try { return Number(localStorage.getItem(k)) || 0; } catch (e) { return 0; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, String(v)); } catch (e) {} };
-let CLOUD_NO_SAVE_DATA = false;   // true, wenn die Spalte profiles.save_data fehlt: dann werden nur die Kernspalten synchronisiert
-const missingSaveCol = err => !!err && /save_data/.test(`${err.message || ''} ${err.details || ''}`);
+const VIP_TEST_MODE = true;   // Testschalter ohne Bezahlsystem. Vor dem Livegang auf false setzen und is_vip nur serverseitig vergeben (Zahlungs-Webhook), sonst kann sich jeder selbst zum VIP machen
+const CLOUD_MISSING = new Set();   // optionale Spalten, die es in der Datenbank (noch) nicht gibt: save_data, is_vip
+const OPT_COLS = ['save_data', 'is_vip'];
+const missingCol = err => { const t = `${(err && err.message) || ''} ${(err && err.details) || ''}`; return OPT_COLS.find(c => !CLOUD_MISSING.has(c) && t.includes(c)) || null; };
 const errText = e => String((e && (e.message || e.error_description)) || e || 'Unbekannter Fehler').slice(0, 140);
 // Kernspalten der Tabelle profiles. lp = Gesamt-Rangpunkte (Rangstufe x 100 + LP), damit "order by lp" über alle Ränge hinweg korrekt sortiert
 const cloudCore = save => { const step = save.rank.step; return { username: save.profile.name, rank_tier: rankName(step), lp: step * 100 + save.rank.lp, account_level: xpLevel(save.xp || 0).level, summoner_icon: save.profile.icon != null ? save.profile.icon : ICON_IDS[0] }; };
+const cloudBody = (save, savedAt) => { const b = { ...cloudCore(save), is_vip: save.vip === true, save_data: { ...save, savedAt } }; CLOUD_MISSING.forEach(c => { delete b[c]; }); return b; };
 async function cloudFetchProfile(userId) {
   const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
   if (error) throw error;
+  if (data) OPT_COLS.forEach(c => { if (!(c in data)) CLOUD_MISSING.add(c); });   // Spalte fehlt in der Antwort: gar nicht erst schreiben
   return data;
+}
+// Fehlt eine optionale Spalte, wird sie gemerkt und der Aufruf ohne sie wiederholt; alles andere ist ein echter Fehler
+async function cloudTry(fn) {
+  for (let i = 0; i < 3; i++) { const r = await fn(); if (!r.error) return r; const c = missingCol(r.error); if (!c) throw r.error; CLOUD_MISSING.add(c); }
+  throw new Error('Sync nicht möglich');
 }
 // Aktualisiert die eigene Zeile (update ... eq id); gibt es sie noch nicht, wird sie angelegt
 async function cloudPushSave(userId, save, savedAt) {
-  const core = cloudCore(save), body = () => (CLOUD_NO_SAVE_DATA ? core : { ...core, save_data: { ...save, savedAt } });
-  let r = await sb.from('profiles').update(body()).eq('id', userId).select('id');
-  if (r.error && !CLOUD_NO_SAVE_DATA && missingSaveCol(r.error)) { CLOUD_NO_SAVE_DATA = true; r = await sb.from('profiles').update(body()).eq('id', userId).select('id'); }
-  if (r.error) throw r.error;
-  if (!r.data || r.data.length === 0) {
-    let ins = await sb.from('profiles').insert({ id: userId, ...body() });
-    if (ins.error && !CLOUD_NO_SAVE_DATA && missingSaveCol(ins.error)) { CLOUD_NO_SAVE_DATA = true; ins = await sb.from('profiles').insert({ id: userId, ...body() }); }
-    if (ins.error) throw ins.error;
-  }
+  const upd = await cloudTry(() => sb.from('profiles').update(cloudBody(save, savedAt)).eq('id', userId).select('id'));
+  if (!upd.data || upd.data.length === 0) await cloudTry(() => sb.from('profiles').insert({ id: userId, ...cloudBody(save, savedAt) }));
   return true;
 }
 async function cloudTop20() {
-  const { data, error } = await sb.from('profiles').select('id, username, rank_tier, lp, account_level, summoner_icon').order('lp', { ascending: false }).limit(20);
-  if (error) throw error;
-  return (data || []).map(r => ({ id: r.id, name: String(r.username || 'Spieler').slice(0, 16), tier: String(r.rank_tier || 'Iron 4'), points: Number(r.lp) || 0, level: Number(r.account_level) || 1, icon: Number.isInteger(r.summoner_icon) ? r.summoner_icon : ICON_IDS[0] }));
+  const r = await cloudTry(() => sb.from('profiles').select(`id, username, rank_tier, lp, account_level, summoner_icon${CLOUD_MISSING.has('is_vip') ? '' : ', is_vip'}`).order('lp', { ascending: false }).limit(20));
+  return (r.data || []).map(x => ({ id: x.id, name: String(x.username || 'Spieler').slice(0, 16), tier: String(x.rank_tier || 'Iron 4'), points: Number(x.lp) || 0, level: Number(x.account_level) || 1, icon: Number.isInteger(x.summoner_icon) ? x.summoner_icon : ICON_IDS[0], vip: x.is_vip === true }));
 }
 const authError = e => {
   const m = String((e && e.message) || ''), c = String((e && (e.code || e.status)) || '');
@@ -4809,7 +4813,7 @@ function ModeInfo({ mode, onClose }) {
   );
 }
 
-function Dashboard({ rank, hearts, profile, mastery, xp, quests, friends, shieldUntil, onDaily, onRanked, onPractice, onMastery, onNoHearts, onInfo, onHeartAd, onShieldAd, onIcon, onReset }) {
+function Dashboard({ rank, hearts, profile, mastery, xp, quests, friends, shieldUntil, isVip, onDaily, onRanked, onPractice, onMastery, onNoHearts, onInfo, onHeartAd, onShieldAd, onIcon, onReset }) {
   const locked = hearts < 1;   // ohne Herzen sind Daily und Ranked gesperrt, Mastery vergibt nur MP und braucht kein Herz
   const { mp: mpNow, level: lvNow } = masteryOf(mastery, profile.champion);
   const [confirm, setConfirm] = useState(false);
@@ -4819,9 +4823,9 @@ function Dashboard({ rank, hearts, profile, mastery, xp, quests, friends, shield
     <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
       <div className="rounded-xl border p-3 flex flex-col gap-3" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <div className="flex items-center gap-3">
-          <SummonerIcon id={profile.icon != null ? profile.icon : ICON_IDS[0]} name={profile.name} className="w-14 h-14" onClick={onIcon} />
+          <SummonerIcon id={profile.icon != null ? profile.icon : ICON_IDS[0]} name={profile.name} className="w-14 h-14" onClick={onIcon} vip={!!isVip} />
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2"><span className="truncate font-bold">{profile.name}</span><StreakBadge n={profile.winStreak || 0} /></div>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="truncate font-bold">{profile.name}</span>{isVip && <VipBadge />}<StreakBadge n={profile.winStreak || 0} /></div>
             <XpBar xp={xp} />
             <div className="mt-1 truncate text-xs text-gray-400">Main: {profile.champion} · {profile.role}</div>
           </div>
@@ -4845,13 +4849,13 @@ function Dashboard({ rank, hearts, profile, mastery, xp, quests, friends, shield
       </div>
 
       <FriendsOnline friends={friends} />
-      <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />
+      {!isVip && <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />}
 
       {locked && (
         <div role="status" className="flex items-center gap-2 rounded-lg border border-red-500/50 bg-red-500/10 px-3 py-2 text-sm text-red-300">
           <Icon n="heart" size={16} /> Keine Herzen mehr.
           <button onClick={onNoHearts} className="underline font-semibold">Recovery Drill</button>
-          <button onClick={onHeartAd} className="underline font-semibold">Herz per Werbung</button>
+          {!isVip && <button onClick={onHeartAd} className="underline font-semibold">Herz per Werbung</button>}
         </div>
       )}
       <div className="grid grid-cols-2 gap-2">
@@ -5404,7 +5408,7 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
   );
 }
 
-function NoHearts({ onDrill, onShop, onClose }) {
+function NoHearts({ onDrill, onShop, onClose, isVip }) {
   return (
     <div className="absolute inset-0 z-40 flex items-end justify-center p-3" style={{ background: 'rgba(1,10,19,.85)' }} onClick={onClose}>
       <div role="dialog" aria-modal="true" aria-label="Keine Herzen mehr" onClick={e => e.stopPropagation()}
@@ -5416,7 +5420,7 @@ function NoHearts({ onDrill, onShop, onClose }) {
         </div>
         <div className="text-sm text-slate-300">Daily, Ranked und Mastery brauchen mindestens ein Herz, denn Niederlagen und Abbrüche kosten eines. Löse im Recovery Drill zwei kurze Fragen richtig und du bekommst sofort 1 Herz zurück.</div>
         <button onClick={onDrill} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13] shadow-[0_0_14px_rgba(200,155,60,.45)]">Recovery Drill absolvieren</button>
-        <button onClick={onShop} className="rounded-xl border border-[#0AC8B9]/60 py-2.5 text-sm font-semibold text-[#0AC8B9]">Stattdessen Werbung ansehen</button>
+        {!isVip && <button onClick={onShop} className="rounded-xl border border-[#0AC8B9]/60 py-2.5 text-sm font-semibold text-[#0AC8B9]">Stattdessen Werbung ansehen</button>}
       </div>
     </div>
   );
@@ -5894,7 +5898,36 @@ function RunHistory({ history }) {
     </div>
   );
 }
-function SupporterCard() {
+function VipBadge({ compact = false }) {
+  return (
+    <span data-vip-badge={compact ? 'compact' : 'full'} title="VIP Supporter" aria-label="VIP Supporter"
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-400/60 bg-amber-400/10 font-bold text-amber-300 [text-shadow:0_0_8px_rgba(251,191,36,.7)] ${compact ? 'px-1.5 py-px text-[10px]' : 'px-2 py-0.5 text-[11px]'}`}>
+      👑{compact ? '' : ' VIP Supporter'}
+    </span>
+  );
+}
+function SupporterCard({ isVip = false, onToggleVip }) {
+  const [hint, setHint] = useState(false);
+  const toggle = VIP_TEST_MODE && onToggleVip && (
+    <div className="mt-3 flex flex-col gap-1">
+      <button type="button" onClick={onToggleVip} data-vip-toggle={isVip ? 'on' : 'off'} aria-pressed={isVip}
+        className="w-full rounded-lg border border-dashed border-amber-400/70 bg-amber-400/10 px-3 py-2 text-xs font-bold text-amber-200 transition hover:bg-amber-400/20 active:scale-[.98]">
+        {isVip ? '🧪 VIP-Status für diesen Account deaktivieren' : '🧪 VIP-Status für diesen Account aktivieren'}
+      </button>
+      <div className="text-center text-[11px] leading-snug text-slate-500">Testfunktion: Es gibt noch kein Bezahlsystem, es wird nichts abgebucht.</div>
+    </div>
+  );
+  if (isVip) return (
+    <div className="h-auto w-full shrink-0 rounded-2xl border border-amber-400/70 bg-gradient-to-br from-amber-900/40 via-slate-900/60 to-slate-950/80 p-4 shadow-[0_0_20px_rgba(245,158,11,0.35)]" data-supporter="true" data-vip-active="true">
+      <div className="text-base font-semibold text-amber-400">✅ Du bist aktiver Supporter – danke für deine Unterstützung!</div>
+      <ul className="mt-3 flex flex-col gap-2 text-sm leading-snug text-slate-200" aria-label="Deine Supporter-Vorteile">
+        <li className="flex items-start gap-2"><span aria-hidden="true">✨</span><span>100% werbefrei: aktiv</span></li>
+        <li className="flex items-start gap-2"><span aria-hidden="true">🛡️</span><span>Goldener Hextech-Profilrahmen: aktiv</span></li>
+        <li className="flex items-start gap-2"><span aria-hidden="true">👑</span><span>Exklusives Supporter-Badge: aktiv</span></li>
+      </ul>
+      {toggle}
+    </div>
+  );
   return (
     <div className="h-auto w-full shrink-0 rounded-2xl border border-amber-500/40 bg-gradient-to-br from-amber-950/30 via-slate-900/60 to-slate-950/80 p-4 shadow-[0_0_15px_rgba(200,155,60,0.15)]" data-supporter="true">
       <div className="text-base font-semibold text-amber-400">🌟 Werde Supporter (2 €)</div>
@@ -5903,7 +5936,9 @@ function SupporterCard() {
         <li className="flex items-start gap-2"><span aria-hidden="true">🛡️</span><span>Goldener Hextech-Profilrahmen</span></li>
         <li className="flex items-start gap-2"><span aria-hidden="true">👑</span><span>Exklusives Supporter-Badge</span></li>
       </ul>
-      <button type="button" className="mt-3 w-full rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 px-4 py-2.5 font-bold text-slate-950 shadow-md transition hover:from-amber-500 hover:to-amber-400 active:scale-[.98]">Jetzt Unterstützer werden</button>
+      <button type="button" onClick={() => setHint(h => !h)} className="mt-3 w-full rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 px-4 py-2.5 font-bold text-slate-950 shadow-md transition hover:from-amber-500 hover:to-amber-400 active:scale-[.98]">Jetzt Unterstützer werden</button>
+      {hint && <div role="status" className="mt-2 rounded-lg border border-[#0AC8B9]/40 bg-[#0AC8B9]/10 px-3 py-2 text-xs leading-snug text-[#0AC8B9]" data-pay-hint="true">💳 Die Bezahlung ist noch nicht aktiv.{VIP_TEST_MODE ? ' Zum Ausprobieren nutze den Test-Schalter darunter.' : ' Bald verfügbar.'}</div>}
+      {toggle}
     </div>
   );
 }
@@ -5944,7 +5979,7 @@ function StatusNote({ profile, onChange }) {
     </div>
   );
 }
-function Profile({ profile, rank, mastery, friends, requests, history, xp, shieldUntil, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout, onIcon, onShieldAd, cloud, onAuth, onCloudLogout, onCloudRetry }) {
+function Profile({ profile, rank, mastery, friends, requests, history, xp, shieldUntil, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout, onIcon, onShieldAd, cloud, onAuth, onCloudLogout, onCloudRetry, isVip, onToggleVip }) {
   const [tab, setTab] = useState('me');
   const [confirm, setConfirm] = useState(false);
   const tier = tierOf(rank.step);
@@ -5957,10 +5992,10 @@ function Profile({ profile, rank, mastery, friends, requests, history, xp, shiel
           <div className="min-w-0 flex-1 flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
               <div className="relative">
-                <SummonerIcon id={profile.icon != null ? profile.icon : ICON_IDS[0]} name={profile.name} className="w-12 h-12" onClick={onIcon} />
+                <SummonerIcon id={profile.icon != null ? profile.icon : ICON_IDS[0]} name={profile.name} className="w-12 h-12" onClick={onIcon} vip={!!isVip} />
                 <span className="absolute -bottom-1 -right-1 text-sm" aria-hidden="true">{STATUS[profile.status].emoji}</span>
               </div>
-              <div className="min-w-0"><div className="truncate font-serif text-xl font-bold leading-tight">{profile.name}</div></div>
+              <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1"><div className="truncate font-serif text-xl font-bold leading-tight">{profile.name}</div>{isVip && <VipBadge />}</div>
             </div>
             <div className={`flex items-center gap-1.5 text-sm font-semibold ${RANK_ICON[tier].cls}`}>
               <RankEmblem tier={tier} size={22} />{rankName(rank.step)} · {rank.lp} LP
@@ -5984,7 +6019,7 @@ function Profile({ profile, rank, mastery, friends, requests, history, xp, shiel
           {/* 3) Mastery-Progression */}
           <MasteryShowcase mastery={mastery} />
           {/* 4) VIP / Supporter: Conversion-Spot direkt über der Historie */}
-          <SupporterCard />
+          <SupporterCard isVip={!!isVip} onToggleVip={onToggleVip} />
           {/* 5) Match-Historie: 2 Spiele + Aufklappen */}
           <RunHistory history={history} />
           {/* 6) Einstellungen */}
@@ -5992,7 +6027,7 @@ function Profile({ profile, rank, mastery, friends, requests, history, xp, shiel
           <div className="flex flex-col gap-3" data-settings="true">
             <div className="font-serif font-bold">Einstellungen</div>
             <CloudCard cloud={cloud || { user: null, status: 'off' }} available={!!sb} onLogin={onAuth} onLogout={onCloudLogout} onRetry={onCloudRetry} />
-            <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />
+            {!isVip && <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />}
             <div>
               <label htmlFor="pname" className="mb-1.5 block text-sm font-semibold">Account-Name</label>
               <input id="pname" value={profile.name} maxLength={16} onChange={e => onChange({ name: e.target.value })}
@@ -6096,7 +6131,8 @@ function CloudCard({ cloud, available, onLogin, onLogout, onRetry }) {
       <div className="text-sm font-bold">{L[0]}</div>
       <div className="truncate text-slate-400">{cloud.user.email}</div>
       {cloud.status === 'error' && <div className="text-red-300">{cloud.msg} Neuer Versuch folgt automatisch.</div>}
-      {cloud.status === 'synced' && cloud.msg === 'core' && <div className="text-amber-300">Gesichert werden Rang, Level und Icon. Für den vollen Spielstand fehlt in der Datenbank die Spalte save_data.</div>}
+      {cloud.status === 'synced' && /save_data/.test(cloud.msg) && <div className="text-amber-300">Gesichert werden Rang, Level und Icon. Für den vollen Spielstand fehlt in der Datenbank die Spalte save_data.</div>}
+      {cloud.status === 'synced' && /is_vip/.test(cloud.msg) && <div className="text-amber-300">Der VIP-Status wird nur auf diesem Gerät gespeichert, denn in der Datenbank fehlt die Spalte is_vip.</div>}
       <div className="flex gap-2">
         {cloud.status === 'error' && <button type="button" onClick={onRetry} className="rounded-lg border border-red-400/60 px-3 py-1.5 font-bold text-red-200">Erneut versuchen</button>}
         <button type="button" onClick={onLogout} data-cloud-logout="true" className="rounded-lg border border-[#C89B3C]/60 px-3 py-1.5 font-bold text-[#C89B3C]">Abmelden</button>
@@ -6105,7 +6141,7 @@ function CloudCard({ cloud, available, onLogin, onLogout, onRetry }) {
   );
 }
 // Echte globale Top 20 aus Supabase; bei weniger als 5 Spielern füllen dezente Beispielspieler die Liste auf
-function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh }) {
+function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh, isVip }) {
   const meId = cloud.user && cloud.user.id, real = remote.rows;
   const fill = real.length < 5 ? buildLeaderboard(rank, profile.name).filter(r => !r.me).slice(0, 20 - real.length) : [];
   const meIdx = real.findIndex(r => r.id === meId);
@@ -6129,9 +6165,9 @@ function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh }) {
         return (
           <div key={r.id || i} data-live-row="true" className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${me ? 'border-2 border-[#C89B3C] bg-[#1A2A48] shadow-[0_0_14px_rgba(200,155,60,.35)]' : 'bg-[var(--panel)] border-[var(--line)]'}`}>
             <Pos n={i + 1} />
-            <SummonerIcon id={r.icon} name={r.name} className="w-9 h-9" label={r.name} />
+            <SummonerIcon id={r.icon} name={r.name} className="w-9 h-9" label={r.name} vip={r.vip || (r.id === (cloud.user && cloud.user.id) && !!isVip)} />
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2"><span className={`truncate ${me ? 'font-extrabold text-white' : 'font-semibold'}`}>{r.name}</span>{me && <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}</div>
+              <div className="flex items-center gap-2"><span className={`truncate ${me ? 'font-extrabold text-white' : 'font-semibold'}`}>{r.name}</span>{(r.vip || (me && isVip)) && <VipBadge compact />}{me && <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}</div>
               <div className="flex items-center gap-1.5 truncate text-xs text-gray-400"><RankEmblem tier={r.tier} size={16} />{r.tier} · Lv. {r.level}</div>
             </div>
             <div className={`font-bold tabular-nums ${me ? 'text-[#C89B3C]' : ''}`}>{r.points % 100} LP</div>
@@ -6149,7 +6185,7 @@ function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh }) {
     </div>
   );
 }
-function Leaderboard({ rank, profile, friends, cloud, onAuth }) {
+function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip }) {
   const [tab, setTab] = useState('global');
   const [remote, setRemote] = useState({ status: sb ? 'loading' : 'off', rows: [] });
   const [tick, setTick] = useState(0);
@@ -6186,7 +6222,7 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth }) {
       <div className="my-1"><TabBar tabs={[['global', 'Global'], ['friends', 'Freunde']]} value={tab} onChange={setTab} /></div>
 
       {tab === 'global' && sb && remote.status !== 'error' && remote.status !== 'off' ? (
-        <LiveBoard remote={remote} profile={profile} rank={rank} cloud={cloud || { user: null }} onAuth={onAuth} onRefresh={() => setTick(n => n + 1)} />
+        <LiveBoard remote={remote} profile={profile} rank={rank} cloud={cloud || { user: null }} onAuth={onAuth} onRefresh={() => setTick(n => n + 1)} isVip={isVip} />
       ) : tab === 'global' ? (
         <>
           {sb && remote.status === 'error' && <div className="rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-200" data-live-error="true">Die Live-Rangliste ist gerade nicht erreichbar. Du siehst Beispielspieler.</div>}
@@ -6207,6 +6243,7 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth }) {
                 <div className="flex items-center gap-2">
                   {r.me && <span aria-label={STATUS[profile.status].label}>{STATUS[profile.status].emoji}</span>}
                   <span className={`truncate ${r.me ? 'font-extrabold text-white' : 'font-semibold'}`}>{r.name}</span>
+                  {r.me && isVip && <VipBadge compact />}
                   {r.me && <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}
                 </div>
                 {r.me && profile.note && <div className="truncate text-xs italic text-gray-400">„{profile.note}“</div>}
@@ -6231,6 +6268,7 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth }) {
                 <div className="flex items-center gap-2">
                   <span aria-label={STATUS[r.status].label}>{STATUS[r.status].emoji}</span>
                   <span className={`truncate ${r.me ? 'font-extrabold text-white' : 'font-semibold'}`}>{r.name}</span>
+                  {r.me && isVip && <VipBadge compact />}
                   {r.me && <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}
                 </div>
                 <div className="truncate text-xs text-gray-400">{rankName(r.step)} · {r.lp} LP{r.note ? ` · „${r.note}“` : ''}</div>
@@ -7014,16 +7052,17 @@ function G({ t }) {
 /* ---------- Beschwörer-Icons, Rang-Wappen, XP, Freunde, Werbung ---------- */
 const ICON_IDS = [29, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 const iconUrl = id => `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/profileicon/${id}.png`;
-function SummonerIcon({ id, name = '', className = 'w-12 h-12', onClick, label = 'Beschwörer-Icon ändern' }) {
+function SummonerIcon({ id, name = '', className = 'w-12 h-12', onClick, label = 'Beschwörer-Icon ändern', vip = false }) {
   const [failed, setFailed] = useState(false);
   useEffect(() => { setFailed(false); }, [id]);
   const inner = failed
     ? <span className="flex h-full w-full items-center justify-center bg-[#0A1428] font-serif font-bold text-[#C89B3C]">{(name || '?')[0].toUpperCase()}</span>
     : <img src={iconUrl(id)} alt="" className="h-full w-full object-cover" onError={() => setFailed(true)} />;
-  const cls = `${className} shrink-0 overflow-hidden rounded-full border-2 border-[#C89B3C]`;
+  // VIP: goldener Hextech-Rahmen mit pulsierendem Schimmer, sonst der Standard-Rahmen
+  const cls = `${className} shrink-0 overflow-hidden rounded-full border-2 ${vip ? 'border-amber-300 ring-2 ring-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.6)] vip-pulse' : 'border-[#C89B3C]'}`;
   return onClick
-    ? <button type="button" onClick={onClick} aria-label={label} title={label} className={`${cls} transition active:scale-95`}>{inner}</button>
-    : <span className={cls}>{inner}</span>;
+    ? <button type="button" onClick={onClick} aria-label={label} title={label} data-vip-frame={vip ? 'true' : undefined} className={`${cls} transition active:scale-95`}>{inner}</button>
+    : <span className={cls} data-vip-frame={vip ? 'true' : undefined}>{inner}</span>;
 }
 function IconPicker({ current, onPick, onClose }) {
   return (
@@ -7446,6 +7485,7 @@ function App() {
   const [matchCount, setMatchCount] = useState(Number.isFinite(init.matchCount) ? init.matchCount : 0);
   const [shieldUntil, setShieldUntil] = useState(Number.isFinite(init.shieldUntil) ? init.shieldUntil : 0);
   const [sinceAd, setSinceAd] = useState(Number.isFinite(init.sinceAd) ? init.sinceAd : 0);
+  const [isVip, setIsVip] = useState(init.vip === true);   // VIP-Supporter: werbefrei, goldener Rahmen, Badge
   useEffect(() => { try { window.scrollTo(0, 0); } catch (e) {} }, [screen]);   // jeder Ansichtswechsel startet ganz oben
   const [notice, setNotice] = useState('');   // kurzer Hinweis, z. B. übernommene Standardwerte oder abgeschlossene Quests
   useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(''), 6000); return () => clearTimeout(t); }, [notice]);
@@ -7461,13 +7501,13 @@ function App() {
   const xpRef = useRef(xp), questsRef = useRef(quests), matchRef = useRef(matchCount);
   xpRef.current = xp; questsRef.current = quests; matchRef.current = matchCount;
 
-  const SAVE_DEPS = [rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd];
-  const buildSave = () => ({ rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd });
+  const SAVE_DEPS = [rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd, isVip];
+  const buildSave = () => ({ rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd, vip: isVip });
   const saveRef = useRef(null); saveRef.current = buildSave();
   // ----- Cloud (Supabase) -----
   const [cloud, setCloud] = useState({ user: null, status: sb ? 'guest' : 'off', msg: '' });   // off | guest | loading | synced | syncing | error
   const [ready, setReady] = useState(false), [authOpen, setAuthOpen] = useState(false), [conflict, setConflict] = useState(null), [retry, setRetry] = useState(0);
-  const cloudUid = useRef(null), stamp = useRef(null), firstWrite = useRef(true), lastPushed = useRef(''), pushing = useRef(false), again = useRef(false), retryTimer = useRef(null);
+  const cloudUid = useRef(null), stamp = useRef(null), firstWrite = useRef(true), lastPushed = useRef(''), fast = useRef(false), pushing = useRef(false), again = useRef(false), retryTimer = useRef(null);
   useEffect(() => {
     writeSave(buildSave());
     const had = lsNum(SAVED_AT_KEY);
@@ -7480,7 +7520,7 @@ function App() {
     stamp.current = cloudAt; lsSet(SYNCED_AT_KEY, cloudAt);
     setRank(cs.rank); setHistory(cs.history); setHearts(Number.isInteger(cs.hearts) ? Math.max(0, Math.min(MAX_HEARTS, cs.hearts)) : MAX_HEARTS); setProfile(cs.profile);
     setFriends(cs.friends || [MOCK_FRIEND]); setRequests(cs.requests || MOCK_REQUESTS); setRecent(cs.recent || []); setMastery(normalizeMastery(cs.mastery));
-    setXp(cs.xp); xpRef.current = cs.xp; setQuests(freshQuests(cs.quests)); setSrs(cs.srs || {}); setMatchCount(cs.matchCount); setShieldUntil(cs.shieldUntil); setSinceAd(cs.sinceAd);
+    setXp(cs.xp); xpRef.current = cs.xp; setQuests(freshQuests(cs.quests)); setSrs(cs.srs || {}); setMatchCount(cs.matchCount); setShieldUntil(cs.shieldUntil); setSinceAd(cs.sinceAd); setIsVip(cs.vip === true);
     setNotice('☁️ Cloud-Spielstand geladen');
   };
   // Nach dem Login: Cloud-Profil laden und mit dem Gerät abgleichen (nichts wird stillschweigend überschrieben)
@@ -7492,6 +7532,7 @@ function App() {
       const row = await cloudFetchProfile(user.id);
       const cs = row && row.save_data && typeof row.save_data === 'object' ? sanitizeSave(row.save_data) : null;
       const cloudAt = cs ? Number(row.save_data.savedAt) || 0 : 0, cloudHas = !!(cs && cs.profile);
+      const vipRow = row && typeof row.is_vip === 'boolean' ? row.is_vip : null;   // der Server entscheidet über VIP
       const local = saveRef.current, hasLocal = !!local.profile, localAt = lsNum(SAVED_AT_KEY), syncedAt = lsNum(SYNCED_AT_KEY);
       const finish = () => { setCloud(c => ({ ...c, status: 'synced' })); setReady(true); };
       if (cloudHas && !hasLocal) { applyCloud(cs, cloudAt); finish(); }
@@ -7503,6 +7544,7 @@ function App() {
         else if (!localDirty && !cloudNewer) { finish(); }
         else { setConflict({ cloudSave: cs, cloudAt }); setCloud(c => ({ ...c, status: 'loading' })); }
       }
+      if (vipRow !== null) setIsVip(vipRow);
     } catch (e) {
       console.warn('BrainGap: Cloud-Laden fehlgeschlagen', e);
       cloudUid.current = null; setCloud(c => ({ ...c, status: 'error', msg: errText(e) }));
@@ -7543,17 +7585,20 @@ function App() {
   useEffect(() => {
     if (!sb || !cloud.user || !ready || !profile) return;
     const uid = cloud.user.id;
+    const wait = fast.current ? 50 : 1500; fast.current = false;   // VIP-Wechsel wird sofort gesendet
     const t = setTimeout(async () => {
       if (pushing.current) { again.current = true; return; }
       const save = saveRef.current, ser = JSON.stringify(save), ts = lsNum(SAVED_AT_KEY) || Date.now();
       if (ser === lastPushed.current) return;
       pushing.current = true; setCloud(c => ({ ...c, status: 'syncing' }));
-      try { await cloudPushSave(uid, save, ts); lastPushed.current = ser; lsSet(SYNCED_AT_KEY, ts); setCloud(c => ({ ...c, status: 'synced', msg: CLOUD_NO_SAVE_DATA ? 'core' : '' })); }
+      try { await cloudPushSave(uid, save, ts); lastPushed.current = ser; lsSet(SYNCED_AT_KEY, ts); setCloud(c => ({ ...c, status: 'synced', msg: [...CLOUD_MISSING].join(',') })); }
       catch (e) { console.warn('BrainGap: Sync fehlgeschlagen', e); setCloud(c => ({ ...c, status: 'error', msg: errText(e) })); clearTimeout(retryTimer.current); retryTimer.current = setTimeout(() => setRetry(n => n + 1), 20000); }
       finally { pushing.current = false; if (again.current) { again.current = false; setRetry(n => n + 1); } }
-    }, 1500);
+    }, wait);
     return () => clearTimeout(t);
   }, [...SAVE_DEPS, cloud.user, ready, retry]);
+  // VIP-Testschalter: Zustand, localStorage (über den Speicher-Effekt) und Supabase-Spalte is_vip
+  const toggleVip = () => { const next = !isVip; setIsVip(next); if (next) setAd(null); fast.current = true; playHextechSound(next ? 'promotion' : 'click'); setNotice(next ? '👑 VIP aktiviert (Testmodus): werbefrei, goldener Rahmen, Supporter-Badge' : 'VIP deaktiviert (Testmodus)'); };
 
   // Jeder Button klickt (Optionen ausgenommen: sie lösen lock_in aus)
   useEffect(() => {
@@ -7737,7 +7782,7 @@ function App() {
   // Zurück vom Ergebnis: Werbung frühestens nach 3 vollendeten Matches, nie mittendrin und nie mit aktivem Hextech-Schild
   const finishRun = () => {
     setScreen('home');
-    if (mode !== 'practice' && !(result && result.drill) && Date.now() >= shieldUntil && sinceAd >= 3) setAd({ kind: 'interstitial' });
+    if (!isVip && mode !== 'practice' && !(result && result.drill) && Date.now() >= shieldUntil && sinceAd >= 3) setAd({ kind: 'interstitial' });
   };
   const adDone = () => {
     if (!ad) return;
@@ -7792,7 +7837,7 @@ function App() {
   };
   const declineRequest = name => setRequests(l => l.filter(x => x.name !== name));
   const updateProfile = patch => setProfile(p => ({ ...p, ...patch }));
-  const logout = () => { if (sb && cloud.user) cloudSignOut(); setProfile(null); setScreen('home'); };   // löscht nur das lokale Profil; der Cloud-Account bleibt bestehen
+  const logout = () => { if (sb && cloud.user) cloudSignOut(); setProfile(null); setIsVip(false); setScreen('home'); };   // löscht nur das lokale Profil; der Cloud-Account bleibt bestehen
 
   const reset = () => { setRank({ step: profile && profile.startStep ? profile.startStep : 0, lp: 0 }); setHistory([]); setHearts(MAX_HEARTS); };
 
@@ -7838,13 +7883,13 @@ function App() {
 
       {(screen === 'home' || screen === 'board' || screen === 'profile') && (
         <div key={screen} className="fade-in flex-1 min-h-0 flex flex-col">
-          {screen === 'home' && <Dashboard rank={rank} hearts={hearts} profile={profile} mastery={mastery} xp={xp} quests={quests} friends={friends} shieldUntil={shieldUntil}
+          {screen === 'home' && <Dashboard rank={rank} hearts={hearts} profile={profile} mastery={mastery} xp={xp} quests={quests} friends={friends} shieldUntil={shieldUntil} isVip={isVip}
             onDaily={playDaily} onRanked={() => setRankedOpen(true)} onPractice={() => setSetupOpen(true)} onMastery={playMastery} onInfo={setInfoMode}
             onNoHearts={() => setHeartsOpen(true)} onHeartAd={() => setAd({ kind: 'heart' })} onShieldAd={() => setAd({ kind: 'shield' })} onIcon={() => setIconOpen(true)} onReset={reset} />}
-          {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} cloud={cloud} onAuth={() => setAuthOpen(true)} />}
+          {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} cloud={cloud} onAuth={() => setAuthOpen(true)} isVip={isVip} />}
           {screen === 'profile' && <Profile profile={profile} rank={rank} mastery={mastery} friends={friends} history={history} xp={xp} shieldUntil={shieldUntil}
             onChange={updateProfile} onLogout={logout} onIcon={() => setIconOpen(true)} onShieldAd={() => setAd({ kind: 'shield' })}
-            cloud={cloud} onAuth={() => setAuthOpen(true)} onCloudLogout={cloudSignOut} onCloudRetry={() => setRetry(n => n + 1)}
+            cloud={cloud} onAuth={() => setAuthOpen(true)} onCloudLogout={cloudSignOut} onCloudRetry={() => setRetry(n => n + 1)} isVip={isVip} onToggleVip={toggleVip}
             onAddFriend={f => setFriends(l => [...l, f])} onRemoveFriend={name => setFriends(l => l.filter(x => x.name !== name))}
             requests={requests} onAccept={acceptRequest} onDecline={declineRequest} />}
         </div>
@@ -7874,10 +7919,10 @@ function App() {
       {setupOpen && <PracticeSetup onStart={playPractice} onClose={() => setSetupOpen(false)} />}
       {rankedOpen && <RankedSetup rank={rank} profile={profile} onStart={playRanked} onClose={() => setRankedOpen(false)} />}
       {infoMode && <ModeInfo mode={infoMode} onClose={() => setInfoMode(null)} />}
-      {heartsOpen && <NoHearts onDrill={startDrill} onShop={() => { setHeartsOpen(false); setAd({ kind: 'heart' }); }} onClose={() => setHeartsOpen(false)} />}
+      {heartsOpen && <NoHearts isVip={isVip} onDrill={startDrill} onShop={() => { setHeartsOpen(false); setAd({ kind: 'heart' }); }} onClose={() => setHeartsOpen(false)} />}
       {iconOpen && <IconPicker current={profile.icon != null ? profile.icon : ICON_IDS[0]} onPick={id => updateProfile({ icon: id })} onClose={() => setIconOpen(false)} />}
       {lvlUp && <SummonerLevelUp level={lvlUp.level} onClose={() => setLvlUp(null)} />}
-      {ad && <AdModal kind={ad.kind} onDone={adDone} onClose={() => setAd(null)} />}
+      {ad && !isVip && <AdModal kind={ad.kind} onDone={adDone} onClose={() => setAd(null)} />}
       {gloss && <GlossSheet k={gloss} onClose={() => setGloss(null)} />}
       {authOpen && <AuthModal onSubmit={authSubmit} onClose={() => setAuthOpen(false)} />}
       {conflict && <ConflictModal local={saveRef.current} cloudSave={conflict.cloudSave} onCloud={chooseCloud} onLocal={chooseLocal} />}
