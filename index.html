@@ -4351,6 +4351,7 @@ const sanitizeSave = d => {
     shieldUntil: Number.isFinite(d.shieldUntil) ? d.shieldUntil : 0,
     sinceAd: Number.isFinite(d.sinceAd) ? Math.max(0, Math.floor(d.sinceAd)) : 0,
     vip: d.vip === true,
+    ranked: sanitizeRanked(d.ranked),
   };
 };
 const loadSave = () => {
@@ -4374,12 +4375,12 @@ const lsNum = k => { try { return Number(localStorage.getItem(k)) || 0; } catch 
 const lsSet = (k, v) => { try { localStorage.setItem(k, String(v)); } catch (e) {} };
 const VIP_TEST_MODE = true;   // Testschalter ohne Bezahlsystem. Vor dem Livegang auf false setzen und is_vip nur serverseitig vergeben (Zahlungs-Webhook), sonst kann sich jeder selbst zum VIP machen
 const CLOUD_MISSING = new Set();   // optionale Spalten, die es in der Datenbank (noch) nicht gibt: save_data, is_vip
-const OPT_COLS = ['save_data', 'is_vip'];
+const OPT_COLS = ['save_data', 'is_vip', 'ranked_played', 'ranked_wins', 'ranked_losses'];
 const missingCol = err => { const t = `${(err && err.message) || ''} ${(err && err.details) || ''}`; return OPT_COLS.find(c => !CLOUD_MISSING.has(c) && t.includes(c)) || null; };
 const errText = e => String((e && (e.message || e.error_description)) || e || 'Unbekannter Fehler').slice(0, 140);
 // Kernspalten der Tabelle profiles. lp = Gesamt-Rangpunkte (Rangstufe x 100 + LP), damit "order by lp" über alle Ränge hinweg korrekt sortiert
 const cloudCore = save => { const step = save.rank.step; return { username: save.profile.name, rank_tier: rankName(step), lp: step * 100 + save.rank.lp, account_level: xpLevel(save.xp || 0).level, summoner_icon: save.profile.icon != null ? save.profile.icon : ICON_IDS[0] }; };
-const cloudBody = (save, savedAt) => { const b = { ...cloudCore(save), is_vip: save.vip === true, save_data: { ...save, savedAt } }; CLOUD_MISSING.forEach(c => { delete b[c]; }); return b; };
+const cloudBody = (save, savedAt) => { const rk = sanitizeRanked(save.ranked); const b = { ...cloudCore(save), is_vip: save.vip === true, ranked_played: rk.played, ranked_wins: rk.wins, ranked_losses: rk.losses, save_data: { ...save, savedAt } }; CLOUD_MISSING.forEach(c => { delete b[c]; }); return b; };
 async function cloudFetchProfile(userId) {
   const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
   if (error) throw error;
@@ -4388,7 +4389,7 @@ async function cloudFetchProfile(userId) {
 }
 // Fehlt eine optionale Spalte, wird sie gemerkt und der Aufruf ohne sie wiederholt; alles andere ist ein echter Fehler
 async function cloudTry(fn) {
-  for (let i = 0; i < 3; i++) { const r = await fn(); if (!r.error) return r; const c = missingCol(r.error); if (!c) throw r.error; CLOUD_MISSING.add(c); }
+  for (let i = 0; i <= OPT_COLS.length; i++) { const r = await fn(); if (!r.error) return r; const c = missingCol(r.error); if (!c) throw r.error; CLOUD_MISSING.add(c); }
   throw new Error('Sync nicht möglich');
 }
 // Aktualisiert die eigene Zeile (update ... eq id); gibt es sie noch nicht, wird sie angelegt
@@ -4398,8 +4399,9 @@ async function cloudPushSave(userId, save, savedAt) {
   return true;
 }
 async function cloudTop20() {
-  const r = await cloudTry(() => sb.from('profiles').select(`id, username, rank_tier, lp, account_level, summoner_icon${CLOUD_MISSING.has('is_vip') ? '' : ', is_vip'}`).order('lp', { ascending: false }).limit(20));
-  return (r.data || []).map(x => ({ id: x.id, name: String(x.username || 'Spieler').slice(0, 16), tier: String(x.rank_tier || 'Iron 4'), points: Number(x.lp) || 0, level: Number(x.account_level) || 1, icon: Number.isInteger(x.summoner_icon) ? x.summoner_icon : ICON_IDS[0], vip: x.is_vip === true }));
+  const r = await cloudTry(() => sb.from('profiles').select(`id, username, rank_tier, lp, account_level, summoner_icon${['is_vip', 'ranked_played', 'ranked_wins', 'ranked_losses'].filter(c => !CLOUD_MISSING.has(c)).map(c => ', ' + c).join('')}`).order('lp', { ascending: false }).limit(20));
+  return (r.data || []).map(x => ({ id: x.id, name: String(x.username || 'Spieler').slice(0, 16), tier: String(x.rank_tier || 'Iron 4'), points: Number(x.lp) || 0, level: Number(x.account_level) || 1, icon: Number.isInteger(x.summoner_icon) ? x.summoner_icon : ICON_IDS[0], vip: x.is_vip === true,
+    ranked: ['ranked_played', 'ranked_wins', 'ranked_losses'].every(c => x[c] !== null && x[c] !== undefined && Number.isFinite(Number(x[c]))) ? sanitizeRanked({ wins: Number(x.ranked_wins), losses: Number(x.ranked_losses) }) : null }));
 }
 const authError = e => {
   const m = String((e && e.message) || ''), c = String((e && (e.code || e.status)) || '');
@@ -5503,8 +5505,250 @@ const StepList = ({ log }) => (
   </div>
 );
 
-function RunComplete({ result, log, practice, format, onDone, onRetry }) {
+
+/* ===================== Ranked-Statistiken (Profil und Spieler-Inspektion) ===================== */
+const EMPTY_RANKED = { played: 0, wins: 0, losses: 0 };
+function sanitizeRanked(r) {   // gespielt = Siege + Niederlagen: die drei Zahlen widersprechen sich nie
+  const n = v => (Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0);
+  const wins = n(r && r.wins), losses = n(r && r.losses);
+  return { played: wins + losses, wins, losses };
+}
+const winrateOf = r => (r && r.played > 0 ? (r.wins / r.played) * 100 : null);
+const mulberry32 = a => () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+// Beispielspieler (Platzhalter in der Rangliste, Demo-Freunde) bekommen stabile, ausdrücklich als simuliert gekennzeichnete Werte
+const simRanked = name => { const h = hashStr('rk' + name), played = 60 + (h % 340), wins = Math.round(played * (0.44 + ((h >>> 8) % 20) / 100)); return { played, wins, losses: played - wins }; };
+const simIcon = name => ICON_IDS[hashStr('ic' + name) % ICON_IDS.length];
+const wrColor = pct => (pct == null ? '#64748b' : pct >= 55 ? '#0AC8B9' : pct >= 50 ? '#C89B3C' : '#E84057');
+function WinRing({ pct, size = 84 }) {
+  const stroke = 8, r = (size - stroke) / 2, c = 2 * Math.PI * r, v = pct == null ? 0 : Math.max(0, Math.min(100, pct)), col = wrColor(pct);
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }} data-winrate-ring={pct == null ? 'none' : Math.round(pct)} role="img" aria-label={pct == null ? 'Winrate: noch keine Spiele' : `Winrate ${Math.round(pct)} Prozent`}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }} aria-hidden="true">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--track)" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={col} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${(c * v) / 100} ${c}`} style={{ filter: `drop-shadow(0 0 4px ${col})`, transition: 'stroke-dasharray .6s' }} />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
+        <span className="font-serif text-lg font-black tabular-nums" style={{ color: col }} data-rs="winrate">{pct == null ? '–' : `${Math.round(pct)}%`}</span>
+        <span className="mt-0.5 text-[9px] font-semibold tracking-wide text-slate-400">Winrate</span>
+      </div>
+    </div>
+  );
+}
+function RankedStats({ stats, size }) {
+  const s = stats || EMPTY_RANKED, pct = winrateOf(s);
+  const cell = (label, val, cls, key, unit) => (
+    <div className="flex min-w-0 flex-col items-center rounded-lg border px-0.5 py-1.5" style={{ borderColor: 'var(--line)' }} aria-label={`${label}: ${val}${unit ? ' ' + unit : ''}`}>
+      <span className={`font-serif text-xl font-black leading-none tabular-nums ${cls}`} data-rs={key}>{val}</span>
+      <span className="mt-1 whitespace-nowrap text-[9px] font-semibold tracking-tight text-slate-400">{label}</span>
+    </div>
+  );
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-3" data-ranked-stats="true">
+      <WinRing pct={pct} size={size || 76} />
+      <div className="grid min-w-[208px] flex-1 grid-cols-3 gap-1.5">
+        {cell('Gespielt', s.played, 'text-slate-100', 'played', 'Runden')}
+        {cell('Siege', s.wins, 'text-[#0AC8B9]', 'wins')}
+        {cell('Niederlagen', s.losses, 'text-[#E84057]', 'losses')}
+      </div>
+    </div>
+  );
+}
+function RankedStatsCard({ ranked }) {
+  const s = ranked || EMPTY_RANKED, pct = winrateOf(s);
+  return (
+    <div className="h-auto w-full shrink-0 rounded-xl border border-[#C89B3C]/60 bg-gradient-to-b from-[#0A1428] to-[#010A13] p-3.5 shadow-[0_0_16px_rgba(200,155,60,.18)]" data-ranked-card="true">
+      <div className="mb-2.5 flex items-baseline justify-between gap-2"><div className="font-serif font-bold text-[#C89B3C]">Ranked-Statistik</div><div className="text-[10px] text-slate-500">Ranked Match &amp; Quiz</div></div>
+      <RankedStats stats={s} />
+      {s.played > 0
+        ? <div className="mt-2.5 flex h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--track)' }} aria-hidden="true"><div style={{ width: `${pct}%`, background: '#0AC8B9' }} /><div className="flex-1" style={{ background: '#E84057' }} /></div>
+        : <div className="mt-2.5 text-center text-xs text-slate-400" data-ranked-empty="true">Noch keine Ranked-Spiele. Spiele ein Ranked Match oder Quiz, um deine Winrate zu sehen.</div>}
+    </div>
+  );
+}
+// Spieler-Inspektion: Klick auf einen Spieler in der Rangliste
+function InspectModal({ p, onClose }) {
+  useEffect(() => { const h = e => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, []);
+  return (
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={`Spielerprofil ${p.name}`} data-inspect="true" onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} className="fade-in relative flex w-full max-w-[360px] flex-col gap-3 rounded-2xl border-2 border-[#C89B3C] bg-[#06111F] p-4 shadow-[0_0_30px_rgba(200,155,60,.35)]" style={{ maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto' }}>
+        <button type="button" onClick={onClose} aria-label="Schließen" data-inspect-close="true" className="absolute right-1.5 top-1.5 p-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
+        <div className="flex items-center gap-3 pr-8">
+          <SummonerIcon id={p.icon} name={p.name} className="w-16 h-16" vip={!!p.vip} />
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="truncate font-serif text-xl font-bold" data-inspect-name="true">{p.name}</span>{p.vip && <VipBadge compact />}</div>
+            {p.level ? <div className="text-xs text-slate-400">Beschwörer-Level {p.level}</div> : null}
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-lg border px-3 py-2" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }} data-inspect-rank="true">
+          <RankEmblem tier={p.tier} size={44} />
+          <div className="min-w-0"><div className="font-serif font-bold text-[#C89B3C]">{p.tier}</div><div className="text-sm tabular-nums text-slate-300">{p.lp} LP</div></div>
+        </div>
+        {p.stats
+          ? <RankedStats stats={p.stats} />
+          : <div className="rounded-lg border border-dashed px-3 py-3 text-center text-sm text-slate-400" style={{ borderColor: 'var(--line)' }} data-inspect-nostats="true">Für diesen Spieler sind noch keine Ranked-Statistiken verfügbar.</div>}
+        {p.sample && <div className="text-center text-[11px] text-slate-500" data-inspect-sample="true">Beispielspieler: Die Werte sind simuliert.</div>}
+      </div>
+    </div>
+  );
+}
+
+/* ===================== Post-Game-Scoreboard (5v5) ===================== */
+const SB_NAMES = ['ShadowFox', 'PoroKing', 'LuxLaserFan', 'SmiteCheck', 'BaronBandit', 'WardMaster', 'TiltProof', 'FlashOnCD', 'NexusNomad', 'DragonSoul', 'MinionMuncher', 'GlassCannon', 'RiftWalker', 'TurretHugger', 'SilentSmite', 'HextechHero', 'FogRunner', 'LastHitLarry', 'CrystalScar', 'StormBringer', 'BlitzBuddy', 'TeleportTina', 'IronWillow', 'GoldDigger', 'VisionBot', 'LaneKing', 'CampCamper', 'SplitPushSam', 'RoamRocket', 'CSCollector', 'AnchorPoint', 'NightOwlGG', 'FrostByte', 'MagePain', 'JungleJoe', 'SupportMain', 'KiteMaster', 'DiveBomber', 'PentaPlease', 'WaveCrasher'];
+// Gewichte je Rolle: Kills, Tode, Assists, CS pro Minute, Schaden pro Minute
+const SB_ROLE = { Toplane: { k: 0.9, d: 1, a: 0.7, cs: 7.2, dmg: 520 }, Jungle: { k: 0.8, d: 1, a: 1.3, cs: 5.4, dmg: 430 }, Midlane: { k: 1.2, d: 0.9, a: 1, cs: 7.8, dmg: 620 }, Botlane: { k: 1.3, d: 0.9, a: 0.8, cs: 8.4, dmg: 680 }, Support: { k: 0.35, d: 1.2, a: 1.8, cs: 1.3, dmg: 260 } };
+// Verteilt eine Gesamtzahl ganzzahlig auf Spieler; ein Spieler kann feste Werte haben, Obergrenzen sind möglich
+function sbSplit(total, w, fixedIdx, fixedVal, rnd, caps) {
+  const n = w.length, res = new Array(n).fill(0); let rem = Math.max(0, total);
+  if (fixedIdx >= 0) { res[fixedIdx] = fixedVal; rem = Math.max(0, total - fixedVal); }
+  const free = [...Array(n).keys()].filter(i => i !== fixedIdx), jw = {};
+  free.forEach(i => { jw[i] = Math.max(0.05, w[i] * (0.6 + 0.8 * rnd())); });
+  const cap = i => (caps ? Math.max(0, caps[i] - res[i]) : Infinity);
+  for (let pass = 0; pass < 12 && rem > 0; pass++) {
+    const open = free.filter(i => cap(i) > 0); if (!open.length) break;
+    const sum = open.reduce((t, i) => t + jw[i], 0); let given = 0;
+    open.forEach(i => { const add = Math.min(cap(i), Math.floor((rem * jw[i]) / sum)); res[i] += add; given += add; });
+    rem -= given;
+    if (!given) { for (const i of [...open].sort((a, b) => jw[b] - jw[a])) { if (rem <= 0) break; if (cap(i) > 0) { res[i] += 1; rem -= 1; } } }
+  }
+  return res;
+}
+function simpleLineup(me, role, rnd) {
+  const used = new Set([normName(me)]), blue = {}, red = {};
+  const pick = r => { const free = Object.keys(ROLE_POOL[r]).filter(c => !used.has(normName(c))); const c = free[Math.floor(rnd() * free.length)]; used.add(normName(c)); return c; };
+  ROLES_ORDER.forEach(r => { blue[r] = r === role ? me : pick(r); });
+  ROLES_ORDER.forEach(r => { red[r] = pick(r); });
+  return { me, role, blue, red };
+}
+// Baut ein stimmiges 5v5-Scoreboard: Kills des einen Teams = Tode des anderen, Assists nie über den Teamkills, Spielerwerte bleiben exakt erhalten
+function buildScoreboard({ win, lineup, role, name, k, d, a, ratio, minutes, hint = {}, seed }) {
+  const rnd = mulberry32(seed >>> 0), R = ROLES_ORDER, p = Math.max(0, R.indexOf(role));
+  k = Math.max(0, k | 0); d = Math.max(0, d | 0); a = Math.max(0, a | 0);
+  const Kw = 14 + Math.floor(rnd() * 17), Kl = Math.max(4, Math.round(Kw * (0.4 + rnd() * 0.35)));
+  let Kb = win ? Kw : Kl, Kr = win ? Kl : Kw;
+  Kb = Math.max(Kb, k + a + 3, hint.tk || 0); Kr = Math.max(Kr, d + 3, hint.ek || 0);
+  if (win && Kb <= Kr) Kb = Kr + 2 + Math.floor(rnd() * 4);
+  if (!win && Kr <= Kb) Kr = Kb + 2 + Math.floor(rnd() * 4);
+  const wk = R.map(r => SB_ROLE[r].k), wd = R.map(r => SB_ROLE[r].d), wa = R.map(r => SB_ROLE[r].a);
+  const killsB = sbSplit(Kb, wk, p, k, rnd), killsR = sbSplit(Kr, wk, -1, 0, rnd);
+  const deathsB = sbSplit(Kr, wd, p, d, rnd), deathsR = sbSplit(Kb, wd, -1, 0, rnd);
+  const asTeam = (K, kills, fixedIdx, fixedVal) => { const tot = Math.max(Math.round(K * (1.5 + rnd() * 0.5)), fixedVal + 4); return sbSplit(tot, wa, fixedIdx, fixedVal, rnd, kills.map(x => K - x)); };
+  const assistsB = asTeam(Kb, killsB, p, a), assistsR = asTeam(Kr, killsR, -1, 0);
+  const pool = SB_NAMES.filter(n => n.toLowerCase() !== String(name).toLowerCase()), names = [];
+  while (names.length < 9) { const n = pool[Math.floor(rnd() * pool.length)]; if (!names.includes(n)) names.push(n); }
+  let ni = 0;
+  const team = (isBlue, kills, deaths, assists) => R.map((r, i) => {
+    const me = isBlue && i === p, S = SB_ROLE[r], good = isBlue === win;
+    const csMul = me ? 0.8 + 0.4 * ratio : 0.88 + 0.24 * rnd(), cs = Math.max(0, Math.round(S.cs * minutes * csMul * (good ? 1.04 : 0.95)));
+    const level = Math.max(9, Math.min(18, Math.round(4.5 + minutes * 0.4 - (r === 'Support' ? 1.2 : 0) + (kills[i] + 0.4 * assists[i]) * 0.04 + (rnd() - 0.5) * 2.2)));
+    const gold = Math.round((500 + 20.5 * cs + 300 * kills[i] + 125 * assists[i] + minutes * 105) / 10) * 10;
+    const dmg = Math.round(S.dmg * minutes * (0.7 + rnd() * 0.6) * (me ? 0.85 + 0.3 * ratio : 1) * (0.75 + 0.05 * (kills[i] + 0.4 * assists[i])));
+    return { role: r, champion: (isBlue ? lineup.blue : lineup.red)[r], name: me ? name : names[ni++], me, level, k: kills[i], d: deaths[i], a: assists[i], cs, gold, dmg };
+  });
+  const blue = team(true, killsB, deathsB, assistsB), red = team(false, killsR, deathsR, assistsR);
+  const maxDmg = Math.max(...blue.concat(red).map(x => x.dmg));
+  const score = x => 3 * x.k + 1.4 * x.a - 2.2 * x.d + 7 * (x.dmg / maxDmg) + 2 * (x.cs / (minutes * 9));
+  const best = arr => arr.reduce((b, x) => (score(x) > score(b) ? x : b), arr[0]);
+  best(win ? blue : red).badge = 'MVP';   // MVP: bester Spieler des Siegerteams
+  best(win ? red : blue).badge = 'ACE';   // ACE: bester Spieler des Verliererteams
+  const towersW = Math.min(11, Math.max(6 + Math.floor(rnd() * 6), (win ? hint.tb : hint.tr) || 0));
+  const towersL = Math.min(towersW - 1, Math.max(Math.floor(rnd() * (Math.min(5, towersW - 3) + 1)), (win ? hint.tr : hint.tb) || 0));
+  const dragW = 2 + Math.floor(rnd() * 3), dragL = Math.floor(rnd() * 3), baronW = Math.floor(rnd() * 3), baronL = baronW === 2 ? 0 : Math.floor(rnd() * 2);
+  const sum = (arr, f) => arr.reduce((t, x) => t + x[f], 0);
+  const mm = Math.floor(minutes), ss = Math.floor((minutes - mm) * 60);
+  const mkTeam = (players, tw, dr, ba) => ({ players, kills: sum(players, 'k'), deaths: sum(players, 'd'), assists: sum(players, 'a'), gold: sum(players, 'gold'), dmg: sum(players, 'dmg'), towers: tw, dragons: dr, barons: ba });
+  return { win, minutes, time: `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`, maxDmg, blue: mkTeam(blue, win ? towersW : towersL, win ? dragW : dragL, win ? baronW : baronL), red: mkTeam(red, win ? towersL : towersW, win ? dragL : dragW, win ? baronL : baronW) };
+}
+// Eingabedaten aus dem Rundenergebnis: Ranked Match übernimmt das echte KDA aus dem HUD, alle anderen Formate leiten es aus richtig/falsch ab
+function sbFromRun(result, log, ctx) {
+  const n = result.n || 5, c = result.correct || 0, ratio = n ? c / n : 0, mv = result.mv2;
+  const role = ROLES_ORDER.includes(mv && mv.lineup && mv.lineup.role ? mv.lineup.role : ctx.role) ? (mv && mv.lineup && mv.lineup.role ? mv.lineup.role : ctx.role) : 'Toplane';
+  const me = mv && mv.lineup ? mv.lineup.me : champLabel(ctx.champion || 'Jax');
+  let k, d, a, lineup, hint = {};
+  if (mv) { k = mv.stats.k; d = mv.stats.d; a = mv.stats.a; lineup = mv.lineup; hint = { tk: mv.stats.tk, ek: mv.stats.ek, tb: mv.towers ? mv.towers.red.length : 0, tr: mv.towers ? mv.towers.blue.length : 0 }; }
+  else { k = Math.round(c * 0.8); a = Math.round(c * 1.2); d = n - c; lineup = simpleLineup(me, role, mulberry32(hashStr(ctx.seed + 'lineup'))); }
+  const endMin = Math.max(0, ...(log || []).map(l => { const m = /\((\d+):(\d+)\)/.exec(l.title || ''); return m ? +m[1] + +m[2] / 60 : 0; }));
+  const minutes = Math.min(44, Math.max(18, endMin + 2 + mulberry32(hashStr(ctx.seed + 'time'))() * 4.5));
+  return buildScoreboard({ win: !!result.win, lineup, role, name: ctx.name || 'Du', k, d, a, ratio, minutes, hint, seed: hashStr(ctx.seed + 'sb') });
+}
+const fmtK = n => (n >= 1000 ? (n / 1000).toFixed(1).replace('.', ',') + 'k' : String(n));
+function SbRow({ p, maxDmg, side }) {
+  const kda = ((p.k + p.a) / Math.max(1, p.d)).toFixed(1).replace('.', ',');
+  const pct = Math.max(4, Math.round((p.dmg / maxDmg) * 100));
+  const bar = side === 'blue' ? 'linear-gradient(90deg,#1e6fb5,#4cc3ff)' : 'linear-gradient(90deg,#9b2335,#ff6b7d)';
+  return (
+    <div data-sb-row={side} data-sb-me={p.me ? 'true' : undefined} className={`rounded-lg border px-2.5 py-2 ${p.me ? 'border-[#C89B3C] bg-[#C89B3C]/10 shadow-[0_0_12px_rgba(200,155,60,.3)]' : ''}`} style={p.me ? undefined : { background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="flex items-center gap-2">
+        <span className="relative shrink-0">
+          <ChampAvatar name={p.champion} className="w-10 h-10" iconSize={18} ring={p.me ? 'border-2 border-[#C89B3C]' : side === 'blue' ? 'border-2 border-[#4cc3ff]/60' : 'border-2 border-[#ff6b7d]/60'} />
+          <span className="absolute -bottom-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full border border-[#C89B3C] bg-[#010A13] px-1 text-[10px] font-bold tabular-nums text-[#F0E6D2]" data-sb-level="true">{p.level}</span>
+        </span>
+        <div className="min-w-0 flex-1 text-left">
+          <div className="flex items-center gap-1.5">
+            <span className={`truncate text-sm ${p.me ? 'font-extrabold text-white' : 'font-semibold'}`} data-sb-name="true">{p.name}</span>
+            {p.me && <span className="shrink-0 rounded px-1 py-px text-[9px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}
+            {p.badge && <span data-sb-badge={p.badge} className={`shrink-0 rounded px-1.5 py-px text-[10px] font-black tracking-wide text-[#010A13] ${p.badge === 'MVP' ? 'bg-gradient-to-b from-[#F5D77A] to-[#C89B3C] shadow-[0_0_8px_rgba(240,199,94,.6)]' : 'bg-gradient-to-b from-slate-100 to-slate-400'}`}>{p.badge}</span>}
+          </div>
+          <div className="truncate text-[11px] text-slate-400">{p.champion} · {ROLE_SHORT[p.role]}</div>
+        </div>
+        <div className="shrink-0 text-right tabular-nums"><div className="text-sm font-bold" data-sb-kda="true">{p.k} / {p.d} / {p.a}</div><div className="text-[10px] text-slate-400">{kda} KDA</div></div>
+      </div>
+      <div className="mt-1.5 flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--track)' }} role="img" aria-label={`Schaden ${fmtK(p.dmg)}`}><div className="h-full rounded-full" style={{ width: `${pct}%`, background: bar }} data-sb-dmg={p.dmg} /></div>
+          <div className="mt-0.5 text-[10px] tabular-nums text-slate-400">Schaden {fmtK(p.dmg)}</div>
+        </div>
+        <div className="shrink-0 text-right text-[10px] leading-tight tabular-nums text-slate-300"><div data-sb-cs="true">🗡 CS {p.cs}</div><div data-sb-gold="true">💰 {fmtK(p.gold)}</div></div>
+      </div>
+    </div>
+  );
+}
+function Scoreboard({ sb, result, practice, unit }) {
+  const win = sb.win, to = result.to;
+  const sub = practice && !result.masteryOnly ? 'Übung zählt nicht' : result.masteryOnly ? `+${result.mastery.gain} MP` : `${fmt(result.lp)} LP · ${rankName(to.step)} (${to.lp} LP)`;
+  const row = (label, b, r, key) => (
+    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-1" data-sb-stat={key}>
+      <div className="text-right font-bold tabular-nums text-[#4cc3ff]" data-sb-blue={key}>{b}</div>
+      <div className="min-w-[64px] text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</div>
+      <div className="text-left font-bold tabular-nums text-[#ff6b7d]" data-sb-red={key}>{r}</div>
+    </div>
+  );
+  const teamBlock = (t, side, title, won) => (
+    <div className="flex flex-col gap-1.5" data-sb-team={side}>
+      <div className="flex items-baseline justify-between px-1">
+        <div className="font-serif text-sm font-black tracking-wider" style={{ color: side === 'blue' ? '#4cc3ff' : '#ff6b7d' }}>{title}</div>
+        <div className="text-[11px] font-semibold tabular-nums text-slate-400">{won ? 'Sieg' : 'Niederlage'} · {t.kills} / {t.deaths} / {t.assists}</div>
+      </div>
+      {t.players.map((pl, i) => <SbRow key={side + i} p={pl} maxDmg={sb.maxDmg} side={side} />)}
+    </div>
+  );
+  return (
+    <div className="flex flex-col gap-3" data-scoreboard="true">
+      <div className={`rounded-2xl border-2 px-3 py-3 text-center ${win ? 'border-[#C89B3C] bg-gradient-to-b from-[#0B3558] via-[#0A2340] to-[#07121f] shadow-[0_0_24px_rgba(76,195,255,.3)]' : 'border-[#7a1f2b] bg-gradient-to-b from-[#3a0d14] via-[#1c0a0f] to-[#0b0608]'}`} data-sb-banner={win ? 'victory' : 'defeat'}>
+        <div className={`pop font-serif text-4xl font-black leading-none tracking-[0.18em] ${win ? 'text-[#F0C75E] [text-shadow:0_0_24px_rgba(240,199,94,.55)]' : 'text-[#E84057] [text-shadow:0_0_20px_rgba(232,64,87,.45)]'}`} data-sb-title="true">{win ? 'VICTORY' : 'DEFEAT'}</div>
+        <div className="mt-1.5 text-xs text-slate-300"><span data-sb-time="true">⏱ {sb.time} min</span> · {unit}{result.kind ? ` · ${result.kind}` : ''}</div>
+        <div className="mt-1 text-[11px] font-semibold tabular-nums" style={{ color: win ? '#0AC8B9' : '#E84057' }} data-sb-lp="true">{sub}</div>
+      </div>
+      <div className="rounded-xl border px-3 py-2" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }} data-sb-teamstats="true">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <div className="text-right font-serif text-xs font-black tracking-wider text-[#4cc3ff]">BLUE TEAM</div><div className="min-w-[64px] text-center text-[10px] text-slate-500">⚔ Kills</div><div className="text-left font-serif text-xs font-black tracking-wider text-[#ff6b7d]">RED TEAM</div>
+        </div>
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 pb-1">
+          <div className="text-right font-serif text-3xl font-black tabular-nums text-[#4cc3ff]" data-sb-blue="kills">{sb.blue.kills}</div><div className="min-w-[64px] text-center text-slate-500">vs</div><div className="text-left font-serif text-3xl font-black tabular-nums text-[#ff6b7d]" data-sb-red="kills">{sb.red.kills}</div>
+        </div>
+        {row('💰 Gold', fmtK(sb.blue.gold), fmtK(sb.red.gold), 'gold')}
+        {row('🏰 Türme', sb.blue.towers, sb.red.towers, 'towers')}
+        {row('🐉 Drachen', sb.blue.dragons, sb.red.dragons, 'dragons')}
+        {row('👑 Baron', sb.blue.barons, sb.red.barons, 'barons')}
+      </div>
+      {teamBlock(sb.blue, 'blue', 'BLUE TEAM', win)}
+      {teamBlock(sb.red, 'red', 'RED TEAM', !win)}
+    </div>
+  );
+}
+function RunComplete({ result, log, practice, format, onDone, onRetry, onReplay, sbCtx }) {
   const [lvPopup, setLvPopup] = useState(!!(result.mastery && result.mastery.levelUp));
+  const [tab, setTab] = useState('board');   // Scoreboard zuerst, das Ergebnis (Rang, LP, Rückblick) in einem zweiten Tab
+  const sb = useMemo(() => (result.drill ? null : sbFromRun(result, log, sbCtx || {})), []);
   useEffect(() => {
     const timers = [];
     if (result.drill) playHextechSound(result.passed ? 'correct' : 'wrong');
@@ -5556,7 +5800,20 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
     <div className="flex-1 min-h-0 relative flex flex-col">
       {promoted && <Confetti />}
       {lvPopup && result.mastery && <MasteryLevelUp m={result.mastery} onClose={() => setLvPopup(false)} />}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-2 [@media(max-height:620px)]:py-1 [@media(min-height:700px)]:py-3 flex flex-col justify-evenly gap-2 [@media(max-height:620px)]:gap-1 [@media(min-height:700px)]:gap-3 text-center" data-endscreen="true">
+      <div className="shrink-0 px-3 pt-2" role="tablist" aria-label="Rundenabschluss" data-endtabs="true">
+        <div className="grid grid-cols-2 gap-1.5 rounded-xl border p-1" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
+          {[['board', '🏆 Scoreboard'], ['result', '📊 Ergebnis']].map(([k, l]) => (
+            <button key={k} type="button" role="tab" aria-selected={tab === k} data-endtab={k} onClick={() => setTab(k)}
+              className={`rounded-lg px-2 py-1.5 text-sm font-bold transition ${tab === k ? 'bg-[#C89B3C] text-[#010A13] shadow-[0_0_10px_rgba(200,155,60,.45)]' : 'text-slate-300 hover:text-white'}`}>{l}</button>
+          ))}
+        </div>
+      </div>
+      {tab === 'board' ? (
+        <div className="flex-1 min-h-0 overflow-y-auto px-3 py-2" data-endscreen="true" data-endview="board">
+          <Scoreboard sb={sb} result={result} practice={practice} unit={unit} />
+        </div>
+      ) : (
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-2 [@media(max-height:620px)]:py-1 [@media(min-height:700px)]:py-3 flex flex-col justify-evenly gap-2 [@media(max-height:620px)]:gap-1 [@media(min-height:700px)]:gap-3 text-center" data-endscreen="true" data-endview="result">
         <div>
           <div className="flex items-center justify-center gap-2">
             <div className="pop font-serif text-4xl [@media(max-height:620px)]:text-3xl font-black leading-none tracking-wider [@media(min-height:760px)]:text-5xl" style={{ color, textShadow: `0 0 26px ${win ? 'rgba(10,200,185,.4)' : 'rgba(232,64,87,.4)'}` }}>{win ? 'VICTORY' : 'DEFEAT'}</div>
@@ -5604,9 +5861,13 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
 
         <Breakdown log={log} phases={phases} />
       </div>
+      )}
       {/* Button am unteren Rand fixiert: immer sichtbar, unabhängig von der Inhaltshöhe */}
       <div className="shrink-0 border-t px-3 pb-3 pt-2" style={{ borderColor: 'var(--line)', background: '#010A13' }} data-endfooter="true">
-        <button onClick={onDone} className="w-full rounded-xl py-3.5 font-serif text-base font-extrabold text-[#010A13]" style={{ background: 'var(--gold)' }}>Weiter zum Dashboard</button>
+        <div className="grid grid-cols-2 gap-2">
+          <button type="button" onClick={onReplay} data-end-replay="true" className="rounded-xl border-2 border-[#C89B3C] py-3 font-serif text-sm font-extrabold text-[#C89B3C] transition active:scale-[.98]">🔄 Erneut spielen</button>
+          <button type="button" onClick={onDone} data-end-home="true" className="rounded-xl py-3 font-serif text-sm font-extrabold text-[#010A13] transition active:scale-[.98]" style={{ background: 'var(--gold)' }}>🏠 Zurück zur Übersicht</button>
+        </div>
       </div>
     </div>
   );
@@ -6183,7 +6444,7 @@ function StatusNote({ profile, onChange }) {
     </div>
   );
 }
-function Profile({ profile, rank, mastery, friends, requests, history, xp, shieldUntil, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout, onIcon, onShieldAd, cloud, onAuth, onCloudLogout, onCloudRetry, isVip, onToggleVip }) {
+function Profile({ profile, rank, mastery, friends, requests, history, xp, shieldUntil, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout, onIcon, onShieldAd, cloud, onAuth, onCloudLogout, onCloudRetry, isVip, onToggleVip, ranked }) {
   const [tab, setTab] = useState('me');
   const [confirm, setConfirm] = useState(false);
   const tier = tierOf(rank.step);
@@ -6222,6 +6483,7 @@ function Profile({ profile, rank, mastery, friends, requests, history, xp, shiel
           <MainPicker role={profile.role} champion={profile.champion} mastery={mastery} onRole={v => onChange({ role: v })} onChampion={v => onChange({ champion: v })} />
           {/* 3) Mastery-Progression */}
           <MasteryShowcase mastery={mastery} />
+          <RankedStatsCard ranked={ranked} />
           {/* 4) VIP / Supporter: Conversion-Spot direkt über der Historie */}
           <SupporterCard isVip={!!isVip} onToggleVip={onToggleVip} />
           {/* 5) Match-Historie: 2 Spiele + Aufklappen */}
@@ -6336,6 +6598,7 @@ function CloudCard({ cloud, available, onLogin, onLogout, onRetry }) {
       <div className="truncate text-slate-400">{cloud.user.email}</div>
       {cloud.status === 'error' && <div className="text-red-300">{cloud.msg} Neuer Versuch folgt automatisch.</div>}
       {cloud.status === 'synced' && /save_data/.test(cloud.msg) && <div className="text-amber-300">Gesichert werden Rang, Level und Icon. Für den vollen Spielstand fehlt in der Datenbank die Spalte save_data.</div>}
+      {cloud.status === 'synced' && /ranked_/.test(cloud.msg) && <div className="text-amber-300">Die Ranked-Statistik wird nur auf diesem Gerät gespeichert, denn in der Datenbank fehlen die Spalten ranked_played, ranked_wins und ranked_losses.</div>}
       {cloud.status === 'synced' && /is_vip/.test(cloud.msg) && <div className="text-amber-300">Der VIP-Status wird nur auf diesem Gerät gespeichert, denn in der Datenbank fehlt die Spalte is_vip.</div>}
       <div className="flex gap-2">
         {cloud.status === 'error' && <button type="button" onClick={onRetry} className="rounded-lg border border-red-400/60 px-3 py-1.5 font-bold text-red-200">Erneut versuchen</button>}
@@ -6345,7 +6608,8 @@ function CloudCard({ cloud, available, onLogin, onLogout, onRetry }) {
   );
 }
 // Echte globale Top 20 aus Supabase; bei weniger als 5 Spielern füllen dezente Beispielspieler die Liste auf
-function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh, isVip }) {
+function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh, isVip, ranked, onInspect }) {
+  const act = fn => ({ role: 'button', tabIndex: 0, onClick: fn, onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } } });
   const meId = cloud.user && cloud.user.id, real = remote.rows;
   const fill = real.length < 5 ? buildLeaderboard(rank, profile.name).filter(r => !r.me).slice(0, 20 - real.length) : [];
   const meIdx = real.findIndex(r => r.id === meId);
@@ -6367,7 +6631,7 @@ function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh, isVip }) {
       {real.map((r, i) => {
         const me = r.id === meId;
         return (
-          <div key={r.id || i} data-live-row="true" className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${me ? 'border-2 border-[#C89B3C] bg-[#1A2A48] shadow-[0_0_14px_rgba(200,155,60,.35)]' : 'bg-[var(--panel)] border-[var(--line)]'}`}>
+          <div key={r.id || i} data-live-row="true" {...act(() => onInspect({ name: r.name, icon: r.icon, vip: r.vip || (me && isVip), tier: me ? rankName(rank.step) : r.tier, lp: me ? rank.lp : r.points % 100, level: r.level, stats: me ? ranked : r.ranked, me }))} className={`cursor-pointer flex items-center gap-3 rounded-lg border px-3 py-2 ${me ? 'border-2 border-[#C89B3C] bg-[#1A2A48] shadow-[0_0_14px_rgba(200,155,60,.35)]' : 'bg-[var(--panel)] border-[var(--line)]'}`}>
             <Pos n={i + 1} />
             <SummonerIcon id={r.icon} name={r.name} className="w-9 h-9" label={r.name} vip={r.vip || (r.id === (cloud.user && cloud.user.id) && !!isVip)} />
             <div className="min-w-0 flex-1">
@@ -6380,7 +6644,7 @@ function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh, isVip }) {
       })}
       {fill.length > 0 && <div className="mt-1 text-center text-[11px] text-slate-500" data-fill-note="true">{real.length === 0 ? 'Noch keine registrierten Spieler.' : 'Noch wenig registrierte Spieler.'} Beispielspieler füllen die Liste auf.</div>}
       {fill.map((r, i) => (
-        <div key={'f' + r.pos} data-fill-row="true" className="flex items-center gap-3 rounded-lg border bg-[var(--panel)] border-[var(--line)] px-3 py-2 opacity-50">
+        <div key={'f' + r.pos} data-fill-row="true" {...act(() => onInspect({ name: r.name, icon: simIcon(r.name), vip: false, tier: rankName(rank.step), lp: r.lp, stats: simRanked(r.name), sample: true }))} className="cursor-pointer flex items-center gap-3 rounded-lg border bg-[var(--panel)] border-[var(--line)] px-3 py-2 opacity-50">
           <Pos n={real.length + i + 1} />
           <div className="min-w-0 flex-1 truncate font-semibold">{r.name}</div>
           <div className="font-bold tabular-nums">{r.lp} LP</div>
@@ -6389,8 +6653,10 @@ function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh, isVip }) {
     </div>
   );
 }
-function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip }) {
+function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip, ranked }) {
   const [tab, setTab] = useState('global');
+  const [inspect, setInspect] = useState(null);   // Spieler-Inspektion
+  const rowAct = fn => ({ role: 'button', tabIndex: 0, 'data-lb-row': 'true', onClick: fn, onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } } });
   const [remote, setRemote] = useState({ status: sb ? 'loading' : 'off', rows: [] });
   const [tick, setTick] = useState(0);
   useEffect(() => {
@@ -6426,7 +6692,7 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip }) {
       <div className="my-1"><TabBar tabs={[['global', 'Global'], ['friends', 'Freunde']]} value={tab} onChange={setTab} /></div>
 
       {tab === 'global' && sb && remote.status !== 'error' && remote.status !== 'off' ? (
-        <LiveBoard remote={remote} profile={profile} rank={rank} cloud={cloud || { user: null }} onAuth={onAuth} onRefresh={() => setTick(n => n + 1)} isVip={isVip} />
+        <LiveBoard remote={remote} profile={profile} rank={rank} cloud={cloud || { user: null }} onAuth={onAuth} onRefresh={() => setTick(n => n + 1)} isVip={isVip} ranked={ranked} onInspect={setInspect} />
       ) : tab === 'global' ? (
         <>
           {sb && remote.status === 'error' && <div className="rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-200" data-live-error="true">Die Live-Rangliste ist gerade nicht erreichbar. Du siehst Beispielspieler.</div>}
@@ -6441,7 +6707,7 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip }) {
               : 'Du führst die Liga an.'}
           </div>
           {rows.map(r => (
-            <div key={r.pos} ref={r.me ? meRef : null} className={rowCls(r.me)}>
+            <div key={r.pos} ref={r.me ? meRef : null} {...rowAct(() => setInspect({ name: r.name, icon: r.me ? (profile.icon != null ? profile.icon : ICON_IDS[0]) : simIcon(r.name), vip: r.me && isVip, tier: rankName(rank.step), lp: r.lp, stats: r.me ? ranked : simRanked(r.name), sample: !r.me, me: !!r.me }))} className={`cursor-pointer ${rowCls(r.me)}`}>
               <Pos n={r.pos} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -6465,7 +6731,7 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip }) {
               : <>Du führst deine Freundesliste an.</>}
           </div>
           {crew.map((r, i) => (
-            <div key={r.name} ref={r.me ? meRef : null} className={rowCls(r.me)}>
+            <div key={r.name} ref={r.me ? meRef : null} {...rowAct(() => setInspect({ name: r.name, icon: r.me ? (profile.icon != null ? profile.icon : ICON_IDS[0]) : simIcon(r.name), vip: r.me && isVip, tier: rankName(r.step), lp: r.lp, stats: r.me ? ranked : simRanked(r.name), sample: !r.me, me: !!r.me }))} className={`cursor-pointer ${rowCls(r.me)}`}>
               <Pos n={i + 1} />
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankEmblem tier={tierOf(r.step)} size={20} /></span>
               <div className="flex-1 min-w-0">
@@ -6481,6 +6747,7 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip }) {
           ))}
         </>
       )}
+      {inspect && <InspectModal p={inspect} onClose={() => setInspect(null)} />}
     </div>
   );
 }
@@ -7703,6 +7970,7 @@ function App() {
   const [matchCount, setMatchCount] = useState(Number.isFinite(init.matchCount) ? init.matchCount : 0);
   const [shieldUntil, setShieldUntil] = useState(Number.isFinite(init.shieldUntil) ? init.shieldUntil : 0);
   const [sinceAd, setSinceAd] = useState(Number.isFinite(init.sinceAd) ? init.sinceAd : 0);
+  const [ranked, setRanked] = useState(() => sanitizeRanked(init.ranked));   // Ranked-Statistik: Spiele, Siege, Niederlagen
   const [isVip, setIsVip] = useState(init.vip === true);   // VIP-Supporter: werbefrei, goldener Rahmen, Badge
   useEffect(() => { try { window.scrollTo(0, 0); } catch (e) {} }, [screen]);   // jeder Ansichtswechsel startet ganz oben
   const [notice, setNotice] = useState('');   // kurzer Hinweis, z. B. übernommene Standardwerte oder abgeschlossene Quests
@@ -7719,8 +7987,8 @@ function App() {
   const xpRef = useRef(xp), questsRef = useRef(quests), matchRef = useRef(matchCount);
   xpRef.current = xp; questsRef.current = quests; matchRef.current = matchCount;
 
-  const SAVE_DEPS = [rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd, isVip];
-  const buildSave = () => ({ rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd, vip: isVip });
+  const SAVE_DEPS = [rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd, isVip, ranked];
+  const buildSave = () => ({ rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd, vip: isVip, ranked });
   const saveRef = useRef(null); saveRef.current = buildSave();
   // ----- Cloud (Supabase) -----
   const [cloud, setCloud] = useState({ user: null, status: sb ? 'guest' : 'off', msg: '' });   // off | guest | loading | synced | syncing | error
@@ -7738,7 +8006,7 @@ function App() {
     stamp.current = cloudAt; lsSet(SYNCED_AT_KEY, cloudAt);
     setRank(cs.rank); setHistory(cs.history); setHearts(Number.isInteger(cs.hearts) ? Math.max(0, Math.min(MAX_HEARTS, cs.hearts)) : MAX_HEARTS); setProfile(cs.profile);
     setFriends(cs.friends || [MOCK_FRIEND]); setRequests(cs.requests || MOCK_REQUESTS); setRecent(cs.recent || []); setMastery(normalizeMastery(cs.mastery));
-    setXp(cs.xp); xpRef.current = cs.xp; setQuests(freshQuests(cs.quests)); setSrs(cs.srs || {}); setMatchCount(cs.matchCount); setShieldUntil(cs.shieldUntil); setSinceAd(cs.sinceAd); setIsVip(cs.vip === true);
+    setXp(cs.xp); xpRef.current = cs.xp; setQuests(freshQuests(cs.quests)); setSrs(cs.srs || {}); setMatchCount(cs.matchCount); setShieldUntil(cs.shieldUntil); setSinceAd(cs.sinceAd); setIsVip(cs.vip === true); setRanked(sanitizeRanked(cs.ranked));
     setNotice('☁️ Cloud-Spielstand geladen');
   };
   // Nach dem Login: Cloud-Profil laden und mit dem Gerät abgleichen (nichts wird stillschweigend überschrieben)
@@ -7763,6 +8031,9 @@ function App() {
         else { setConflict({ cloudSave: cs, cloudAt }); setCloud(c => ({ ...c, status: 'loading' })); }
       }
       if (vipRow !== null) setIsVip(vipRow);
+      if (row && !cloudHas && ['ranked_played', 'ranked_wins', 'ranked_losses'].every(c => row[c] !== null && row[c] !== undefined && Number.isFinite(Number(row[c])))) {   // nur Spalten vorhanden: Zähler wachsen nur, also gilt der höhere Stand
+        const rr = sanitizeRanked({ wins: Number(row.ranked_wins), losses: Number(row.ranked_losses) }); setRanked(cur => (rr.played > cur.played ? rr : cur));
+      }
     } catch (e) {
       console.warn('BrainGap: Cloud-Laden fehlgeschlagen', e);
       cloudUid.current = null; setCloud(c => ({ ...c, status: 'error', msg: errText(e) }));
@@ -7869,7 +8140,9 @@ function App() {
   const canPlay = hearts > 0;
   const playDaily = () => { if (canPlay) begin('daily', { id: dailyStartId() }); };
   // Übungsmodus: 5 neutrale Rollen-Szenarien mit wechselndem Champion der gewählten Rolle (nicht immer derselbe)
+  const lastPractice = useRef(null);
   const playPractice = ({ role, difficulty }) => {
+    lastPractice.current = { role, difficulty };
     const r = role || pickRandom(ROLES_ORDER);
     const all = GENERIC[r] || [];
     const byDiff = all.filter(id => { const sc = RUNS.find(x => x.id === id); return sc && (!difficulty || sc.difficulty === difficulty); });
@@ -7958,7 +8231,7 @@ function App() {
         setMastery(m => ({ ...m, [champ]: { mp: after, runs: ((m[champ] || {}).runs || 0) + 1 } }));
         mres = { champion: champ, gain, before, after, lvBefore: masteryLevel(before), lvAfter: masteryLevel(after), levelUp: masteryLevel(after) > masteryLevel(before) };
       }
-      const info = isMv2 ? { stats: mv2.stats, state: mv2.state, grade: mv2Grade(correct, mv2.stats.d), lineup: mv2.ctx.lineup, plan: mv2.plan, epilog: matchEpilog(mv2, v.win) } : null;
+      const info = isMv2 ? { stats: mv2.stats, state: mv2.state, grade: mv2Grade(correct, mv2.stats.d), lineup: mv2.ctx.lineup, plan: mv2.plan, epilog: matchEpilog(mv2, v.win), towers: mv2.towers } : null;
       if (mode === 'practice') {   // Übungsmodus: nichts aufs Profil, nichts in die Historie
         setResult({ ...v, correct, n, from: rank, to: rank });
       } else if (isMastery) {      // Mastery vergibt NUR MP: nie LP, kein MMR, kein Herz, keine Serie
@@ -7979,6 +8252,7 @@ function App() {
           role: rs.format === 'quiz' ? `${rs.queue.length} Szenarien` : isMv2 ? `${ROLE_SHORT[rs.role]} · Ranked Match` : rs.role,
           lp: v.lp, mp: mres ? mres.gain : 0, ts: Date.now() }, ...h].slice(0, 20));
         countRun();
+        if (mode === 'ranked') setRanked(r => sanitizeRanked({ wins: r.wins + (v.win ? 1 : 0), losses: r.losses + (v.win ? 0 : 1) }));   // zählt Ranked Match und Ranked Quiz
         if (isMv2) { addXp(50); trackQuest('ranked'); }              // Matches geben +50 XP
         if (rs.format === 'quiz') trackQuest('ranked');
         if (mode === 'daily') trackQuest('daily');
@@ -7998,6 +8272,15 @@ function App() {
     setScreen('home');
   };
   // Zurück vom Ergebnis: Werbung frühestens nach 3 vollendeten Matches, nie mittendrin und nie mit aktivem Hextech-Schild
+  // Erneut spielen: derselbe Modus wie die gerade beendete Runde (ohne Zwischenwerbung)
+  const replay = () => {
+    const f = rs.format, m = mode;
+    if (m !== 'practice' && f !== 'mastery' && !canPlay) { setScreen('home'); setHeartsOpen(true); return; }
+    if (m === 'practice') { playPractice(lastPractice.current || {}); return; }
+    if (f === 'mastery') { playMastery(); return; }
+    if (m === 'ranked') { if (f === 'mv2') setScreen('home'); playRanked({ way: f === 'mv2' ? 'match' : 'quiz', role: rs.role }); return; }
+    playDaily();
+  };
   const finishRun = () => {
     setScreen('home');
     if (!isVip && mode !== 'practice' && !(result && result.drill) && Date.now() >= shieldUntil && sinceAd >= 3) setAd({ kind: 'interstitial' });
@@ -8104,10 +8387,10 @@ function App() {
           {screen === 'home' && <Dashboard rank={rank} hearts={hearts} profile={profile} mastery={mastery} xp={xp} quests={quests} friends={friends} shieldUntil={shieldUntil} isVip={isVip}
             onDaily={playDaily} onRanked={() => setRankedOpen(true)} onPractice={() => setSetupOpen(true)} onMastery={playMastery} onInfo={setInfoMode}
             onNoHearts={() => setHeartsOpen(true)} onHeartAd={() => setAd({ kind: 'heart' })} onShieldAd={() => setAd({ kind: 'shield' })} onIcon={() => setIconOpen(true)} onReset={reset} />}
-          {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} cloud={cloud} onAuth={() => setAuthOpen(true)} isVip={isVip} />}
+          {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} cloud={cloud} onAuth={() => setAuthOpen(true)} isVip={isVip} ranked={ranked} />}
           {screen === 'profile' && <Profile profile={profile} rank={rank} mastery={mastery} friends={friends} history={history} xp={xp} shieldUntil={shieldUntil}
             onChange={updateProfile} onLogout={logout} onIcon={() => setIconOpen(true)} onShieldAd={() => setAd({ kind: 'shield' })}
-            cloud={cloud} onAuth={() => setAuthOpen(true)} onCloudLogout={cloudSignOut} onCloudRetry={() => setRetry(n => n + 1)} isVip={isVip} onToggleVip={toggleVip}
+            cloud={cloud} onAuth={() => setAuthOpen(true)} onCloudLogout={cloudSignOut} onCloudRetry={() => setRetry(n => n + 1)} isVip={isVip} onToggleVip={toggleVip} ranked={ranked}
             onAddFriend={f => setFriends(l => [...l, f])} onRemoveFriend={name => setFriends(l => l.filter(x => x.name !== name))}
             requests={requests} onAccept={acceptRequest} onDecline={declineRequest} />}
         </div>
@@ -8118,7 +8401,8 @@ function App() {
           hud={rs.format === 'mv2' && rs.mv2 ? { stats: rs.mv2.stats, state: rs.mv2.state, towers: rs.mv2.towers } : null}
           record={{ c: rs.log.filter(e => e.ok).length, w: rs.log.filter(e => !e.ok).length }} onNext={next} onAbort={abort} />
       )}
-      {screen === 'complete' && result && <RunComplete result={result} log={rs.log} practice={mode === 'practice' || !!result.masteryOnly} format={rs.format} onDone={finishRun} onRetry={startDrill} />}
+      {screen === 'complete' && result && <RunComplete result={result} log={rs.log} practice={mode === 'practice' || !!result.masteryOnly} format={rs.format} onDone={finishRun} onRetry={startDrill} onReplay={replay}
+        sbCtx={{ name: profile.name, champion: rs.champion || profile.champion, role: rs.role || profile.role, seed: hashStr(profile.name + '|' + run + '|' + matchCount) }} />}
       {screen === 'pregame' && pregame && pregame.accepted && <PregameFlow profile={profile} role={pregame.role} onCancel={cancelPregame} onPlan={onPlan} onStart={startMv2} />}
 
       {screen !== 'scenario' && screen !== 'complete' && screen !== 'pregame' && (
