@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BrainGap.gg Prototype</title>
+<meta name="theme-color" content="#010A13">
+<meta name="description" content="BrainGap.gg: Duolingo für League-of-Legends-Makro. Interaktive Szenarien, Ranked-Matches und Champion-Mastery.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BrainGap">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%20%22BrainGap.gg%22%2C%20%22short_name%22%3A%20%22BrainGap%22%2C%20%22description%22%3A%20%22Trainiere%20League-of-Legends-Makro%22%2C%20%22start_url%22%3A%20%22.%22%2C%20%22display%22%3A%20%22standalone%22%2C%20%22orientation%22%3A%20%22portrait%22%2C%20%22background_color%22%3A%20%22%23010A13%22%2C%20%22theme_color%22%3A%20%22%23010A13%22%2C%20%22lang%22%3A%20%22de%22%2C%20%22icons%22%3A%20%5B%7B%22src%22%3A%20%22data%3Aimage/svg%2Bxml%2C%253Csvg%2520xmlns%253D%2527http%253A//www.w3.org/2000/svg%2527%2520viewBox%253D%25270%25200%252064%252064%2527%253E%253Crect%2520width%253D%252764%2527%2520height%253D%252764%2527%2520rx%253D%252714%2527%2520fill%253D%2527%2523010A13%2527/%253E%253Ctext%2520x%253D%252732%2527%2520y%253D%252743%2527%2520font-size%253D%252734%2527%2520text-anchor%253D%2527middle%2527%2520fill%253D%2527%2523C89B3C%2527%2520font-family%253D%2527serif%2527%2520font-weight%253D%2527bold%2527%253EBG%253C/text%253E%253C/svg%253E%22%2C%20%22sizes%22%3A%20%22any%22%2C%20%22type%22%3A%20%22image/svg%2Bxml%22%2C%20%22purpose%22%3A%20%22any%22%7D%5D%7D">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Crect%20width%3D%2764%27%20height%3D%2764%27%20rx%3D%2714%27%20fill%3D%27%23010A13%27/%3E%3Ctext%20x%3D%2732%27%20y%3D%2743%27%20font-size%3D%2734%27%20text-anchor%3D%27middle%27%20fill%3D%27%23C89B3C%27%20font-family%3D%27serif%27%20font-weight%3D%27bold%27%3EBG%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Crect%20width%3D%2764%27%20height%3D%2764%27%20rx%3D%2714%27%20fill%3D%27%23010A13%27/%3E%3Ctext%20x%3D%2732%27%20y%3D%2743%27%20font-size%3D%2734%27%20text-anchor%3D%27middle%27%20fill%3D%27%23C89B3C%27%20font-family%3D%27serif%27%20font-weight%3D%27bold%27%3EBG%3C/text%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -34,10 +43,21 @@
   .fade-in { animation:fadein .18s ease-out; }
   @media (prefers-reduced-motion:reduce){ .pop,.panic,.shake,.rankglow,.fade-in,.blink,.slidedown{animation:none} .confetti{display:none} }
   button:focus-visible,input:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+  @keyframes pulsedot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.35);opacity:.45} }
+  .pulsedot { display:inline-block; animation:pulsedot 1.4s ease-in-out infinite; }
+  @keyframes bannerpop { 0%{transform:translateY(-14px) scale(.8);opacity:0} 12%{transform:none;opacity:1} 85%{opacity:1} 100%{opacity:0;transform:translateY(-6px)} }
+  .bannerpop { animation:bannerpop 3.2s ease-out both; }
+  @keyframes floatgold { 0%{transform:translateY(0);opacity:1} 100%{transform:translateY(-22px);opacity:0} }
+  .floatgold { animation:floatgold 2s ease-out both; }
+  @keyframes redflash { 0%,100%{background:rgba(232,64,87,0)} 20%{background:rgba(232,64,87,.55)} 60%{background:rgba(232,64,87,.2)} }
+  .redflash { animation:redflash 1.2s ease-out both; }
+  footer.riot-footer { max-width:400px; margin:6px auto 0; padding:10px 16px calc(14px + env(safe-area-inset-bottom,0px)); font-size:10px; line-height:1.45; color:#7a8294; text-align:center; }
+  @media (prefers-reduced-motion:reduce){ .pulsedot,.bannerpop,.floatgold,.redflash{animation:none} }
 </style>
 </head>
 <body>
 <div id="root"></div>
+<footer class="riot-footer">BrainGap.gg isn’t endorsed by Riot Games and doesn’t reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.</footer>
 <script type="text/babel">
 const { useState, useEffect, useRef } = React;
 
@@ -4005,6 +4025,16 @@ const Sound = (() => {
       chord(c, t, [220, 261.63, 329.63], { stagger: 0.05, attack: 0.03, decay: 1.5, peak: 0.28, wet: 0.6, lp: 700 });
       voice(c, { type: 'sine', f0: 110, f1: 98, t0: t, attack: 0.03, decay: 1.2, peak: 0.22 });
     },
+    ready_gong: (c, t) => {   // tiefer Gong: Grundton mit Obertönen, langem Ausklang und Hall
+      [[82, 0.55, 3.4], [123, 0.3, 2.8], [196, 0.2, 2.2], [247, 0.12, 1.7]].forEach(([f, pk, d]) => voice(c, { type: 'sine', f0: f, f1: f * 0.97, t0: t, attack: 0.008, decay: d, peak: pk, wet: 0.7 }));
+      noise(c, { t0: t, dur: 0.14, peak: 0.2, ftype: 'lowpass', freq: 900 });
+    },
+    fanfare: (c, t) => {   // Sieges-Fanfare (synthetisch, kein Riot-Original): Pauke, aufsteigende Quinten, Schlussakkord
+      bass(c, t, 70, 0.5);
+      [[392, 0], [523.25, 0.16], [659.25, 0.32], [783.99, 0.5]].forEach(([f, d]) => voice(c, { type: 'sawtooth', f0: f, t0: t + d, attack: 0.02, decay: 0.55, peak: 0.2, ftype: 'lowpass', freq: 2200, wet: 0.5 }));
+      chord(c, t + 0.75, [C5, E5, G5, C6], { stagger: 0.04, decay: 2.4, peak: 0.26, wet: 0.8 });
+      bass(c, t + 0.75, 65, 0.45);
+    },
   };
 
   function play(type) {
@@ -4089,6 +4119,7 @@ const sanitizeSave = d => {
     startStep: Number.isInteger(p.startStep) ? p.startStep : step,
     hiddenMmr: Number.isFinite(p.hiddenMmr) ? p.hiddenMmr : step * 100 + 50,
     winStreak: Number.isInteger(p.winStreak) && p.winStreak > 0 ? p.winStreak : 0,
+    icon: Number.isInteger(p.icon) ? p.icon : ICON_IDS[0],
   } : null;
   const person = f => f && typeof f === 'object' && typeof f.name === 'string' && Number.isInteger(f.step) && Number.isFinite(f.lp);
   const fix = f => ({ ...f, status: LS_STATUS.includes(f.status) ? f.status : 'online', note: typeof f.note === 'string' ? f.note : '' });
@@ -4100,6 +4131,12 @@ const sanitizeSave = d => {
     requests: Array.isArray(d.requests) ? d.requests.filter(person).map(fix) : undefined,
     recent: Array.isArray(d.recent) ? d.recent.filter(x => typeof x === 'string') : [],
     mastery: d.mastery,
+    xp: Number.isFinite(d.xp) ? Math.max(0, Math.floor(d.xp)) : 0,
+    quests: d.quests && typeof d.quests === 'object' ? d.quests : null,
+    srs: d.srs && typeof d.srs === 'object' && !Array.isArray(d.srs) ? d.srs : {},
+    matchCount: Number.isFinite(d.matchCount) ? Math.max(0, Math.floor(d.matchCount)) : 0,
+    shieldUntil: Number.isFinite(d.shieldUntil) ? d.shieldUntil : 0,
+    sinceAd: Number.isFinite(d.sinceAd) ? Math.max(0, Math.floor(d.sinceAd)) : 0,
   };
 };
 const loadSave = () => {
@@ -4120,8 +4157,8 @@ const ROLE_FILTERS = [['Alle', null], ['Top', 'Toplane'], ['Mid', 'Midlane'], ['
 const DIFF_FILTERS = [['Alle', null], ...['Eisen', 'Bronze', 'Silber', 'Gold', 'Platin', 'Smaragd', 'Diamant', 'Master+'].filter(d => RUNS.some(r => r.difficulty === d)).map(d => [d, d])];
 const pickRandom = list => list[Math.floor(Math.random() * list.length)];
 // Startszenarien, die zu den Filtern passen (null = kein Filter). Folge-Szenarien ergeben sich über nextId.
-const practicePool = (role, difficulty) => START_IDS.map(id => RUNS.find(r => r.id === id))
-  .filter(sc => (!role || sc.role === role) && (!difficulty || sc.difficulty === difficulty));
+const practicePool = (role, difficulty) => ['Toplane', 'Jungle', 'Midlane', 'Botlane', 'Support'].filter(r => !role || r === role)
+  .flatMap(r => (GENERIC[r] || []).map(id => RUNS.find(x => x.id === id))).filter(sc => sc && (!difficulty || sc.difficulty === difficulty));
 
 
 /* ---------- Leaderboard-Logik ---------- */
@@ -4547,20 +4584,20 @@ const MODE_INFO = {
     risk: 'Gewertet wie ein Ranked-Match: ab 3 von 5 richtigen Entscheidungen Sieg mit +15 bis +28 LP, sonst Niederlage mit −14 bis −24 LP. Das Hidden MMR steuert, wie hoch die LP in dieser Spanne ausfallen. Ein Herz geht nur bei Niederlage oder Abbruch verloren.',
     focus: 'Der gesamte Matchverlauf: Wave Management, Objective-Timing und Rotationen.' },
   ranked: { icon: 'swords', title: 'Ranked Match',
-    goal: 'Steige in der Rangliste auf. Du wählst die Match-Simulation (ein zusammenhängendes Match in einer Rolle deiner Wahl) oder das Makro-Quiz (5 unabhängige Situationen).',
-    duration: '5 Phasen oder 5 Fragen (ca. 3 bis 5 Minuten)',
-    risk: 'Nach der letzten Entscheidung wird einmal abgerechnet: 5/5 Dominanter Sieg (+24 bis +28 LP), 3 bis 4/5 Arbeitssieg (+15 bis +18), 2/5 knappe Niederlage (−14), 0 bis 1/5 Stomp (−20 bis −24). Das Hidden MMR verschiebt die LP innerhalb der Spanne. Siege kosten kein Herz, Niederlagen und Aufgeben jeweils eines. Es gilt der Tier-Lock: Du bekommst Szenarien deiner Liga.',
+    goal: 'Steige in der Rangliste auf. Die Match-Simulation startet mit Ready Check, Champion-Wahl, 5v5-Ladebildschirm und einem taktischen Gameplan (Win-Condition deines Teams). Danach folgen 5 Phasen mit festem Lineup und Spielzustand (Gleichstand, Vorsprung, Rückstand). Alternativ gibt es das Makro-Quiz mit 5 unabhängigen Situationen.',
+    duration: '5 Phasen oder 5 Fragen (ca. 3 bis 6 Minuten)',
+    risk: 'Das Match bringt BEIDES: LP für deinen Rang (5/5 +24 bis +28, 3 bis 4/5 +15 bis +18, 2/5 −14, 0 bis 1/5 −20 bis −24) und Mastery-Punkte für deinen gespielten Champion. Ein Match gibt +50 XP, der richtige Gameplan weitere +50 XP. Siege kosten kein Herz, Niederlagen und Aufgeben jeweils eines.',
     focus: 'Macro, Wave Management, Vision und Clutch-Decisions unter Zeitdruck.' },
   practice: { icon: 'target', title: 'Übungsmodus',
-    goal: 'Trainiere ohne Druck und filtere nach Rolle und Schwierigkeit, um gezielt Schwächen zu üben.',
-    duration: '5 Phasen (ca. 3 bis 5 Minuten, je nach Szenario-Timer)',
+    goal: 'Trainiere ohne Druck: 5 neutrale Rollen-Szenarien. Bei der Rollenwahl wechselt der Champion von Run zu Run, du spielst nicht immer dieselbe Figur.',
+    duration: '5 Fragen (ca. 3 bis 5 Minuten, je nach Szenario-Timer)',
     risk: 'Kein Risiko: keine LP, kein MMR, keine Herzen und kein Eintrag in der Historie. Am Ende siehst du nur, wie viele LP es gewesen wären.',
     focus: 'Gezieltes Training einzelner Rollen und Schwierigkeitsstufen, vom Early Game bis zum Closing.' },
   mastery: { icon: 'crown', title: 'Champion Mastery',
-    goal: 'Level deinen Main-Champion von Stufe 1 bis 7. Für 16 Kern-Champions (Jax, Aatrox, Darius, Lee Sin, Viego, Kayn, Ahri, Zed, Yasuo, Jinx, Kai\'Sa, Ezreal, Draven, Thresh, Leona, Nautilus) gibt es handgeschriebene Szenarien, jeder andere Champion nutzt das adaptive Rollen-Template.',
+    goal: 'Level deinen Main-Champion ohne Obergrenze. Für 16 Kern-Champions (Jax, Aatrox, Darius, Lee Sin, Viego, Kayn, Ahri, Zed, Yasuo, Jinx, Kai\'Sa, Ezreal, Draven, Thresh, Leona, Nautilus) gibt es handgeschriebene Szenarien, jeder andere Champion nutzt Rollen-Vorlagen mit seinem Namen.',
     duration: '5 Fragen (ca. 2 bis 3 Minuten)',
-    risk: 'Gewertet wie Ranked (LP, Hidden MMR, Herz nur bei Niederlage oder Abbruch). Zusätzlich gibt es Mastery-Punkte: Sieg mit 4 bis 5 richtig +300 bis +350 MP, 3 von 5 richtig +150 MP, Niederlage +50 MP (nie ein Stufenverlust). Stufen ab 300, 750, 1.400, 2.200 (Hextech-Emblem), 3.200 und 4.500 MP (Meister-Wappen).',
-    focus: 'Stufe 1 bis 2: Grundlagen und Trading-Fenster. Stufe 3 bis 4: Matchups, Wave-Control und Setups. Stufe 5 bis 7: Late-Game, Flanken und Clutch-Entscheidungen. Du spielst ausschließlich deinen gewählten Champion: handgeschriebene Szenarien plus Rollen-Vorlagen, in die dein Name eingesetzt wird. Bevorzugt kommen Szenarien deiner Liga; reichen sie nicht, rücken die nächsten Ligen derselben Rolle nach, nie ein fremder Champion.' },
+    risk: 'Mastery vergibt NUR Mastery-Punkte, niemals LP: kein MMR, kein Herz, keine Serie. Sieg mit 4 bis 5 richtig +300 bis +350 MP, 3 von 5 richtig +150 MP, Niederlage +50 MP. Stufen ab 300, 750, 1.400, 2.200, 3.200 und 4.500 MP, danach alle 2.000 MP eine weitere Stufe. Titel: Novize (1 bis 4), Adept (5 bis 6), Meister (7 bis 9), Großmeister (10 bis 19), Legende (20+).',
+    focus: 'Stufe 1 bis 2: Grundlagen und Trading-Fenster. Stufe 3 bis 4: Matchups, Wave-Control und Setups. Stufe 5 und höher: Late-Game, Flanken und Clutch-Entscheidungen. Du spielst ausschließlich deinen gewählten Champion, nie einen fremden. Ungespielte Fragen kommen zuerst, falsch beantwortete pausieren für 2 Matches.' },
 };
 
 function ModeInfo({ mode, onClose }) {
@@ -4588,27 +4625,25 @@ function ModeInfo({ mode, onClose }) {
   );
 }
 
-function Dashboard({ rank, history, hearts, profile, mastery, onDaily, onRanked, onPractice, onMastery, onNoHearts, onInfo, onShop, onReset }) {
-  const locked = hearts < 1;
-  const { mp: mpNow, level: lvNow } = masteryOf(mastery, profile.champion);   // ohne Herzen sind Daily und Ranked gesperrt
+function Dashboard({ rank, hearts, profile, mastery, xp, quests, friends, shieldUntil, onDaily, onRanked, onPractice, onMastery, onNoHearts, onInfo, onHeartAd, onShieldAd, onIcon, onReset }) {
+  const locked = hearts < 1;   // ohne Herzen sind Daily und Ranked gesperrt, Mastery vergibt nur MP und braucht kein Herz
+  const { mp: mpNow, level: lvNow } = masteryOf(mastery, profile.champion);
   const [confirm, setConfirm] = useState(false);
-  const tier = tierOf(rank.step), cls = RANK_ICON[tier].cls;   // eine Farbquelle für Icon, Text, Rahmen und Balken
+  const tier = tierOf(rank.step), cls = RANK_ICON[tier].cls;   // eine Farbquelle für Emblem, Text, Rahmen und Balken
   const pct = Math.min(100, rank.lp);
   return (
     <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
       <div className="rounded-xl border p-3 flex flex-col gap-3" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <div className="flex items-center gap-3">
-          <div className={`w-[72px] h-[72px] shrink-0 rounded-2xl border border-current flex items-center justify-center ${cls}`} style={{ background: 'var(--bg)' }}>
-            <RankIcon tier={tier} size={46} />
-          </div>
+          <SummonerIcon id={profile.icon != null ? profile.icon : ICON_IDS[0]} name={profile.name} className="w-14 h-14" onClick={onIcon} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2"><span className="truncate font-bold">{profile.name}</span><StreakBadge n={profile.winStreak || 0} /></div>
-            <div className="truncate text-sm text-slate-400">Main: {profile.champion} · {profile.role}</div>
-            <div className="truncate text-xs text-gray-400">{STATUS[profile.status].emoji} {STATUS[profile.status].label}{profile.note ? ` · „${profile.note}“` : ''}</div>
+            <XpBar xp={xp} />
+            <div className="mt-1 truncate text-xs text-gray-400">Main: {profile.champion} · {profile.role}</div>
           </div>
           <div className="text-right">
-            <div className={`flex items-center justify-end gap-1.5 font-serif text-xl font-black leading-tight ${cls}`}>
-              <RankIcon tier={tier} size={20} />{rankName(rank.step)}
+            <div className={`flex items-center justify-end gap-1.5 font-serif text-lg font-black leading-tight ${cls}`}>
+              <RankEmblem tier={tier} size={30} />{rankName(rank.step)}
             </div>
             <div className="text-sm text-slate-300 tabular-nums">{rank.lp} LP</div>
             {rank.shield && <div className="flex items-center justify-end gap-1 text-xs text-[#0AC8B9]"><Icon n="shield" size={12} /> Demotion Shield aktiv</div>}
@@ -4625,11 +4660,14 @@ function Dashboard({ rank, history, hearts, profile, mastery, onDaily, onRanked,
         </div>
       </div>
 
+      <FriendsOnline friends={friends} />
+      <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />
+
       {locked && (
         <div role="status" className="flex items-center gap-2 rounded-lg border border-red-500/50 bg-red-500/10 px-3 py-2 text-sm text-red-300">
           <Icon n="heart" size={16} /> Keine Herzen mehr.
           <button onClick={onNoHearts} className="underline font-semibold">Recovery Drill</button>
-          <button onClick={onShop} className="underline font-semibold">Herzen holen</button>
+          <button onClick={onHeartAd} className="underline font-semibold">Herz per Werbung</button>
         </div>
       )}
       <div className="grid grid-cols-2 gap-2">
@@ -4645,43 +4683,29 @@ function Dashboard({ rank, history, hearts, profile, mastery, onDaily, onRanked,
           cls="flex flex-col gap-1.5 rounded-xl bg-[#C89B3C] p-3 text-left text-[#010A13] shadow-[0_0_16px_rgba(200,155,60,.5)] transition hover:brightness-110 active:scale-[.98]">
           <Icon n="swords" size={26} />
           <span className="font-serif font-extrabold leading-tight">Ranked Match</span>
-          <span className="text-xs font-semibold text-[#010A13]/70">5-Phasen-Simulation eines vollen Ranked Matches um LP.</span>
+          <span className="text-xs font-semibold text-[#010A13]/70">Ready Check, Gameplan und 5 Phasen um LP und Mastery.</span>
         </ModeCard>
         <ModeCard onClick={onPractice} onInfo={() => onInfo('practice')} label="Übungsmodus"
           cls="flex flex-col gap-1.5 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3 text-left transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
           <Icon n="target" size={26} className="text-[#0AC8B9]" />
           <span className="font-serif font-extrabold text-white leading-tight">Übungsmodus</span>
-          <span className="text-xs text-gray-400">Üben ohne LP-Risiko, mit Filtern.</span>
+          <span className="text-xs text-gray-400">Üben ohne LP-Risiko, mit wechselnden Champions.</span>
         </ModeCard>
-        <ModeCard wrap="col-span-2" onClick={locked ? onNoHearts : onMastery} locked={locked} onInfo={() => onInfo('mastery')} label="Champion Mastery"
+        <ModeCard wrap="col-span-2" onClick={onMastery} onInfo={() => onInfo('mastery')} label="Champion Mastery"
           cls="flex items-center gap-3 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2.5 text-left transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
           <ChampAvatar name={profile.champion || 'Heimerdinger'} className="w-10 h-10" />
           <span className="min-w-0 pr-8">
             <span className="block font-serif font-extrabold leading-tight text-white">Champion Mastery</span>
-            <span className="block truncate text-xs text-gray-400">{champLabel(profile.champion)} – Stufe {lvNow}<span className="text-[#C89B3C]"> · {mpNow.toLocaleString('de-DE')} MP</span></span>
+            <span className="block truncate text-xs text-gray-400">{champLabel(profile.champion)} – Stufe {lvNow}<span className="text-[#C89B3C]"> · {mpNow.toLocaleString('de-DE')} MP</span> · nur MP, keine LP</span>
           </span>
         </ModeCard>
       </div>
 
       <Divider />
-      <div className="flex flex-col gap-2">
-        <div className="font-serif font-bold">Letzte Runs</div>
-        {history.length === 0 && <div className="text-sm text-slate-500 rounded-lg border border-dashed p-3 text-center" style={{ borderColor: 'var(--line)' }}><span aria-hidden="true">🐹</span> Ein Poro schläft hier... Spiel deinen ersten Run.</div>}
-        {history.slice(0, 5).map((h, i) => {
-          const win = h.lp >= 0, c = win ? 'var(--teal)' : 'var(--red)';
-          return (
-            <div key={h.ts + '-' + i} className="flex items-center gap-3 rounded-lg border px-3 py-2" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-              <span className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center" style={{ color: c, background: win ? 'rgba(10,200,185,.14)' : 'rgba(232,64,87,.14)' }} aria-label={win ? 'Sieg' : 'Niederlage'}>
-                <Icon n={win ? 'check' : 'x'} size={16} />
-              </span>
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm truncate">{h.champion}</div>
-                <div className="text-xs text-slate-400">{h.role}</div>
-              </div>
-              <div className="font-extrabold tabular-nums" style={{ color: h.lp === 0 ? 'var(--gold)' : c }}>{h.lp > 0 ? '+' : ''}{h.lp} LP</div>
-            </div>
-          );
-        })}
+      <QuestList quests={quests} />
+      <div className="rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3" data-tip="true">
+        <div className="font-serif text-sm font-bold text-[#C89B3C]">Pro-Taktik-Tipp des Tages</div>
+        <p className="mt-1 text-sm leading-snug text-slate-200"><G t={tipOfDay()} /></p>
       </div>
 
       <button onClick={() => { if (confirm) { onReset(); setConfirm(false); } else setConfirm(true); }}
@@ -4740,13 +4764,12 @@ const WayCard = ({ active, icon, title, text, onClick }) => (
   </button>
 );
 
-function RankedSetup({ rank, onStart, onClose }) {
+function RankedSetup({ rank, profile, onStart, onClose }) {
   const [way, setWay] = useState(null);       // 'match' | 'quiz'
-  const [role, setRole] = useState(null);
+  const [role, setRole] = useState(profile ? profile.role : null);
   const pool = rankedPool(rank.step);          // Tier-Lock
   const quizCount = Math.min(QUIZ_LENGTH, pool.length);
   const ready = way === 'quiz' || (way === 'match' && !!role);
-  const picked = role ? matchPool(role, rank.step)[0] : null;
   return (
     <div className="absolute inset-0 z-40 flex items-end justify-center p-3" style={{ background: 'rgba(1,10,19,.85)' }} onClick={onClose}>
       <div role="dialog" aria-modal="true" aria-label="Ranked Match einrichten" onClick={e => e.stopPropagation()}
@@ -4757,26 +4780,20 @@ function RankedSetup({ rank, onStart, onClose }) {
           <button onClick={onClose} aria-label="Schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
         </div>
         <div className="text-xs text-gray-400">
-          Ein Herz geht nur bei Niederlage oder Abbruch verloren. LP werden erst am Ende gebucht. Liga {tierOf(rank.step)}: Du spielst nur {pool[0].difficulty}-Szenarien.
+          Ein Herz geht nur bei Niederlage oder Abbruch verloren. Das Match bringt LP für deinen Rang und Mastery-Punkte für deinen Champion. Liga {tierOf(rank.step)}: Du spielst nur {pool[0].difficulty}-Szenarien.
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <WayCard active={way === 'match'} icon="swords" title="Match-Simulation" text="Ein echtes Match: zusammenhängende Entscheidungen einer Rolle" onClick={() => setWay('match')} />
+          <WayCard active={way === 'match'} icon="swords" title="Match-Simulation" text="Ready Check, 5v5-Ladebildschirm, Gameplan und 5 zusammenhängende Phasen" onClick={() => setWay('match')} />
           <WayCard active={way === 'quiz'} icon="zap" title="Makro-Quiz" text={`${quizCount} schnelle, unabhängige Situationen aus deiner Liga`} onClick={() => setWay('quiz')} />
         </div>
         {way === 'match' && (
           <div>
             <div className="text-sm font-semibold mb-1.5">Rolle wählen</div>
-            <div className="flex flex-wrap gap-2">
-              {RANKED_ROLES.map(([l, v]) => <Chip key={l} active={role === v} disabled={!matchPool(v, rank.step).length} onClick={() => setRole(v)}>{l}</Chip>)}
-            </div>
-            <div className="text-xs text-gray-400 mt-2">Fehler beenden das Match nicht.{picked && picked.difficulty !== pool[0].difficulty ? ` Für diese Rolle gibt es in deiner Liga kein eigenes Match, du spielst das nächstpassende (${picked.difficulty}).` : ''}</div>
+            <div className="flex flex-wrap gap-2">{RANKED_ROLES.map(([l, v]) => <Chip key={l} active={role === v} onClick={() => setRole(v)}>{l}</Chip>)}</div>
+            <div className="text-xs text-gray-400 mt-2">Deine 9 Mitspieler und Gegner werden für jedes Match neu zusammengestellt und bleiben bis zum Ende gleich.</div>
           </div>
         )}
-        {way === 'quiz' && (
-          <div className="text-xs text-gray-400">
-            Keine Rollenwahl nötig. {quizCount} Szenarien nacheinander{quizCount < QUIZ_LENGTH ? ` (in deiner Liga gibt es erst ${pool.length})` : ''}, danach das Gesamtergebnis.
-          </div>
-        )}
+        {way === 'quiz' && <div className="text-xs text-gray-400">Keine Rollenwahl nötig. {quizCount} Szenarien nacheinander, danach das Gesamtergebnis.</div>}
         {!way && <div className="text-xs text-gray-500">Wähle einen Weg.</div>}
         <button disabled={!ready} onClick={() => onStart({ way, role })}
           className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#C89B3C] font-serif font-extrabold text-[#010A13] shadow-[0_0_14px_rgba(200,155,60,.45)] disabled:opacity-40">
@@ -4787,7 +4804,7 @@ function RankedSetup({ rank, onStart, onClose }) {
   );
 }
 
-function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree', stage = 0, stages = 1, record = { c: 0, w: 0 }, onNext, onAbort }) {
+function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree', stage = 0, stages = 1, record = { c: 0, w: 0 }, hud = null, onNext, onAbort }) {
   const limit = Math.min(scenario.timeLimit || DEFAULT_TIME_LIMIT, timeCap || Infinity);   // individuelles Zeitlimit pro Szenario
   const [left, setLeft] = useState(limit);
   const [pick, setPick] = useState(null);       // { opt } | { timeout: true } | null
@@ -4796,6 +4813,8 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
   const [mapOpen, setMapOpen] = useState(false);
   const [leave, setLeave] = useState(false);   // Bestätigung zum Abbrechen
   const [full, setFull] = useState(false);     // Gesamtkarte statt Fokus-Ausschnitt
+  const [showBanner, setShowBanner] = useState(false);   // Kill-/Objective-/Todes-Banner nach der Antwort
+  useEffect(() => { if (!pick || !scenario.mv2) return; setShowBanner(true); const t = setTimeout(() => setShowBanner(false), 3400); return () => clearTimeout(t); }, [pick]);
   const paused = mapOpen || full;               // Taktik-Analyse: Timer steht
   const openMap = () => { pausedRef.current = true; setMapOpen(true); };                 // Ref sofort setzen, bevor der nächste Tick kommt
   const toggleFull = () => { if (!full) pausedRef.current = true; setFull(!full); };
@@ -4869,11 +4888,15 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
   const focus = focusFor(scenario.markers);
   const cc = record.c + (ok ? 1 : 0), nn = record.c + record.w + 1, lead = cc - (nn - cc);
   const st = pick ? ((format === 'match' || format === 'tree') ? standing(lead, ok, stage) : { good: ok, text: `Zwischenstand: ${cc} von ${nn} richtig` }) : null;
-  const nextLabel = stage + 1 >= stages ? 'Zur Auswertung ➔' : (format === 'match' || format === 'tree') ? 'Nächste Phase ➔' : 'Nächste Frage ➔';
+  const nextLabel = stage + 1 >= stages ? 'Zur Auswertung ➔' : (format === 'match' || format === 'tree' || format === 'mv2') ? 'Nächste Phase ➔' : 'Nächste Frage ➔';
+  const mvEv = pick && scenario.mv2 ? scenario.mv2.ev[ok ? 'ok' : 'bad'] : null;   // Spielereignis dieser Entscheidung (Kills, Tod, Gold, Objective)
+  const hudStats = hud ? (mvEv ? applyEv(hud.stats, mvEv) : hud.stats) : null;
+  const hudState = hud ? (pick ? nextState(hud.state, ok) : hud.state) : null;
   const goNext = () => { if (adv.current || !pick) return; adv.current = true; onNext(pick.opt || null); };
 
   return (
     <div className={`flex-1 min-h-0 relative flex flex-col ${wrong ? 'shake' : ''}`}>
+      {pick && scenario.mv2 && showBanner && mvEv && <MatchBanner ev={mvEv} me={scenario.mv2.me} victim={scenario.mv2.victim} />}
       <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
         {/* Spielzeit und Phase in einem Badge */}
         <div className="flex items-center gap-2">
@@ -4890,6 +4913,8 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
             <Icon n="home" size={18} />
           </button>
         </div>
+
+        {hud && hudStats && <MatchHud stats={hudStats} state={hudState} />}
 
         {momentum && showMom && !pick && (
           <div role="status" className={`rounded-lg border px-3 py-1.5 text-sm ${momentum.good ? 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10 text-[#0AC8B9]' : 'border-red-500/60 bg-red-500/10 text-red-300'}`}>
@@ -4934,7 +4959,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
 
         {/* Kontext */}
         <div className="rounded-xl border p-2.5 leading-snug text-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-          {scenario.context}
+          <G t={scenario.context} />
         </div>
 
         {/* Entscheidungen: 2 bis 4 Optionen, je nach Länge des Arrays */}
@@ -4950,7 +4975,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
                   : chosen ? 'bg-[#0A1428]' : 'bg-[#010A13]/80 border-[#C89B3C]/40 opacity-50'}`}
                 style={chosen ? { borderColor: fbColor } : undefined}>
                 <span className={`w-7 h-7 shrink-0 rounded-md border flex items-center justify-center text-sm font-extrabold bg-[#0A1428] border-[#C89B3C]/60 text-[#C89B3C] transition-colors ${!pick ? 'group-hover:border-[#0AC8B9] group-hover:text-[#0AC8B9]' : ''}`}>{key}</span>
-                <span className="font-semibold text-[13px] leading-snug text-gray-100">{text}</span>
+                <span className="font-semibold text-[13px] leading-snug text-gray-100"><G t={text} /></span>
               </button>
             );
           })}
@@ -4962,12 +4987,12 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
               <Icon n={ok ? 'check' : 'x'} size={18} />{ok ? 'Richtige Entscheidung' : 'Fehlentscheidung'}
             </div>
             {ok ? (
-              <p className="px-3 py-1.5 text-sm leading-relaxed text-slate-200">{fbText}</p>
+              <p className="px-3 py-1.5 text-sm leading-relaxed text-slate-200"><G t={fbText} /></p>
             ) : (
               <dl className="space-y-1 px-3 py-1.5 text-sm leading-relaxed">
-                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Deine Wahl: </dt><dd className="inline text-slate-200">{choice}</dd></div>
-                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Direkte Folge: </dt><dd className="inline text-slate-200">{chain[0]}</dd></div>
-                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Team-Schaden: </dt><dd className="inline text-slate-200">{chain[1]}</dd></div>
+                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Deine Wahl: </dt><dd className="inline text-slate-200"><G t={choice} /></dd></div>
+                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Direkte Folge: </dt><dd className="inline text-slate-200"><G t={chain[0]} /></dd></div>
+                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Team-Schaden: </dt><dd className="inline text-slate-200"><G t={chain[1]} /></dd></div>
               </dl>
             )}
             {st && (
@@ -5000,7 +5025,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
                className="w-full rounded-2xl border border-[#C89B3C]/60 bg-[#06111F] p-4 flex flex-col gap-3 text-center">
             <div id="leave-title" className="font-serif text-lg font-bold">Zurück zum Dashboard?</div>
             <div className="text-sm text-slate-300">
-              Dein aktueller Fortschritt geht verloren und es werden keine LP gewertet.{!practice && ' Du verlierst dafür 1 Herz.'}
+              Dein aktueller Fortschritt geht verloren und es werden keine LP gewertet.{!practice && format !== 'mastery' && ' Du verlierst dafür 1 Herz.'}{format === 'mastery' && ' Mastery ist risikofrei: Es geht nur dieser Lauf verloren, kein Herz.'}
             </div>
             <div className="grid grid-cols-2 gap-2">
               <button autoFocus onClick={() => setLeave(false)}
@@ -5035,7 +5060,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
               {scenario.markers.filter(m => m.type === 'fog').map(m => <div key={m.label}><span className="font-bold text-slate-200">?</span> {m.label}</div>)}
             </div>
           )}
-          <div className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 p-3 text-sm leading-relaxed overflow-y-auto">{scenario.context}</div>
+          <div className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 p-3 text-sm leading-relaxed overflow-y-auto"><G t={scenario.context} /></div>
         </div>
       )}
 
@@ -5118,12 +5143,12 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
     if (result.drill) playHextechSound(result.passed ? 'correct' : 'wrong');
     else {
       const promo = !practice && result.to.step > result.from.step;
-      if (!(result.mastery && result.mastery.levelUp)) playHextechSound(result.win ? (promo ? 'promotion' : 'victory') : 'defeat');   // bei Mastery-Level-Up spielt das Popup den promotion-Sound
+      if (!(result.mastery && result.mastery.levelUp)) playHextechSound(result.win ? (promo ? 'promotion' : 'fanfare') : 'defeat');   // bei Mastery-Level-Up spielt das Popup den promotion-Sound
       if (!practice && result.heartLost) timers.push(setTimeout(() => playHextechSound('heart_loss'), 1100));
     }
     return () => timers.forEach(clearTimeout);
   }, []);
-  const unit = format === 'match' ? 'Match' : format === 'quiz' ? 'Quiz' : format === 'mastery' ? 'Mastery' : format === 'drill' ? 'Drill' : 'Run';
+  const unit = (format === 'match' || format === 'mv2') ? 'Match' : format === 'quiz' ? 'Quiz' : format === 'mastery' ? 'Mastery' : format === 'drill' ? 'Drill' : 'Run';
 
   if (result.drill) {
     return (
@@ -5168,7 +5193,7 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
         </div>
         <div className="rounded-xl border px-8 py-3" style={{ background: 'var(--panel)', borderColor: practice ? 'var(--line)' : color }}>
           {practice ? (
-            <div className="text-lg font-extrabold" style={{ color }}>Das wären {fmt(result.lp)} LP gewesen</div>
+            <div className="text-lg font-extrabold" style={{ color }}>{result.masteryOnly ? `+${result.mastery.gain} MP, keine LP` : `Das wären ${fmt(result.lp)} LP gewesen`}</div>
           ) : (
             <>
               <div className="text-4xl font-black tabular-nums" style={{ color }}>{fmt(result.lp)} LP</div>
@@ -5183,7 +5208,7 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
         </div>
 
         {practice ? (
-          <div className="text-sm text-slate-400">Dein Rang und deine Historie bleiben unverändert.</div>
+          <div className="text-sm text-slate-400">{result.masteryOnly ? 'Mastery vergibt nur Mastery-Punkte: Rang, MMR und Herzen bleiben unverändert.' : 'Dein Rang und deine Historie bleiben unverändert.'}</div>
         ) : (
           <div className="w-full flex flex-col items-center gap-2 rounded-xl border p-3" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
             <div className="relative w-20 h-20 flex items-center justify-center">
@@ -5208,6 +5233,7 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
         )}
 
         <div className="w-full"><Divider /></div>
+        {result.mv2 && <MatchStats r={result} />}
         {result.mastery && <MasteryResult m={result.mastery} />}
         <div className="font-serif text-lg font-bold">Post-Match Breakdown</div>
         <StepList log={log} />
@@ -5281,11 +5307,12 @@ function adaptScenario(sc, champ) {
 }
 // Mastery-Punkte (MP) und Stufen 1 bis 7
 const MP_STEPS = [0, 300, 750, 1400, 2200, 3200, 4500];
-const masteryLevel = mp => MP_STEPS.reduce((lv, t, i) => (mp >= t ? i + 1 : lv), 1);
+const masteryLevel = mp => (mp >= 4500 ? 7 + Math.floor((mp - 4500) / 2000) : MP_STEPS.reduce((lv, t, i) => (mp >= t ? i + 1 : lv), 1));   // ab Stufe 7: alle 2.000 MP eine weitere Stufe
+const masteryTitle = lv => (lv >= 20 ? 'Legende' : lv >= 10 ? 'Großmeister' : lv >= 7 ? 'Meister' : lv >= 5 ? 'Adept' : 'Novize');
 const masteryGain = (correct, n) => { const r = correct / n; return r >= 1 ? 350 : r >= 0.8 ? 300 : r >= 0.6 ? 150 : 50; };   // Niederlage: Trost-MP
 function masteryProgress(mp) {
   const level = masteryLevel(mp);
-  if (level >= 7) return { level, pct: 100, into: mp - MP_STEPS[6], span: 0, next: null };
+  if (level >= 7) { const a = 4500 + (level - 7) * 2000; return { level, pct: Math.round(((mp - a) / 2000) * 100), into: mp - a, span: 2000, next: a + 2000 }; }
   const a = MP_STEPS[level - 1], b = MP_STEPS[level];
   return { level, pct: Math.round(((mp - a) / (b - a)) * 100), into: mp - a, span: b - a, next: b };
 }
@@ -5316,13 +5343,17 @@ const sceneBand = sc => { const m = parseInt(sc.gameTime, 10); return m < 10 ? 1
 // Champions und Rollen-Vorlagen, in die sein Name eingesetzt wird. Es gibt kein Auffüllen mit anderen Champions oder anderen Rollen.
 // Danach gilt der Liga-Lock (eigene Liga zuerst, reichen die Vorlagen nicht, rücken die nächstgelegenen Ligen DERSELBEN Rolle nach)
 // und die Phase der Mastery-Stufe (Stufe 1-2: 0-10 Min, 3-4: 10-22 Min, 5-7: 22+ Min).
-function pickMastery(pool, level, step, recent, n) {
+function pickMastery(pool, level, step, recent, n, srsInfo) {
   const band = level <= 2 ? 1 : level <= 4 ? 2 : 3;
   const league = rankedTier(step);
   const dist = sc => { const t = DIFF_TIER[sc.difficulty]; return t === undefined ? 0 : t - league; };
-  const cost = sc => Math.abs(dist(sc)) * 40 + (dist(sc) > 0 ? 3 : 0)           // eigene Liga immer zuerst (40 > jede Phasen-Abweichung), darunter vor darüber
+  const S = srsInfo ? srsInfo.srs : null, M = srsInfo ? srsInfo.matchCount : 0;
+  // Spaced Repetition: ungespielte Fragen zuerst; falsch beantwortete sind gesperrt, bis matchCount - failedAt > 2 (weich: nur wenn sonst zu wenige Fragen bleiben)
+  const spaced = id => { if (!S) return 0; const e = S[baseId(id)]; if (!e) return -3; if (e.failedAt != null && M - e.failedAt <= 2) return 24; /* schlechter als jede Phasen-Abweichung (20), aber nie schlechter als eine fremde Liga */ return Math.min(3, e.seen) * 1.5; };
+  const cost = sc => Math.abs(dist(sc)) * 80 + (dist(sc) > 0 ? 3 : 0)           // eigene Liga immer zuerst (80 > Phase + Sperre + Wiederholung), darunter vor darüber
     + Math.abs(sceneBand(sc) - band) * 10                                         // Phase der Stufe
     + (!sc.id.includes('~') ? -4 : 0)                                             // handgeschriebene Szenarien des Champions zuerst
+    + spaced(sc.id)
     + (recent.includes(baseId(sc.id)) ? 6 : 0) + Math.random() * 1.5;            // Wiederholungen meiden
   return pool.map(sc => [cost(sc), sc.id]).sort((a, b) => a[0] - b[0]).slice(0, n).map(x => x[1]);
 }
@@ -5548,7 +5579,7 @@ function MasteryResult({ m }) {
       <div className="flex items-center gap-3">
         <ChampAvatar name={m.champion} className="w-12 h-12" iconSize={20} ring="border-2 border-[#C89B3C]" />
         <div className="min-w-0 flex-1">
-          <div className="font-serif font-bold">{m.champion} · Stufe {pr.level}</div>
+          <div className="font-serif font-bold">{m.champion} · Stufe {pr.level} · {masteryTitle(pr.level)}</div>
           <div className="text-xs tabular-nums text-slate-400">+{m.gain} MP · {m.after.toLocaleString('de-DE')} MP gesamt</div>
         </div>
         {emb && <span className={emb.cls} title={emb.label}><Icon n={emb.icon} size={24} /></span>}
@@ -5572,6 +5603,7 @@ function MasteryLevelUp({ m, onClose }) {
         </div>
         <div className="pop font-serif text-2xl font-black text-yellow-300">Mastery-Stufe aufgestiegen!</div>
         <div className="font-serif text-lg font-bold">{m.champion}: Stufe {m.lvBefore} ➔ Stufe {m.lvAfter}</div>
+        <div className="text-sm font-semibold text-[#0AC8B9]">Titel: {masteryTitle(m.lvAfter)}</div>
         {emb && (
           <div className={`flex items-center gap-2 rounded-lg border border-current/40 px-3 py-1.5 text-sm font-bold ${emb.cls}`}>
             <Icon n={emb.icon} size={20} /> {emb.label} freigeschaltet
@@ -5603,6 +5635,7 @@ function MasteryShowcase({ mastery }) {
             Meister-Champion: {top.name} (Stufe {pr.level} • {top.mp.toLocaleString('de-DE')} MP)
           </span>
           {emb && <div className={`mt-1 text-xs font-semibold ${emb.cls}`}>{emb.label}</div>}
+          <div className="mt-0.5 text-xs font-semibold text-[#0AC8B9]" data-title="true">{masteryTitle(pr.level)}</div>
         </div>
       </div>
       <div className="mt-3 h-2.5 overflow-hidden rounded-full" style={{ background: 'var(--track)' }} role="progressbar" aria-valuenow={pr.pct} aria-valuemin={0} aria-valuemax={100}>
@@ -5658,23 +5691,67 @@ function Requests({ requests, onAccept, onDecline }) {
   );
 }
 
-function Profile({ profile, rank, mastery, friends, requests, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout }) {
+function RunHistory({ history }) {
+  return (
+    <div className="flex flex-col gap-2" data-history="true">
+      <div className="font-serif font-bold">Letzte Runs</div>
+      {history.length === 0 && <div className="text-sm text-slate-500 rounded-lg border border-dashed p-3 text-center" style={{ borderColor: 'var(--line)' }}><span aria-hidden="true">🐹</span> Ein Poro schläft hier noch. Spiele deinen ersten Run.</div>}
+      {history.slice(0, 8).map((h, i) => {
+        const mastery = h.mp > 0 && !h.lp, win = mastery ? true : h.lp >= 0, c = win ? 'var(--teal)' : 'var(--red)';
+        return (
+          <div key={h.ts + '-' + i} className="flex items-center gap-3 rounded-lg border px-3 py-2" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+            <span className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center" style={{ color: c, background: win ? 'rgba(10,200,185,.14)' : 'rgba(232,64,87,.14)' }} aria-label={win ? 'Sieg' : 'Niederlage'}>
+              <Icon n={win ? 'check' : 'x'} size={16} />
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-sm truncate">{h.champion}</div>
+              <div className="text-xs text-slate-400">{h.role}</div>
+            </div>
+            <div className="text-right font-extrabold tabular-nums" style={{ color: mastery ? 'var(--gold)' : h.lp === 0 ? 'var(--gold)' : c }}>
+              {mastery ? `+${h.mp} MP` : `${h.lp > 0 ? '+' : ''}${h.lp} LP`}
+              {!mastery && h.mp > 0 && <div className="text-[10px] font-semibold text-[#C89B3C]">+{h.mp} MP</div>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+function SupporterCard() {
+  return (
+    <div className="rounded-xl border border-[#C89B3C]/70 bg-gradient-to-r from-[#2a1f08] to-[#10213a] p-3" data-supporter="true">
+      <div className="flex items-center gap-3">
+        <Icon n="crown" size={26} className="shrink-0 text-[#C89B3C]" />
+        <div className="min-w-0 flex-1">
+          <div className="font-serif text-sm font-bold text-[#C89B3C]">Supporter werden: 2 € / Monat</div>
+          <div className="text-xs text-slate-300">Komplett werbefrei lernen und das Projekt unterstützen.</div>
+        </div>
+        <button type="button" className="shrink-0 rounded-lg bg-[#C89B3C] px-3 py-1.5 text-xs font-extrabold text-[#010A13]">Unterstützen</button>
+      </div>
+    </div>
+  );
+}
+function Profile({ profile, rank, mastery, friends, requests, history, xp, shieldUntil, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout, onIcon, onShieldAd }) {
   const [tab, setTab] = useState('me');
   const [confirm, setConfirm] = useState(false);
   const tier = tierOf(rank.step);
   return (
     <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
       <div className="flex items-center gap-3 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3">
-        <div className="relative shrink-0">
-          <ChampAvatar name={profile.champion || 'Heimerdinger'} className="w-16 h-16" iconSize={28} />
-          <span className="absolute -bottom-1 -right-1 text-base" aria-hidden="true">{STATUS[profile.status].emoji}</span>
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="truncate font-serif text-xl font-bold">{profile.name}</div>
-          <div className={`flex items-center gap-1.5 text-sm font-semibold ${RANK_ICON[tier].cls}`}>
-            <RankIcon tier={tier} size={16} />{rankName(rank.step)} · {rank.lp} LP
+        <RankEmblem tier={tier} size={84} glow />
+        <div className="min-w-0 flex-1 flex flex-col gap-1.5">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <SummonerIcon id={profile.icon != null ? profile.icon : ICON_IDS[0]} name={profile.name} className="w-12 h-12" onClick={onIcon} />
+              <span className="absolute -bottom-1 -right-1 text-sm" aria-hidden="true">{STATUS[profile.status].emoji}</span>
+            </div>
+            <div className="min-w-0"><div className="truncate font-serif text-xl font-bold leading-tight">{profile.name}</div></div>
           </div>
-          {profile.note && <div className="mt-0.5 truncate text-xs italic text-gray-400">„{profile.note}“</div>}
+          <div className={`flex items-center gap-1.5 text-sm font-semibold ${RANK_ICON[tier].cls}`}>
+            <RankEmblem tier={tier} size={22} />{rankName(rank.step)} · {rank.lp} LP
+          </div>
+          <XpBar xp={xp} />
+          {profile.note && <div className="truncate text-xs italic text-gray-400">„{profile.note}“</div>}
         </div>
       </div>
       <TabBar tabs={[['me', 'Profil'], ['friends', `Freunde (${friends.length})`],
@@ -5687,6 +5764,10 @@ function Profile({ profile, rank, mastery, friends, requests, onChange, onAddFri
       ) : (
         <>
           <MasteryShowcase mastery={mastery} />
+          <SupporterCard />
+          <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />
+          <RunHistory history={history} />
+          <Divider />
           <div>
             <label htmlFor="status" className="mb-1.5 block text-sm font-semibold">Status</label>
             <select id="status" value={profile.status} onChange={e => onChange({ status: e.target.value })} className={`w-full ${fieldCls}`} style={{ colorScheme: 'dark' }}>
@@ -5811,26 +5892,631 @@ function Leaderboard({ rank, profile, friends }) {
   );
 }
 
-function Premium({ hearts, onRefill }) {
-  const [refilled, setRefilled] = useState(false);
-  const perks = ['Keine Werbung', 'Unbegrenzte Coach-Fragen', 'OP.GG-Replay-Analyse (später)'];
+
+/* ===================== Meilenstein-Update: Pre-Game, Match-Dramaturgie, Level, Quests ===================== */
+const DIFF_NAMES = ['Eisen', 'Bronze', 'Silber', 'Gold', 'Platin', 'Smaragd', 'Diamant', 'Master+'];
+const TLIM = [30, 30, 35, 45, 45, 60, 60, 60];
+const ROLES_ORDER = ['Toplane', 'Jungle', 'Midlane', 'Botlane', 'Support'];
+const ROLE_SHORT = { Toplane: 'Top', Jungle: 'Jungle', Midlane: 'Mid', Botlane: 'Bot', Support: 'Support' };
+const ROLE_KEY = { Toplane: 'TOP', Jungle: 'JG', Midlane: 'MID', Botlane: 'BOT', Support: 'SUP' };
+// Win-Conditions: Teamfight, Early-Game-Snowball, Late-Game-Skalierung, Pick-Comp, Splitpush
+const ARCH = {
+  TF: { label: '5v5 Wombo-Combo / Teamfight', why: 'viel Engage und Flächenschaden für einen geschlossenen 5v5' },
+  EARLY: { label: 'Early-Game Snowball', why: 'starke frühe Duelle und Tempo, um vor dem Late-Game zu gewinnen' },
+  SCALE: { label: 'Late-Game Skalierung', why: 'Champions, die mit Items und Zeit immer stärker werden' },
+  PICK: { label: 'Pick-Comp / Ambush', why: 'Kontrolle und Burst, um einzelne Gegner aus dem Nebel zu fangen' },
+  SPLIT: { label: 'Splitpush-Druck', why: 'starke Duellanten, die Seitenlanes allein gewinnen und Gegner binden' },
+};
+// Champion-Pools je Rolle mit Archetyp-Tags (Coaching-Einschätzung, keine offiziellen Riot-Daten)
+const ROLE_POOL = {
+  Toplane: { Malphite: ['TF'], Ornn: ['TF', 'SCALE'], Renekton: ['EARLY'], Darius: ['EARLY'], Fiora: ['SPLIT'], Jax: ['SPLIT', 'SCALE'], Camille: ['SPLIT', 'PICK'], Sion: ['TF', 'SCALE'], Aatrox: ['EARLY', 'TF'], Gnar: ['TF'], Garen: ['EARLY'], Sett: ['EARLY'] },
+  Jungle: { Sejuani: ['TF'], Amumu: ['TF'], 'Lee Sin': ['EARLY', 'PICK'], Nocturne: ['PICK'], Elise: ['EARLY', 'PICK'], Viego: ['EARLY', 'SCALE'], Kayn: ['SCALE', 'PICK'], Warwick: ['EARLY', 'TF'], Zac: ['TF'] },
+  Midlane: { Orianna: ['TF'], Ahri: ['PICK'], Zed: ['PICK', 'EARLY'], Azir: ['SCALE'], Viktor: ['SCALE', 'TF'], Syndra: ['PICK'], Lux: ['PICK'], Katarina: ['TF', 'EARLY'], Yasuo: ['SPLIT'], Annie: ['TF', 'EARLY'] },
+  Botlane: { Jinx: ['SCALE', 'TF'], "Kai'Sa": ['SCALE'], Ezreal: ['SCALE'], Draven: ['EARLY'], 'Miss Fortune': ['TF', 'EARLY'], Caitlyn: ['EARLY', 'SPLIT'], Ashe: ['PICK', 'TF'], Lucian: ['EARLY'], Zeri: ['SCALE', 'SPLIT'], Vayne: ['SCALE', 'SPLIT'] },
+  Support: { Thresh: ['PICK'], Leona: ['TF', 'EARLY'], Nautilus: ['PICK', 'EARLY'], Alistar: ['TF'], Lulu: ['SCALE'], Janna: ['SCALE'], Braum: ['TF'], Soraka: ['SCALE'], Karma: ['EARLY'], Blitzcrank: ['PICK'], Rakan: ['TF'] },
+};
+const DEFAULT_TAGS = { Toplane: ['SPLIT'], Jungle: ['EARLY'], Midlane: ['PICK'], Botlane: ['SCALE'], Support: ['PICK'] };
+const champTags = (name, role) => {
+  const n = normName(name);
+  for (const r of ROLES_ORDER) for (const k of Object.keys(ROLE_POOL[r])) if (normName(k) === n) return ROLE_POOL[r][k];
+  return DEFAULT_TAGS[role] || ['EARLY'];
+};
+const archScore = team => { const s = { TF: 0, EARLY: 0, SCALE: 0, PICK: 0, SPLIT: 0 }; ROLES_ORDER.forEach(r => champTags(team[r], r).forEach(t => { s[t] += 1; })); return s; };
+const archRank = s => Object.entries(s).sort((a, b) => b[1] - a[1]);
+// Frisches 5v5-Lineup für jedes Match: eigenes Team (Blau) und Gegner (Rot), 10 verschiedene Champions
+function genLineup(me, role) {
+  let best = null;
+  for (let i = 0; i < 400; i++) {
+    const used = new Set([normName(me)]);
+    const pick = r => { const c = shuffle(Object.keys(ROLE_POOL[r]).filter(x => !used.has(normName(x))))[0]; used.add(normName(c)); return c; };
+    const blue = {}, red = {};
+    ROLES_ORDER.forEach(r => { blue[r] = r === role ? me : pick(r); });
+    ROLES_ORDER.forEach(r => { red[r] = pick(r); });
+    const sb = archScore(blue), sr = archScore(red), rb = archRank(sb), rr = archRank(sr);
+    const margin = rb[0][1] - rb[1][1];
+    const cand = { me, role, blue, red, win: rb[0][0], sb, sr, enemyArch: rr[0][0], margin };
+    if (margin >= 1 && rb[0][1] >= 2 && rr[0][0] !== rb[0][0]) return cand;   // eindeutige Stärke, Gegner mit anderer Stärke
+    if (!best || margin > best.margin) best = cand;
+  }
+  return best;
+}
+// Platzhalter: {ME}, {OPP} (Gegner deiner Rolle), {A1}-{A4} (deine 4 Mitspieler, in Rollen-Reihenfolge), {E_TOP|E_JG|E_MID|E_BOT|E_SUP}, {ROLE}
+function slotMap(lu) {
+  const m = { ME: lu.me, OPP: lu.red[lu.role], ROLE: ROLE_SHORT[lu.role] };
+  ROLES_ORDER.filter(r => r !== lu.role).forEach((r, i) => { m['A' + (i + 1)] = lu.blue[r]; });
+  ROLES_ORDER.forEach(r => { m['E_' + ROLE_KEY[r]] = lu.red[r]; });
+  return m;
+}
+const fillSlots = (t, m) => t.replace(/\{([A-Z_0-9]+)\}/g, (_, k) => (m[k] !== undefined ? m[k] : k));
+
+// ---- Match-Vorlagen: 5 Phasen, Spielzustand EVEN / AHEAD / BEHIND ----
+const MV2_PHASE = { 1: 'Early Laning', 2: 'Objektive', 3: 'Mid-Game', 4: 'Baron/Soul', 5: 'Late Game' };
+const MT = (time, ctx, hint, good, bad, markers, ev) => ({ time, ctx, hint, good, bad, markers, ev });
+const EV1 = { ok: { tk: 1, k: 1, gold: 300, kill: true }, bad: { ek: 1, d: 1, gold: -300, death: true } };
+const LANE_BAD = (a, b, c, d) => [[a, [b, c]], [d[0], [d[1], d[2]]]];
+const MV2 = {
+  1: {
+    Toplane: MT('03:40', 'Du bist {ME} (Top) gegen {OPP}, Minute 03:40, Level 4. Du hast die ersten zwei Wellen langsam gesammelt, die dritte Welle mit der Kanonen-Minion steht kurz vor dem gegnerischen Turm. Der gegnerische Jungler {E_JG} wurde zuletzt Bot gesehen.',
+      'Wann ist {OPP} an seinem Turm am verwundbarsten?',
+      ['Die dritte Welle unter den Turm crashen lassen und {OPP} an der Turmkante traden, solange {E_JG} Bot gebunden ist.', 'Perfekt! Du gewinnst das Duell und holst den First Blood.'],
+      [['Ohne Welle unter den Turm tauchen, um {OPP} zu töten.', ['Der Turm beschießt dich, während {OPP} traden kann.', 'Du stirbst, und {OPP} bekommt Gold und Wellenkontrolle.']],
+       ['Die Welle liegen lassen und ohne Vision zur Seite laufen.', ['{E_JG} taucht aus dem Fog auf und ganked dich.', 'Du stirbst, und die Lane gehört den Gegnern.']]],
+      [[10, 40, 'hero', 'ME'], [14, 32, 'enemy', 'OPP'], [40, 9, 'objective', 'Gegner-Turm (T1)'], [84, 80, 'enemy', 'E_JG']], EV1),
+    Jungle: MT('03:10', 'Du bist {ME} (Jungle) gegen {E_JG}, Minute 03:10, Level 3. Der Scuttle Crab spawnt um 2:55 im Fluss. Eure Laner haben keine Prio: Top und Bot werden gepusht. Du stehst mitten im Clear, mit dem Abschluss kommst du in etwa 30 Sekunden auf Level 4.',
+      'Wer hat Prio auf den Lanes, wenn du ganken willst?',
+      ['Den Clear sauber beenden, Level 4 holen und erst dann zum Scuttle gehen, wenn die Welle auf deiner Seite steht.', 'Perfekt! Du verlierst keine Camps und gehst mit Level 4 und Prio in den Fluss.'],
+      [['Den Clear abbrechen und ohne Prio einen Gank auf eine gedrückte Lane versuchen.', ['Ohne Welle auf eurer Seite hat dein Laner keinen Spielraum, und der Gegner entkommt.', 'Du verlierst Camps und Zeit, und {E_JG} holt Level 4 vor dir.']],
+       ['Zum Scuttle laufen, obwohl du ohne Level 4 und ohne Vision kommst.', ['{E_JG} ist mit Level 4 früher am Crab als du.', 'Du verlierst den Kampf um den Scuttle und gibst Vision und Tempo ab.']]],
+      [[28, 56, 'hero', 'ME'], [70, 40, 'enemy', 'OPP'], [62, 66, 'objective', 'Scuttle Crab (2:55)'], [12, 24, 'hero', 'A1']], EV1),
+    Midlane: MT('03:40', 'Du bist {ME} (Mid) gegen {OPP}, Minute 03:40, Level 4. Du hast die ersten zwei Wellen langsam gesammelt, die dritte Welle mit der Kanonen-Minion steht kurz vor dem gegnerischen Turm. Der gegnerische Jungler {E_JG} wurde zuletzt Top gesehen.',
+      'Was bindet den gegnerischen Turm, während du tradest?',
+      ['Die dritte Welle in den gegnerischen Turm crashen lassen und {OPP} traden, solange {E_JG} Top gebunden ist.', 'Perfekt! Der Turm räumt die Welle, und du gewinnst das Duell.'],
+      [['Allein ohne Welle unter den Turm laufen.', ['Der Turm beschießt dich, und {OPP} kann in Ruhe traden.', 'Du stirbst und gibst Gold und Prio ab.']],
+       ['Die Welle liegen lassen und ohne Info weiterfarmen.', ['{E_JG} ganked aus dem Dunkeln.', 'Du stirbst, und Mid gehört den Gegnern.']]],
+      [[48, 52, 'hero', 'ME'], [56, 44, 'enemy', 'OPP'], [60, 41, 'objective', 'Gegner-Turm (T1)'], [30, 12, 'enemy', 'E_JG']], EV1),
+    Botlane: MT('02:05', 'Du bist {ME} (Bot) mit {A4} gegen {OPP} und {E_SUP}, Minute 02:05. Ihr habt die erste Welle und die ersten drei Nahkampf-Minions der zweiten Welle erledigt (in der Botlane sind das die 9 Minions für Level 2). Ihr seid Level 2, die Gegner noch Level 1.',
+      'Wer hat zuerst Level 2, und was heißt das für einen All-in?',
+      ['Mit {A4} sofort vorrücken und den All-in erzwingen, bevor {OPP} und {E_SUP} Level 2 erreichen.', 'Perfekt! Ihr nutzt das Level-Fenster, bevor die Gegner nachziehen.'],
+      [['Hinter den eigenen Minions stehen bleiben und zuschauen.', ['Die Gegner erreichen kurz danach Level 2, und euer Vorsprung ist weg.', 'Ihr habt den stärksten Moment der Lane verschenkt, und die Gegner gewinnen Lane-Prio.']],
+       ['Allein vorlaufen, ohne dass {A4} nachsetzt.', ['Ohne Hilfe überlebt {OPP}, und {E_SUP} bestraft dich.', 'Du stirbst, und die Gegner bekommen Gold und Level-Vorsprung.']]],
+      [[70, 91, 'hero', 'ME'], [66, 91, 'hero', 'A4'], [80, 91, 'enemy', 'OPP'], [84, 91, 'enemy', 'E_SUP']], EV1),
+    Support: MT('02:05', 'Du bist {ME} (Support) mit {A4} gegen {OPP} und {E_BOT}, Minute 02:05. Ihr habt die erste Welle und die ersten drei Nahkampf-Minions der zweiten Welle erledigt (9 Minions für Level 2) und seid Level 2, die Gegner noch Level 1.',
+      'Wer hat zuerst Level 2, und was heißt das für einen All-in?',
+      ['Mit {A4} vorrücken und den All-in erzwingen, solange {OPP} und {E_BOT} noch Level 1 sind.', 'Perfekt! Ihr nutzt das Level-Fenster, bevor die Gegner nachziehen.'],
+      [['Hinter den eigenen Minions stehen bleiben und zuschauen.', ['Die Gegner erreichen kurz danach Level 2, und euer Vorsprung ist weg.', 'Ihr habt den stärksten Moment der Lane verschenkt, und die Gegner gewinnen Lane-Prio.']],
+       ['Allein vorlaufen, ohne dass {A4} nachsetzt.', ['Ohne Schaden von {A4} überlebt {E_BOT}, und {OPP} bestraft dich.', 'Du stirbst, und die Gegner bekommen Gold und Level-Vorsprung.']]],
+      [[70, 91, 'hero', 'ME'], [66, 91, 'hero', 'A4'], [80, 91, 'enemy', 'OPP'], [84, 91, 'enemy', 'E_BOT']], EV1),
+  },
+  2: {
+    AHEAD: MT('10:20', 'Du bist {ME} ({ROLE}), Minute 10:20. Ihr führt nach der Lane-Phase. Die Voidgrubs sind seit 6:00 frei, der gegnerische Jungler {E_JG} ist auf der anderen Seite der Karte gebunden. Eure Welle ist gecrasht, {OPP} steht allein an seinem Turm.',
+      'Wie nutzt du einen Vorsprung, ohne ihn zu riskieren?',
+      ['Mit {A1} die Voidgrubs nehmen und danach mit der gecrashten Welle einen Dive auf {OPP} koordinieren.', 'Perfekt! Ihr baut den Vorsprung aus, ohne etwas zu riskieren.'],
+      [['Allein weiterfarmen und den Vorsprung nicht nutzen.', ['Die Gegner holen Level und Gold auf.', 'Euer Vorsprung schmilzt, und die Voidgrubs gehen an sie.']],
+       ['Ohne Welle und ohne Vision auf {OPP} diven.', ['Der Turm und {E_JG} treffen dich.', 'Du stirbst und gibst den Vorsprung zurück.']]],
+      [[36, 38, 'hero', 'ME'], [38, 42, 'hero', 'A1'], [33, 30, 'objective', 'Voidgrubs'], [84, 76, 'enemy', 'E_JG'], [52, 44, 'enemy', 'OPP']],
+      { ok: { tk: 2, k: 1, a: 1, gold: 800, obj: 'VOIDGRUBEN GESICHERT!', kill: true }, bad: { ek: 2, d: 1, gold: -600, death: true } }),
+    BEHIND: MT('10:20', 'Du bist {ME} ({ROLE}), Minute 10:20. Ihr liegt zurück: Die Gegner haben Gold und Lane-Prio gewonnen. {OPP} und {E_JG} drücken jetzt auf euren T2-Turm, die Voidgrubs stehen bei den Gegnern.',
+      'Was begrenzt den Schaden, wenn du hinten liegst?',
+      ['Den Turm mit der Welle und {A2} verteidigen, das Objective abgeben und den Schaden begrenzen.', 'Gut gelöst! Ihr verliert kein weiteres Gold und haltet den Turm.'],
+      [['Den Turm aufgeben und allein die Voidgrubs versuchen.', ['Die Gegner nehmen den Turm und die Gruben.', 'Euer Rückstand wächst, und ihr verliert zwei Ressourcen.']],
+       ['Allein in die Gegner laufen, um den Rückstand aufzuholen.', ['{OPP} und {E_JG} fangen dich ab.', 'Du stirbst, und der Turm fällt trotzdem.']]],
+      [[22, 64, 'hero', 'ME'], [26, 60, 'hero', 'A2'], [9, 60, 'objective', 'Eigener Turm (T2)'], [18, 56, 'enemy', 'OPP'], [24, 50, 'enemy', 'E_JG']],
+      { ok: { tk: 1, a: 1, gold: 300 }, bad: { ek: 2, d: 1, gold: -800, death: true } }),
+    EVEN: MT('10:20', 'Du bist {ME} ({ROLE}), Minute 10:20. Das Spiel ist ausgeglichen. Der Drache erscheint in etwa 40 Sekunden, {E_JG} und {E_BOT} bewegen sich in Richtung Pit. Eure Welle ist neutral.',
+      'Wer sieht zuerst, wenn der Drache spawnt?',
+      ['Mit {A1} Vision um den Pit sichern, die Welle zuvor crashen und dann den Drachen starten.', 'Perfekt! Ihr kontrolliert den Pit und nehmt den Drachen.'],
+      [['Ohne Vision zum Drachen gehen und starten.', ['{E_JG} und {E_BOT} greifen aus dem Dunkeln an.', 'Ihr verliert den Kampf und den Drachen.']],
+       ['Die Welle liegen lassen und den Drachen ignorieren.', ['Die Gegner nehmen den Drachen ohne Gegenwehr.', 'Sie bekommen den Buff und das Tempo.']]],
+      [[60, 66, 'hero', 'ME'], [58, 70, 'hero', 'A1'], [66, 70, 'objective', 'Drache'], [72, 60, 'enemy', 'E_JG'], [74, 64, 'enemy', 'E_BOT']],
+      { ok: { tk: 2, ek: 1, k: 1, gold: 700, obj: 'DRACHE ERLEGT!', kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -700, death: true } }),
+  },
+  3: {
+    AHEAD: MT('17:30', 'Du bist {ME} ({ROLE}), Minute 17:30. Ihr führt klar nach Objectives. Eure Welle ist an ihrem T2 gecrasht, {OPP} muss sie räumen. {E_MID} und {E_JG} sind auf der anderen Seite der Karte.',
+      'Wie setzt du Druck, ohne einen Kampf zu erzwingen?',
+      ['Mit der gecrashten Welle und {A1} den T2-Turm drücken, ohne einen Kampf zu erzwingen.', 'Perfekt! Der Turm fällt, und ihr nehmt Druck auf die Karte.'],
+      [['Die Welle liegen lassen und zur Mitte zurückziehen.', ['Die Gegner bekommen Zeit zum Räumen.', 'Der Turm bleibt stehen, und ihr verschenkt Tempo.']],
+       ['Allein in die Gegner laufen, um den Vorsprung zu erhöhen.', ['Du läufst ohne Vision in mehrere Gegner.', 'Du stirbst, und der Druck ist weg.']]],
+      [[60, 28, 'hero', 'ME'], [56, 32, 'hero', 'A1'], [70, 31, 'objective', 'Gegner-Turm (T2)'], [78, 24, 'enemy', 'OPP']],
+      { ok: { tk: 2, ek: 1, a: 1, gold: 900, obj: 'TURM ZERSTÖRT!' }, bad: { ek: 2, d: 1, gold: -700, death: true } }),
+    BEHIND: MT('17:30', 'Du bist {ME} ({ROLE}), Minute 17:30. Ihr liegt zurück. {E_MID} und {E_JG} greifen euren T2 an, euer Team kann ihn nicht mehr sicher verteidigen. Auf der anderen Seite der Karte steht ein gegnerischer Turm ohne Verteidiger.',
+      'Was bringt dir ein Tausch, wenn du nicht verteidigen kannst?',
+      ['Den Turm abgeben und stattdessen einen anderen Turm der Karte nehmen (Turm-Tausch), statt in Unterzahl zu verteidigen.', 'Gut! Ihr tauscht Türme und haltet den Rückstand klein.'],
+      [['In Unterzahl den T2 verteidigen.', ['Ihr verliert den Kampf in Unterzahl.', 'Der Turm fällt, und ihr verliert zusätzlich Spieler.']],
+       ['Beide Türme aufgeben und zur Base recallen.', ['Die Gegner nehmen den Turm kampflos.', 'Ihr bekommt nichts zurück, und der Rückstand wächst.']]],
+      [[40, 52, 'hero', 'ME'], [36, 56, 'hero', 'A2'], [9, 60, 'objective', 'Eigener Turm (T2)'], [88, 30, 'objective', 'Gegner-Turm (andere Lane)'], [26, 50, 'enemy', 'E_MID'], [22, 56, 'enemy', 'E_JG']],
+      { ok: { tk: 1, k: 1, gold: 500, obj: 'TURM-TAUSCH GEWONNEN!', kill: true }, bad: { ek: 3, d: 1, gold: -900, death: true } }),
+    EVEN: MT('17:30', 'Du bist {ME} ({ROLE}), Minute 17:30. Das Spiel ist ausgeglichen. Der Baron spawnt um 20:00, in etwa 150 Sekunden. {E_MID} wurde zuletzt in der Mitte gesehen.',
+      'Wo steht deine Welle, wenn der Baron spawnt?',
+      ['Die Welle langsam pushen (Slow Push), Vision um den Baron-Pit sichern und früh mit dem Team gruppieren.', 'Perfekt! Ihr geht mit Vision und Wellenvorteil in den Baron.'],
+      [['Die Welle liegen lassen und erst bei 20:00 rotieren.', ['Die gegnerische Welle drückt euren Turm.', 'Ihr geht unter Druck in den Baron.']],
+       ['Alle einzeln Seitenlanes pushen.', ['Ihr steht verstreut, als {E_MID} auftaucht.', 'Sie fangen euch einzeln ab.']]],
+      [[46, 50, 'hero', 'ME'], [42, 54, 'hero', 'A1'], [33, 30, 'objective', 'Baron'], [54, 44, 'enemy', 'E_MID']],
+      { ok: { tk: 2, ek: 1, k: 1, gold: 600, kill: true }, bad: { tk: 1, ek: 2, d: 1, gold: -600, death: true } }),
+  },
+  4: {
+    AHEAD: MT('24:10', 'Du bist {ME} ({ROLE}), Minute 24:10. Ihr führt. Der Baron ist seit 20:00 verfügbar. Die Gegner haben keine Vision im Pit und stehen verteilt im Fluss, euer Team steht geschlossen.',
+      'Wer steht mit dem Rücken zu wem?',
+      ['Den Baron anfangen, um die Gegner anzulocken, und bei Annäherung geschlossen umdrehen und den Kampf annehmen.', 'Perfekt! Der Baron wird zum Köder, und ihr gewinnt den Kampf.'],
+      [['Den Baron stur weiterschlagen, auch wenn die Gegner kommen.', ['Ihr schlagt den Baron mit dem Rücken zu den Gegnern.', 'Ihr verliert den Kampf und den Baron.']],
+       ['Den Baron nicht anfassen und auf einen Fehler warten.', ['Die Gegner stehen ohne Vision und müssen nicht reagieren.', 'Ihr verschenkt euren Vorsprung.']]],
+      [[36, 36, 'hero', 'ME'], [34, 40, 'hero', 'A1'], [33, 30, 'objective', 'Baron'], [50, 40, 'enemy', 'E_JG']],
+      { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1200, obj: 'BARON NASHOR GESICHERT!', kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1000, death: true } }),
+    BEHIND: MT('24:10', 'Du bist {ME} ({ROLE}), Minute 24:10. Ihr liegt zurück. Die Gegner schlagen den Baron, euer Jungler hat Smite (900 wahren Schaden). Die Gegner haben Vision am Eingang.',
+      'Wann reicht dein Smite für den Baron?',
+      ['Mit Vision am Rand warten und den Baron erst stehlen, wenn er unter 900 Leben fällt (Smite-Steal), statt frontal in fünf Gegner zu laufen.', 'Perfekt! Der Smite-Steal dreht den Baron und das Spiel.'],
+      [['Frontal in die fünf Gegner laufen.', ['Ihr kommt in Unterzahl in den Kampf.', 'Ihr verliert den Kampf und den Baron.']],
+       ['Den Smite zu früh bei viel Leben drücken.', ['Der Smite macht nur 900 wahren Schaden, der Baron lebt weiter.', 'Die Gegner schließen den Baron ab.']]],
+      [[40, 38, 'hero', 'ME'], [38, 42, 'hero', 'A2'], [33, 30, 'objective', 'Baron'], [34, 32, 'enemy', 'E_TOP'], [36, 34, 'enemy', 'E_MID'], [32, 34, 'enemy', 'E_JG']],
+      { ok: { tk: 2, ek: 1, k: 1, a: 1, gold: 1000, obj: 'BARON NASHOR GESTOHLEN!', kill: true }, bad: { ek: 4, d: 1, gold: -1400, death: true } }),
+    EVEN: MT('24:10', 'Du bist {ME} ({ROLE}), Minute 24:10. Das Spiel ist ausgeglichen, der Baron ist seit 20:00 verfügbar. Beide Teams haben wenig Vision, {E_SUP} wurde im Fluss gesehen.',
+      'Wer sieht zuerst, wenn ihr den Baron startet?',
+      ['Mit dem Team Vision um den Pit sichern und den Baron erst starten, wenn der Eingang frei ist.', 'Perfekt! Ihr startet den Baron mit Vision und gesichertem Eingang.'],
+      [['Den Baron sofort ohne Vision starten.', ['{E_SUP} und die Gegner greifen aus dem Dunkeln an.', 'Ihr verliert den Kampf und den Baron.']],
+       ['Allein vorlaufen und die Büsche prüfen.', ['Du läufst ohne Info in die Gegner.', 'Du stirbst, und euer Team startet in Unterzahl.']]],
+      [[42, 42, 'hero', 'ME'], [38, 44, 'hero', 'A1'], [33, 30, 'objective', 'Baron'], [48, 40, 'enemy', 'E_SUP']],
+      { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1100, obj: 'BARON NASHOR GESICHERT!', kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1000, death: true } }),
+  },
+  5: {
+    AHEAD: MT('30:20', 'Du bist {ME} ({ROLE}), Minute 30:20. Ihr habt den Baron und führt klar. Der Hand-of-Baron-Buff hält 180 Sekunden, die Gegner sind in der Base verteilt. Euer Team steht vor dem gegnerischen Inhibitor.',
+      'Wie lange hält der Buff, und was machst du damit?',
+      ['Mit dem Buff und den gestärkten Minions geschlossen den Nexus pushen und kein Objective mehr suchen.', 'Perfekt! Ihr beendet das Spiel mit dem Nexus-Push.'],
+      [['Zum Elder-Drachen abdrehen und das Spiel verlängern.', ['Der Buff läuft ab, und die Gegner sammeln sich.', 'Ihr gebt die Chance auf ein schnelles Ende ab.']],
+       ['Einzeln die Lanes pushen, ohne euch zu gruppieren.', ['Die Gegner fangen euch einzeln ab.', 'Der Push bricht zusammen.']]],
+      [[70, 24, 'hero', 'ME'], [66, 28, 'hero', 'A1'], [84, 17, 'objective', 'Gegner-Inhibitor'], [88, 12, 'enemy', 'E_SUP']],
+      { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1500, obj: 'NEXUS ZERSTÖRT!', kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1200, death: true } }),
+    BEHIND: MT('30:20', 'Du bist {ME} ({ROLE}), Minute 30:20. Ihr liegt zurück. Die Gegner sind in eurer Base, euer Inhibitor ist gefallen. Ihr seid zu viert gegen fünf Gegner, aber ihr kämpft unter euren Türmen.',
+      'Wo hilft euch der Turmschutz am meisten?',
+      ['Unter eurem Turm zusammenbleiben, die Frontline vor den Carry stellen und die Gegner einzeln wegfokussieren.', 'Heroisch! Ihr gewinnt den Base-Fight mit 3:2 und dreht das Spiel.'],
+      [['Einzeln aus der Base fliehen, um den Nexus zu verlassen.', ['Die Gegner jagen euch einzeln.', 'Ihr verliert Spieler und den Nexus.']],
+       ['Frontal aus dem Turmschutz in die fünf Gegner laufen.', ['Ihr verliert den Turmschutz und den Kampf.', 'Der Nexus fällt.']]],
+      [[10, 86, 'hero', 'ME'], [14, 88, 'hero', 'A2'], [8, 92, 'objective', 'Eigenes Nexus'], [20, 80, 'enemy', 'E_BOT'], [24, 76, 'enemy', 'E_MID']],
+      { ok: { tk: 3, ek: 2, k: 1, a: 2, gold: 1200, obj: 'HEROISCHES COMEBACK!', kill: true }, bad: { ek: 4, d: 1, gold: -1500, death: true } }),
+    EVEN: MT('30:20', 'Du bist {ME} ({ROLE}), Minute 30:20. Das Spiel ist ausgeglichen. Beide Teams stehen sich im Fluss vor dem Elder Dragon gegenüber, {E_TOP} führt die gegnerische Frontline an.',
+      'Wer erreicht wen zuerst?',
+      ['Front-to-Back kämpfen: hinter eurer Frontline bleiben und erst den nächsten sicher erreichbaren Gegner beschießen.', 'Perfekt! Ihr gewinnt den Kampf mit sauberer Positionierung.'],
+      [['Blind in die gegnerische Backline springen.', ['Ihr steht allein vor ihrer Kontrolle.', 'Ihr verliert den Kampf und den Elder.']],
+       ['Den Kampf meiden und den Elder abgeben.', ['Die Gegner nehmen den Elder ohne Kampf.', 'Sie bekommen den Vorteil, und das Spiel kippt.']]],
+      [[50, 50, 'hero', 'ME'], [46, 54, 'hero', 'A1'], [66, 70, 'objective', 'Elder Dragon'], [58, 44, 'enemy', 'E_TOP']],
+      { ok: { tk: 3, ek: 1, k: 1, a: 2, gold: 1000, kill: true }, bad: { tk: 1, ek: 3, d: 1, gold: -1000, death: true } }),
+  },
+};
+const mv2Template = (phase, state, role) => (phase === 1 ? MV2[1][role] : MV2[phase][state]);
+const nextState = (s, ok) => (ok ? (s === 'BEHIND' ? 'EVEN' : 'AHEAD') : (s === 'AHEAD' ? 'EVEN' : 'BEHIND'));
+const applyEv = (st, ev) => ({ tk: st.tk + (ev.tk || 0), ek: st.ek + (ev.ek || 0), k: st.k + (ev.k || 0), d: st.d + (ev.d || 0), a: st.a + (ev.a || 0), gold: st.gold + (ev.gold || 0) });
+const MV2_START = { tk: 0, ek: 0, k: 0, d: 0, a: 0, gold: 0 };
+const STATE_LABEL = { EVEN: 'Gleichstand', AHEAD: 'Vorsprung', BEHIND: 'Rückstand' };
+function mv2Grade(correct, d) {   // LoL-Benotung: S+, S, A, B, C
+  if (correct >= 5) return d === 0 ? 'S+' : 'S';
+  if (correct === 4) return d <= 1 ? 'S' : 'A';
+  if (correct === 3) return d <= 1 ? 'A' : 'B';
+  if (correct === 2) return 'B';
+  return 'C';
+}
+// Baut das Szenario einer Phase aus Vorlage und festem Lineup. Die 10 Champions bleiben über alle 5 Phasen identisch.
+function buildMv2Scenario(tpl, ctx, phase, state) {
+  const m = slotMap(ctx.lineup), f = t => fillSlots(t, m);
+  const id = `mv2~${ctx.matchId}~${phase}~${state}`;
+  const tier = Math.max(0, Math.min(7, rankedTier(ctx.step)));
+  const markers = tpl.markers.map(([x, y, type, s]) => {
+    const slot = /^(ME|OPP|A\d|E_[A-Z]+)$/.test(s);
+    const mk = { x, y, type, label: slot ? m[s] : s };
+    if (slot) { if (s === 'ME') mk.isPlayer = true; else mk.champion = m[s]; }
+    return mk;
+  });
+  const enemies = ROLES_ORDER.map(r => ctx.lineup.red[r]);
+  const victim = phase === 1 ? m.OPP : enemies[(phase + 1) % 5];
+  const pos = (hashStr(ctx.matchId) + phase) % 3;   // richtige Antwort wandert über A, B und C
+  const arr = tpl.bad.map(b => ({ text: f(b[0]), chain: b[1].map(f), lp: -15 }));
+  arr[1].lp = -10;
+  arr.splice(pos, 0, { text: f(tpl.good[0]), fb: f(tpl.good[1]), lp: 20 });
+  const options = arr.map((o, i) => ({ label: `${'ABC'[i]}: ${o.text}`, lpChange: o.lp, nextId: 'end',
+    feedback: o.lp > 0 ? o.fb : 'Fehlentscheidung.', ...(o.lp > 0 ? {} : { chain: o.chain }) }));
+  const sc = { id, gameTime: tpl.time, timeLimit: TLIM[tier], champion: ctx.me, role: ctx.role, difficulty: DIFF_NAMES[tier], phase: MV2_PHASE[phase],
+    markers, coachHint: f(tpl.hint), context: f(tpl.ctx), options, mv2: { phase, state, ev: tpl.ev, victim, me: ctx.me } };
+  DYN[id] = sc;
+  return sc;
+}
+
+/* ---------- Beschwörer-Level und tägliche Quests ---------- */
+// Für Level L braucht man insgesamt 75·L·(L-1) XP: Level 4 -> 900 XP, 600 XP bis Level 5
+const xpLevel = xp => {
+  let l = 1; while (75 * (l + 1) * l <= xp) l++;
+  const base = 75 * l * (l - 1), need = 150 * l;
+  return { level: l, into: xp - base, need, pct: Math.round(((xp - base) / need) * 100) };
+};
+const todayKey = () => new Date().toISOString().slice(0, 10);
+const QUEST_POOL = [
+  { id: 'ranked1', text: 'Spiele ein Ranked Match', target: 1, xp: 200, ev: 'ranked' },
+  { id: 'correct8', text: 'Beantworte 8 Fragen richtig', target: 8, xp: 150, ev: 'correct' },
+  { id: 'mastery1', text: 'Absolviere einen Mastery-Run', target: 1, xp: 200, ev: 'mastery' },
+  { id: 'win1', text: 'Gewinne ein Match', target: 1, xp: 250, ev: 'win' },
+  { id: 'daily1', text: 'Schließe den Daily Run ab', target: 1, xp: 150, ev: 'daily' },
+  { id: 'plan1', text: 'Analysiere einen Gameplan richtig', target: 1, xp: 150, ev: 'plan' },
+];
+const questIds = date => { const h = hashStr(date); return [0, 1, 2].map(i => QUEST_POOL[(h + i * 2) % QUEST_POOL.length].id); };   // 3 verschiedene pro Tag
+const freshQuests = saved => {
+  const date = todayKey();
+  if (saved && saved.date === date && Array.isArray(saved.ids) && saved.ids.length === 3) return { date, ids: saved.ids, progress: saved.progress || {}, claimed: saved.claimed || {} };
+  return { date, ids: questIds(date), progress: {}, claimed: {} };
+};
+const TIPS = [
+  'Crash vor Recall: Lass deine Welle erst in den gegnerischen Turm laufen und gehe danach zur Base, dann verlierst du keine Minions.',
+  'Slow Push: Baue etwa eine Minute vor Drache oder Baron eine große Welle auf, damit sie crasht, wenn ihr rotiert.',
+  'Freeze: Halte die Welle knapp außerhalb deiner Turmreichweite, wenn der gegnerische Jungler in deiner Hälfte ist.',
+  'Der Baron spawnt seit Patch 26.1 um 20:00. Plane Vision und Wellen schon eine Minute vorher.',
+  'Zhonya\'s gibt 2,5 Sekunden Stasis und hat 120 Sekunden Abklingzeit. Nutze das Fenster danach.',
+  'Flash hat 300 Sekunden Abklingzeit: Ein Gegner ohne Flash ist leicht zu fangen.',
+  'Smite macht 600 wahren Schaden (900 mit Upgrade). Drücke ihn erst, wenn das Monster darunter fällt.',
+  'Prio bedeutet: Deine Welle steht vorn, deshalb kannst du zuerst zu Objectives rotieren.',
+  'Der Turm beschießt zuerst Minions und wechselt auf Champions, die einen Verbündeten in Turmreichweite angreifen.',
+  'Level 2 in der Botlane: erste Welle plus drei Nahkampf-Minions der zweiten Welle (9 Minions).',
+  'Control Wards kosten 75 Gold. Kaufe bei jedem Reset eines.',
+  'Cheater Recall: Crashe die dritte Welle mit der Kanonen-Minion und gehe sofort zurück, um früh Items zu kaufen.',
+  'Der Scuttle Crab spawnt um 2:55 und respawnt nach seinem Tod rund 2:30 später.',
+  'Elder Immolation richtet Gegner unter 20 % Leben hin: Ein einziger Treffer reicht.',
+];
+const tipOfDay = () => TIPS[Math.floor(Date.now() / 86400000) % TIPS.length];
+
+/* ---------- Glossar ---------- */
+const GLOSS = {
+  freeze: ['Freeze', 'Du hältst die Minion-Welle knapp außerhalb deiner eigenen Turmreichweite fest, sodass der Gegner nur unter Risiko farmen kann.'],
+  prio: ['Prio', 'Lane-Priorität heißt, dass deine Welle weiter vorn steht und du deshalb zuerst zu Objectives oder in den Fluss rotieren kannst.'],
+  cheater: ['Cheater Recall', 'Du crashst eine große Welle und gehst direkt zurück zur Base, um früh Items zu kaufen, während der Gegner die Welle am Turm abräumen muss.'],
+  slow: ['Slow Push', 'Du lässt Minions sich zu einer großen Welle aufbauen, die später auf einmal in den gegnerischen Turm crasht.'],
+  stasis: ['Stasis', 'Zhonya\'s Hourglass macht dich 2,5 Sekunden lang unverwundbar und unangreifbar, aber du kannst in dieser Zeit nichts tun.'],
+};
+const GLOSS_RE = /(Cheater Recall|Slow Push|slow pushen|langsam pushen|Lane-Prio|Freeze|einfrieren|einfrierst|eingefroren|Stasis|Prio)/g;
+const glossKey = s => { const l = s.toLowerCase(); return /cheater/.test(l) ? 'cheater' : /slow|langsam/.test(l) ? 'slow' : /freeze|einfrier|eingefror/.test(l) ? 'freeze' : /stasis/.test(l) ? 'stasis' : 'prio'; };
+const GlossCtx = React.createContext(() => {});
+function G({ t }) {
+  const open = React.useContext(GlossCtx);
+  if (typeof t !== 'string') return t;
+  const parts = t.split(GLOSS_RE);
+  return <>{parts.map((p, i) => (i % 2 === 1
+    ? <span key={i} role="button" tabIndex={0} data-silent="true" data-gloss={glossKey(p)} title="Tippen für eine Erklärung"
+        onClick={e => { e.stopPropagation(); open(glossKey(p)); }}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); open(glossKey(p)); } }}
+        className="cursor-help underline decoration-dotted decoration-[#0AC8B9] underline-offset-2">{p}</span>
+    : <React.Fragment key={i}>{p}</React.Fragment>))}</>;
+}
+
+/* ---------- Beschwörer-Icons, Rang-Wappen, XP, Freunde, Werbung ---------- */
+const ICON_IDS = [29, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const iconUrl = id => `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/profileicon/${id}.png`;
+function SummonerIcon({ id, name = '', className = 'w-12 h-12', onClick, label = 'Beschwörer-Icon ändern' }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => { setFailed(false); }, [id]);
+  const inner = failed
+    ? <span className="flex h-full w-full items-center justify-center bg-[#0A1428] font-serif font-bold text-[#C89B3C]">{(name || '?')[0].toUpperCase()}</span>
+    : <img src={iconUrl(id)} alt="" className="h-full w-full object-cover" onError={() => setFailed(true)} />;
+  const cls = `${className} shrink-0 overflow-hidden rounded-full border-2 border-[#C89B3C]`;
+  return onClick
+    ? <button type="button" onClick={onClick} aria-label={label} title={label} className={`${cls} transition active:scale-95`}>{inner}</button>
+    : <span className={cls}>{inner}</span>;
+}
+function IconPicker({ current, onPick, onClose }) {
   return (
-    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-      <div className="text-center pt-4">
-        <Icon n="crown" size={44} className="mx-auto text-[#C89B3C]" />
-        <div className="font-serif text-2xl font-black mt-2">BrainGap Premium</div>
-        <div className="text-slate-400 text-sm">Trainiere ohne Limit.</div>
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(1,10,19,.9)' }} onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label="Beschwörer-Icon wählen" onClick={e => e.stopPropagation()} className="flex w-full flex-col gap-3 rounded-2xl border border-[#C89B3C]/50 bg-[#06111F] p-4">
+        <div className="flex items-center gap-2">
+          <div className="flex-1 font-serif text-lg font-bold">Beschwörer-Icon wählen</div>
+          <button type="button" onClick={onClose} aria-label="Schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
+        </div>
+        <div className="grid grid-cols-5 gap-3">
+          {ICON_IDS.map(id => (
+            <button key={id} type="button" data-icon={id} aria-pressed={current === id} aria-label={`Icon ${id}`} onClick={() => { onPick(id); onClose(); }}
+              className={`overflow-hidden rounded-full border-2 transition active:scale-90 ${current === id ? 'border-[#0AC8B9] shadow-[0_0_12px_rgba(10,200,185,.7)]' : 'border-[#C89B3C]/40'}`}>
+              <SummonerIcon id={id} name={String(id)} className="w-full aspect-square" />
+            </button>
+          ))}
+        </div>
+        <div className="text-xs text-slate-500">Riot-Standard-Icons via Data Dragon.</div>
       </div>
-      <div className="rounded-lg border p-4 flex flex-col gap-3" style={{ background: 'var(--panel)', borderColor: 'var(--gold)' }}>
-        {perks.map(p => <div key={p} className="flex items-center gap-2"><Icon n="check" size={18} className="text-[#0AC8B9]" />{p}</div>)}
-        <div className="text-center mt-2"><span className="text-3xl font-black">2 €</span><span className="text-slate-400"> / Monat</span></div>
-        <button className="py-3 rounded-lg font-serif font-extrabold text-[#010A13]" style={{ background: 'var(--gold)' }}>Premium freischalten</button>
+    </div>
+  );
+}
+// Offizielle Rang-Wappen (CommunityDragon) mit Fallback-Kette: zweiter Pfad, dann iron.png, dann das eingebaute Wappen
+const emblemSrc = t => [
+  `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/${t}.png`,
+  `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/ranked-emblem/emblem-${t}.png`,
+  'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png',
+];
+function RankEmblem({ tier, size = 64, glow = false, className = '' }) {
+  const t = tier.toLowerCase(), srcs = emblemSrc(t);
+  const [i, setI] = useState(0);
+  useEffect(() => { setI(0); }, [t]);
+  const cls = RANK_ICON[tier].cls;
+  return (
+    <span className={`relative inline-flex shrink-0 items-center justify-center ${cls} ${className}`} style={{ width: size, height: size }} data-emblem={t}>
+      {glow && <span className="rankglow absolute inset-0 rounded-full bg-current opacity-40 blur-xl" aria-hidden="true" />}
+      {i < srcs.length
+        ? <img src={srcs[i]} alt={`Rang-Wappen ${tier}`} width={size} height={size} className="relative object-contain drop-shadow-[0_0_8px_currentColor]" onError={() => setI(n => n + 1)} />
+        : <span className="relative" data-emblem-fallback="true"><RankIcon tier={tier} size={Math.round(size * 0.8)} /></span>}
+    </span>
+  );
+}
+function XpBar({ xp }) {
+  const L = xpLevel(xp);
+  return (
+    <div>
+      <div className="text-xs font-semibold tabular-nums text-slate-300" data-xp-label="true">Lv. {L.level} Beschwörer • {L.into.toLocaleString('de-DE')} / {L.need.toLocaleString('de-DE')} XP</div>
+      <div className="mt-1 h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--track)' }} role="progressbar" aria-valuenow={L.pct} aria-valuemin={0} aria-valuemax={100}>
+        <div className="h-full rounded-full bg-gradient-to-r from-[#0AC8B9] to-[#C89B3C]" style={{ width: `${L.pct}%` }} />
       </div>
-      <button onClick={() => { onRefill(); setRefilled(true); }} className="rounded-lg border py-3 font-semibold text-[#0AC8B9]" style={{ borderColor: 'var(--teal)' }}>
-        Werbung ansehen
-        <span className="block text-xs font-normal text-slate-400">Test: füllt deine Herzen sofort auf {MAX_HEARTS} (Ghost-Buff folgt)</span>
+    </div>
+  );
+}
+function FriendsOnline({ friends }) {
+  const [open, setOpen] = useState(false);
+  const online = friends.filter(f => f.status === 'online').length;
+  return (
+    <div className="relative">
+      <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}
+        className="flex items-center gap-2 rounded-full border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-1.5 text-xs font-semibold transition hover:border-[#0AC8B9]">
+        <span className="pulsedot" aria-hidden="true">🟢</span>
+        <span data-friends-online="true">{online === 0 ? 'Keine Freunde online' : `${online} ${online === 1 ? 'Freund' : 'Freunde'} online`}</span>
       </button>
-      {refilled && <div role="status" className="text-sm text-center text-red-400">Herzen aufgefüllt: {hearts}/{MAX_HEARTS}</div>}
+      {open && (
+        <div role="menu" className="slidedown absolute left-0 top-full z-30 mt-1.5 w-64 rounded-xl border border-[#C89B3C]/50 bg-[#06111F] p-2 shadow-[0_8px_24px_rgba(0,0,0,.6)]">
+          {friends.length === 0 && <div className="p-2 text-xs text-slate-500">Noch keine Freunde. Füge welche im Profil hinzu.</div>}
+          {friends.map(f => (
+            <div key={f.name} role="menuitem" className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm">
+              <span aria-hidden="true">{STATUS[f.status] ? STATUS[f.status].emoji : '🟢'}</span>
+              <span className="flex-1 truncate font-semibold">{f.name}</span>
+              <span className="text-xs text-slate-400">{STATUS[f.status] ? STATUS[f.status].label : ''}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+function AdModal({ kind, onDone, onClose }) {
+  const [left, setLeft] = useState(5);
+  useEffect(() => { if (left <= 0) return; const t = setTimeout(() => setLeft(l => l - 1), 1000); return () => clearTimeout(t); }, [left]);
+  const T = { interstitial: ['Anzeige', 'Weiter'], shield: ['Hextech-Schild: Werbespot', '30 Minuten werbefrei aktivieren'], heart: ['Werbespot für ein Herz', '+1 Herz abholen'] }[kind];
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(1,10,19,.94)' }}>
+      <div role="dialog" aria-modal="true" aria-label={T[0]} className="flex w-full flex-col items-center gap-3 rounded-2xl border border-[#C89B3C]/50 bg-[#06111F] p-4 text-center">
+        <div className="font-serif text-lg font-bold text-[#C89B3C]">{T[0]}</div>
+        <div className="flex h-32 w-full items-center justify-center rounded-xl border border-dashed border-slate-600 text-sm text-slate-400">Platzhalter für einen echten Werbespot (Demo)</div>
+        {left > 0
+          ? <div className="text-sm tabular-nums text-slate-300" aria-live="polite">Noch {left} s</div>
+          : <button type="button" autoFocus onClick={onDone} className="w-full rounded-xl bg-[#C89B3C] py-2.5 font-serif font-extrabold text-[#010A13]">{T[1]}</button>}
+        {kind !== 'interstitial' && <button type="button" onClick={onClose} className="text-xs text-slate-500 underline">Abbrechen</button>}
+      </div>
+    </div>
+  );
+}
+function ShieldCard({ shieldUntil, onWatch }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 15000); return () => clearInterval(t); }, []);
+  const left = Math.max(0, shieldUntil - now), active = left > 0, mm = Math.ceil(left / 60000);
+  return (
+    <div className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 text-xs ${active ? 'border-[#0AC8B9]/70 bg-[#0AC8B9]/10 text-[#0AC8B9]' : 'border-[#C89B3C]/40 bg-[#010A13]/80 text-slate-200'}`} data-shield={active ? 'on' : 'off'}>
+      <div className="flex-1 leading-snug">{active ? `🛡️ Hextech-Schild aktiv: noch ${mm} Min. garantiert werbefrei` : '🛡️ Hextech-Schild: 1 Werbespot ansehen → 30 Minuten garantiert werbefrei lernen!'}</div>
+      {!active && <button type="button" onClick={onWatch} className="shrink-0 rounded-lg bg-[#C89B3C] px-2.5 py-1.5 font-bold text-[#010A13]">Ansehen</button>}
+    </div>
+  );
+}
+function SummonerLevelUp({ level, onClose }) {
+  useEffect(() => { playHextechSound('promotion'); }, []);
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-5" style={{ background: 'rgba(1,10,19,.92)' }} role="dialog" aria-modal="true" aria-label="Level-Up">
+      <Confetti />
+      <div className="relative z-20 flex w-full flex-col items-center gap-3 rounded-2xl border border-[#C89B3C] bg-[#06111F] p-5 text-center shadow-[0_0_30px_rgba(200,155,60,.4)]">
+        <div className="pop font-serif text-3xl font-black text-yellow-300">LEVEL UP!</div>
+        <div className="font-serif text-xl font-bold">Beschwörer-Level {level}</div>
+        <div className="flex items-center gap-1 text-red-400">{Array.from({ length: MAX_HEARTS }, (_, i) => <Icon key={i} n="heart" size={26} fill="currentColor" />)}</div>
+        <div className="text-sm text-slate-300">Alle Herzen wurden vollständig aufgeladen.</div>
+        <button type="button" onClick={onClose} className="w-full rounded-xl bg-[#C89B3C] py-2.5 font-serif font-extrabold text-[#010A13]">Weiter</button>
+      </div>
+    </div>
+  );
+}
+function GlossSheet({ k, onClose }) {
+  const g = GLOSS[k];
+  if (!g) return null;
+  return (
+    <div className="absolute inset-0 z-[60] flex items-end p-3" style={{ background: 'rgba(1,10,19,.6)' }} onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label={g[0]} onClick={e => e.stopPropagation()} className="w-full rounded-2xl border border-[#0AC8B9]/60 bg-[#06111F] p-4">
+        <div className="font-serif text-lg font-bold text-[#0AC8B9]">{g[0]}</div>
+        <p className="mt-1 text-sm leading-relaxed text-slate-200">{g[1]}</p>
+        <button type="button" autoFocus onClick={onClose} className="mt-3 w-full rounded-xl border border-[#0AC8B9]/60 py-2 text-sm font-bold text-[#0AC8B9]">Verstanden</button>
+      </div>
+    </div>
+  );
+}
+function QuestList({ quests }) {
+  return (
+    <div className="flex flex-col gap-2" data-quests="true">
+      <div className="font-serif font-bold">Tägliche Hextech-Missionen</div>
+      {quests.ids.map(id => {
+        const q = QUEST_POOL.find(x => x.id === id), p = Math.min(q.target, quests.progress[id] || 0), done = !!quests.claimed[id];
+        return (
+          <div key={id} data-quest={id} className={`rounded-lg border px-3 py-2 ${done ? 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10' : 'border-[#C89B3C]/30 bg-[#010A13]/70'}`}>
+            <div className="flex items-center gap-2 text-sm">
+              <span aria-hidden="true">{done ? '✅' : '🎯'}</span>
+              <span className="flex-1">{q.text}</span>
+              <span className="text-xs font-bold text-[#C89B3C]">+{q.xp} XP</span>
+            </div>
+            <div className="mt-1.5 flex items-center gap-2">
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full" style={{ background: 'var(--track)' }}><div className="h-full rounded-full bg-[#C89B3C]" style={{ width: `${(p / q.target) * 100}%` }} /></div>
+              <span className="text-xs tabular-nums text-slate-400">{p}/{q.target}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------- Ranked Pre-Game: Ready Check, Champion-Wahl, Ladebildschirm, Gameplan ---------- */
+const SUMMONER_NAMES = ['WardBot', 'FlashOnD', 'MinionMagnet', 'TiltProof', 'GankLord', 'BaronBuddy', 'SupportDiff', 'LaneKing', 'NexusNinja'];
+function LoadSlot({ champ, role, icon, name, side, mine }) {
+  return (
+    <div data-lineup={side} className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 ${side === 'blue' ? 'border-blue-400/50 bg-blue-500/10' : 'border-red-400/50 bg-red-500/10'} ${mine ? 'ring-2 ring-[#C89B3C]' : ''}`}>
+      <SummonerIcon id={icon} name={name} className="w-7 h-7" />
+      <ChampAvatar name={champ} className="w-10 h-10" iconSize={16} />
+      <div className="min-w-0 flex-1 leading-tight">
+        <div className="truncate text-sm font-bold" data-champ-slot={champ}>{champ}</div>
+        <div className="truncate text-[10px] text-slate-400">{name} · {ROLE_SHORT[role]}</div>
+      </div>
+    </div>
+  );
+}
+function PregameFlow({ profile, role, onCancel, onPlan, onStart }) {
+  const [step, setStep] = useState('ready');
+  const [left, setLeft] = useState(10);
+  const pool = Object.keys(ROLE_POOL[role]);
+  const mine = profile.role === role ? champLabel(profile.champion) : pool[0];
+  const choices = pool.some(c => normName(c) === normName(mine)) ? pool : [mine, ...pool];
+  const [me, setMe] = useState(mine);
+  const [lineup, setLineup] = useState(null);
+  const [plan, setPlan] = useState(null);
+  const opts = useRef(shuffle(Object.keys(ARCH))).current;
+  useEffect(() => { playHextechSound('ready_gong'); }, []);
+  useEffect(() => {
+    if (step !== 'ready') return;
+    if (left <= 0) { onCancel('timeout'); return; }
+    const t = setTimeout(() => setLeft(l => l - 1), 1000);
+    return () => clearTimeout(t);
+  }, [step, left]);
+  const shell = 'absolute inset-0 z-50 flex flex-col overflow-y-auto';
+  const bg = { background: 'linear-gradient(#010A13,#0A1428)' };
+  const back = <button type="button" onClick={() => onCancel('cancel')} className="self-center pb-2 text-xs text-slate-500 underline">Abbrechen</button>;
+
+  if (step === 'ready') {
+    return (
+      <div className={shell} style={bg} role="dialog" aria-modal="true" aria-label="Spiel gefunden">
+        <div className="m-auto flex w-full flex-col items-center gap-4 p-6 text-center">
+          <div className="pop font-serif text-3xl font-black tracking-wide text-[#C89B3C]">SPIEL GEFUNDEN!</div>
+          <div className="text-sm text-slate-300">Ranked · {ROLE_SHORT[role]}</div>
+          <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-[#C89B3C] shadow-[0_0_24px_rgba(200,155,60,.5)]">
+            <span className="font-serif text-5xl font-black tabular-nums" data-ready-count="true" aria-live="polite">{left}</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--track)' }}><div className="h-full bg-[#0AC8B9] transition-[width] duration-1000 ease-linear" style={{ width: `${(left / 10) * 100}%` }} /></div>
+          <button type="button" autoFocus onClick={() => setStep('select')} className="w-full rounded-xl bg-[#C89B3C] py-3 font-serif text-lg font-extrabold text-[#010A13] shadow-[0_0_16px_rgba(200,155,60,.5)] active:scale-[.98]">Annehmen</button>
+          <button type="button" onClick={() => onCancel('decline')} className="text-xs text-slate-500 underline">Ablehnen</button>
+        </div>
+      </div>
+    );
+  }
+  if (step === 'select') {
+    return (
+      <div className={shell} style={bg}>
+        <div className="flex flex-col gap-3 p-4">
+          <div className="font-serif text-xl font-black text-[#C89B3C]">Champion-Auswahl</div>
+          <div className="text-sm text-slate-300">Rolle: {ROLE_SHORT[role]}. Bestätige deinen Champion.</div>
+          <div className="grid grid-cols-4 gap-x-2 gap-y-3">
+            {choices.map(c => (
+              <button key={c} type="button" data-pick={c} aria-pressed={normName(me) === normName(c)} onClick={() => setMe(c)} className="flex flex-col items-center gap-1 active:scale-90">
+                <ChampAvatar name={c} className="w-12 h-12" iconSize={20} ring={normName(me) === normName(c) ? 'border-2 border-[#C89B3C] shadow-[0_0_0_2px_rgba(10,200,185,.75)]' : 'border-2 border-[#C89B3C]/40'} />
+                <span className="max-w-full truncate text-[11px] font-semibold text-[#C89B3C]">{c}</span>
+              </button>
+            ))}
+          </div>
+          <button type="button" onClick={() => { setLineup(genLineup(me, role)); setStep('loading'); }} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Bestätigen: {me}</button>
+          {back}
+        </div>
+      </div>
+    );
+  }
+  if (step === 'loading') {
+    const icon = (c, i) => ICON_IDS[(hashStr(c) + i) % ICON_IDS.length];
+    return (
+      <div className={shell} style={bg}>
+        <div className="flex flex-col gap-3 p-4">
+          <div className="font-serif text-xl font-black text-[#C89B3C]">Ladebildschirm</div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-1.5"><div className="text-center text-xs font-bold uppercase tracking-wide text-blue-300">Dein Team (Blau)</div>
+              {ROLES_ORDER.map((r, i) => <LoadSlot key={r} side="blue" role={r} champ={lineup.blue[r]} mine={r === role} name={r === role ? profile.name : SUMMONER_NAMES[i]} icon={r === role ? (profile.icon != null ? profile.icon : ICON_IDS[0]) : icon(lineup.blue[r], i)} />)}</div>
+            <div className="flex flex-col gap-1.5"><div className="text-center text-xs font-bold uppercase tracking-wide text-red-300">Gegner (Rot)</div>
+              {ROLES_ORDER.map((r, i) => <LoadSlot key={r} side="red" role={r} champ={lineup.red[r]} name={SUMMONER_NAMES[(i + 4) % SUMMONER_NAMES.length]} icon={icon(lineup.red[r], i + 5)} />)}</div>
+          </div>
+          <div className="text-center text-xs text-slate-400">Diese 10 Champions bleiben über alle 5 Phasen gleich.</div>
+          <button type="button" onClick={() => setStep('plan')} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Weiter zum Gameplan ➔</button>
+          {back}
+        </div>
+      </div>
+    );
+  }
+  const tagged = lineup ? ROLES_ORDER.filter(r => champTags(lineup.blue[r], r).includes(lineup.win)).map(r => lineup.blue[r]).join(', ') : '';
+  const pick = k => { if (plan) return; const ok = k === lineup.win; setPlan({ pick: k, ok }); onPlan(ok); };
+  return (
+    <div className={shell} style={bg}>
+      <div className="flex flex-col gap-3 p-4">
+        <div className="font-serif text-xl font-black text-[#C89B3C]">Taktischer Gameplan</div>
+        <p className="text-sm leading-snug text-slate-200">Analysiere das Matchup: Was ist die Hauptstärke / Win-Condition deines Teams gegen diese gegnerische Komposition?</p>
+        <div className="grid grid-cols-2 gap-1.5">
+          {['blue', 'red'].map(side => <div key={side} className={`flex justify-center gap-1 rounded-lg border p-1.5 ${side === 'blue' ? 'border-blue-400/50' : 'border-red-400/50'}`}>
+            {ROLES_ORDER.map(r => <ChampAvatar key={r} name={lineup[side][r]} className="w-8 h-8" iconSize={12} />)}</div>)}
+        </div>
+        <div className="flex flex-col gap-1.5" role="group" aria-label="Win-Condition">
+          {opts.map(k => (
+            <button key={k} type="button" data-arch={k} disabled={!!plan} onClick={() => pick(k)}
+              className={`rounded-xl border px-3 py-2 text-left text-sm font-semibold transition ${plan ? (k === lineup.win ? 'border-[#0AC8B9] bg-[#0AC8B9]/15' : plan.pick === k ? 'border-red-500 bg-red-500/10' : 'opacity-50 border-[#C89B3C]/30') : 'border-[#C89B3C]/40 bg-[#010A13]/80 hover:border-[#0AC8B9]'}`}>
+              {ARCH[k].label}
+            </button>
+          ))}
+        </div>
+        {plan && (
+          <div role="status" className={`rounded-lg border px-3 py-2 text-sm leading-snug ${plan.ok ? 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10 text-[#0AC8B9]' : 'border-red-500/60 bg-red-500/10 text-red-300'}`}>
+            {plan.ok
+              ? <><b>Gameplan verstanden! +50 Taktik-XP</b><br /><span className="text-slate-200">Deine Stärke: {ARCH[lineup.win].label} ({tagged}): {ARCH[lineup.win].why}.</span></>
+              : <><b>Nicht ganz.</b><br /><span className="text-slate-200">Die Hauptstärke deines Teams ist {ARCH[lineup.win].label} ({tagged}): {ARCH[lineup.win].why}. Die Gegner setzen auf {ARCH[lineup.enemyArch].label}.</span></>}
+          </div>
+        )}
+        {plan && <button type="button" autoFocus onClick={() => onStart({ me, role, lineup, planOk: plan.ok })} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Phase 1 starten ➔</button>}
+        {!plan && back}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Match-HUD und Banner (Ranked Match) ---------- */
+const fmtGold = g => `${g >= 0 ? '+' : '-'}${Math.abs(g).toLocaleString('de-DE')}g`;
+function MatchHud({ stats, state }) {
+  return (
+    <div className="rounded-lg border border-[#C89B3C]/50 bg-[#010A13]/90 px-2 py-1.5 text-xs" role="group" aria-label="Match-HUD" data-hud-state={state}>
+      <div className="grid grid-cols-3 items-center gap-1.5 text-center">
+        <div className="font-bold tabular-nums"><span className="text-blue-400">[Blau]</span> <span data-hud="tk">{stats.tk}</span> ⚔️ <span data-hud="ek">{stats.ek}</span> <span className="text-red-400">[Rot]</span></div>
+        <div className="font-bold tabular-nums">KDA <span data-hud="kda">{stats.k} / {stats.d} / {stats.a}</span></div>
+        <div className={`font-bold tabular-nums ${stats.gold >= 0 ? 'text-[#C89B3C]' : 'text-red-400'}`} data-hud="gold">{fmtGold(stats.gold)}</div>
+      </div>
+      <div className="mt-0.5 text-center text-[10px] text-slate-400">Spielstand: {STATE_LABEL[state]}</div>
+    </div>
+  );
+}
+function MatchBanner({ ev, me, victim }) {
+  return (
+    <div className="pointer-events-none absolute inset-x-3 top-12 z-30 flex flex-col items-center gap-1.5" aria-live="assertive" data-banners="true">
+      {ev.death && <div className="redflash absolute -inset-4 -z-10 rounded-xl" aria-hidden="true" />}
+      {ev.kill && (
+        <div data-banner="kill" className="bannerpop relative w-full rounded-lg border-2 border-[#F0E6D2] bg-gradient-to-r from-[#7a5a14] via-[#C89B3C] to-[#7a5a14] px-3 py-1.5 text-center font-serif text-sm font-black text-[#010A13] shadow-[0_0_18px_rgba(200,155,60,.8)]">
+          {me} ⚔️ {victim} ELIMINIERT!<span className="floatgold absolute -top-1 right-2 text-xs font-black text-yellow-200">+300g</span>
+        </div>
+      )}
+      {ev.obj && <div data-banner="obj" className="bannerpop w-full rounded-lg border-2 border-[#0AC8B9] bg-[#06242a] px-3 py-1.5 text-center font-serif text-sm font-black text-[#0AC8B9] shadow-[0_0_18px_rgba(10,200,185,.7)]">{ev.obj}</div>}
+      {ev.death && <div data-banner="death" className="bannerpop w-full rounded-lg border-2 border-red-500 bg-red-950 px-3 py-1.5 text-center font-serif text-sm font-black text-red-300 shadow-[0_0_18px_rgba(232,64,87,.8)]">DU WURDEST ELIMINIERT!</div>}
+    </div>
+  );
+}
+function MatchStats({ r }) {
+  const { stats, grade, state, lineup, plan } = r.mv2;
+  const kda = (stats.k + stats.a) / Math.max(1, stats.d);
+  return (
+    <div className="w-full rounded-xl border border-[#C89B3C]/50 bg-[#010A13]/80 p-3 text-left" data-matchstats="true">
+      <div className="flex items-center justify-between">
+        <span className="font-serif font-bold">Match-Statistik</span>
+        <span className="pop rounded-md border border-[#C89B3C] px-3 py-0.5 font-serif text-2xl font-black text-[#C89B3C]" data-grade={grade}>{grade}</span>
+      </div>
+      <div className="mt-2 grid grid-cols-3 gap-2 text-center text-sm">
+        <div><div className="text-[10px] uppercase text-slate-400">KDA</div><div className="font-bold tabular-nums" data-end="kda">{stats.k} / {stats.d} / {stats.a}</div></div>
+        <div><div className="text-[10px] uppercase text-slate-400">Team</div><div className="font-bold tabular-nums" data-end="team">{stats.tk} : {stats.ek}</div></div>
+        <div><div className="text-[10px] uppercase text-slate-400">Gold-Lead</div><div className="font-bold tabular-nums" data-end="gold">{fmtGold(stats.gold)}</div></div>
+      </div>
+      <div className="mt-2 text-xs text-slate-400">KDA-Ratio {kda.toFixed(1)} · Spielstand am Ende: {STATE_LABEL[state]} · Win-Condition: {ARCH[lineup.win].label}{plan ? ' (erkannt)' : ''}{r.xpGain ? ` · +${r.xpGain} XP` : ''}</div>
     </div>
   );
 }
@@ -5838,28 +6524,43 @@ function Premium({ hearts, onRefill }) {
 /* ---------- App ---------- */
 function App() {
   const [init] = useState(() => loadSave() || { rank: { step: 0, lp: 0 }, history: [] });  // Rang und Profil kommen aus dem Onboarding
-  const [screen, setScreen] = useState('home');   // home | scenario | complete | board | premium
+  const [screen, setScreen] = useState('home');   // home | scenario | complete | board | profile | pregame
   const [mode, setMode] = useState('daily');      // 'daily' | 'ranked' | 'practice'
   const [setupOpen, setSetupOpen] = useState(false);
   const [rankedOpen, setRankedOpen] = useState(false);
   const [heartsOpen, setHeartsOpen] = useState(false);
+  const [pregame, setPregame] = useState(null);   // { role } während Ready Check bis Gameplan
+  const [ad, setAd] = useState(null);             // { kind: 'interstitial' | 'shield' | 'heart' }
+  const [iconOpen, setIconOpen] = useState(false);
+  const [gloss, setGloss] = useState(null);
+  const [lvlUp, setLvlUp] = useState(null);
   const [profile, setProfile] = useState(init.profile || null);   // null = noch nicht registriert
   const [friends, setFriends] = useState(init.friends || [MOCK_FRIEND]);
   const [requests, setRequests] = useState(init.requests || MOCK_REQUESTS);
-  const [recent, setRecent] = useState(init.recent || []);
-  const [mastery, setMastery] = useState(() => normalizeMastery(init.mastery));
-  const [notice, setNotice] = useState('');   // kurzer Hinweis nach dem Start, z. B. übernommene Standardwerte
-  useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(''), 6000); return () => clearTimeout(t); }, [notice]);   // Mastery-Punkte je Champion: { Name: { mp, runs } }   // zuletzt gespielte Szenario-IDs
+  const [recent, setRecent] = useState(init.recent || []);   // zuletzt gespielte Szenario-IDs
+  const [mastery, setMastery] = useState(() => normalizeMastery(init.mastery));   // Mastery-Punkte je Champion: { Name: { mp, runs } }
+  const [xp, setXp] = useState(Number.isFinite(init.xp) ? init.xp : 0);
+  const [quests, setQuests] = useState(() => freshQuests(init.quests));
+  const [srs, setSrs] = useState(init.srs || {});                  // Spaced Repetition: { Szenario: { seen, failedAt } }
+  const [matchCount, setMatchCount] = useState(Number.isFinite(init.matchCount) ? init.matchCount : 0);
+  const [shieldUntil, setShieldUntil] = useState(Number.isFinite(init.shieldUntil) ? init.shieldUntil : 0);
+  const [sinceAd, setSinceAd] = useState(Number.isFinite(init.sinceAd) ? init.sinceAd : 0);
+  const [notice, setNotice] = useState('');   // kurzer Hinweis, z. B. übernommene Standardwerte oder abgeschlossene Quests
+  useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(''), 6000); return () => clearTimeout(t); }, [notice]);
   const [infoMode, setInfoMode] = useState(null);
   const [rank, setRank] = useState(init.rank);
   const [history, setHistory] = useState(init.history);
   const [hearts, setHearts] = useState(Number.isInteger(init.hearts) ? Math.max(0, Math.min(MAX_HEARTS, init.hearts)) : MAX_HEARTS);
   const [run, setRun] = useState(0);
-  // format: 'tree' (Daily, Übung), 'match' (Ranked: Match-Simulation), 'quiz' (Ranked: Makro-Quiz)
-  const [rs, setRs] = useState({ id: START_IDS[0], format: 'tree', correct: 0, log: [], champion: '', role: '', stage: 0, stages: 1, queue: [] });
+  // format: 'tree' (Daily), 'mv2' (Ranked Match v2), 'quiz' (Ranked Quiz), 'mastery', 'queue' (Übung), 'drill'
+  const [rs, setRs] = useState({ id: START_IDS[0], format: 'tree', correct: 0, log: [], champion: '', role: '', stage: 0, stages: 1, queue: [], mv2: null });
   const [result, setResult] = useState(null);     // { from, to } bei Daily und Ranked
 
-  useEffect(() => { writeSave({ rank, history, hearts, profile, friends, requests, recent, mastery }); }, [rank, history, hearts, profile, friends, requests, recent, mastery]);
+  const xpRef = useRef(xp), questsRef = useRef(quests), matchRef = useRef(matchCount);
+  xpRef.current = xp; questsRef.current = quests; matchRef.current = matchCount;
+
+  useEffect(() => { writeSave({ rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd }); },
+    [rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd]);
 
   // Jeder Button klickt (Optionen ausgenommen: sie lösen lock_in aus)
   useEffect(() => {
@@ -5871,29 +6572,80 @@ function App() {
     return () => document.removeEventListener('click', onClick);
   }, []);
 
+  // Beschwörer-XP: bei Level-Up werden alle Herzen aufgeladen
+  const addXp = n => {
+    const before = xpRef.current, after = before + n;
+    xpRef.current = after; setXp(after);
+    const la = xpLevel(after).level;
+    if (la > xpLevel(before).level) { setHearts(MAX_HEARTS); setLvlUp({ level: la }); }
+  };
+  // Tägliche Quests: jedes Ereignis zählt, bei Erfüllung gibt es sofort XP
+  const trackQuest = (ev, n = 1) => {
+    const q = freshQuests(questsRef.current);
+    const progress = { ...q.progress }, claimed = { ...q.claimed }; let gain = 0; const done = [];
+    q.ids.forEach(id => {
+      const def = QUEST_POOL.find(x => x.id === id);
+      if (def.ev !== ev) return;
+      progress[id] = Math.min(def.target, (progress[id] || 0) + n);
+      if (progress[id] >= def.target && !claimed[id]) { claimed[id] = true; gain += def.xp; done.push(def); }
+    });
+    const nq = { ...q, progress, claimed };
+    questsRef.current = nq; setQuests(nq);
+    if (gain) { addXp(gain); setNotice(`Quest abgeschlossen: ${done.map(d => d.text).join(', ')} (+${gain} XP)`); }
+  };
+  // Spaced Repetition: Falsch beantwortete Fragen werden für 2 Matches gesperrt
+  const markSrs = (id, ok) => { const at = matchRef.current; setSrs(s => {   // Zählerstand jetzt festhalten: das State-Update läuft erst später, nach countRun()
+    const e = s[id] || { seen: 0, failedAt: null };
+    const next = { ...s, [id]: { seen: e.seen + 1, failedAt: ok ? e.failedAt : at } };
+    const keys = Object.keys(next);
+    if (keys.length > 600) keys.slice(0, keys.length - 600).forEach(k => delete next[k]);
+    return next;
+  }); };
+  const countRun = () => { matchRef.current += 1; setMatchCount(c => c + 1); setSinceAd(s => s + 1); };
+
   // Startet einen Lauf. Ein Herz kostet nur eine Niederlage oder ein Abbruch, nicht der Start.
   const begin = (nextMode, cfg) => {
     const sc = getScenario(cfg.id);
     setMode(nextMode); setRun(n => n + 1); setResult(null); setSetupOpen(false); setRankedOpen(false); setHeartsOpen(false);
-    setRs({ format: 'tree', correct: 0, log: [], champion: sc.champion, role: sc.role, stage: 0, stages: matchStages(cfg.id), queue: [], ...cfg });
+    setRs({ format: 'tree', correct: 0, log: [], champion: sc.champion, role: sc.role, stage: 0, stages: matchStages(cfg.id), queue: [], mv2: null, ...cfg });
     setScreen('scenario');
   };
   const canPlay = hearts > 0;
   const playDaily = () => { if (canPlay) begin('daily', { id: dailyStartId() }); };
+  // Übungsmodus: 5 neutrale Rollen-Szenarien mit wechselndem Champion der gewählten Rolle (nicht immer derselbe)
   const playPractice = ({ role, difficulty }) => {
-    const pool = practicePool(role, difficulty);
-    if (pool.length) begin('practice', { id: pickRandom(freshStarts(pool, recent)).id });
+    const r = role || pickRandom(ROLES_ORDER);
+    const all = GENERIC[r] || [];
+    const byDiff = all.filter(id => { const sc = RUNS.find(x => x.id === id); return sc && (!difficulty || sc.difficulty === difficulty); });
+    const pool = byDiff.length ? byDiff : all;
+    if (!pool.length) return;
+    const need = Math.min(QUIZ_LENGTH, pool.length);
+    let best = null;
+    for (const c of shuffle(Object.keys(ROLE_POOL[r]))) {
+      const clash = new RegExp('\\b' + escapeRe(c) + '\\b', 'i');
+      const avail = pool.filter(id => { const sc = RUNS.find(x => x.id === id); return normName(sc.champion) !== normName(c) && !clash.test(JSON.stringify(sc)); });
+      if (!best || avail.length > best.avail.length) best = { c, avail };
+      if (avail.length >= need) break;
+    }
+    const q = freshFirst(best.avail, recent, need).map(id => adaptScenario(RUNS.find(x => x.id === id), best.c).id);
+    if (q.length) begin('practice', { format: 'queue', id: q[0], queue: q, stages: q.length, champion: best.c, role: r });
   };
   const playRanked = ({ way, role }) => {
     if (!canPlay) return;
-    if (way === 'match') {
-      const pool = matchPool(role, rank.step);
-      if (pool.length) { const sc = pickRandom(freshStarts(pool, recent)); begin('ranked', { format: 'match', id: sc.id, stages: matchStages(sc.id) }); }
-    } else {
-      const queue = freshFirst(rankedPool(rank.step).map(r => r.id), recent, QUIZ_LENGTH);   // nur eigene Liga, ohne zuletzt gespielte
-      begin('ranked', { format: 'quiz', id: queue[0], queue, stages: queue.length });
-    }
+    if (way === 'match') { setRankedOpen(false); setPregame({ role }); setScreen('pregame'); return; }   // Ready Check, Champion-Wahl, Ladebildschirm, Gameplan
+    const queue = freshFirst(rankedPool(rank.step).map(r => r.id), recent, QUIZ_LENGTH);   // nur eigene Liga, ohne zuletzt gespielte
+    begin('ranked', { format: 'quiz', id: queue[0], queue, stages: queue.length });
   };
+  // Ranked Match v2: festes 5v5-Lineup, Spielzustand EVEN / AHEAD / BEHIND, Live-HUD
+  const startMv2 = ({ me, role, lineup, planOk }) => {
+    const ctx = { matchId: Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36), lineup, role, me, step: rank.step };
+    const sc = buildMv2Scenario(mv2Template(1, 'EVEN', role), ctx, 1, 'EVEN');
+    setPregame(null); setMode('ranked'); setRun(n => n + 1); setResult(null);
+    setRs({ id: sc.id, format: 'mv2', correct: 0, log: [], champion: me, role, stage: 0, stages: 5, queue: [], mv2: { ctx, state: 'EVEN', stats: MV2_START, plan: planOk } });
+    setScreen('scenario');
+  };
+  const cancelPregame = () => { setPregame(null); setScreen('home'); };
+  const onPlan = ok => { if (ok) { addXp(50); trackQuest('plan'); } };
 
   const mmr = profile && profile.hiddenMmr != null ? profile.hiddenMmr : rank.step * 100 + rank.lp;
 
@@ -5901,20 +6653,35 @@ function App() {
     const cur = getScenario(rs.id);
     const ok = !!opt && opt.lpChange > 0;                 // richtig = beste Option, keine LP pro Phase
     setRecent(r => [baseId(cur.id), ...r.filter(x => x !== baseId(cur.id))].slice(0, RECENT_MAX));
+    if (rs.format !== 'mv2') markSrs(baseId(cur.id), ok);
+    if (ok) trackQuest('correct');
     const best = cur.options.find(o => o.lpChange > 0);
     const log = [...rs.log, {
-      title: rs.format === 'match' || rs.format === 'tree' ? `Phase ${rs.stage + 1}: ${cur.phase} (${cur.gameTime})` : `Frage ${rs.stage + 1}: ${cur.champion} (${cur.gameTime})`,
+      title: rs.format === 'mv2' || rs.format === 'tree' ? `Phase ${rs.stage + 1}: ${cur.phase} (${cur.gameTime})` : `Frage ${rs.stage + 1}: ${cur.champion} (${cur.gameTime})`,
       text: opt ? stripLetter(opt.label) : 'Keine Entscheidung (Zeit abgelaufen)',
       feedback: opt ? opt.feedback : 'Zeit abgelaufen.',
       ok, chain: opt ? (opt.chain || null) : TIMEOUT_CHAIN, best: ok || !best ? null : stripLetter(best.label),
     }];
     const correct = rs.correct + (ok ? 1 : 0);
 
+    let mv2 = rs.mv2;
+    if (rs.format === 'mv2') {   // Spielzustand und KDA fortschreiben, nächste Phase aus dem festen Lineup bauen
+      const ev = (cur.mv2 && cur.mv2.ev[ok ? 'ok' : 'bad']) || {};
+      mv2 = { ...mv2, stats: applyEv(mv2.stats, ev), state: nextState(mv2.state, ok) };
+      if (rs.stage < 4) {
+        const nsc = buildMv2Scenario(mv2Template(rs.stage + 2, mv2.state, mv2.ctx.role), mv2.ctx, rs.stage + 2, mv2.state);
+        setRs({ ...rs, id: nsc.id, stage: rs.stage + 1, correct, log, mv2 });
+        return;
+      }
+    }
+
     let nextId = null;                                    // null = Lauf beendet
-    if (rs.queue.length) nextId = rs.queue[rs.stage + 1] || null;   // Quiz, Mastery, Drill: feste Frageliste
-    else {
-      nextId = opt ? opt.nextId : mainLine(cur);          // Timeout wirkt wie eine Fehlentscheidung: das Spiel geht weiter
-      if (nextId === 'end' || !getScenario(nextId)) nextId = null;
+    if (rs.format !== 'mv2') {
+      if (rs.queue.length) nextId = rs.queue[rs.stage + 1] || null;   // Quiz, Mastery, Übung, Drill: feste Frageliste
+      else {
+        nextId = opt ? opt.nextId : mainLine(cur);        // Timeout wirkt wie eine Fehlentscheidung: das Spiel geht weiter
+        if (nextId === 'end' || !getScenario(nextId)) nextId = null;
+      }
     }
     if (nextId) { setRs({ ...rs, id: nextId, stage: rs.stage + 1, correct, log }); return; }
 
@@ -5926,7 +6693,22 @@ function App() {
       setResult({ drill: true, passed, correct, n });
     } else {
       const v = scoreRun(correct, n, mmr, rank);
-      if (mode !== 'practice') {   // Übungsmodus: nichts aufs Profil, nichts in die Historie
+      const isMastery = rs.format === 'mastery', isMv2 = rs.format === 'mv2';
+      let mres = null;
+      if (isMastery || isMv2) {   // Mastery-Punkte: Sieg 300 bis 350, knapp 150, Niederlage 50 Trost-MP (nie ein Stufenverlust)
+        const champ = rs.champion, gain = masteryGain(correct, n);
+        const before = (mastery[champ] || {}).mp || 0, after = before + gain;
+        setMastery(m => ({ ...m, [champ]: { mp: after, runs: ((m[champ] || {}).runs || 0) + 1 } }));
+        mres = { champion: champ, gain, before, after, lvBefore: masteryLevel(before), lvAfter: masteryLevel(after), levelUp: masteryLevel(after) > masteryLevel(before) };
+      }
+      const info = isMv2 ? { stats: mv2.stats, state: mv2.state, grade: mv2Grade(correct, mv2.stats.d), lineup: mv2.ctx.lineup, plan: mv2.plan } : null;
+      if (mode === 'practice') {   // Übungsmodus: nichts aufs Profil, nichts in die Historie
+        setResult({ ...v, correct, n, from: rank, to: rank });
+      } else if (isMastery) {      // Mastery vergibt NUR MP: nie LP, kein MMR, kein Herz, keine Serie
+        setHistory(h => [{ champion: rs.champion, role: `Mastery · ${ROLE_SHORT[rs.role] || rs.role}`, lp: 0, mp: mres.gain, ts: Date.now() }, ...h].slice(0, 20));
+        countRun(); trackQuest('mastery'); if (v.win) trackQuest('win');
+        setResult({ win: v.win, kind: v.kind, lp: 0, correct, n, from: rank, to: rank, mastery: mres, masteryOnly: true });
+      } else {
         const { event, ...to } = applyLp(rank, v.lp);
         const heartLost = !v.win;                         // Siege kosten kein Herz, Niederlagen genau eines
         setRank(to);
@@ -5937,37 +6719,46 @@ function App() {
         if (heartLost) setHearts(h => Math.max(0, h - 1));
         setHistory(h => [{
           champion: rs.format === 'quiz' ? 'Makro-Quiz' : rs.champion,
-          role: rs.format === 'quiz' ? `${rs.queue.length} Szenarien` : rs.format === 'mastery' ? `Mastery · ${rs.role}` : rs.format === 'match' ? `${rs.role} · Match` : rs.role,
-          lp: v.lp, ts: Date.now() }, ...h].slice(0, 20));
-        let mres = null;
-        if (rs.format === 'mastery') {   // Mastery-Punkte buchen: Sieg 300 bis 350, knapp 150, Niederlage 50 Trost-MP
-          const champ = rs.champion, gain = masteryGain(correct, n);
-          const before = (mastery[champ] || {}).mp || 0, after = before + gain;
-          setMastery(m => ({ ...m, [champ]: { mp: after, runs: ((m[champ] || {}).runs || 0) + 1 } }));
-          mres = { champion: champ, gain, before, after, lvBefore: masteryLevel(before), lvAfter: masteryLevel(after), levelUp: masteryLevel(after) > masteryLevel(before) };
-        }
-        setResult({ ...v, correct, n, from: rank, to, event, heartLost, streak, prevStreak, bonus, mastery: mres });
-      } else setResult({ ...v, correct, n, from: rank, to: rank });
+          role: rs.format === 'quiz' ? `${rs.queue.length} Szenarien` : isMv2 ? `${ROLE_SHORT[rs.role]} · Ranked Match` : rs.role,
+          lp: v.lp, mp: mres ? mres.gain : 0, ts: Date.now() }, ...h].slice(0, 20));
+        countRun();
+        if (isMv2) { addXp(50); trackQuest('ranked'); }              // Matches geben +50 XP
+        if (rs.format === 'quiz') trackQuest('ranked');
+        if (mode === 'daily') trackQuest('daily');
+        if (v.win) trackQuest('win');
+        setResult({ ...v, correct, n, from: rank, to, event, heartLost, streak, prevStreak, bonus, mastery: mres, mv2: info, xpGain: isMv2 ? 50 : 0 });
+      }
     }
-    setRs({ ...rs, correct, log });
+    setRs({ ...rs, correct, log, mv2 });
     setScreen('complete');
   };
 
   // Abbruch während eines Laufs: kein LP-Eintrag, keine Historie, zurück ins Hauptmenü
   const abort = () => {
-    if (mode !== 'practice') { setHearts(h => Math.max(0, h - 1)); updateProfile({ winStreak: 0 }); playHextechSound('heart_loss'); }   // Aufgeben nimmt 1 Herz
-    setRs({ id: START_IDS[0], format: 'tree', correct: 0, log: [], champion: '', role: '', stage: 0, stages: 1, queue: [] });
+    if (mode !== 'practice' && rs.format !== 'mastery') { setHearts(h => Math.max(0, h - 1)); updateProfile({ winStreak: 0 }); playHextechSound('heart_loss'); }   // Aufgeben nimmt 1 Herz (Mastery und Übung sind risikofrei)
+    setRs({ id: START_IDS[0], format: 'tree', correct: 0, log: [], champion: '', role: '', stage: 0, stages: 1, queue: [], mv2: null });
     setResult(null); setSetupOpen(false); setRankedOpen(false);
     setScreen('home');
   };
+  // Zurück vom Ergebnis: Werbung frühestens nach 3 vollendeten Matches, nie mittendrin und nie mit aktivem Hextech-Schild
+  const finishRun = () => {
+    setScreen('home');
+    if (mode !== 'practice' && !(result && result.drill) && Date.now() >= shieldUntil && sinceAd >= 3) setAd({ kind: 'interstitial' });
+  };
+  const adDone = () => {
+    if (!ad) return;
+    if (ad.kind === 'shield') setShieldUntil(Date.now() + 30 * 60 * 1000);
+    if (ad.kind === 'heart') setHearts(h => Math.min(MAX_HEARTS, h + 1));
+    setSinceAd(0); setAd(null);
+  };
 
   const playMastery = () => {
-    if (!canPlay || !profile) return;
+    if (!profile) return;   // Mastery kostet kein Herz: es gibt nur MP, nie LP
     const me = normName(champLabel(profile.champion));
     const pool = masteryScenarios(profile.champion, profile.role).filter(sc => normName(sc.champion) === me);   // Champion-Lock: handgeschrieben oder Rollen-Vorlage mit deinem Namen
     if (!pool.length) return;
     const mp = (mastery[champLabel(profile.champion)] || {}).mp || 0;
-    const queue = pickMastery(pool, masteryLevel(mp), rank.step, recent, QUIZ_LENGTH)
+    const queue = pickMastery(pool, masteryLevel(mp), rank.step, recent, QUIZ_LENGTH, { srs, matchCount })
       .filter(id => { const sc = getScenario(id); return !!sc && normName(sc.champion) === me; });   // zweite Sicherung: kein fremder Protagonist
     if (!queue.length) return;
     begin('ranked', { format: 'mastery', id: queue[0], queue, stages: queue.length, champion: champLabel(profile.champion), role: profile.role });   // Die ganze Queue gehört deinem Champion
@@ -5984,15 +6775,17 @@ function App() {
     const cleanStep = Number.isInteger(step) ? Math.max(0, Math.min(MAX_STEP, step)) : 0;               // Standard: Iron 4
     const cleanRole = LS_ROLES.includes(role) ? role : 'Toplane';                                       // Standard: Top
     const cleanChamp = champLabel((typeof champion === 'string' && champion.trim()) || 'Jax');          // Standard: Jax
-    const newProfile = { name: cleanName, role: cleanRole, champion: cleanChamp, status: 'online', note: '', startStep: cleanStep, hiddenMmr: cleanStep * 100 + 50, winStreak: 0 };
+    const newProfile = { name: cleanName, role: cleanRole, champion: cleanChamp, status: 'online', note: '', startStep: cleanStep, hiddenMmr: cleanStep * 100 + 50, winStreak: 0, icon: ICON_IDS[0] };
     const newRank = { step: cleanStep, lp: 0 };
     const newMastery = { [cleanChamp]: { mp: 0, runs: 0 } };
+    const newQuests = freshQuests(null);
     // 1) Alles synchron in den State: profile gesetzt = Dashboard wird gerendert, kein Weg zurück ins Onboarding
     setProfile(newProfile); setRank(newRank); setHistory([]); setHearts(MAX_HEARTS); setFriends([MOCK_FRIEND]); setRequests(MOCK_REQUESTS);
-    setRecent([]); setMastery(newMastery); setScreen('home');
+    setRecent([]); setMastery(newMastery); setXp(0); setQuests(newQuests); setSrs({}); setMatchCount(0); setShieldUntil(0); setSinceAd(0); setScreen('home');
+    xpRef.current = 0; questsRef.current = newQuests; matchRef.current = 0;
     if (notice) setNotice(notice);
     // 2) Speichern getrennt: ein blockierter oder voller Speicher (Privatmodus, Quota) darf den Wechsel nie verhindern
-    try { writeSave({ rank: newRank, history: [], hearts: MAX_HEARTS, profile: newProfile, friends: [MOCK_FRIEND], requests: MOCK_REQUESTS, recent: [], mastery: newMastery }); }
+    try { writeSave({ rank: newRank, history: [], hearts: MAX_HEARTS, profile: newProfile, friends: [MOCK_FRIEND], requests: MOCK_REQUESTS, recent: [], mastery: newMastery, xp: 0, quests: newQuests, srs: {}, matchCount: 0, shieldUntil: 0, sinceAd: 0 }); }
     catch (e) { console.warn('BrainGap: Speichern nicht möglich, die App läuft ohne Speicher weiter.', e); }
   };
   // Anfrage annehmen: Spieler wandert in die Freundesliste (und damit ins Freunde-Leaderboard)
@@ -6012,9 +6805,10 @@ function App() {
   const scenario = getScenario(rs.id);
   const phaseTag = scenario ? `${scenario.phase} (${rs.stage + 1}/${rs.stages})` : '';
   const tag = rs.format === 'quiz' ? `Quiz (${rs.stage + 1}/${rs.stages})` : rs.format === 'mastery' ? `Mastery · Stufe ${masteryLevel(((mastery[rs.champion] || {}).mp) || 0)} (${rs.stage + 1}/${rs.stages})`
+    : rs.format === 'queue' ? `Übung · ${rs.champion} (${rs.stage + 1}/${rs.stages})`
     : rs.format === 'drill' ? `Recovery Drill (${rs.stage + 1}/${rs.stages})` : phaseTag;
-  const momentum = (rs.format === 'match' || rs.format === 'tree') && rs.stage > 0 && rs.log.length ? makeMomentum(rs.log, rs.stage) : null;
-  const tabs = [['home', 'home', 'Home'], ['board', 'trophy', 'Leaderboard'], ['profile', 'user', 'Profil'], ['premium', 'crown', 'Premium']];
+  const momentum = rs.format === 'tree' && rs.stage > 0 && rs.log.length ? makeMomentum(rs.log, rs.stage) : null;
+  const tabs = [['home', 'home', 'Home'], ['board', 'trophy', 'Leaderboard'], ['profile', 'user', 'Profil']];   // genau 3 Tabs
 
   if (!profile) {   // Erster Start: Registrierung
     return (
@@ -6031,6 +6825,7 @@ function App() {
   }
 
   return (
+    <GlossCtx.Provider value={setGloss}>
     <div className="relative mx-auto w-full max-w-[400px] h-full max-h-[820px] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
          style={{ borderColor: 'var(--line)' }}>
       <header className="px-4 py-2.5 border-b flex items-center gap-2" style={{ borderColor: 'var(--line)' }}>
@@ -6045,40 +6840,49 @@ function App() {
         </div>
       )}
 
-      {(screen === 'home' || screen === 'board' || screen === 'profile' || screen === 'premium') && (
+      {(screen === 'home' || screen === 'board' || screen === 'profile') && (
         <div key={screen} className="fade-in flex-1 min-h-0 flex flex-col">
-          {screen === 'home' && <Dashboard rank={rank} history={history} hearts={hearts} profile={profile} mastery={mastery} onDaily={playDaily} onRanked={() => setRankedOpen(true)}
-            onPractice={() => setSetupOpen(true)} onMastery={playMastery} onInfo={setInfoMode} onNoHearts={() => setHeartsOpen(true)} onShop={() => setScreen('premium')} onReset={reset} />}
+          {screen === 'home' && <Dashboard rank={rank} hearts={hearts} profile={profile} mastery={mastery} xp={xp} quests={quests} friends={friends} shieldUntil={shieldUntil}
+            onDaily={playDaily} onRanked={() => setRankedOpen(true)} onPractice={() => setSetupOpen(true)} onMastery={playMastery} onInfo={setInfoMode}
+            onNoHearts={() => setHeartsOpen(true)} onHeartAd={() => setAd({ kind: 'heart' })} onShieldAd={() => setAd({ kind: 'shield' })} onIcon={() => setIconOpen(true)} onReset={reset} />}
           {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} />}
-          {screen === 'profile' && <Profile profile={profile} rank={rank} mastery={mastery} friends={friends} onChange={updateProfile} onLogout={logout}
+          {screen === 'profile' && <Profile profile={profile} rank={rank} mastery={mastery} friends={friends} history={history} xp={xp} shieldUntil={shieldUntil}
+            onChange={updateProfile} onLogout={logout} onIcon={() => setIconOpen(true)} onShieldAd={() => setAd({ kind: 'shield' })}
             onAddFriend={f => setFriends(l => [...l, f])} onRemoveFriend={name => setFriends(l => l.filter(x => x.name !== name))}
             requests={requests} onAccept={acceptRequest} onDecline={declineRequest} />}
-          {screen === 'premium' && <Premium hearts={hearts} onRefill={() => setHearts(MAX_HEARTS)} />}
         </div>
       )}
       {screen === 'scenario' && scenario && (
         <Scenario key={`${run}-${scenario.id}-${rs.stage}`} scenario={scenario} practice={mode === 'practice'}
           tag={tag} momentum={momentum} timeCap={rs.format === 'drill' ? 30 : null} format={rs.format} stage={rs.stage} stages={rs.stages}
+          hud={rs.format === 'mv2' && rs.mv2 ? { stats: rs.mv2.stats, state: rs.mv2.state } : null}
           record={{ c: rs.log.filter(e => e.ok).length, w: rs.log.filter(e => !e.ok).length }} onNext={next} onAbort={abort} />
       )}
-      {screen === 'complete' && result && <RunComplete result={result} log={rs.log} practice={mode === 'practice'} format={rs.format} onDone={() => setScreen('home')} onRetry={startDrill} />}
+      {screen === 'complete' && result && <RunComplete result={result} log={rs.log} practice={mode === 'practice' || !!result.masteryOnly} format={rs.format} onDone={finishRun} onRetry={startDrill} />}
+      {screen === 'pregame' && pregame && <PregameFlow profile={profile} role={pregame.role} onCancel={cancelPregame} onPlan={onPlan} onStart={startMv2} />}
 
-      {screen !== 'scenario' && screen !== 'complete' && (
-        <nav className="grid grid-cols-4 border-t" style={{ borderColor: 'var(--line)', background: '#010A13' }}>
+      {screen !== 'scenario' && screen !== 'complete' && screen !== 'pregame' && (
+        <nav className="grid grid-cols-3 border-t" style={{ borderColor: 'var(--line)', background: '#010A13' }}>
           {tabs.map(([id, ic, label]) => (
             <button key={id} onClick={() => setScreen(id)} aria-current={screen === id}
               className={`py-3 flex flex-col items-center gap-1 text-xs ${screen === id ? 'text-[#0AC8B9]' : 'text-slate-500'}`}>
-              <span className="relative"><Icon n={ic} size={22} />{id === 'profile' && requests.length > 0 && <span className="absolute -right-2 -top-1.5 rounded-full bg-red-500 px-1 text-[9px] font-bold leading-3 text-white" aria-label={`${requests.length} offene Anfragen`}>{requests.length}</span>}</span>{label}
+              <span className="relative"><Icon n={ic} size={22} />{id === 'profile' && requests.length > 0 && <span className="absolute -right-2 -top-1.5 rounded-full bg-red-500 px-1 text-[9px] font-bold leading-3 text-white" aria-label={`${requests.length} offene Freundschaftsanfragen`}>{requests.length}</span>}</span>
+              {label}
             </button>
           ))}
         </nav>
       )}
 
       {setupOpen && <PracticeSetup onStart={playPractice} onClose={() => setSetupOpen(false)} />}
-      {rankedOpen && <RankedSetup rank={rank} onStart={playRanked} onClose={() => setRankedOpen(false)} />}
+      {rankedOpen && <RankedSetup rank={rank} profile={profile} onStart={playRanked} onClose={() => setRankedOpen(false)} />}
       {infoMode && <ModeInfo mode={infoMode} onClose={() => setInfoMode(null)} />}
-      {heartsOpen && <NoHearts onDrill={startDrill} onShop={() => { setHeartsOpen(false); setScreen('premium'); }} onClose={() => setHeartsOpen(false)} />}
+      {heartsOpen && <NoHearts onDrill={startDrill} onShop={() => { setHeartsOpen(false); setAd({ kind: 'heart' }); }} onClose={() => setHeartsOpen(false)} />}
+      {iconOpen && <IconPicker current={profile.icon != null ? profile.icon : ICON_IDS[0]} onPick={id => updateProfile({ icon: id })} onClose={() => setIconOpen(false)} />}
+      {lvlUp && <SummonerLevelUp level={lvlUp.level} onClose={() => setLvlUp(null)} />}
+      {ad && <AdModal kind={ad.kind} onDone={adDone} onClose={() => setAd(null)} />}
+      {gloss && <GlossSheet k={gloss} onClose={() => setGloss(null)} />}
     </div>
+    </GlossCtx.Provider>
   );
 }
 
