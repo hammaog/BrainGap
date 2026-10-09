@@ -5156,67 +5156,69 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
   const promoted = !practice && to.step > result.from.step;
   const demoted = !practice && to.step < result.from.step;
   const newLeague = promoted && tierOf(to.step) !== tierOf(result.from.step);
-  const cls = to && RANK_ICON[tierOf(to.step)].cls;
-  const toGo = to && to.step < MAX_STEP ? 100 - to.lp : null;   // Challenger hat kein Ziel mehr
+  const cls = RANK_ICON[tierOf(to.step)].cls;
+  const toGo = to.step < MAX_STEP ? 100 - to.lp : null;   // Challenger hat kein Ziel mehr
+  const phases = format === 'mv2' || format === 'tree' || format === 'match';
+  const status = promoted ? (newLeague ? `Neue Liga: ${rankName(to.step)}!` : 'Aufstieg!') : demoted ? `Abstieg in ${rankName(to.step)}` : (!practice && result.event === 'shield') ? 'Demotion Shield aktiv' : null;
+  const mmrTotal = (result.mmrDelta || 0) + (result.bonus || 0);
+  const bigColor = result.masteryOnly ? 'var(--gold)' : color;
+  const bigText = result.masteryOnly ? `+${result.mastery.gain} MP` : `${fmt(result.lp)} LP`;
+  const hasTiles = !!(result.mv2 || result.mastery);
 
   return (
     <div className="flex-1 min-h-0 relative flex flex-col">
       {promoted && <Confetti />}
       {lvPopup && result.mastery && <MasteryLevelUp m={result.mastery} onClose={() => setLvPopup(false)} />}
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center gap-3 text-center">
-        <div className="pt-2">
-          <div className="pop font-serif text-4xl font-black tracking-wide" style={{ color }}>{win ? 'VICTORY' : 'DEFEAT'}</div>
-          <div className="mt-1 font-serif text-lg font-bold text-white">{result.kind}</div>
-          <div className="text-xs text-slate-400">{unit} Complete · {result.correct} von {result.n} richtig</div>
-          {!practice && result.streak >= 2 && <div className="mt-2 flex justify-center"><StreakBadge n={result.streak} /></div>}
-          {!practice && !result.win && result.prevStreak >= 2 && <div className="mt-1 text-xs text-slate-400">Siegesserie beendet (war {result.prevStreak}x)</div>}
-        </div>
-        <div className="rounded-xl border px-8 py-3" style={{ background: 'var(--panel)', borderColor: practice ? 'var(--line)' : color }}>
-          {practice ? (
-            <div className="text-lg font-extrabold" style={{ color }}>{result.masteryOnly ? `+${result.mastery.gain} MP, keine LP` : `Das wären ${fmt(result.lp)} LP gewesen`}</div>
-          ) : (
-            <>
-              <div className="text-4xl font-black tabular-nums" style={{ color }}>{fmt(result.lp)} LP</div>
-              <div className={`mt-1 text-sm font-semibold tabular-nums ${result.mmrDelta > 0 ? 'text-[#0AC8B9]' : 'text-[#E84057]'}`}>
-                MMR {fmt(result.mmrDelta + result.bonus)} {result.mmrDelta > 0 ? '▲' : '▼'}{result.bonus > 0 && <span className="ml-1 text-orange-300">(inkl. +{result.bonus} Serie)</span>}
-              </div>
-              <div className={`mt-1 flex items-center justify-center gap-1 text-xs ${result.heartLost ? 'text-red-300' : 'text-slate-400'}`}>
-                <Icon n="heart" size={12} fill={result.heartLost ? 'currentColor' : 'none'} /> {result.heartLost ? '−1 Herz' : 'Kein Herz verloren'}
-              </div>
-            </>
-          )}
+      <div className="flex-1 min-h-0 overflow-y-auto px-3 pt-2 pb-2 flex flex-col gap-2 text-center" data-endscreen="true">
+        <div>
+          <div className="flex items-center justify-center gap-2">
+            <div className="pop font-serif text-3xl font-black leading-none tracking-wide" style={{ color }}>{win ? 'VICTORY' : 'DEFEAT'}</div>
+            {!practice && result.streak >= 2 && <StreakBadge n={result.streak} />}
+          </div>
+          <div className="mt-1 text-xs text-slate-400">{result.kind} · {unit} Complete · {result.correct} von {result.n} richtig{!practice && !result.win && result.prevStreak >= 2 ? ` · Siegesserie beendet (war ${result.prevStreak}x)` : ''}</div>
         </div>
 
-        {practice ? (
-          <div className="text-sm text-slate-400">{result.masteryOnly ? 'Mastery vergibt nur Mastery-Punkte: Rang, MMR und Herzen bleiben unverändert.' : 'Dein Rang und deine Historie bleiben unverändert.'}</div>
-        ) : (
-          <div className="w-full flex flex-col items-center gap-2 rounded-xl border p-3" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-            <div className="relative w-20 h-20 flex items-center justify-center">
-              {promoted && <span className="rankglow absolute inset-0 rounded-full bg-yellow-400/50 blur-xl" aria-hidden="true" />}
-              <span className="relative"><RankIcon tier={tierOf(to.step)} size={56} /></span>
+        {/* Eine einzige Hextech-Karte: Rang links, LP/MP rechts, dünner Fortschrittsbalken darunter */}
+        <div className="rounded-xl border px-3 py-2" style={{ background: 'var(--panel)', borderColor: practice && !result.masteryOnly ? 'var(--line)' : color }} data-endcard="true">
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-[42px] w-[42px] shrink-0 items-center justify-center">
+              {promoted && <span className="rankglow absolute inset-0 rounded-full bg-yellow-400/50 blur-lg" aria-hidden="true" />}
+              <span className="relative"><RankIcon tier={tierOf(to.step)} size={42} /></span>
             </div>
-            {promoted && <div className="pop font-black text-yellow-300">{newLeague ? `Neue Liga: ${rankName(to.step)}!` : 'Aufstieg!'}</div>}
-            {demoted && <div className="font-bold text-red-400">Abstieg in {rankName(to.step)} mit {to.lp} LP</div>}
-            {result.event === 'shield' && (
-              <div className="flex items-center gap-1.5 rounded-lg border border-[#0AC8B9]/60 bg-[#0AC8B9]/10 px-3 py-1.5 text-xs font-semibold text-[#0AC8B9]" role="status">
-                <Icon n="shield" size={14} /> Demotion Shield aktiv: Eine weitere Niederlage bei 0 LP führt zum Abstieg.
+            <div className="min-w-0 flex-1 text-left leading-tight">
+              <div className="text-sm font-bold"><span className={cls}>{rankName(to.step)}</span> <span className="font-normal tabular-nums text-slate-400">({to.lp} LP)</span></div>
+              {status && <div className={`mt-0.5 text-[11px] font-semibold ${demoted ? 'text-red-400' : promoted ? 'text-yellow-300' : 'text-[#0AC8B9]'}`} role="status">{status}</div>}
+            </div>
+            <div className="max-w-[58%] shrink-0 text-right">
+              <div className={`font-serif font-black leading-none tabular-nums ${result.masteryOnly ? 'text-2xl' : 'text-3xl'}`} style={{ color: bigColor, opacity: practice && !result.masteryOnly ? .65 : 1 }} data-end="lp">{bigText}</div>
+              <div className="mt-1 text-[10px] leading-tight tabular-nums text-slate-400" data-end-sub="true">
+                {result.masteryOnly ? 'keine LP · Rang bleibt' : practice ? 'Übung: zählt nicht' : (
+                  <>
+                    <span className={mmrTotal > 0 ? 'text-[#0AC8B9]' : 'text-[#E84057]'}>MMR {fmt(mmrTotal)} {result.mmrDelta > 0 ? '▲' : '▼'}{result.bonus > 0 && <span className="text-orange-300"> (inkl. +{result.bonus} Serie)</span>}</span>
+                    {' · '}<span className={result.heartLost ? 'text-red-300' : ''}>❤️ {result.heartLost ? '-1' : '±0'}</span>
+                  </>
+                )}
               </div>
-            )}
-            <div className="text-sm text-slate-300">
-              Aktueller Rang: <span className={`font-bold ${cls}`}>{rankName(to.step)}</span> <span className="tabular-nums text-slate-400">({to.lp} LP)</span>
             </div>
-            <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--track)' }}>
-              <div className={`h-full rounded-full bg-current ${cls}`} style={{ width: `${Math.min(100, to.lp)}%` }} />
-            </div>
-            {toGo !== null && <div className="text-sm font-semibold text-slate-100">Noch {toGo} LP bis {rankName(to.step + 1)}</div>}
+          </div>
+          <div className="mt-2 h-1 overflow-hidden rounded-full" style={{ background: 'var(--track)' }} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.min(100, to.lp)}
+               aria-label={toGo !== null ? `Noch ${toGo} LP bis ${rankName(to.step + 1)}` : 'Höchster Rang erreicht'} title={toGo !== null ? `Noch ${toGo} LP bis ${rankName(to.step + 1)}` : 'Höchster Rang erreicht'}>
+            <div className={`h-full rounded-full bg-current ${cls}`} style={{ width: `${Math.min(100, to.lp)}%` }} />
+          </div>
+        </div>
+
+        {hasTiles && (
+          <div className={`grid gap-2 ${result.mv2 && result.mastery ? 'grid-cols-2' : 'grid-cols-1'}`} data-endtiles="true">
+            {result.mv2 && <MatchStats r={result} />}
+            {result.mastery && <MasteryResult m={result.mastery} />}
           </div>
         )}
 
-        <div className="w-full"><Divider /></div>
-        {result.mv2 && <MatchStats r={result} />}
-        {result.mastery && <MasteryResult m={result.mastery} />}
-        <Breakdown log={log} phases={format === 'mv2' || format === 'tree' || format === 'match'} />
-        <button onClick={onDone} className="w-full py-3 rounded-xl font-serif font-extrabold text-[#010A13]" style={{ background: 'var(--gold)' }}>Weiter zum Dashboard</button>
+        <Breakdown log={log} phases={phases} />
+      </div>
+      {/* Button am unteren Rand fixiert: immer sichtbar, unabhängig von der Inhaltshöhe */}
+      <div className="shrink-0 border-t px-3 pb-3 pt-2" style={{ borderColor: 'var(--line)', background: '#010A13' }} data-endfooter="true">
+        <button onClick={onDone} className="w-full rounded-xl py-3 font-serif font-extrabold text-[#010A13]" style={{ background: 'var(--gold)' }}>Weiter zum Dashboard</button>
       </div>
     </div>
   );
@@ -5554,17 +5556,15 @@ const TabBar = ({ tabs, value, onChange }) => (
 function MasteryResult({ m }) {
   const pr = masteryProgress(m.after), emb = MASTERY_EMBLEM(pr.level);
   return (
-    <div className="w-full rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3 text-left">
-      <div className="flex items-center gap-3">
-        <ChampAvatar name={m.champion} className="w-12 h-12" iconSize={20} ring="border-2 border-[#C89B3C]" />
-        <div className="min-w-0 flex-1">
-          <div className="font-serif font-bold">{m.champion} · Stufe {pr.level} · {masteryTitle(pr.level)}</div>
-          <div className="text-xs tabular-nums text-slate-400">+{m.gain} MP · {m.after.toLocaleString('de-DE')} MP gesamt</div>
-        </div>
-        {emb && <span className={emb.cls} title={emb.label}><Icon n={emb.icon} size={24} /></span>}
+    <div className="min-w-0 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 px-2.5 py-2 text-left" data-mastery-tile="true">
+      <div className="flex items-center gap-2">
+        <ChampAvatar name={m.champion} className="w-9 h-9 shrink-0" iconSize={14} ring="border-2 border-[#C89B3C]" />
+        <div className="min-w-0 flex-1 text-[11px] font-bold leading-tight">{m.champion} · Stufe {pr.level} · {masteryTitle(pr.level)}</div>
+        {emb && <span className={emb.cls} title={emb.label}><Icon n={emb.icon} size={18} /></span>}
       </div>
-      <div className="mt-2 h-2 overflow-hidden rounded-full" style={{ background: 'var(--track)' }}><div className="h-full rounded-full bg-[#C89B3C]" style={{ width: `${pr.pct}%` }} /></div>
-      <div className="mt-1 text-xs text-slate-400 tabular-nums">{pr.next ? `${pr.into} / ${pr.span} MP bis Stufe ${pr.level + 1}` : 'Höchste Stufe erreicht'}</div>
+      <div className="mt-1.5 text-[11px] font-semibold tabular-nums text-[#C89B3C]">+{m.gain} MP · {m.after.toLocaleString('de-DE')} MP gesamt</div>
+      <div className="mt-1 h-1 overflow-hidden rounded-full" style={{ background: 'var(--track)' }}><div className="h-full rounded-full bg-[#C89B3C]" style={{ width: `${pr.pct}%` }} /></div>
+      <div className="mt-1 text-[10px] tabular-nums text-slate-400">{pr.next ? `${pr.into} / ${pr.span} MP bis Stufe ${pr.level + 1}` : 'Höchste Stufe erreicht'}</div>
     </div>
   );
 }
@@ -6530,31 +6530,31 @@ function Breakdown({ log, phases }) {
   const [open, setOpen] = useState(false);
   const noun = phases ? 'Phasen' : 'Fragen';
   return (
-    <div className="flex w-full flex-col gap-2" data-breakdown={open ? 'open' : 'closed'}>
-      <div className="font-serif text-lg font-bold">Post-Match Breakdown</div>
+    <div className="flex w-full flex-col items-center gap-1" data-breakdown={open ? 'open' : 'closed'}>
       <button type="button" aria-expanded={open} aria-controls="breakdown-panel" onClick={() => setOpen(o => !o)}
-        className="w-full rounded-xl border border-[#C89B3C]/60 bg-[#010A13]/80 py-2.5 text-sm font-bold text-[#C89B3C] transition hover:border-[#0AC8B9] active:scale-[.99]">
+        className="rounded-lg px-3 py-1.5 text-xs font-semibold text-[#C89B3C] underline decoration-dotted underline-offset-4 transition hover:text-[#F0E6D2]">
         {open ? `📊 ${noun}-Rückblick ausblenden ▲` : `📊 Detaillierten ${noun}-Rückblick anzeigen ▼`}
       </button>
-      {open && <div id="breakdown-panel" className="slidedown"><StepList log={log} /></div>}
+      {open && <div id="breakdown-panel" className="slidedown w-full"><StepList log={log} /></div>}
     </div>
   );
 }
 function MatchStats({ r }) {
   const { stats, grade, state, lineup, plan } = r.mv2;
   const kda = (stats.k + stats.a) / Math.max(1, stats.d);
+  const cell = (label, val, k) => <div className="min-w-0"><div className="text-[9px] uppercase leading-none text-slate-500">{label}</div><div className="mt-0.5 whitespace-nowrap text-[11px] font-bold tabular-nums" data-end={k}>{val}</div></div>;
   return (
-    <div className="w-full rounded-xl border border-[#C89B3C]/50 bg-[#010A13]/80 p-3 text-left" data-matchstats="true">
+    <div className="min-w-0 rounded-xl border border-[#C89B3C]/50 bg-[#010A13]/80 px-2.5 py-2 text-left" data-matchstats="true" title={`KDA-Ratio ${kda.toFixed(1)} · Win-Condition: ${ARCH[lineup.win].label}${plan ? ' (erkannt)' : ''}`}>
       <div className="flex items-center justify-between">
-        <span className="font-serif font-bold">Match-Statistik</span>
-        <span className="pop rounded-md border border-[#C89B3C] px-3 py-0.5 font-serif text-2xl font-black text-[#C89B3C]" data-grade={grade}>{grade}</span>
+        <span className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Match</span>
+        <span className="pop rounded border border-[#C89B3C] px-2 font-serif text-xl font-black leading-tight text-[#C89B3C]" data-grade={grade}>{grade}</span>
       </div>
-      <div className="mt-2 grid grid-cols-3 gap-2 text-center text-sm">
-        <div><div className="text-[10px] uppercase text-slate-400">KDA</div><div className="font-bold tabular-nums" data-end="kda">{stats.k} / {stats.d} / {stats.a}</div></div>
-        <div><div className="text-[10px] uppercase text-slate-400">Team</div><div className="font-bold tabular-nums" data-end="team">{stats.tk} : {stats.ek}</div></div>
-        <div><div className="text-[10px] uppercase text-slate-400">Gold-Lead</div><div className="font-bold tabular-nums" data-end="gold">{fmtGold(stats.gold)}</div></div>
+      <div className="mt-1.5 grid grid-cols-[1.45fr_1fr_1.15fr] gap-1 text-center">
+        {cell('KDA', `${stats.k} / ${stats.d} / ${stats.a}`, 'kda')}
+        {cell('Team', `${stats.tk} : ${stats.ek}`, 'team')}
+        {cell('Gold', fmtGold(stats.gold), 'gold')}
       </div>
-      <div className="mt-2 text-xs text-slate-400">KDA-Ratio {kda.toFixed(1)} · Spielstand am Ende: {STATE_LABEL[state]} · Win-Condition: {ARCH[lineup.win].label}{plan ? ' (erkannt)' : ''}{r.xpGain ? ` · +${r.xpGain} XP` : ''}</div>
+      <div className="mt-1.5 text-[10px] leading-tight text-slate-400">Ende: {STATE_LABEL[state]} · Gameplan {plan ? '✓' : '✗'}{r.xpGain ? ` · +${r.xpGain} XP` : ''}</div>
     </div>
   );
 }
@@ -6852,7 +6852,7 @@ function App() {
 
   if (!profile) {   // Erster Start: Registrierung
     return (
-      <div className="relative mx-auto w-full max-w-[400px] h-full max-h-[820px] min-h-[min(100dvh,820px)] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
+      <div className="relative mx-auto w-full max-w-[400px] h-[min(100dvh,820px)] sm:h-[min(calc(100dvh-2rem),820px)] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
            style={{ borderColor: 'var(--line)' }}>
         <header className="px-4 py-2.5 border-b flex items-center gap-2" style={{ borderColor: 'var(--line)' }}>
           <ChampAvatar name="Heimerdinger" className="w-8 h-8" iconSize={16} fallbackIcon="brain" ring="border border-[#C89B3C]" />
@@ -6866,7 +6866,7 @@ function App() {
 
   return (
     <GlossCtx.Provider value={setGloss}>
-    <div className="relative mx-auto w-full max-w-[400px] h-full max-h-[820px] min-h-[min(100dvh,820px)] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
+    <div className="relative mx-auto w-full max-w-[400px] h-[min(100dvh,820px)] sm:h-[min(calc(100dvh-2rem),820px)] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
          style={{ borderColor: 'var(--line)' }}>
       <header className="px-4 py-2.5 border-b flex items-center gap-2" style={{ borderColor: 'var(--line)' }}>
         <ChampAvatar name="Heimerdinger" className="w-8 h-8" iconSize={16} fallbackIcon="brain" ring="border border-[#C89B3C]" />
