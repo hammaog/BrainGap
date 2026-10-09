@@ -51,8 +51,14 @@
   .floatgold { animation:floatgold 2s ease-out both; }
   @keyframes redflash { 0%,100%{background:rgba(232,64,87,0)} 20%{background:rgba(232,64,87,.55)} 60%{background:rgba(232,64,87,.2)} }
   .redflash { animation:redflash 1.2s ease-out both; }
+  .modal-overlay { position:fixed; inset:0; background:rgba(1,10,19,.85); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); z-index:9999;
+                   display:flex; align-items:center; justify-content:center; padding:16px; }
+  @keyframes bannerin { 0%{transform:translateY(-14px) scale(.85);opacity:0} 100%{transform:none;opacity:1} }
+  .bannerin { animation:bannerin .45s ease-out both; }
+  @keyframes goldpop { 0%{transform:translateY(8px) scale(.5);opacity:0} 60%{transform:translateY(-6px) scale(1.25);opacity:1} 100%{transform:none;opacity:1} }
+  .goldpop { animation:goldpop .8s ease-out both; }
   footer.riot-footer { max-width:400px; margin:6px auto 0; padding:10px 16px calc(14px + env(safe-area-inset-bottom,0px)); font-size:10px; line-height:1.45; color:#7a8294; text-align:center; }
-  @media (prefers-reduced-motion:reduce){ .pulsedot,.bannerpop,.floatgold,.redflash{animation:none} }
+  @media (prefers-reduced-motion:reduce){ .pulsedot,.bannerpop,.floatgold,.redflash,.bannerin,.goldpop{animation:none} }
 </style>
 </head>
 <body>
@@ -4813,8 +4819,6 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
   const [mapOpen, setMapOpen] = useState(false);
   const [leave, setLeave] = useState(false);   // Bestätigung zum Abbrechen
   const [full, setFull] = useState(false);     // Gesamtkarte statt Fokus-Ausschnitt
-  const [showBanner, setShowBanner] = useState(false);   // Kill-/Objective-/Todes-Banner nach der Antwort
-  useEffect(() => { if (!pick || !scenario.mv2) return; setShowBanner(true); const t = setTimeout(() => setShowBanner(false), 3400); return () => clearTimeout(t); }, [pick]);
   const paused = mapOpen || full;               // Taktik-Analyse: Timer steht
   const openMap = () => { pausedRef.current = true; setMapOpen(true); };                 // Ref sofort setzen, bevor der nächste Tick kommt
   const toggleFull = () => { if (!full) pausedRef.current = true; setFull(!full); };
@@ -4888,15 +4892,15 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
   const focus = focusFor(scenario.markers);
   const cc = record.c + (ok ? 1 : 0), nn = record.c + record.w + 1, lead = cc - (nn - cc);
   const st = pick ? ((format === 'match' || format === 'tree') ? standing(lead, ok, stage) : { good: ok, text: `Zwischenstand: ${cc} von ${nn} richtig` }) : null;
-  const nextLabel = stage + 1 >= stages ? 'Zur Auswertung ➔' : (format === 'match' || format === 'tree' || format === 'mv2') ? 'Nächste Phase ➔' : 'Nächste Frage ➔';
+  const nextLabel = stage + 1 >= stages ? 'ZUM ENDERGEBNIS ➔' : (format === 'match' || format === 'tree' || format === 'mv2') ? `WEITER ZU PHASE ${stage + 2} ➔` : `WEITER ZU FRAGE ${stage + 2} ➔`;
   const mvEv = pick && scenario.mv2 ? scenario.mv2.ev[ok ? 'ok' : 'bad'] : null;   // Spielereignis dieser Entscheidung (Kills, Tod, Gold, Objective)
   const hudStats = hud ? (mvEv ? applyEv(hud.stats, mvEv) : hud.stats) : null;
   const hudState = hud ? (pick ? nextState(hud.state, ok) : hud.state) : null;
   const goNext = () => { if (adv.current || !pick) return; adv.current = true; onNext(pick.opt || null); };
 
   return (
+    <>
     <div className={`flex-1 min-h-0 relative flex flex-col ${wrong ? 'shake' : ''}`}>
-      {pick && scenario.mv2 && showBanner && mvEv && <MatchBanner ev={mvEv} me={scenario.mv2.me} victim={scenario.mv2.victim} />}
       <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
         {/* Spielzeit und Phase in einem Badge */}
         <div className="flex items-center gap-2">
@@ -4980,33 +4984,6 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
             );
           })}
         </div>
-
-        {pick && (
-          <div role="status" className="shrink-0 max-h-[60vh] sm:max-h-[70vh] overflow-y-auto rounded-lg border" style={{ borderColor: fbColor }}>
-            <div className="flex items-center gap-2 px-3 pt-2 font-serif font-bold" style={{ color: fbColor }}>
-              <Icon n={ok ? 'check' : 'x'} size={18} />{ok ? 'Richtige Entscheidung' : 'Fehlentscheidung'}
-            </div>
-            {ok ? (
-              <p className="px-3 py-1.5 text-sm leading-relaxed text-slate-200"><G t={fbText} /></p>
-            ) : (
-              <dl className="space-y-1 px-3 py-1.5 text-sm leading-relaxed">
-                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Deine Wahl: </dt><dd className="inline text-slate-200"><G t={choice} /></dd></div>
-                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Direkte Folge: </dt><dd className="inline text-slate-200"><G t={chain[0]} /></dd></div>
-                <div><dt className="inline font-semibold" style={{ color: fbColor }}>Team-Schaden: </dt><dd className="inline text-slate-200"><G t={chain[1]} /></dd></div>
-              </dl>
-            )}
-            {st && (
-              <div className="mx-3 mb-2 rounded-md border px-2.5 py-1.5 text-sm font-semibold"
-                   style={{ borderColor: st.good ? 'rgba(10,200,185,.5)' : 'rgba(232,64,87,.5)', color: st.good ? 'var(--teal)' : 'var(--red)', background: st.good ? 'rgba(10,200,185,.08)' : 'rgba(232,64,87,.08)' }}>{st.text}</div>
-            )}
-          </div>
-        )}
-        {pick && (
-          <div className="sticky bottom-0 z-10 -mx-3 mt-auto shrink-0 bg-gradient-to-t from-[#010A13] via-[#010A13]/95 to-transparent px-3 pb-2 pt-3">
-            <button autoFocus onClick={goNext}
-              className="w-full rounded-xl bg-[#C89B3C] py-2.5 font-serif font-extrabold text-[#010A13] shadow-[0_0_12px_rgba(200,155,60,.4)] transition active:scale-[.98]">{nextLabel}</button>
-          </div>
-        )}
 
         <div className="flex items-center justify-between mt-auto pt-0.5">
           <div className="text-xs text-slate-400">{practice ? 'Übung: zählt nicht' : 'Ergebnis nach der letzten Entscheidung'}</div>
@@ -5099,6 +5076,9 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
         </div>
       )}
     </div>
+    {/* Feedback als Pop-up: außerhalb des Shake-Containers, damit position:fixed immer am Bildschirm hängt */}
+    {pick && <FeedbackModal scenario={scenario} ok={ok} timeout={!pick.opt} choice={choice} fbText={fbText} chain={chain} ev={mvEv} st={st} hudStats={hudStats} hudState={hudState} nextLabel={nextLabel} onNext={goNext} />}
+    </>
   );
 }
 
@@ -5235,8 +5215,7 @@ function RunComplete({ result, log, practice, format, onDone, onRetry }) {
         <div className="w-full"><Divider /></div>
         {result.mv2 && <MatchStats r={result} />}
         {result.mastery && <MasteryResult m={result.mastery} />}
-        <div className="font-serif text-lg font-bold">Post-Match Breakdown</div>
-        <StepList log={log} />
+        <Breakdown log={log} phases={format === 'mv2' || format === 'tree' || format === 'match'} />
         <button onClick={onDone} className="w-full py-3 rounded-xl font-serif font-extrabold text-[#010A13]" style={{ background: 'var(--gold)' }}>Weiter zum Dashboard</button>
       </div>
     </div>
@@ -6365,9 +6344,31 @@ function LoadSlot({ champ, role, icon, name, side, mine }) {
     </div>
   );
 }
-function PregameFlow({ profile, role, onCancel, onPlan, onStart }) {
-  const [step, setStep] = useState('ready');
+function ReadyCheckModal({ role, onAccept, onDecline }) {
   const [left, setLeft] = useState(10);
+  useEffect(() => { playHextechSound('ready_gong'); }, []);
+  useEffect(() => {
+    if (left <= 0) { onDecline('timeout'); return; }
+    const t = setTimeout(() => setLeft(l => l - 1), 1000);
+    return () => clearTimeout(t);
+  }, [left]);
+  return (
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Spiel gefunden" data-ready-modal="true">
+      <div className="flex w-full max-w-[340px] flex-col items-center gap-4 rounded-2xl border-2 border-[#C89B3C] bg-[#06111F] p-6 text-center shadow-[0_0_40px_rgba(200,155,60,.45)]">
+        <div className="pop font-serif text-3xl font-black tracking-wide text-[#C89B3C]">SPIEL GEFUNDEN!</div>
+        <div className="text-sm text-slate-300">Ranked · {ROLE_SHORT[role]}</div>
+        <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-[#C89B3C] shadow-[0_0_24px_rgba(200,155,60,.5)]">
+          <span className="font-serif text-5xl font-black tabular-nums" data-ready-count="true" aria-live="polite">{left}</span>
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--track)' }}><div className="h-full bg-[#0AC8B9] transition-[width] duration-1000 ease-linear" style={{ width: `${(left / 10) * 100}%` }} /></div>
+        <button type="button" autoFocus onClick={onAccept} className="w-full rounded-xl bg-[#C89B3C] py-3 font-serif text-lg font-extrabold text-[#010A13] shadow-[0_0_16px_rgba(200,155,60,.5)] active:scale-[.98]">Annehmen</button>
+        <button type="button" onClick={() => onDecline('decline')} className="text-xs text-slate-500 underline">Ablehnen</button>
+      </div>
+    </div>
+  );
+}
+function PregameFlow({ profile, role, onCancel, onPlan, onStart }) {
+  const [step, setStep] = useState('select');   // der Ready Check ist ein eigenes Modal (ReadyCheckModal)
   const pool = Object.keys(ROLE_POOL[role]);
   const mine = profile.role === role ? champLabel(profile.champion) : pool[0];
   const choices = pool.some(c => normName(c) === normName(mine)) ? pool : [mine, ...pool];
@@ -6375,40 +6376,18 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart }) {
   const [lineup, setLineup] = useState(null);
   const [plan, setPlan] = useState(null);
   const opts = useRef(shuffle(Object.keys(ARCH))).current;
-  useEffect(() => { playHextechSound('ready_gong'); }, []);
-  useEffect(() => {
-    if (step !== 'ready') return;
-    if (left <= 0) { onCancel('timeout'); return; }
-    const t = setTimeout(() => setLeft(l => l - 1), 1000);
-    return () => clearTimeout(t);
-  }, [step, left]);
-  const shell = 'absolute inset-0 z-50 flex flex-col overflow-y-auto';
+  useEffect(() => { try { window.scrollTo(0, 0); } catch (e) {} }, [step]);   // jeder Ansichtswechsel startet ganz oben
+  const shell = 'flex-1 min-h-0 w-full overflow-y-auto flex flex-col';   // normaler Fluss: trägt zur Höhe bei, kein absolutes Overlay
   const bg = { background: 'linear-gradient(#010A13,#0A1428)' };
   const back = <button type="button" onClick={() => onCancel('cancel')} className="self-center pb-2 text-xs text-slate-500 underline">Abbrechen</button>;
 
-  if (step === 'ready') {
-    return (
-      <div className={shell} style={bg} role="dialog" aria-modal="true" aria-label="Spiel gefunden">
-        <div className="m-auto flex w-full flex-col items-center gap-4 p-6 text-center">
-          <div className="pop font-serif text-3xl font-black tracking-wide text-[#C89B3C]">SPIEL GEFUNDEN!</div>
-          <div className="text-sm text-slate-300">Ranked · {ROLE_SHORT[role]}</div>
-          <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-[#C89B3C] shadow-[0_0_24px_rgba(200,155,60,.5)]">
-            <span className="font-serif text-5xl font-black tabular-nums" data-ready-count="true" aria-live="polite">{left}</span>
-          </div>
-          <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--track)' }}><div className="h-full bg-[#0AC8B9] transition-[width] duration-1000 ease-linear" style={{ width: `${(left / 10) * 100}%` }} /></div>
-          <button type="button" autoFocus onClick={() => setStep('select')} className="w-full rounded-xl bg-[#C89B3C] py-3 font-serif text-lg font-extrabold text-[#010A13] shadow-[0_0_16px_rgba(200,155,60,.5)] active:scale-[.98]">Annehmen</button>
-          <button type="button" onClick={() => onCancel('decline')} className="text-xs text-slate-500 underline">Ablehnen</button>
-        </div>
-      </div>
-    );
-  }
   if (step === 'select') {
     return (
       <div className={shell} style={bg}>
-        <div className="flex flex-col gap-3 p-4">
+        <div className="mx-auto flex w-full max-w-[400px] flex-col gap-3 p-4">
           <div className="font-serif text-xl font-black text-[#C89B3C]">Champion-Auswahl</div>
           <div className="text-sm text-slate-300">Rolle: {ROLE_SHORT[role]}. Bestätige deinen Champion.</div>
-          <div className="grid grid-cols-4 gap-x-2 gap-y-3">
+          <div className="grid grid-cols-4 justify-items-center gap-x-2 gap-y-3 sm:grid-cols-5">
             {choices.map(c => (
               <button key={c} type="button" data-pick={c} aria-pressed={normName(me) === normName(c)} onClick={() => setMe(c)} className="flex flex-col items-center gap-1 active:scale-90">
                 <ChampAvatar name={c} className="w-12 h-12" iconSize={20} ring={normName(me) === normName(c) ? 'border-2 border-[#C89B3C] shadow-[0_0_0_2px_rgba(10,200,185,.75)]' : 'border-2 border-[#C89B3C]/40'} />
@@ -6426,7 +6405,7 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart }) {
     const icon = (c, i) => ICON_IDS[(hashStr(c) + i) % ICON_IDS.length];
     return (
       <div className={shell} style={bg}>
-        <div className="flex flex-col gap-3 p-4">
+        <div className="mx-auto flex w-full max-w-[400px] flex-col gap-3 p-4">
           <div className="font-serif text-xl font-black text-[#C89B3C]">Ladebildschirm</div>
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1.5"><div className="text-center text-xs font-bold uppercase tracking-wide text-blue-300">Dein Team (Blau)</div>
@@ -6445,7 +6424,7 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart }) {
   const pick = k => { if (plan) return; const ok = k === lineup.win; setPlan({ pick: k, ok }); onPlan(ok); };
   return (
     <div className={shell} style={bg}>
-      <div className="flex flex-col gap-3 p-4">
+      <div className="mx-auto flex w-full max-w-[400px] flex-col gap-3 p-4">
         <div className="font-serif text-xl font-black text-[#C89B3C]">Taktischer Gameplan</div>
         <p className="text-sm leading-snug text-slate-200">Analysiere das Matchup: Was ist die Hauptstärke / Win-Condition deines Teams gegen diese gegnerische Komposition?</p>
         <div className="grid grid-cols-2 gap-1.5">
@@ -6488,17 +6467,76 @@ function MatchHud({ stats, state }) {
     </div>
   );
 }
-function MatchBanner({ ev, me, victim }) {
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+// Kurzer Map-Text: was ist passiert (Kills, Tode, Gold, Spielstand)?
+function mapStory(ev, stats, state) {
+  const p = [];
+  if (ev.tk || ev.ek) p.push(ev.tk ? `Dein Team gewinnt ${plural(ev.tk, 'Kill', 'Kills')}${ev.ek ? `, die Gegner ${ev.ek}` : ''}.` : `Die Gegner gewinnen ${plural(ev.ek, 'Kill', 'Kills')}.`);
+  if (ev.k || ev.d || ev.a) p.push(`Du: ${plural(ev.k || 0, 'Kill', 'Kills')}, ${plural(ev.d || 0, 'Tod', 'Tode')}, ${plural(ev.a || 0, 'Assist', 'Assists')}.`);
+  p.push(`Gold ${fmtGold(ev.gold || 0)} (gesamt ${fmtGold(stats.gold)}), Spielstand: ${STATE_LABEL[state]}.`);
+  return 'Auf der Map: ' + p.join(' ');
+}
+function FeedbackBanner({ ev, ok, me, victim, champion }) {
+  const e = ev || {};
+  const none = !e.kill && !e.obj && !e.death;
   return (
-    <div className="pointer-events-none absolute inset-x-3 top-12 z-30 flex flex-col items-center gap-1.5" aria-live="assertive" data-banners="true">
-      {ev.death && <div className="redflash absolute -inset-4 -z-10 rounded-xl" aria-hidden="true" />}
-      {ev.kill && (
-        <div data-banner="kill" className="bannerpop relative w-full rounded-lg border-2 border-[#F0E6D2] bg-gradient-to-r from-[#7a5a14] via-[#C89B3C] to-[#7a5a14] px-3 py-1.5 text-center font-serif text-sm font-black text-[#010A13] shadow-[0_0_18px_rgba(200,155,60,.8)]">
-          {me} ⚔️ {victim} ELIMINIERT!<span className="floatgold absolute -top-1 right-2 text-xs font-black text-yellow-200">+300g</span>
+    <div className="relative flex flex-col items-center gap-1.5" data-banners="true" aria-live="assertive">
+      {e.death && <div className="redflash absolute -inset-3 -z-10 rounded-xl" aria-hidden="true" />}
+      {e.kill && (
+        <div data-banner="kill" className="bannerin relative flex w-full items-center justify-center gap-2 rounded-lg border-2 border-[#F0E6D2] bg-gradient-to-r from-[#7a5a14] via-[#C89B3C] to-[#7a5a14] px-3 py-2 font-serif text-sm font-black text-[#010A13] shadow-[0_0_18px_rgba(200,155,60,.8)]">
+          <ChampAvatar name={me} className="w-8 h-8" iconSize={12} ring="border-2 border-[#010A13]/60" />
+          <span>{me} ⚔️ {victim} ELIMINIERT!</span>
+          <ChampAvatar name={victim} className="w-8 h-8" iconSize={12} ring="border-2 border-[#010A13]/60" />
+          <span className="goldpop absolute -top-2.5 right-2 rounded bg-[#010A13] px-1.5 text-xs font-black text-yellow-300">+300g</span>
         </div>
       )}
-      {ev.obj && <div data-banner="obj" className="bannerpop w-full rounded-lg border-2 border-[#0AC8B9] bg-[#06242a] px-3 py-1.5 text-center font-serif text-sm font-black text-[#0AC8B9] shadow-[0_0_18px_rgba(10,200,185,.7)]">{ev.obj}</div>}
-      {ev.death && <div data-banner="death" className="bannerpop w-full rounded-lg border-2 border-red-500 bg-red-950 px-3 py-1.5 text-center font-serif text-sm font-black text-red-300 shadow-[0_0_18px_rgba(232,64,87,.8)]">DU WURDEST ELIMINIERT!</div>}
+      {e.obj && <div data-banner="obj" className="bannerin w-full rounded-lg border-2 border-[#0AC8B9] bg-[#06242a] px-3 py-2 text-center font-serif text-sm font-black text-[#0AC8B9] shadow-[0_0_18px_rgba(10,200,185,.7)]">{e.obj}</div>}
+      {e.death && <div data-banner="death" className="bannerin w-full rounded-lg border-2 border-red-500 bg-red-950 px-3 py-2 text-center font-serif text-sm font-black text-red-300 shadow-[0_0_18px_rgba(232,64,87,.8)]">DU WURDEST ELIMINIERT!</div>}
+      {none && (ok
+        ? <div data-banner="good" className="bannerin flex w-full items-center justify-center gap-2 rounded-lg border-2 border-[#C89B3C] bg-[#2a1f08] px-3 py-2 font-serif text-sm font-black text-[#F0E6D2]"><ChampAvatar name={champion} className="w-8 h-8" iconSize={12} />VORTEIL GESICHERT!</div>
+        : <div data-banner="bad" className="bannerin w-full rounded-lg border-2 border-red-500 bg-red-950 px-3 py-2 text-center font-serif text-sm font-black text-red-300">ENTSCHEIDUNG BESTRAFT</div>)}
+    </div>
+  );
+}
+// Feedback nach jeder Entscheidung: zentriertes Pop-up, schließt nur per Klick (kein Timer, kein Runterscrollen)
+function FeedbackModal({ scenario, ok, timeout, choice, fbText, chain, ev, st, hudStats, hudState, nextLabel, onNext }) {
+  const mv = scenario.mv2, color = ok ? 'var(--teal)' : 'var(--red)';
+  const story = mv && ev && hudStats ? mapStory(ev, hudStats, hudState) : (st ? `Auf der Map: ${st.text}` : '');
+  return (
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={ok ? 'Richtige Entscheidung' : 'Bestraft'} data-feedback={ok ? 'ok' : 'bad'}>
+      <div className="fade-in flex w-full max-w-[360px] flex-col gap-3 overflow-y-auto rounded-2xl border-2 bg-[#06111F] p-4 shadow-[0_0_40px_rgba(0,0,0,.6)]" style={{ borderColor: color, maxHeight: 'calc(100dvh - 32px)' }}>
+        <FeedbackBanner ev={ev} ok={ok} me={mv ? mv.me : scenario.champion} victim={mv ? mv.victim : ''} champion={scenario.champion} />
+        <div className="text-center">
+          <div className="pop font-serif text-2xl font-black leading-tight" style={{ color }} data-verdict="true">{ok ? '✅ RICHTIGE ENTSCHEIDUNG' : '❌ BESTRAFT!'}</div>
+          {!ok && <div className="mt-0.5 text-xs text-slate-400">Fehlentscheidung{timeout ? ' · Zeit abgelaufen' : ''}</div>}
+        </div>
+        {story && <div data-feedback-map="true" className="rounded-lg border px-3 py-2 text-sm leading-snug" style={{ borderColor: ok ? 'rgba(10,200,185,.5)' : 'rgba(232,64,87,.5)', background: ok ? 'rgba(10,200,185,.08)' : 'rgba(232,64,87,.08)' }}>{story}</div>}
+        <div data-feedback-coach="true" className="text-sm leading-relaxed text-slate-200">
+          <div className="mb-0.5 text-xs font-bold uppercase tracking-wide text-[#C89B3C]">Coach-Erklärung</div>
+          {ok ? <p><G t={fbText} /></p> : (
+            <>
+              <p className="mb-1 text-xs text-slate-400">Deine Wahl: <G t={choice} /></p>
+              <p><b style={{ color }}>Direkte Folge:</b> <G t={chain[0]} /> <b style={{ color }}>Team-Schaden:</b> <G t={chain[1]} /></p>
+            </>
+          )}
+        </div>
+        <button type="button" autoFocus onClick={onNext} data-feedback-next="true"
+          className="w-full rounded-xl bg-gradient-to-b from-[#E0B552] to-[#C89B3C] py-3.5 font-serif text-base font-extrabold tracking-wide text-[#010A13] shadow-[0_0_18px_rgba(200,155,60,.55)] transition active:scale-[.98]">{nextLabel}</button>
+      </div>
+    </div>
+  );
+}
+function Breakdown({ log, phases }) {
+  const [open, setOpen] = useState(false);
+  const noun = phases ? 'Phasen' : 'Fragen';
+  return (
+    <div className="flex w-full flex-col gap-2" data-breakdown={open ? 'open' : 'closed'}>
+      <div className="font-serif text-lg font-bold">Post-Match Breakdown</div>
+      <button type="button" aria-expanded={open} aria-controls="breakdown-panel" onClick={() => setOpen(o => !o)}
+        className="w-full rounded-xl border border-[#C89B3C]/60 bg-[#010A13]/80 py-2.5 text-sm font-bold text-[#C89B3C] transition hover:border-[#0AC8B9] active:scale-[.99]">
+        {open ? `📊 ${noun}-Rückblick ausblenden ▲` : `📊 Detaillierten ${noun}-Rückblick anzeigen ▼`}
+      </button>
+      {open && <div id="breakdown-panel" className="slidedown"><StepList log={log} /></div>}
     </div>
   );
 }
@@ -6545,6 +6583,7 @@ function App() {
   const [matchCount, setMatchCount] = useState(Number.isFinite(init.matchCount) ? init.matchCount : 0);
   const [shieldUntil, setShieldUntil] = useState(Number.isFinite(init.shieldUntil) ? init.shieldUntil : 0);
   const [sinceAd, setSinceAd] = useState(Number.isFinite(init.sinceAd) ? init.sinceAd : 0);
+  useEffect(() => { try { window.scrollTo(0, 0); } catch (e) {} }, [screen]);   // jeder Ansichtswechsel startet ganz oben
   const [notice, setNotice] = useState('');   // kurzer Hinweis, z. B. übernommene Standardwerte oder abgeschlossene Quests
   useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(''), 6000); return () => clearTimeout(t); }, [notice]);
   const [infoMode, setInfoMode] = useState(null);
@@ -6632,7 +6671,7 @@ function App() {
   };
   const playRanked = ({ way, role }) => {
     if (!canPlay) return;
-    if (way === 'match') { setRankedOpen(false); setPregame({ role }); setScreen('pregame'); return; }   // Ready Check, Champion-Wahl, Ladebildschirm, Gameplan
+    if (way === 'match') { setRankedOpen(false); setPregame({ role, accepted: false }); return; }   // Ready Check als Modal über dem Dashboard, danach Champion-Wahl, Ladebildschirm, Gameplan
     const queue = freshFirst(rankedPool(rank.step).map(r => r.id), recent, QUIZ_LENGTH);   // nur eigene Liga, ohne zuletzt gespielte
     begin('ranked', { format: 'quiz', id: queue[0], queue, stages: queue.length });
   };
@@ -6645,6 +6684,7 @@ function App() {
     setScreen('scenario');
   };
   const cancelPregame = () => { setPregame(null); setScreen('home'); };
+  const acceptReady = () => { setPregame(p => ({ ...p, accepted: true })); setScreen('pregame'); try { window.scrollTo(0, 0); } catch (e) {} };   // Modal schließt, Champion-Wahl öffnet, Ansicht ganz oben
   const onPlan = ok => { if (ok) { addXp(50); trackQuest('plan'); } };
 
   const mmr = profile && profile.hiddenMmr != null ? profile.hiddenMmr : rank.step * 100 + rank.lp;
@@ -6812,7 +6852,7 @@ function App() {
 
   if (!profile) {   // Erster Start: Registrierung
     return (
-      <div className="relative mx-auto w-full max-w-[400px] h-full max-h-[820px] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
+      <div className="relative mx-auto w-full max-w-[400px] h-full max-h-[820px] min-h-[min(100dvh,820px)] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
            style={{ borderColor: 'var(--line)' }}>
         <header className="px-4 py-2.5 border-b flex items-center gap-2" style={{ borderColor: 'var(--line)' }}>
           <ChampAvatar name="Heimerdinger" className="w-8 h-8" iconSize={16} fallbackIcon="brain" ring="border border-[#C89B3C]" />
@@ -6826,7 +6866,7 @@ function App() {
 
   return (
     <GlossCtx.Provider value={setGloss}>
-    <div className="relative mx-auto w-full max-w-[400px] h-full max-h-[820px] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
+    <div className="relative mx-auto w-full max-w-[400px] h-full max-h-[820px] min-h-[min(100dvh,820px)] flex flex-col overflow-hidden sm:my-4 sm:rounded-3xl sm:border bg-gradient-to-b from-[#010A13] to-[#0A1428]"
          style={{ borderColor: 'var(--line)' }}>
       <header className="px-4 py-2.5 border-b flex items-center gap-2" style={{ borderColor: 'var(--line)' }}>
         <ChampAvatar name="Heimerdinger" className="w-8 h-8" iconSize={16} fallbackIcon="brain" ring="border border-[#C89B3C]" />
@@ -6859,7 +6899,7 @@ function App() {
           record={{ c: rs.log.filter(e => e.ok).length, w: rs.log.filter(e => !e.ok).length }} onNext={next} onAbort={abort} />
       )}
       {screen === 'complete' && result && <RunComplete result={result} log={rs.log} practice={mode === 'practice' || !!result.masteryOnly} format={rs.format} onDone={finishRun} onRetry={startDrill} />}
-      {screen === 'pregame' && pregame && <PregameFlow profile={profile} role={pregame.role} onCancel={cancelPregame} onPlan={onPlan} onStart={startMv2} />}
+      {screen === 'pregame' && pregame && pregame.accepted && <PregameFlow profile={profile} role={pregame.role} onCancel={cancelPregame} onPlan={onPlan} onStart={startMv2} />}
 
       {screen !== 'scenario' && screen !== 'complete' && screen !== 'pregame' && (
         <nav className="grid grid-cols-3 border-t" style={{ borderColor: 'var(--line)', background: '#010A13' }}>
@@ -6873,6 +6913,7 @@ function App() {
         </nav>
       )}
 
+      {pregame && !pregame.accepted && <ReadyCheckModal role={pregame.role} onAccept={acceptReady} onDecline={cancelPregame} />}
       {setupOpen && <PracticeSetup onStart={playPractice} onClose={() => setSetupOpen(false)} />}
       {rankedOpen && <RankedSetup rank={rank} profile={profile} onStart={playRanked} onClose={() => setRankedOpen(false)} />}
       {infoMode && <ModeInfo mode={infoMode} onClose={() => setInfoMode(null)} />}
