@@ -65,7 +65,7 @@
 <div id="root"></div>
 <footer class="riot-footer">BrainGap.gg isn’t endorsed by Riot Games and doesn’t reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.</footer>
 <script type="text/babel">
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useMemo } = React;
 
 /* Lucide-Icons (Original-Pfade, inline, weil Lucide-React-Module hier nicht ladbar sind) */
 const P = {
@@ -5893,11 +5893,11 @@ const ARCH = {
 };
 // Champion-Pools je Rolle mit Archetyp-Tags (Coaching-Einschätzung, keine offiziellen Riot-Daten)
 const ROLE_POOL = {
-  Toplane: { Malphite: ['TF'], Ornn: ['TF', 'SCALE'], Renekton: ['EARLY'], Darius: ['EARLY'], Fiora: ['SPLIT'], Jax: ['SPLIT', 'SCALE'], Camille: ['SPLIT', 'PICK'], Sion: ['TF', 'SCALE'], Aatrox: ['EARLY', 'TF'], Gnar: ['TF'], Garen: ['EARLY'], Sett: ['EARLY'] },
-  Jungle: { Sejuani: ['TF'], Amumu: ['TF'], 'Lee Sin': ['EARLY', 'PICK'], Nocturne: ['PICK'], Elise: ['EARLY', 'PICK'], Viego: ['EARLY', 'SCALE'], Kayn: ['SCALE', 'PICK'], Warwick: ['EARLY', 'TF'], Zac: ['TF'] },
-  Midlane: { Orianna: ['TF'], Ahri: ['PICK'], Zed: ['PICK', 'EARLY'], Azir: ['SCALE'], Viktor: ['SCALE', 'TF'], Syndra: ['PICK'], Lux: ['PICK'], Katarina: ['TF', 'EARLY'], Yasuo: ['SPLIT'], Annie: ['TF', 'EARLY'] },
-  Botlane: { Jinx: ['SCALE', 'TF'], "Kai'Sa": ['SCALE'], Ezreal: ['SCALE'], Draven: ['EARLY'], 'Miss Fortune': ['TF', 'EARLY'], Caitlyn: ['EARLY', 'SPLIT'], Ashe: ['PICK', 'TF'], Lucian: ['EARLY'], Zeri: ['SCALE', 'SPLIT'], Vayne: ['SCALE', 'SPLIT'] },
-  Support: { Thresh: ['PICK'], Leona: ['TF', 'EARLY'], Nautilus: ['PICK', 'EARLY'], Alistar: ['TF'], Lulu: ['SCALE'], Janna: ['SCALE'], Braum: ['TF'], Soraka: ['SCALE'], Karma: ['EARLY'], Blitzcrank: ['PICK'], Rakan: ['TF'] },
+  Toplane: { Gwen: ['SCALE', 'SPLIT'], Malphite: ['TF'], Ornn: ['TF', 'SCALE'], Renekton: ['EARLY'], Darius: ['EARLY'], Fiora: ['SPLIT'], Jax: ['SPLIT', 'SCALE'], Camille: ['SPLIT', 'PICK'], Sion: ['TF', 'SCALE'], Aatrox: ['EARLY', 'TF'], Gnar: ['TF'], Garen: ['EARLY'], Sett: ['EARLY'] },
+  Jungle: { Evelynn: ['PICK', 'EARLY'], Sejuani: ['TF'], Amumu: ['TF'], 'Lee Sin': ['EARLY', 'PICK'], Nocturne: ['PICK'], Elise: ['EARLY', 'PICK'], Viego: ['EARLY', 'SCALE'], Kayn: ['SCALE', 'PICK'], Warwick: ['EARLY', 'TF'], Zac: ['TF'] },
+  Midlane: { Kassadin: ['SCALE'], Veigar: ['SCALE'], Xerath: ['PICK'], Talon: ['PICK', 'EARLY'], Lissandra: ['TF', 'PICK'], Orianna: ['TF'], Ahri: ['PICK'], Zed: ['PICK', 'EARLY'], Azir: ['SCALE'], Viktor: ['SCALE', 'TF'], Syndra: ['PICK'], Lux: ['PICK'], Katarina: ['TF', 'EARLY'], Yasuo: ['SPLIT'], Annie: ['TF', 'EARLY'] },
+  Botlane: { Ziggs: ['SCALE', 'TF'], Jinx: ['SCALE', 'TF'], "Kai'Sa": ['SCALE'], Ezreal: ['SCALE'], Draven: ['EARLY'], 'Miss Fortune': ['TF', 'EARLY'], Caitlyn: ['EARLY', 'SPLIT'], Ashe: ['PICK', 'TF'], Lucian: ['EARLY'], Zeri: ['SCALE', 'SPLIT'], Vayne: ['SCALE', 'SPLIT'] },
+  Support: { Pyke: ['PICK', 'EARLY'], Senna: ['SCALE'], Thresh: ['PICK'], Leona: ['TF', 'EARLY'], Nautilus: ['PICK', 'EARLY'], Alistar: ['TF'], Lulu: ['SCALE'], Janna: ['SCALE'], Braum: ['TF'], Soraka: ['SCALE'], Karma: ['EARLY'], Blitzcrank: ['PICK'], Rakan: ['TF'] },
 };
 const DEFAULT_TAGS = { Toplane: ['SPLIT'], Jungle: ['EARLY'], Midlane: ['PICK'], Botlane: ['SCALE'], Support: ['PICK'] };
 const champTags = (name, role) => {
@@ -5907,21 +5907,135 @@ const champTags = (name, role) => {
 };
 const archScore = team => { const s = { TF: 0, EARLY: 0, SCALE: 0, PICK: 0, SPLIT: 0 }; ROLES_ORDER.forEach(r => champTags(team[r], r).forEach(t => { s[t] += 1; })); return s; };
 const archRank = s => Object.entries(s).sort((a, b) => b[1] - a[1]);
-// Frisches 5v5-Lineup für jedes Match: eigenes Team (Blau) und Gegner (Rot), 10 verschiedene Champions
-function genLineup(me, role) {
-  let best = null;
-  for (let i = 0; i < 400; i++) {
+/* ---- Schadensprofil & Draft-Analyse (Coaching-Einschätzung, keine offiziellen Riot-Daten) ---- */
+// Primäre Schadensart: AP = magisch, AD = physisch, MIX = gemischt (zählt weder für "Heavy AP" noch für "Full AD")
+const CHAMP_DMG_LISTS = {
+  AP: ['Malphite', 'Gwen', 'Sejuani', 'Amumu', 'Elise', 'Zac', 'Evelynn', 'Orianna', 'Ahri', 'Azir', 'Viktor', 'Syndra', 'Lux', 'Katarina', 'Annie', 'Kassadin', 'Veigar', 'Xerath', 'Lissandra', 'Ziggs', 'Thresh', 'Leona', 'Nautilus', 'Alistar', 'Lulu', 'Janna', 'Braum', 'Soraka', 'Karma', 'Blitzcrank', 'Rakan'],
+  AD: ['Renekton', 'Darius', 'Fiora', 'Jax', 'Camille', 'Aatrox', 'Gnar', 'Garen', 'Sett', 'Lee Sin', 'Nocturne', 'Viego', 'Zed', 'Yasuo', 'Talon', 'Jinx', 'Draven', 'Miss Fortune', 'Caitlyn', 'Ashe', 'Lucian', 'Zeri', 'Vayne', 'Pyke', 'Senna'],
+  MIX: ['Ornn', 'Sion', 'Kayn', 'Warwick', "Kai'Sa", 'Ezreal'],
+};
+const CHAMP_DMG = {};
+Object.keys(CHAMP_DMG_LISTS).forEach(k => CHAMP_DMG_LISTS[k].forEach(n => { CHAMP_DMG[normName(n)] = k; }));
+const DEFAULT_DMG = { Toplane: 'AD', Jungle: 'AD', Midlane: 'AP', Botlane: 'AD', Support: 'AP' };
+const dmgOf = (name, role) => CHAMP_DMG[normName(name)] || DEFAULT_DMG[role] || 'AD';
+// Champions mit verlässlichem harten CC (Stun, Root, Knock-up, Suppression, Fear, Charm)
+const HARD_CC = new Set(['Leona', 'Amumu', 'Lissandra', 'Nautilus', 'Sejuani', 'Alistar', 'Malphite', 'Thresh', 'Blitzcrank', 'Braum', 'Rakan', 'Zac', 'Elise', 'Syndra', 'Annie', 'Lux', 'Warwick', 'Ashe', 'Ahri', 'Renekton', 'Ornn', 'Nocturne', 'Janna', 'Karma', 'Veigar', 'Xerath', 'Gnar', 'Jax', 'Sion', 'Camille', 'Sett'].map(normName));
+const isHardCc = n => HARD_CC.has(normName(n));
+const joinNames = a => (a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' und ' + a[a.length - 1]);
+function damageProfile(team) {
+  const ap = [], ad = [], mix = [];
+  ROLES_ORDER.forEach(r => { const d = dmgOf(team[r], r); (d === 'AP' ? ap : d === 'MIX' ? mix : ad).push(team[r]); });
+  return { ap, ad, mix, apCount: ap.length, apShare: ap.length / 5 };
+}
+// Priorität: extremes Schadensprofil (Heavy AP, dann Full AD), dann CC-Lockdown, sonst klassischer Archetyp
+function classifyDraft(red) {
+  const dp = damageProfile(red);
+  if (dp.apShare >= 0.8) return 'AP';
+  if (dp.apCount === 0 && dp.mix.length === 0) return 'AD';
+  if (ROLES_ORDER.filter(r => isHardCc(red[r])).length >= 3) return 'CC';
+  return 'ARCH';
+}
+const PLAYSTYLE = {
+  TF: 'Als Team gruppiert um Objectives spielen, Engage-Tools sparen und den 5v5 mit dem ersten Initiate erzwingen.',
+  EARLY: 'Slow Push mit Prio aufbauen und den Turm-Dive über die gecrashte Welle ansetzen, um den frühen Vorsprung in Gold zu verwandeln.',
+  SCALE: 'Wave-Freeze nahe am eigenen Turm, sicher farmen und kein Risiko eingehen, bis die 2-Item-Spikes da sind.',
+  PICK: 'Vision-Kontrolle aufbauen und einzelne Gegner im Nebel isolieren und fangen, bevor der 5v5 beginnt.',
+  SPLIT: '1-3-1 mit Sidelane-Druck: Cross-Map-Play, bei dem ein Splitpusher Gegner bindet und der Rest dem 5v5 ausweicht.',
+};
+// Analyse der 5 gegnerischen Champions -> Kern-Frage, Antworten und Coaching-Feedback mit den konkreten Champions
+function analyzeMatchup(lu) {
+  const red = lu.red, blue = lu.blue;
+  const dp = damageProfile(red);
+  const cc = ROLES_ORDER.map(r => red[r]).filter(isHardCc);
+  const win = lu.win || archRank(archScore(blue))[0][0];
+  const enemyArch = lu.enemyArch || archRank(archScore(red))[0][0];
+  const kind = classifyDraft(red);
+  const profile = { ap: dp.ap, ad: dp.ad, mix: dp.mix, apCount: dp.apCount, apShare: dp.apShare, cc, win, enemyArch };
+  const O = (key, label) => ({ key, label });
+  if (kind === 'AP') {
+    const n = joinNames(dp.ap), c = dp.ap.length;
+    return { kind, profile, topic: 'Draft-Analyse · Schadensprofil', correct: 'AP_MR',
+      question: 'Das gegnerische Team besteht fast ausschließlich aus magischem Schaden (AP). Wie kontert euer Team diesen Draft?',
+      options: [
+        O('AP_MR', 'Früh Magieresistenz priorisieren (Merkurs Schuhe, Kaenic Rookern / Schlund von Malmortius), um den gegnerischen Burst-Schaden komplett zu neutralisieren.'),
+        O('AP_STD', 'Stur den Standard-Build ohne Magieresistenz durchziehen und hoffen, den Gegner schneller zu töten.'),
+        O('AP_ARMOR', 'Rüstung stacken (Plated Steelcaps, Dornenpanzer), weil Rüstung gegen jeden Schaden hilft.'),
+        O('AP_HEAL', 'Als Erstes Anti-Heal kaufen, unabhängig davon, was die Gegner für Schaden machen.')],
+      explain: {
+        ok: `Richtig gedacht! Gegen ${n} verliert der Gegner ab Minute 18 jeden Kampf, sobald euer Team Kaenic Rookern und Merkurs Schuhe fertiggestellt hat. Ein einzelnes MR-Item gewinnt euch dieses Spiel!`,
+        bad: {
+          AP_STD: `Fehler! Ohne Magieresistenz schmelzt ihr gegen ${c} AP-Champions (${n}) im gegnerischen Burst-Fenster. Ein defensives Resistenz-Item ist hier Pflicht.`,
+          AP_ARMOR: `Fehler! Rüstung schützt nicht vor magischem Schaden: ${n} bestrafen euch trotzdem im Burst-Fenster. Merkurs Schuhe und Kaenic Rookern / Schlund von Malmortius sind hier Pflicht.`,
+          AP_HEAL: `Fehler! Anti-Heal hilft gegen Heilung, nicht gegen Burst. Gegen ${n} entscheidet Magieresistenz: Merkurs Schuhe und Kaenic Rookern / Schlund von Malmortius.` } } };
+  }
+  if (kind === 'AD') {
+    const n = joinNames(dp.ad);
+    return { kind, profile, topic: 'Draft-Analyse · Schadensprofil', correct: 'AD_ARMOR',
+      question: 'Die Gegner haben keinen magischen Schaden (Full AD). Welcher Item-Pfad entscheidet das Spiel für eure Frontline/Bruiser?',
+      options: [
+        O('AD_ARMOR', 'Plated Steelcaps (Tabis) rushen und früh Rüstung (Dornenpanzer / Gefrorenes Herz) stacken – das negiert den Schaden der gegnerischen Carrys im Mid-Game.'),
+        O('AD_GLASS', 'Magieresistenz-Items kaufen oder reine Glaskanonen-Builds ohne Rüstung spielen.'),
+        O('AD_HP', 'Nur Lebenspunkte-Items ohne Rüstung stapeln und hoffen, dass die Gegner irgendwann aufhören.'),
+        O('AD_LIFESTEAL', 'Auf Vampirismus-Items setzen und Rüstung komplett ignorieren.')],
+      explain: {
+        ok: `Richtig gedacht! ${n} machen ausschließlich physischen Schaden. Plated Steelcaps und früh Rüstung (Dornenpanzer / Gefrorenes Herz) negieren im Mid-Game den Schaden ihrer Carrys, und eure Frontline bleibt im Kampf stehen.`,
+        bad: {
+          AD_GLASS: `Fehler! ${n} machen nur physischen Schaden: Magieresistenz ist hier verschenkt, und Glaskanonen ohne Rüstung schmelzen unter den Auto-Attacks. Plated Steelcaps, Dornenpanzer und Gefrorenes Herz sind Pflicht.`,
+          AD_HP: `Fehler! Reine Lebenspunkte ohne Rüstung verpuffen gegen ${n}: Jeder physische Treffer kostet euch das volle Leben. Rüstung (Plated Steelcaps, Dornenpanzer, Gefrorenes Herz) skaliert deutlich besser.`,
+          AD_LIFESTEAL: `Fehler! Gegen ${n} stirbt ihr im Burst, bevor Vampirismus heilen kann. Ohne Rüstung (Plated Steelcaps, Dornenpanzer, Gefrorenes Herz) ist die Frontline wertlos.` } } };
+  }
+  if (kind === 'CC') {
+    const n = joinNames(cc), c = cc.length;
+    return { kind, profile, topic: 'Draft-Analyse · Crowd Control', correct: 'CC_TENACITY',
+      question: `Die Gegner haben ${c} harte CC-Champions (${n}). Wie bereitet euer Team sich auf den ersten Lockdown vor?`,
+      options: [
+        O('CC_TENACITY', 'Zähigkeit (Tenacity) über Runen/Schuhe mitnehmen und QSS/Cleanse gegen den ersten Lockdown bereithalten.'),
+        O('CC_BURST', 'Möglichst viel Burst-Schaden stapeln und hoffen, dass der Gegner nicht trifft.'),
+        O('CC_CLUMP', 'Dicht zusammenstehen und im Pulk in den Kampf laufen, damit sich alle gegenseitig schützen.'),
+        O('CC_BLIND', 'Ohne Vision in die Engage-Reichweite der Gegner laufen, damit sie nicht fliehen können.')],
+      explain: {
+        ok: `Richtig gedacht! Gegen ${n} entscheidet der erste Lockdown: Mit Zähigkeit (Runen/Schuhe) und QSS/Cleanse kommt ihr aus der CC-Kette, bevor euer Team Schaden frisst.`,
+        bad: {
+          CC_BURST: `Fehler! Burst nützt nichts, wenn ihr im Lockdown von ${n} hängt: Wer gestunnt wird, stirbt, bevor er Schaden macht. Zähigkeit und QSS/Cleanse sind Pflicht.`,
+          CC_CLUMP: `Fehler! Gegen ${n} (viele harte CC-Effekte) trifft ein einziger Lockdown im Pulk gleich mehrere von euch. Besser auseinanderziehen und Zähigkeit plus QSS/Cleanse einplanen.`,
+          CC_BLIND: `Fehler! Ohne Vision in die Reichweite von ${n} zu laufen heißt, direkt in den ersten Lockdown zu stolpern. Vision, Zähigkeit und QSS/Cleanse sind Pflicht.` } } };
+  }
+  const tagged = joinNames(ROLES_ORDER.filter(r => champTags(blue[r], r).includes(win)).map(r => blue[r]));
+  const bad = {};
+  Object.keys(ARCH).forEach(k => { if (k !== win) bad[k] = `Fehler! Eure Hauptstärke ist ${ARCH[win].label} (${tagged}): ${ARCH[win].why}. Der passende Plan wäre gewesen: ${PLAYSTYLE[win]} Die Gegner setzen auf ${ARCH[enemyArch].label}.`; });
+  return { kind: 'ARCH', profile, topic: 'Makro-Plan', correct: win,
+    question: `Das Schadensprofil der Gegner ist nicht extrem (${dp.apCount} von 5 mit magischem Schaden), es gibt keine Draft-Schwäche, die ihr mit einem einzelnen Item-Pfad bestrafen könnt. Welcher Makro-Plan passt zur Hauptstärke eures Teams?`,
+    options: Object.keys(ARCH).map(k => O(k, PLAYSTYLE[k])),
+    explain: { ok: `Richtig gedacht! ${tagged} geben euch ${ARCH[win].label}: ${ARCH[win].why}. Der passende Plan: ${PLAYSTYLE[win]} Die Gegner setzen auf ${ARCH[enemyArch].label}.`, bad } };
+}
+// Frisches 5v5-Lineup für jedes Match: eigenes Team (Blau) und Gegner (Rot), 10 verschiedene Champions.
+// Der gegnerische Draft ist je nach Match Heavy AP, Full AD, CC-Lockdown oder ausgeglichen (klassischer Archetyp).
+const pickKind = () => { const r = Math.random(); return r < 0.22 ? 'AP' : r < 0.40 ? 'AD' : r < 0.58 ? 'CC' : 'ARCH'; };
+function genLineup(me, role, forceKind) {
+  const want = forceKind || pickKind();
+  const pref = want === 'AP' ? (c, r) => dmgOf(c, r) === 'AP' : want === 'AD' ? (c, r) => dmgOf(c, r) === 'AD' : want === 'CC' ? c => isHardCc(c) : null;
+  let best = null, last = null;
+  for (let i = 0; i < 700; i++) {
     const used = new Set([normName(me)]);
-    const pick = r => { const c = shuffle(Object.keys(ROLE_POOL[r]).filter(x => !used.has(normName(x))))[0]; used.add(normName(c)); return c; };
+    const pick = (r, pf) => {
+      const free = Object.keys(ROLE_POOL[r]).filter(x => !used.has(normName(x)));
+      const pre = pf ? free.filter(c => pf(c, r)) : [];
+      const c = shuffle(pre.length && Math.random() < 0.92 ? pre : free)[0]; used.add(normName(c)); return c;
+    };
     const blue = {}, red = {};
-    ROLES_ORDER.forEach(r => { blue[r] = r === role ? me : pick(r); });
-    ROLES_ORDER.forEach(r => { red[r] = pick(r); });
+    ROLES_ORDER.forEach(r => { blue[r] = r === role ? me : pick(r, null); });
+    ROLES_ORDER.forEach(r => { red[r] = pick(r, pref); });
     const sb = archScore(blue), sr = archScore(red), rb = archRank(sb), rr = archRank(sr);
     const margin = rb[0][1] - rb[1][1];
-    const cand = { me, role, blue, red, win: rb[0][0], sb, sr, enemyArch: rr[0][0], margin };
-    if (margin >= 1 && rb[0][1] >= 2 && rr[0][0] !== rb[0][0]) return cand;   // eindeutige Stärke, Gegner mit anderer Stärke
-    if (!best || margin > best.margin) best = cand;
+    const cand = { me, role, blue, red, win: rb[0][0], sb, sr, enemyArch: rr[0][0], margin, kind: classifyDraft(red) };
+    last = cand;
+    if (cand.kind === want && (want !== 'ARCH' || damageProfile(red).apCount >= 1)) {   // "ausgeglichen" braucht mindestens einen AP-Champion
+      if (margin >= 1 && rb[0][1] >= 2 && rr[0][0] !== rb[0][0]) { cand.q = analyzeMatchup(cand); return cand; }   // eindeutige Stärke, Gegner mit anderer Stärke
+      if (!best || margin > best.margin) best = cand;
+    }
   }
+  if (!best && want !== 'ARCH') return genLineup(me, role, 'ARCH');
+  best = best || last; best.q = analyzeMatchup(best);
   return best;
 }
 // Platzhalter: {ME}, {OPP} (Gegner deiner Rolle), {A1}-{A4} (deine 4 Mitspieler, in Rollen-Reihenfolge), {E_TOP|E_JG|E_MID|E_BOT|E_SUP}, {ROLE}
@@ -6372,7 +6486,7 @@ function ReadyCheckModal({ role, onAccept, onDecline }) {
     </div>
   );
 }
-function PregameFlow({ profile, role, onCancel, onPlan, onStart }) {
+function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind }) {
   const [step, setStep] = useState('select');   // der Ready Check ist ein eigenes Modal (ReadyCheckModal)
   const pool = Object.keys(ROLE_POOL[role]);
   const mine = profile.role === role ? champLabel(profile.champion) : pool[0];
@@ -6380,7 +6494,7 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart }) {
   const [me, setMe] = useState(mine);
   const [lineup, setLineup] = useState(null);
   const [plan, setPlan] = useState(null);
-  const opts = useRef(shuffle(Object.keys(ARCH))).current;
+  const order = useMemo(() => (lineup && lineup.q ? shuffle(lineup.q.options) : []), [lineup]);   // Antwortreihenfolge pro Match gemischt
   useEffect(() => { try { window.scrollTo(0, 0); } catch (e) {} }, [step]);   // jeder Ansichtswechsel startet ganz oben
   const shell = 'flex-1 min-h-0 w-full overflow-y-auto flex flex-col';   // normaler Fluss: trägt zur Höhe bei, kein absolutes Overlay
   const bg = { background: 'linear-gradient(#010A13,#0A1428)' };
@@ -6400,7 +6514,7 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart }) {
               </button>
             ))}
           </div>
-          <button type="button" onClick={() => { setLineup(genLineup(me, role)); setStep('loading'); }} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Bestätigen: {me}</button>
+          <button type="button" onClick={() => { setLineup(genLineup(me, role, forceKind)); setStep('loading'); }} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Bestätigen: {me}</button>
           {back}
         </div>
       </div>
@@ -6425,30 +6539,30 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart }) {
       </div>
     );
   }
-  const tagged = lineup ? ROLES_ORDER.filter(r => champTags(lineup.blue[r], r).includes(lineup.win)).map(r => lineup.blue[r]).join(', ') : '';
-  const pick = k => { if (plan) return; const ok = k === lineup.win; setPlan({ pick: k, ok }); onPlan(ok); };
+  const q = lineup.q;
+  const pick = k => { if (plan) return; const ok = k === q.correct; setPlan({ pick: k, ok }); onPlan(ok); };
   return (
-    <div className={shell} style={bg}>
+    <div className={shell} style={bg} data-plan-kind={q.kind}>
       <div className="mx-auto flex w-full max-w-[400px] flex-col gap-3 p-4">
         <div className="font-serif text-xl font-black text-[#C89B3C]">Taktischer Gameplan</div>
-        <p className="text-sm leading-snug text-slate-200">Analysiere das Matchup: Was ist die Hauptstärke / Win-Condition deines Teams gegen diese gegnerische Komposition?</p>
+        <p className="text-sm leading-snug text-slate-200"><span className="mr-1.5 rounded bg-[#C89B3C]/20 px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wide text-[#C89B3C]" data-plan-topic="true">{q.topic}</span>Analysiere das Matchup: {q.question}</p>
         <div className="grid grid-cols-2 gap-1.5">
-          {['blue', 'red'].map(side => <div key={side} className={`flex justify-center gap-1 rounded-lg border p-1.5 ${side === 'blue' ? 'border-blue-400/50' : 'border-red-400/50'}`}>
-            {ROLES_ORDER.map(r => <ChampAvatar key={r} name={lineup[side][r]} className="w-8 h-8" iconSize={12} />)}</div>)}
+          {['blue', 'red'].map(side => <div key={side} data-plan-team={side} className={`grid grid-cols-5 gap-1 rounded-lg border p-1.5 ${side === 'blue' ? 'border-blue-400/50' : 'border-red-400/50'}`}>
+            {ROLES_ORDER.map(r => <span key={r} data-champ={lineup[side][r]} className="contents"><ChampAvatar name={lineup[side][r]} className="h-auto w-full max-w-[34px] aspect-square justify-self-center" iconSize={12} /></span>)}</div>)}
         </div>
-        <div className="flex flex-col gap-1.5" role="group" aria-label="Win-Condition">
-          {opts.map(k => (
-            <button key={k} type="button" data-arch={k} disabled={!!plan} onClick={() => pick(k)}
-              className={`rounded-xl border px-3 py-2 text-left text-sm font-semibold transition ${plan ? (k === lineup.win ? 'border-[#0AC8B9] bg-[#0AC8B9]/15' : plan.pick === k ? 'border-red-500 bg-red-500/10' : 'opacity-50 border-[#C89B3C]/30') : 'border-[#C89B3C]/40 bg-[#010A13]/80 hover:border-[#0AC8B9]'}`}>
-              {ARCH[k].label}
+        <div className="flex flex-col gap-1.5" role="group" aria-label={q.topic}>
+          {order.map(o => (
+            <button key={o.key} type="button" data-arch={o.key} disabled={!!plan} onClick={() => pick(o.key)}
+              className={`rounded-xl border px-3 py-2 text-left text-sm font-semibold leading-snug transition ${plan ? (o.key === q.correct ? 'border-[#0AC8B9] bg-[#0AC8B9]/15' : plan.pick === o.key ? 'border-red-500 bg-red-500/10' : 'opacity-50 border-[#C89B3C]/30') : 'border-[#C89B3C]/40 bg-[#010A13]/80 hover:border-[#0AC8B9]'}`}>
+              {o.label}
             </button>
           ))}
         </div>
         {plan && (
-          <div role="status" className={`rounded-lg border px-3 py-2 text-sm leading-snug ${plan.ok ? 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10 text-[#0AC8B9]' : 'border-red-500/60 bg-red-500/10 text-red-300'}`}>
+          <div role="status" className={`rounded-lg border px-3 py-2 text-sm leading-snug ${plan.ok ? 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10 text-[#0AC8B9]' : 'border-red-500/60 bg-red-500/10 text-red-300'}`} data-plan-feedback={plan.ok ? 'ok' : 'bad'}>
             {plan.ok
-              ? <><b>Gameplan verstanden! +50 Taktik-XP</b><br /><span className="text-slate-200">Deine Stärke: {ARCH[lineup.win].label} ({tagged}): {ARCH[lineup.win].why}.</span></>
-              : <><b>Nicht ganz.</b><br /><span className="text-slate-200">Die Hauptstärke deines Teams ist {ARCH[lineup.win].label} ({tagged}): {ARCH[lineup.win].why}. Die Gegner setzen auf {ARCH[lineup.enemyArch].label}.</span></>}
+              ? <><b>Gameplan verstanden! +50 Taktik-XP</b><br /><span className="text-slate-200">{q.explain.ok}</span></>
+              : <><b>Nicht ganz.</b><br /><span className="text-slate-200">{q.explain.bad[plan.pick]}</span><span className="mt-1.5 block text-xs text-slate-400">Richtig wäre gewesen: {q.options.find(o => o.key === q.correct).label}</span></>}
           </div>
         )}
         {plan && <button type="button" autoFocus onClick={() => onStart({ me, role, lineup, planOk: plan.ok })} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Phase 1 starten ➔</button>}
