@@ -9880,13 +9880,43 @@ function MatchHud({ stats, state }) {
   );
 }
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
-// Kurzer Map-Text: was ist passiert (Kills, Tode, Gold, Spielstand)?
-function mapStory(ev, stats, state) {
-  const p = [];
-  if (ev.tk || ev.ek) p.push(ev.tk ? `Dein Team gewinnt ${plural(ev.tk, 'Kill', 'Kills')}${ev.ek ? `, die Gegner ${ev.ek}` : ''}.` : `Die Gegner gewinnen ${plural(ev.ek, 'Kill', 'Kills')}.`);
-  if (ev.k || ev.d || ev.a) p.push(`Du: ${plural(ev.k || 0, 'Kill', 'Kills')}, ${plural(ev.d || 0, 'Tod', 'Tode')}, ${plural(ev.a || 0, 'Assist', 'Assists')}.`);
-  p.push(`Gold ${fmtGold(ev.gold || 0)} (gesamt ${fmtGold(stats.gold)}), Spielstand: ${STATE_LABEL[state]}.`);
-  return 'Auf der Map: ' + p.join(' ');
+// Map-Zusammenfassung als Badge-Leiste: nur die direkten Folgen der Entscheidung, keine verschachtelten Gesamtwerte
+const CHIP_STATE = { EVEN: ['⚖️', 'Ausgeglichen'], AHEAD: ['📈', 'Vorteil'], BEHIND: ['📉', 'Rückstand'] };
+const CHIP_TONE = {
+  bad: 'border-red-500/60 bg-red-500/10 text-red-300', good: 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10 text-[#7fe9e1]',
+  gold: 'border-[#C89B3C]/70 bg-[#C89B3C]/10 text-[#F0C75E]', neutral: 'border-slate-500/50 bg-slate-500/10 text-slate-200',
+};
+function mapChips(ev, state) {
+  const c = [], e = ev || {};
+  if (e.ek) c.push({ k: 'enemy', tone: 'bad', text: `🔴 Gegner: +${plural(e.ek, 'Kill', 'Kills')}` });
+  if (e.k || e.a) c.push({ k: 'own', tone: 'good', text: `🟢 ${e.k && e.a ? 'Eigener Kill / Assist' : e.k ? 'Eigener Kill' : 'Eigener Assist'}` });
+  else if (e.tk) c.push({ k: 'team', tone: 'good', text: `🟢 Team: +${plural(e.tk, 'Kill', 'Kills')}` });
+  if (e.d) c.push({ k: 'kda', tone: 'bad', text: `💀 KDA: ${e.k || 0}/${e.d}/${e.a || 0}` });
+  if (e.gold) c.push({ k: 'gold', tone: e.gold < 0 ? 'bad' : 'gold', text: e.gold < 0 ? `🪙 Gold-Verlust: ${fmtGold(e.gold)}` : `🪙 Gold-Gewinn: ${fmtGold(e.gold)}` });
+  const [ic, label] = CHIP_STATE[state] || CHIP_STATE.EVEN;
+  c.push({ k: 'state', tone: state === 'AHEAD' ? 'good' : state === 'BEHIND' ? 'bad' : 'neutral', text: `${ic} Spielstand: ${label}` });
+  return c;
+}
+// Szenario-Zwischenstand (Lehrbaum, Quiz, Mastery) als Chips: "Dein Team: +1.400 Gold Vorsprung | Lane-Prio gesichert"
+function stChips(st) {
+  const t = st.text || '', c = [];
+  let m;
+  if ((m = /^Zwischenstand: (.+)$/.exec(t))) return [{ k: 'progress', tone: st.good ? 'good' : 'bad', text: `📊 Zwischenstand: ${m[1]}` }];
+  const [lead, tag] = t.split(' | ');
+  if ((m = /^(Dein Team|Gegner): \+([\d.]+) Gold Vorsprung$/.exec(lead))) c.push({ k: 'gold', tone: m[1] === 'Gegner' ? 'bad' : 'gold', text: `🪙 Gold-Vorsprung: ${m[1]} +${m[2]}g` });
+  else c.push({ k: 'state', tone: 'neutral', text: '⚖️ Spielstand: Ausgeglichen' });
+  if (tag) c.push({ k: 'tag', tone: st.good ? 'good' : 'bad', text: `${st.good ? '🟢' : '🔴'} ${tag}` });
+  return c;
+}
+function MapChips({ chips }) {
+  return (
+    <div data-feedback-map="true" role="group" aria-label="Auf der Map" className="flex flex-col gap-1">
+      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Auf der Map</div>
+      <div className="flex flex-wrap gap-1.5">
+        {chips.map(ch => <span key={ch.k} data-chip={ch.k} className={`max-w-full rounded-md border px-2 py-1 text-xs font-semibold leading-tight ${CHIP_TONE[ch.tone]}`}>{ch.text}</span>)}
+      </div>
+    </div>
+  );
 }
 function FeedbackBanner({ ev, ok, me, victim, champion }) {
   const e = ev || {};
@@ -9915,7 +9945,7 @@ function FeedbackModal({ scenario, ok, timeout, choice, fbText, chain, ev, st, h
   const mv = scenario.mv2, color = ok ? 'var(--teal)' : 'var(--red)';
   const [why, setWhy] = useState(false);   // Erklärung der richtigen Antwort, nur nach Fehlentscheidungen
   const best = !ok && !mv ? (scenario.options || []).find(o => o.lpChange > 0 && o.feedback) : null;
-  const story = mv && ev && hudStats ? mapStory(ev, hudStats, hudState) : (st ? `Auf der Map: ${st.text}` : '');
+  const chips = mv && ev && hudStats ? mapChips(ev, hudState) : (st ? stChips(st) : null);
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={ok ? 'Richtige Entscheidung' : 'Bestraft'} data-feedback={ok ? 'ok' : 'bad'}>
       <div className="fade-in flex w-full max-w-[360px] flex-col gap-3 overflow-y-auto rounded-2xl border-2 bg-[#06111F] p-4 shadow-[0_0_40px_rgba(0,0,0,.6)]" style={{ borderColor: color, maxHeight: 'calc(100dvh - 32px)' }}>
@@ -9924,7 +9954,7 @@ function FeedbackModal({ scenario, ok, timeout, choice, fbText, chain, ev, st, h
           <div className="pop font-serif text-2xl font-black leading-tight" style={{ color }} data-verdict="true">{ok ? '✅ RICHTIGE ENTSCHEIDUNG' : '❌ BESTRAFT!'}</div>
           {!ok && <div className="mt-0.5 text-xs text-slate-400">Fehlentscheidung{timeout ? ' · Zeit abgelaufen' : ''}</div>}
         </div>
-        {story && <div data-feedback-map="true" className="rounded-lg border px-3 py-2 text-sm leading-snug" style={{ borderColor: ok ? 'rgba(10,200,185,.5)' : 'rgba(232,64,87,.5)', background: ok ? 'rgba(10,200,185,.08)' : 'rgba(232,64,87,.08)' }}>{story}</div>}
+        {chips && <MapChips chips={chips} />}
         <div data-feedback-coach="true" className="text-sm leading-relaxed text-slate-200">
           <div className="mb-0.5 text-xs font-bold uppercase tracking-wide text-[#C89B3C]">Coach-Erklärung</div>
           {ok ? <p><G t={fbText} /></p> : (
