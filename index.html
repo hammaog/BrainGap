@@ -4281,6 +4281,7 @@ const RANK_ICON = {
   Master:      { icon: 'crown',   cls: 'text-purple-500' },
   Grandmaster: { icon: 'crown',   cls: 'text-red-500' },
   Challenger:  { icon: 'crown',   cls: 'text-yellow-200' },
+  Unranked:    { icon: 'shield',  cls: 'text-slate-400' },
 };
 const RankIcon = ({ tier, size = 44 }) => {
   const r = RANK_ICON[tier];
@@ -4292,6 +4293,25 @@ const RankIcon = ({ tier, size = 44 }) => {
 };
 const tierOf = step => step < DIV_TIERS * 4 ? TIERS[Math.floor(step / 4)] : TIERS[DIV_TIERS + step - DIV_TIERS * 4];
 const rankName = step => step < DIV_TIERS * 4 ? `${tierOf(step)} ${4 - (step % 4)}` : tierOf(step);
+
+/* ---------- Platzierungsspiele (Placements) wie im echten LoL ---------- */
+// Neue Spieler sind Unranked und spielen genau 3 Ranked-Spiele (Ranked Match oder Makro-Quiz). Danach entscheidet die Zahl der Siege über den Start-Rang.
+const PLACEMENT_GAMES = 3;
+const PLACEMENT_RANKS = [{ step: 3, lp: 0 }, { step: 6, lp: 0 }, { step: 8, lp: 0 }, { step: 12, lp: 0 }];   // 0 Siege: Iron 1, 1 Sieg: Bronze 2, 2 Siege: Silver 4, 3 Siege: Gold 4
+const placementRank = wins => PLACEMENT_RANKS[Math.max(0, Math.min(PLACEMENT_GAMES, wins | 0))];
+// Schwierigkeit während der Platzierung: Start in Silber, jeder Sieg eine Liga höher, jede Niederlage eine tiefer
+const placementStep = pl => Math.max(0, Math.min(16, 8 + 4 * (pl.wins - (pl.played - pl.wins))));
+const sanitizePlacement = (pl, ctx) => {
+  const n = v => (Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0);
+  if (pl && typeof pl === 'object' && (typeof pl.done === 'boolean' || Number.isFinite(pl.played))) {
+    const played = Math.min(PLACEMENT_GAMES, n(pl.played)), wins = Math.min(played, n(pl.wins));
+    return { played, wins, done: pl.done === true || played >= PLACEMENT_GAMES };
+  }
+  // Altstand ohne Platzierungsdaten: wer schon Rang, LP, Ranked-Spiele oder eine Historie hat, gilt als eingestuft und behält seinen Rang
+  const c = ctx || {}, d = c.d || {}, r = c.rank || {}, pr = c.profile || {}, rk = d.ranked || {};
+  const progressed = r.step > 0 || r.lp > 0 || pr.startStep > 0 || (n(rk.wins) + n(rk.losses)) > 0 || (Array.isArray(d.history) && d.history.length > 0) || n(d.matchCount) > 0;
+  return { played: 0, wins: 0, done: !!progressed };
+};
 
 // 100 LP pro Division, Überschuss wird mitgenommen. Beim Wechsel in eine neue Liga startet man mit 0 LP.
 // Demotion Shield: Die erste Niederlage, die bei 0 LP beginnt, wird abgefangen, die zweite führt zum Abstieg auf 75 LP.
@@ -4352,6 +4372,7 @@ const sanitizeSave = d => {
     sinceAd: Number.isFinite(d.sinceAd) ? Math.max(0, Math.floor(d.sinceAd)) : 0,
     vip: d.vip === true,
     ranked: sanitizeRanked(d.ranked),
+    placement: sanitizePlacement(d.placement, { d, rank, profile }),
   };
 };
 const loadSave = () => {
@@ -4375,12 +4396,12 @@ const lsNum = k => { try { return Number(localStorage.getItem(k)) || 0; } catch 
 const lsSet = (k, v) => { try { localStorage.setItem(k, String(v)); } catch (e) {} };
 const VIP_TEST_MODE = true;   // Testschalter ohne Bezahlsystem. Vor dem Livegang auf false setzen und is_vip nur serverseitig vergeben (Zahlungs-Webhook), sonst kann sich jeder selbst zum VIP machen
 const CLOUD_MISSING = new Set();   // optionale Spalten, die es in der Datenbank (noch) nicht gibt: save_data, is_vip
-const OPT_COLS = ['save_data', 'is_vip', 'ranked_played', 'ranked_wins', 'ranked_losses'];
+const OPT_COLS = ['save_data', 'is_vip', 'ranked_played', 'ranked_wins', 'ranked_losses', 'placement_played', 'placement_wins'];
 const missingCol = err => { const t = `${(err && err.message) || ''} ${(err && err.details) || ''}`; return OPT_COLS.find(c => !CLOUD_MISSING.has(c) && t.includes(c)) || null; };
 const errText = e => String((e && (e.message || e.error_description)) || e || 'Unbekannter Fehler').slice(0, 140);
 // Kernspalten der Tabelle profiles. lp = Gesamt-Rangpunkte (Rangstufe x 100 + LP), damit "order by lp" über alle Ränge hinweg korrekt sortiert
-const cloudCore = save => { const step = save.rank.step; return { username: save.profile.name, rank_tier: rankName(step), lp: step * 100 + save.rank.lp, account_level: xpLevel(save.xp || 0).level, summoner_icon: save.profile.icon != null ? save.profile.icon : ICON_IDS[0] }; };
-const cloudBody = (save, savedAt) => { const rk = sanitizeRanked(save.ranked); const b = { ...cloudCore(save), is_vip: save.vip === true, ranked_played: rk.played, ranked_wins: rk.wins, ranked_losses: rk.losses, save_data: { ...save, savedAt } }; CLOUD_MISSING.forEach(c => { delete b[c]; }); return b; };
+const cloudCore = save => { const step = save.rank.step, un = !!(save.placement && save.placement.done === false); return { username: save.profile.name, rank_tier: un ? 'Unranked' : rankName(step), lp: un ? 0 : step * 100 + save.rank.lp, account_level: xpLevel(save.xp || 0).level, summoner_icon: save.profile.icon != null ? save.profile.icon : ICON_IDS[0] }; };
+const cloudBody = (save, savedAt) => { const rk = sanitizeRanked(save.ranked); const b = { ...cloudCore(save), is_vip: save.vip === true, ranked_played: rk.played, ranked_wins: rk.wins, ranked_losses: rk.losses, placement_played: (save.placement || {}).played || 0, placement_wins: (save.placement || {}).wins || 0, save_data: { ...save, savedAt } }; CLOUD_MISSING.forEach(c => { delete b[c]; }); return b; };
 async function cloudFetchProfile(userId) {
   const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
   if (error) throw error;
@@ -4399,8 +4420,9 @@ async function cloudPushSave(userId, save, savedAt) {
   return true;
 }
 async function cloudTop20() {
-  const r = await cloudTry(() => sb.from('profiles').select(`id, username, rank_tier, lp, account_level, summoner_icon${['is_vip', 'ranked_played', 'ranked_wins', 'ranked_losses'].filter(c => !CLOUD_MISSING.has(c)).map(c => ', ' + c).join('')}`).order('lp', { ascending: false }).limit(20));
-  return (r.data || []).map(x => ({ id: x.id, name: String(x.username || 'Spieler').slice(0, 16), tier: String(x.rank_tier || 'Iron 4'), points: Number(x.lp) || 0, level: Number(x.account_level) || 1, icon: Number.isInteger(x.summoner_icon) ? x.summoner_icon : ICON_IDS[0], vip: x.is_vip === true,
+  const r = await cloudTry(() => sb.from('profiles').select(`id, username, rank_tier, lp, account_level, summoner_icon${['is_vip', 'ranked_played', 'ranked_wins', 'ranked_losses', 'placement_played', 'placement_wins'].filter(c => !CLOUD_MISSING.has(c)).map(c => ', ' + c).join('')}`).order('lp', { ascending: false }).limit(20));
+  return (r.data || []).map(x => ({ id: x.id, name: String(x.username || 'Spieler').slice(0, 16), tier: String(x.rank_tier || 'Iron 4'), points: Number(x.lp) || 0, level: Number(x.account_level) || 1, icon: Number.isInteger(x.summoner_icon) ? x.summoner_icon : ICON_IDS[0], vip: x.is_vip === true, unranked: String(x.rank_tier) === 'Unranked',
+    placement: (x.placement_played !== null && x.placement_played !== undefined && Number.isFinite(Number(x.placement_played)) && Number.isFinite(Number(x.placement_wins))) ? { played: Math.min(PLACEMENT_GAMES, Math.max(0, Math.floor(Number(x.placement_played)))), wins: Math.max(0, Math.floor(Number(x.placement_wins))) } : null,
     ranked: ['ranked_played', 'ranked_wins', 'ranked_losses'].every(c => x[c] !== null && x[c] !== undefined && Number.isFinite(Number(x[c]))) ? sanitizeRanked({ wins: Number(x.ranked_wins), losses: Number(x.ranked_losses) }) : null }));
 }
 const authError = e => {
@@ -5019,11 +5041,12 @@ function ModeInfo({ mode, onClose }) {
   );
 }
 
-function Dashboard({ rank, hearts, profile, mastery, xp, quests, friends, shieldUntil, isVip, onDaily, onRanked, onPractice, onMastery, onNoHearts, onInfo, onHeartAd, onShieldAd, onIcon, onReset }) {
+function Dashboard({ rank, placement, hearts, profile, mastery, xp, quests, friends, shieldUntil, isVip, onDaily, onRanked, onPractice, onMastery, onNoHearts, onInfo, onHeartAd, onShieldAd, onIcon, onReset }) {
   const locked = hearts < 1;   // ohne Herzen sind Daily und Ranked gesperrt, Mastery vergibt nur MP und braucht kein Herz
   const { mp: mpNow, level: lvNow } = masteryOf(mastery, profile.champion);
   const [confirm, setConfirm] = useState(false);
-  const tier = tierOf(rank.step), cls = RANK_ICON[tier].cls;   // eine Farbquelle für Emblem, Text, Rahmen und Balken
+  const unr = !!(placement && !placement.done);   // Unranked: Platzierungsspiele laufen
+  const tier = unr ? 'Unranked' : tierOf(rank.step), cls = RANK_ICON[tier].cls;   // eine Farbquelle für Emblem, Text, Rahmen und Balken
   const pct = Math.min(100, rank.lp);
   return (
     <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
@@ -5037,12 +5060,13 @@ function Dashboard({ rank, hearts, profile, mastery, xp, quests, friends, shield
           </div>
           <div className="text-right">
             <div className={`flex items-center justify-end gap-1.5 font-serif text-lg font-black leading-tight ${cls}`}>
-              <RankEmblem tier={tier} size={30} />{rankName(rank.step)}
+              <RankEmblem tier={tier} size={30} />{unr ? 'Unranked' : rankName(rank.step)}
             </div>
-            <div className="text-sm text-slate-300 tabular-nums">{rank.lp} LP</div>
+            <div className="text-sm text-slate-300 tabular-nums" data-dash-sub="true">{unr ? `${placement.played} / ${PLACEMENT_GAMES} Spiele` : `${rank.lp} LP`}</div>
             {rank.shield && <div className="flex items-center justify-end gap-1 text-xs text-[#0AC8B9]"><Icon n="shield" size={12} /> Demotion Shield aktiv</div>}
           </div>
         </div>
+        {unr ? <PlacementCard placement={placement} /> : (
         <div>
           <div className="h-3 rounded-full overflow-hidden" style={{ background: 'var(--track)' }} role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
             <div className={`h-full rounded-full bg-current shadow-[0_0_10px_currentColor] transition-all duration-500 ${cls}`} style={{ width: `${pct}%` }} />
@@ -5052,6 +5076,7 @@ function Dashboard({ rank, hearts, profile, mastery, xp, quests, friends, shield
             <span>{rank.step < MAX_STEP ? `Nächster Rang: ${rankName(rank.step + 1)}` : 'Höchster Rang'}</span>
           </div>
         </div>
+        )}
       </div>
 
       <FriendsOnline friends={friends} />
@@ -5158,10 +5183,11 @@ const WayCard = ({ active, icon, title, text, onClick }) => (
   </button>
 );
 
-function RankedSetup({ rank, profile, onStart, onClose }) {
+function RankedSetup({ rank, step, placement, profile, onStart, onClose }) {
   const [way, setWay] = useState(null);       // 'match' | 'quiz'
   const [role, setRole] = useState(profile ? profile.role : null);
-  const pool = rankedPool(rank.step);          // Tier-Lock
+  const unr = !!(placement && !placement.done);
+  const pool = rankedPool(step);               // Tier-Lock: automatisch dein aktueller Rang, in den Platzierungsspielen passt sich die Liga nach jedem Spiel an
   const quizCount = Math.min(QUIZ_LENGTH, pool.length);
   const ready = way === 'quiz' || (way === 'match' && !!role);
   return (
@@ -5174,7 +5200,7 @@ function RankedSetup({ rank, profile, onStart, onClose }) {
           <button onClick={onClose} aria-label="Schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
         </div>
         <div className="text-xs text-gray-400">
-          Ein Herz geht nur bei Niederlage oder Abbruch verloren. Das Match bringt LP für deinen Rang und Mastery-Punkte für deinen Champion. Liga {tierOf(rank.step)}: Du spielst nur {pool[0].difficulty}-Szenarien.
+          Ein Herz geht nur bei Niederlage oder Abbruch verloren. {unr ? `Platzierungsspiel ${placement.played + 1} von ${PLACEMENT_GAMES}: Das Ergebnis zählt für deine Einstufung (keine LP). ` : 'Das Match bringt LP für deinen Rang und Mastery-Punkte für deinen Champion. '}{unr ? 'Aktuelle Stufe' : `Liga ${tierOf(step)}`}: Du spielst nur {pool[0].difficulty}-Szenarien.
         </div>
         <div className="grid grid-cols-2 gap-2">
           <WayCard active={way === 'match'} icon="swords" title="Match-Simulation" text="Ready Check, 5v5-Ladebildschirm, Gameplan und 5 zusammenhängende Phasen" onClick={() => setWay('match')} />
@@ -5581,7 +5607,7 @@ function InspectModal({ p, onClose }) {
         </div>
         <div className="flex items-center gap-3 rounded-lg border px-3 py-2" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }} data-inspect-rank="true">
           <RankEmblem tier={p.tier} size={44} />
-          <div className="min-w-0"><div className="font-serif font-bold text-[#C89B3C]">{p.tier}</div><div className="text-sm tabular-nums text-slate-300">{p.lp} LP</div></div>
+          <div className="min-w-0"><div className="font-serif font-bold text-[#C89B3C]">{p.unranked ? `Unranked${p.placement ? ` (${p.placement.played}/${PLACEMENT_GAMES})` : ''}` : p.tier}</div><div className="text-sm tabular-nums text-slate-300">{p.unranked ? (p.placement ? `Platzierungsspiele: ${p.placement.wins} ${p.placement.wins === 1 ? 'Sieg' : 'Siege'}, ${p.placement.played - p.placement.wins} ${p.placement.played - p.placement.wins === 1 ? 'Niederlage' : 'Niederlagen'}` : 'Platzierungsspiele laufen') : `${p.lp} LP`}</div></div>
         </div>
         {p.stats
           ? <RankedStats stats={p.stats} />
@@ -5704,7 +5730,7 @@ function SbRow({ p, maxDmg, side }) {
 }
 function Scoreboard({ sb, result, practice, unit }) {
   const win = sb.win, to = result.to;
-  const sub = practice && !result.masteryOnly ? 'Übung zählt nicht' : result.masteryOnly ? `+${result.mastery.gain} MP` : `${fmt(result.lp)} LP · ${rankName(to.step)} (${to.lp} LP)`;
+  const sub = practice && !result.masteryOnly ? 'Übung zählt nicht' : result.masteryOnly ? `+${result.mastery.gain} MP` : result.placement ? (result.placement.final ? `Eingestuft: ${rankName(to.step)}` : `Platzierungsspiel ${result.placement.played} von ${PLACEMENT_GAMES}`) : result.unrankedDaily ? 'Daily zählt nach der Einstufung' : `${fmt(result.lp)} LP · ${rankName(to.step)} (${to.lp} LP)`;
   const row = (label, b, r, key) => (
     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-1" data-sb-stat={key}>
       <div className="text-right font-bold tabular-nums text-[#4cc3ff]" data-sb-blue={key}>{b}</div>
@@ -5747,14 +5773,15 @@ function Scoreboard({ sb, result, practice, unit }) {
 }
 function RunComplete({ result, log, practice, format, onDone, onRetry, onReplay, sbCtx }) {
   const [lvPopup, setLvPopup] = useState(!!(result.mastery && result.mastery.levelUp));
-  const [tab, setTab] = useState('board');   // Scoreboard zuerst, das Ergebnis (Rang, LP, Rückblick) in einem zweiten Tab
+  const [tab, setTab] = useState('board');
+  const [ceremony, setCeremony] = useState(!!(result.placement && result.placement.final));   // feierliche Einstufung nach dem 3. Platzierungsspiel   // Scoreboard zuerst, das Ergebnis (Rang, LP, Rückblick) in einem zweiten Tab
   const sb = useMemo(() => (result.drill ? null : sbFromRun(result, log, sbCtx || {})), []);
   useEffect(() => {
     const timers = [];
     if (result.drill) playHextechSound(result.passed ? 'correct' : 'wrong');
     else {
       const promo = !practice && result.to.step > result.from.step;
-      if (!(result.mastery && result.mastery.levelUp)) playHextechSound(result.win ? (promo ? 'promotion' : 'fanfare') : 'defeat');   // bei Mastery-Level-Up spielt das Popup den promotion-Sound
+      if (!(result.mastery && result.mastery.levelUp) && !(result.placement && result.placement.final)) playHextechSound(result.win ? (promo ? 'promotion' : 'fanfare') : 'defeat');   // bei Mastery-Level-Up spielt das Popup den promotion-Sound
       if (!practice && result.heartLost) timers.push(setTimeout(() => playHextechSound('heart_loss'), 1100));
     }
     return () => timers.forEach(clearTimeout);
@@ -5787,19 +5814,21 @@ function RunComplete({ result, log, practice, format, onDone, onRetry, onReplay,
   const promoted = !practice && to.step > result.from.step;
   const demoted = !practice && to.step < result.from.step;
   const newLeague = promoted && tierOf(to.step) !== tierOf(result.from.step);
-  const cls = RANK_ICON[tierOf(to.step)].cls;
+  const pl = result.placement || null, unr = !!result.unranked, placedNow = !!(pl && pl.final);
+  const cls = RANK_ICON[unr ? 'Unranked' : tierOf(to.step)].cls;
   const toGo = to.step < MAX_STEP ? 100 - to.lp : null;   // Challenger hat kein Ziel mehr
   const phases = format === 'mv2' || format === 'tree' || format === 'match';
-  const status = promoted ? (newLeague ? `Neue Liga: ${rankName(to.step)}!` : 'Aufstieg!') : demoted ? `Abstieg in ${rankName(to.step)}` : (!practice && result.event === 'shield') ? 'Demotion Shield aktiv' : null;
+  const status = pl ? (placedNow ? `Eingestuft: ${rankName(to.step)}` : `Platzierungsspiel ${pl.played} von ${PLACEMENT_GAMES} abgeschlossen`) : result.unrankedDaily ? 'Daily zählt erst nach der Einstufung' : promoted ? (newLeague ? `Neue Liga: ${rankName(to.step)}!` : 'Aufstieg!') : demoted ? `Abstieg in ${rankName(to.step)}` : (!practice && result.event === 'shield') ? 'Demotion Shield aktiv' : null;
   const mmrTotal = (result.mmrDelta || 0) + (result.bonus || 0);
-  const bigColor = result.masteryOnly ? 'var(--gold)' : color;
-  const bigText = result.masteryOnly ? `+${result.mastery.gain} MP` : `${fmt(result.lp)} LP`;
+  const bigColor = result.masteryOnly || placedNow ? 'var(--gold)' : color;
+  const bigText = result.masteryOnly ? `+${result.mastery.gain} MP` : pl ? (placedNow ? `${pl.wins}–${pl.played - pl.wins}` : `${pl.played} / ${PLACEMENT_GAMES}`) : result.unrankedDaily ? 'kein LP' : `${fmt(result.lp)} LP`;
   const hasTiles = !!(result.mv2 || result.mastery);
 
   return (
     <div className="flex-1 min-h-0 relative flex flex-col">
-      {promoted && <Confetti />}
+      {promoted && !pl && <Confetti />}
       {lvPopup && result.mastery && <MasteryLevelUp m={result.mastery} onClose={() => setLvPopup(false)} />}
+      {ceremony && result.placement && result.placement.final && <PlacementCeremony pl={result.placement} to={result.to} onClose={() => setCeremony(false)} />}
       <div className="shrink-0 px-3 pt-2" role="tablist" aria-label="Rundenabschluss" data-endtabs="true">
         <div className="grid grid-cols-2 gap-1.5 rounded-xl border p-1" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
           {[['board', '🏆 Scoreboard'], ['result', '📊 Ergebnis']].map(([k, l]) => (
@@ -5828,16 +5857,16 @@ function RunComplete({ result, log, practice, format, onDone, onRetry, onReplay,
           <div className="flex items-center gap-3">
             <div className="relative flex h-[56px] w-[56px] shrink-0 items-center justify-center">
               {promoted && <span className="rankglow absolute inset-0 rounded-full bg-yellow-400/50 blur-lg" aria-hidden="true" />}
-              <span className="relative [@media(min-height:800px)]:scale-125"><RankEmblem tier={tierOf(to.step)} size={56} className="w-14 h-14" /></span>
+              <span className="relative [@media(min-height:800px)]:scale-125"><RankEmblem tier={unr ? 'Unranked' : tierOf(to.step)} size={56} className="w-14 h-14" /></span>
             </div>
             <div className="min-w-0 flex-1 text-left leading-tight">
-              <div className="text-base font-bold"><span className={cls}>{rankName(to.step)}</span> <span className="block font-normal tabular-nums text-slate-400">({to.lp} LP)</span></div>
+              <div className="text-base font-bold"><span className={`${cls} whitespace-nowrap`}>{unr ? 'Unranked' : rankName(to.step)}</span> <span className="block font-normal tabular-nums text-slate-400">{unr ? (pl ? null : 'noch ohne Rang') : `(${to.lp} LP)`}</span></div>
               {status && <div className={`mt-1 text-xs font-semibold ${demoted ? 'text-red-400' : promoted ? 'text-yellow-300' : 'text-[#0AC8B9]'}`} role="status">{status}</div>}
             </div>
             <div className="max-w-[58%] shrink-0 text-right">
               <div className={`font-serif font-black leading-none tabular-nums ${result.masteryOnly ? 'text-3xl' : 'text-4xl'}`} style={{ color: bigColor, opacity: practice && !result.masteryOnly ? .65 : 1 }} data-end="lp">{bigText}</div>
               <div className="mt-1.5 text-[11px] leading-tight tabular-nums text-slate-400" data-end-sub="true">
-                {result.masteryOnly ? 'keine LP · Rang bleibt' : practice ? 'Übung: zählt nicht' : (
+                {result.masteryOnly ? 'keine LP · Rang bleibt' : practice ? 'Übung: zählt nicht' : pl ? <><div>{placedNow ? 'Bilanz: ' : ''}{pl.wins} {pl.wins === 1 ? 'Sieg' : 'Siege'} · {pl.played - pl.wins} {pl.played - pl.wins === 1 ? 'Niederlage' : 'Niederlagen'}</div><div className={result.heartLost ? 'text-red-300' : ''}>❤️ {result.heartLost ? '-1' : '±0'}</div></> : result.unrankedDaily ? 'zählt nach der Einstufung' : (
                   <>
                     <span className={mmrTotal > 0 ? 'text-[#0AC8B9]' : 'text-[#E84057]'}>MMR {fmt(mmrTotal)} {result.mmrDelta > 0 ? '▲' : '▼'}{result.bonus > 0 && <span className="text-orange-300"> (inkl. +{result.bonus} Serie)</span>}</span>
                     {' · '}<span className={result.heartLost ? 'text-red-300' : ''}>❤️ {result.heartLost ? '-1' : '±0'}</span>
@@ -5846,10 +5875,13 @@ function RunComplete({ result, log, practice, format, onDone, onRetry, onReplay,
               </div>
             </div>
           </div>
+          {unr && pl ? <div className="mt-3"><PlacementPips pl={pl} /></div> : null}
+          {!unr && (
           <div className="mt-3 h-1 overflow-hidden rounded-full" style={{ background: 'var(--track)' }} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.min(100, to.lp)}
                aria-label={toGo !== null ? `Noch ${toGo} LP bis ${rankName(to.step + 1)}` : 'Höchster Rang erreicht'} title={toGo !== null ? `Noch ${toGo} LP bis ${rankName(to.step + 1)}` : 'Höchster Rang erreicht'}>
             <div className={`h-full rounded-full bg-current ${cls}`} style={{ width: `${Math.min(100, to.lp)}%` }} />
           </div>
+          )}
         </div>
 
         {hasTiles && (
@@ -6097,13 +6129,9 @@ function MainPicker({ role, champion, onRole, onChampion, mastery }) {
 
 function Onboarding({ onDone, onAuth }) {
   const [name, setName] = useState('');
-  const [tier, setTier] = useState(0);                 // Standard: Iron
-  const [div, setDiv] = useState(4);                   // Standard: IV
   const [role, setRole] = useState(null);              // null = nicht gewählt, Standard Top
   const [champion, setChampion] = useState('');        // leer = Standard Jax
   const [error, setError] = useState('');
-  const hasDiv = tier < DIV_TIERS;
-  const step = hasDiv ? tier * 4 + (4 - div) : DIV_TIERS * 4 + (tier - DIV_TIERS);
 
   // Bewusst ohne Formular-Element: In Sandbox-Umgebungen ohne allow-forms feuert der Browser kein submit-Event, der Button wäre tot.
   const handleCreateAccount = e => {
@@ -6114,7 +6142,7 @@ function Onboarding({ onDone, onAuth }) {
       const finalChamp = champion.trim() ? champLabel(champion) : (MASTERY_TILES.find(t => t[1] === finalRole) || ['Jax'])[0];   // Standard: Jax
       const used = [!name.trim() && 'Name „Beschwörer"', !role && !champion.trim() && 'Rolle und Champion (Top, Jax)', (!role) !== (!champion.trim()) && (!role ? 'Rolle' : 'Champion') + ' (' + (role ? finalChamp : finalRole.replace('lane', '')) + ')'].filter(Boolean);
       setError('');
-      onDone({ name: name.trim() || 'Beschwörer', step, role: finalRole, champion: finalChamp,
+      onDone({ name: name.trim() || 'Beschwörer', step: 0, role: finalRole, champion: finalChamp,
                notice: used.length ? `Standardwerte übernommen: ${used.join(', ')}. Du kannst alles im Profil ändern.` : '' });
     } catch (err) {
       console.error('BrainGap: Account-Erstellung fehlgeschlagen', err);
@@ -6133,19 +6161,9 @@ function Onboarding({ onDone, onAuth }) {
         <label htmlFor="acc" className="mb-1.5 block text-sm font-semibold">Account-Name</label>
         <input id="acc" value={name} onChange={e => setName(e.target.value)} onKeyDown={onEnter} maxLength={16} placeholder="Beschwörer (Standard)" className={`w-full ${fieldCls}`} />
       </div>
-      <div>
-        <div className="mb-1.5 text-sm font-semibold">Aktueller Rang</div>
-        <div className="flex gap-2">
-          <select aria-label="Liga" value={tier} onChange={e => setTier(+e.target.value)} className={`w-full ${fieldCls}`} style={{ colorScheme: 'dark' }}>
-            {TIERS.map((t, i) => <option key={t} value={i}>{t}</option>)}
-          </select>
-          {hasDiv && (
-            <select aria-label="Division" value={div} onChange={e => setDiv(+e.target.value)} className={`w-24 ${fieldCls}`} style={{ colorScheme: 'dark' }}>
-              {[4, 3, 2, 1].map(d => <option key={d} value={d}>{d}</option>)}
-            </select>
-          )}
-        </div>
-        <div className="mt-1 text-xs text-gray-500">Du startest als {rankName(step)} mit 0 LP.</div>
+      <div className="flex items-center gap-3 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3" data-onboarding-unranked="true">
+        <RankEmblem tier="Unranked" size={48} />
+        <div className="text-xs leading-snug text-slate-300"><div className="text-sm font-bold text-[#F0E6D2]">Du startest als Unranked</div>Spiele 3 Platzierungsspiele (Ranked Match oder Makro-Quiz). Danach wird dein Rang festgelegt: 3 Siege = Gold 4, 2 = Silver 4, 1 = Bronze 2, 0 = Iron 1.</div>
       </div>
       <MainPicker role={role} champion={champion} onRole={r => { setRole(r); setError(''); }} onChampion={c => { setChampion(c); setError(''); }} mastery={null} />
       <div className="-mt-1 text-xs text-gray-500">Ohne Auswahl starten wir mit Top und Jax. Alles lässt sich später im Profil ändern.</div>
@@ -6326,7 +6344,7 @@ function Requests({ requests, onAccept, onDecline }) {
 }
 
 function RunHistoryRow({ h, i }) {
-  const mastery = h.mp > 0 && !h.lp, win = mastery ? true : h.lp >= 0, c = win ? 'var(--teal)' : 'var(--red)';
+  const mastery = h.mp > 0 && !h.lp && !h.placement, win = h.win !== undefined ? h.win : (mastery ? true : h.lp >= 0), c = win ? 'var(--teal)' : 'var(--red)';
   return (
     <div key={h.ts + '-' + i} className="flex items-center gap-3 rounded-lg border px-3 py-2" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }} data-history-row="true">
       <span className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center" style={{ color: c, background: win ? 'rgba(10,200,185,.14)' : 'rgba(232,64,87,.14)' }} aria-label={win ? 'Sieg' : 'Niederlage'}>
@@ -6337,7 +6355,7 @@ function RunHistoryRow({ h, i }) {
         <div className="text-xs text-slate-400">{h.role}</div>
       </div>
       <div className="text-right font-extrabold tabular-nums" style={{ color: mastery ? 'var(--gold)' : h.lp === 0 ? 'var(--gold)' : c }}>
-        {mastery ? `+${h.mp} MP` : `${h.lp > 0 ? '+' : ''}${h.lp} LP`}
+        {h.placement ? `Platzierung ${h.placement}` : mastery ? `+${h.mp} MP` : `${h.lp > 0 ? '+' : ''}${h.lp} LP`}
         {!mastery && h.mp > 0 && <div className="text-[10px] font-semibold text-[#C89B3C]">+{h.mp} MP</div>}
       </div>
     </div>
@@ -6444,10 +6462,11 @@ function StatusNote({ profile, onChange }) {
     </div>
   );
 }
-function Profile({ profile, rank, mastery, friends, requests, history, xp, shieldUntil, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout, onIcon, onShieldAd, cloud, onAuth, onCloudLogout, onCloudRetry, isVip, onToggleVip, ranked }) {
+function Profile({ profile, rank, mastery, friends, requests, history, xp, shieldUntil, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout, onIcon, onShieldAd, cloud, onAuth, onCloudLogout, onCloudRetry, isVip, onToggleVip, ranked, placement }) {
   const [tab, setTab] = useState('me');
   const [confirm, setConfirm] = useState(false);
-  const tier = tierOf(rank.step);
+  const unr = !!(placement && !placement.done);
+  const tier = unr ? 'Unranked' : tierOf(rank.step);
   return (
     <div className="flex-1 min-h-0 overflow-y-auto p-4 flex flex-col gap-4 [&>*]:shrink-0" data-profile-scroll="true">   {/* [&>*]:shrink-0: Karten werden im Scrollbereich nie zusammengedrückt */}
       {/* 1) Profil-Header: Icon, Name, Level, Rang, darunter Status und Notiz */}
@@ -6463,8 +6482,9 @@ function Profile({ profile, rank, mastery, friends, requests, history, xp, shiel
               <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1"><div className="truncate font-serif text-xl font-bold leading-tight">{profile.name}</div>{isVip && <VipBadge />}</div>
             </div>
             <div className={`flex items-center gap-1.5 text-sm font-semibold ${RANK_ICON[tier].cls}`}>
-              <RankEmblem tier={tier} size={22} />{rankName(rank.step)} · {rank.lp} LP
+              <RankEmblem tier={tier} size={22} /><span data-profile-rank="true">{unr ? `Unranked (${placement.played}/${PLACEMENT_GAMES})` : `${rankName(rank.step)} · ${rank.lp} LP`}</span>
             </div>
+            {unr && <div className="-mt-0.5 text-[11px] leading-snug text-slate-400" data-placement-status="true">Platzierungsspiele: {placement.played} / {PLACEMENT_GAMES} abgeschlossen</div>}
             <XpBar xp={xp} />
           </div>
         </div>
@@ -6570,7 +6590,7 @@ function AuthModal({ onSubmit, onClose }) {
 }
 // Gerät und Cloud haben unterschiedliche Spielstände: der Spieler entscheidet, nichts wird stillschweigend überschrieben
 function ConflictModal({ local, cloudSave, onCloud, onLocal }) {
-  const sum = sv => `${rankName(sv.rank.step)} · ${sv.rank.lp} LP · Lv. ${xpLevel(sv.xp || 0).level} · ${sv.matchCount || 0} Matches`;
+  const sum = sv => `${sv.placement && sv.placement.done === false ? `Unranked (${sv.placement.played}/${PLACEMENT_GAMES})` : `${rankName(sv.rank.step)} · ${sv.rank.lp} LP`} · Lv. ${xpLevel(sv.xp || 0).level} · ${sv.matchCount || 0} Matches`;
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Spielstand wählen" data-conflict="true">
       <div className="fade-in flex w-full max-w-[360px] flex-col gap-3 rounded-2xl border-2 border-[#C89B3C] bg-[#06111F] p-5 shadow-[0_0_30px_rgba(200,155,60,.35)]">
@@ -6598,6 +6618,7 @@ function CloudCard({ cloud, available, onLogin, onLogout, onRetry }) {
       <div className="truncate text-slate-400">{cloud.user.email}</div>
       {cloud.status === 'error' && <div className="text-red-300">{cloud.msg} Neuer Versuch folgt automatisch.</div>}
       {cloud.status === 'synced' && /save_data/.test(cloud.msg) && <div className="text-amber-300">Gesichert werden Rang, Level und Icon. Für den vollen Spielstand fehlt in der Datenbank die Spalte save_data.</div>}
+      {cloud.status === 'synced' && /placement_/.test(cloud.msg) && <div className="text-amber-300">Die Platzierungsspiele werden nur auf diesem Gerät gespeichert, denn in der Datenbank fehlen die Spalten placement_played und placement_wins.</div>}
       {cloud.status === 'synced' && /ranked_/.test(cloud.msg) && <div className="text-amber-300">Die Ranked-Statistik wird nur auf diesem Gerät gespeichert, denn in der Datenbank fehlen die Spalten ranked_played, ranked_wins und ranked_losses.</div>}
       {cloud.status === 'synced' && /is_vip/.test(cloud.msg) && <div className="text-amber-300">Der VIP-Status wird nur auf diesem Gerät gespeichert, denn in der Datenbank fehlt die Spalte is_vip.</div>}
       <div className="flex gap-2">
@@ -6608,9 +6629,11 @@ function CloudCard({ cloud, available, onLogin, onLogout, onRetry }) {
   );
 }
 // Echte globale Top 20 aus Supabase; bei weniger als 5 Spielern füllen dezente Beispielspieler die Liste auf
-function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh, isVip, ranked, onInspect }) {
+function LiveBoard({ remote, profile, rank, placement, cloud, onAuth, onRefresh, isVip, ranked, onInspect }) {
   const act = fn => ({ role: 'button', tabIndex: 0, onClick: fn, onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } } });
-  const meId = cloud.user && cloud.user.id, real = remote.rows;
+  const meId = cloud.user && cloud.user.id, unr = !!(placement && !placement.done);
+  // Unranked-Spieler stehen hinter allen Eingestuften, untereinander nach Siegen in den Platzierungsspielen
+  const real = [...remote.rows].map(r => (r.id === meId && unr ? { ...r, unranked: true, placement } : r)).sort((a, b) => ((a.unranked ? 1 : 0) - (b.unranked ? 1 : 0)) || (a.unranked ? ((b.placement ? b.placement.wins : 0) - (a.placement ? a.placement.wins : 0)) : 0));
   const fill = real.length < 5 ? buildLeaderboard(rank, profile.name).filter(r => !r.me).slice(0, 20 - real.length) : [];
   const meIdx = real.findIndex(r => r.id === meId);
   const podium = ['text-yellow-400', 'text-slate-300', 'text-amber-700'];
@@ -6625,20 +6648,21 @@ function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh, isVip, ran
       <div className={box} data-live-info="true">
         {remote.status === 'loading' ? 'Lade Rangliste …'
           : !cloud.user ? <>Als Gast erscheinst du nicht in der Rangliste. <button type="button" onClick={onAuth} className="font-bold text-[#C89B3C] underline">Einloggen</button>, um mitzuspielen.</>
+          : unr ? <>Du bist Unranked ({placement.played}/{PLACEMENT_GAMES}). Schließe deine Platzierungsspiele ab, um einen Rang zu bekommen.</>
           : meIdx >= 0 ? <>Dein Platz: <span className="font-bold text-white">{meIdx + 1}</span> von {real.length}.</>
           : 'Du bist noch nicht in den Top 20. Spiele weiter, bis dein Rang hier erscheint.'}
       </div>
       {real.map((r, i) => {
         const me = r.id === meId;
         return (
-          <div key={r.id || i} data-live-row="true" {...act(() => onInspect({ name: r.name, icon: r.icon, vip: r.vip || (me && isVip), tier: me ? rankName(rank.step) : r.tier, lp: me ? rank.lp : r.points % 100, level: r.level, stats: me ? ranked : r.ranked, me }))} className={`cursor-pointer flex items-center gap-3 rounded-lg border px-3 py-2 ${me ? 'border-2 border-[#C89B3C] bg-[#1A2A48] shadow-[0_0_14px_rgba(200,155,60,.35)]' : 'bg-[var(--panel)] border-[var(--line)]'}`}>
+          <div key={r.id || i} data-live-row="true" {...act(() => onInspect({ name: r.name, icon: r.icon, vip: r.vip || (me && isVip), tier: r.unranked ? 'Unranked' : (me ? rankName(rank.step) : r.tier), lp: me ? rank.lp : r.points % 100, unranked: !!r.unranked, placement: r.unranked ? r.placement : null, level: r.level, stats: me ? ranked : r.ranked, me }))} className={`cursor-pointer flex items-center gap-3 rounded-lg border px-3 py-2 ${me ? 'border-2 border-[#C89B3C] bg-[#1A2A48] shadow-[0_0_14px_rgba(200,155,60,.35)]' : 'bg-[var(--panel)] border-[var(--line)]'}`}>
             <Pos n={i + 1} />
             <SummonerIcon id={r.icon} name={r.name} className="w-9 h-9" label={r.name} vip={r.vip || (r.id === (cloud.user && cloud.user.id) && !!isVip)} />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2"><span className={`truncate ${me ? 'font-extrabold text-white' : 'font-semibold'}`}>{r.name}</span>{(r.vip || (me && isVip)) && <VipBadge compact />}{me && <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}</div>
-              <div className="flex items-center gap-1.5 truncate text-xs text-gray-400"><RankEmblem tier={r.tier} size={16} />{r.tier} · Lv. {r.level}</div>
+              <div className="flex items-center gap-1.5 truncate text-xs text-gray-400"><RankEmblem tier={r.unranked ? 'Unranked' : r.tier} size={16} />{r.unranked ? `Unranked${r.placement ? ` (${r.placement.played}/${PLACEMENT_GAMES})` : ''}` : r.tier} · Lv. {r.level}</div>
             </div>
-            <div className={`font-bold tabular-nums ${me ? 'text-[#C89B3C]' : ''}`}>{r.points % 100} LP</div>
+            <div className={`font-bold tabular-nums ${me ? 'text-[#C89B3C]' : ''}`}>{r.unranked ? (r.placement ? `${r.placement.wins} ${r.placement.wins === 1 ? 'Sieg' : 'Siege'}` : '–') : `${r.points % 100} LP`}</div>
           </div>
         );
       })}
@@ -6653,7 +6677,7 @@ function LiveBoard({ remote, profile, rank, cloud, onAuth, onRefresh, isVip, ran
     </div>
   );
 }
-function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip, ranked }) {
+function Leaderboard({ rank, placement, profile, friends, cloud, onAuth, isVip, ranked }) {
   const [tab, setTab] = useState('global');
   const [inspect, setInspect] = useState(null);   // Spieler-Inspektion
   const rowAct = fn => ({ role: 'button', tabIndex: 0, 'data-lb-row': 'true', onClick: fn, onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } } });
@@ -6666,16 +6690,17 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip, ranked }) {
     cloudTop20().then(rows => { if (alive) setRemote({ status: 'ok', rows }); }).catch(e => { console.warn('BrainGap: Rangliste nicht ladbar', e); if (alive) setRemote({ status: 'error', rows: [] }); });
     return () => { alive = false; };
   }, [tab, tick, cloud && cloud.status]);
-  const rows = buildLeaderboard(rank, profile.name);
+  const unr = !!(placement && !placement.done);   // Unranked: erscheint noch nicht in der Rangliste, steht ganz unten
+  const rows = unr ? [...buildLeaderboard({ step: 8, lp: 0 }, profile.name).filter(r => !r.me).map((r, i) => ({ ...r, pos: i + 1 })), { name: profile.name, lp: 0, me: true, pos: '–', unranked: true }] : buildLeaderboard(rank, profile.name);
   const meIdx = rows.findIndex(r => r.me);
-  const target = meIdx > 0 ? rows[meIdx - 1] : null;      // Bot direkt über dir
+  const target = !unr && meIdx > 0 ? rows[meIdx - 1] : null;      // Bot direkt über dir
   const meRef = useRef(null);
   const podium = ['text-yellow-400', 'text-slate-300', 'text-amber-700'];
 
   // Freunde-Ranking: eigener Account und Freunde nach Rangpunkten (bei Gleichstand stehst du vorn)
   const myScore = rank.step * 100 + rank.lp;
   const crew = [...friends.map(f => ({ ...f, score: f.step * 100 + f.lp })),
-    { name: profile.name, step: rank.step, lp: rank.lp, status: profile.status, note: profile.note, me: true, score: myScore + 0.5 }]
+    { name: profile.name, step: rank.step, lp: rank.lp, status: profile.status, note: profile.note, me: true, unranked: unr, score: unr ? -1 : myScore + 0.5 }]
     .sort((a, b) => b.score - a.score);
   const crewMe = crew.findIndex(r => r.me);
   const crewTarget = crewMe > 0 ? crew[crewMe - 1] : null;
@@ -6692,22 +6717,22 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip, ranked }) {
       <div className="my-1"><TabBar tabs={[['global', 'Global'], ['friends', 'Freunde']]} value={tab} onChange={setTab} /></div>
 
       {tab === 'global' && sb && remote.status !== 'error' && remote.status !== 'off' ? (
-        <LiveBoard remote={remote} profile={profile} rank={rank} cloud={cloud || { user: null }} onAuth={onAuth} onRefresh={() => setTick(n => n + 1)} isVip={isVip} ranked={ranked} onInspect={setInspect} />
+        <LiveBoard remote={remote} profile={profile} rank={rank} cloud={cloud || { user: null }} onAuth={onAuth} onRefresh={() => setTick(n => n + 1)} isVip={isVip} ranked={ranked} onInspect={setInspect} placement={placement} />
       ) : tab === 'global' ? (
         <>
           {sb && remote.status === 'error' && <div className="rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-200" data-live-error="true">Die Live-Rangliste ist gerade nicht erreichbar. Du siehst Beispielspieler.</div>}
           <div className="flex items-center gap-2 my-1">
-            <RankEmblem tier={tierOf(rank.step)} size={26} />
-            <div className="font-serif font-bold text-lg">{rankName(rank.step)} Leaderboard</div>
+            <RankEmblem tier={unr ? 'Unranked' : tierOf(rank.step)} size={26} />
+            <div className="font-serif font-bold text-lg">{unr ? 'Platzierungsphase' : `${rankName(rank.step)} Leaderboard`}</div>
           </div>
           <div className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2 text-sm text-gray-300 mb-1">
-            Dein Platz: <span className="font-bold text-white">{meIdx + 1}</span> von {rows.length}.{' '}
+            {unr ? <>Du bist Unranked ({placement.played}/{PLACEMENT_GAMES}). Schließe deine Platzierungsspiele ab, um in der Rangliste zu erscheinen. Die Liste zeigt Beispielspieler.</> : <>Dein Platz: <span className="font-bold text-white">{meIdx + 1}</span> von {rows.length}.{' '}
             {target
               ? <>Nächstes Ziel: <span className="font-bold text-white">{target.name}</span>, noch <span className="font-bold text-[#C89B3C] tabular-nums">{target.lp - rank.lp} LP</span> bis zum Überholen.</>
-              : 'Du führst die Liga an.'}
+              : 'Du führst die Liga an.'}</>}
           </div>
           {rows.map(r => (
-            <div key={r.pos} ref={r.me ? meRef : null} {...rowAct(() => setInspect({ name: r.name, icon: r.me ? (profile.icon != null ? profile.icon : ICON_IDS[0]) : simIcon(r.name), vip: r.me && isVip, tier: rankName(rank.step), lp: r.lp, stats: r.me ? ranked : simRanked(r.name), sample: !r.me, me: !!r.me }))} className={`cursor-pointer ${rowCls(r.me)}`}>
+            <div key={r.pos} ref={r.me ? meRef : null} {...rowAct(() => setInspect({ name: r.name, icon: r.me ? (profile.icon != null ? profile.icon : ICON_IDS[0]) : simIcon(r.name), vip: r.me && isVip, tier: unr && r.me ? 'Unranked' : rankName(rank.step), lp: r.lp, unranked: unr && !!r.me, placement: unr && r.me ? placement : null, stats: r.me ? ranked : simRanked(r.name), sample: !r.me, me: !!r.me }))} className={`cursor-pointer ${rowCls(r.me)}`}>
               <Pos n={r.pos} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -6718,7 +6743,7 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip, ranked }) {
                 </div>
                 {r.me && profile.note && <div className="truncate text-xs italic text-gray-400">„{profile.note}“</div>}
               </div>
-              <div className={`font-bold tabular-nums ${r.me ? 'text-[#C89B3C]' : ''}`}>{r.lp} LP</div>
+              <div className={`font-bold tabular-nums ${r.me ? 'text-[#C89B3C]' : ''}`}>{r.unranked ? `${placement.wins} ${placement.wins === 1 ? 'Sieg' : 'Siege'}` : `${r.lp} LP`}</div>
             </div>
           ))}
         </>
@@ -6727,13 +6752,14 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip, ranked }) {
           <div className="font-serif font-bold text-lg my-1">Freunde-Leaderboard</div>
           <div className="rounded-lg border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2 text-sm text-gray-300 mb-1">
             {friends.length === 0 ? 'Noch keine Freunde. Füge im Profil welche hinzu, um dich zu vergleichen.'
+              : unr ? <>Du bist Unranked ({placement.played}/{PLACEMENT_GAMES}) und stehst bis zur Einstufung ganz unten.</>
               : crewTarget ? <>Dein Platz: <span className="font-bold text-white">{crewMe + 1}</span> von {crew.length}. Nächstes Ziel: <span className="font-bold text-white">{crewTarget.name}</span>, noch <span className="font-bold text-[#C89B3C] tabular-nums">{Math.max(1, Math.ceil(crewTarget.score - myScore))} LP</span> bis zum Überholen.</>
               : <>Du führst deine Freundesliste an.</>}
           </div>
           {crew.map((r, i) => (
-            <div key={r.name} ref={r.me ? meRef : null} {...rowAct(() => setInspect({ name: r.name, icon: r.me ? (profile.icon != null ? profile.icon : ICON_IDS[0]) : simIcon(r.name), vip: r.me && isVip, tier: rankName(r.step), lp: r.lp, stats: r.me ? ranked : simRanked(r.name), sample: !r.me, me: !!r.me }))} className={`cursor-pointer ${rowCls(r.me)}`}>
+            <div key={r.name} ref={r.me ? meRef : null} {...rowAct(() => setInspect({ name: r.name, icon: r.me ? (profile.icon != null ? profile.icon : ICON_IDS[0]) : simIcon(r.name), vip: r.me && isVip, tier: r.unranked ? 'Unranked' : rankName(r.step), lp: r.lp, unranked: !!r.unranked, placement: r.unranked ? placement : null, stats: r.me ? ranked : simRanked(r.name), sample: !r.me, me: !!r.me }))} className={`cursor-pointer ${rowCls(r.me)}`}>
               <Pos n={i + 1} />
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankEmblem tier={tierOf(r.step)} size={20} /></span>
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C]/40 bg-[#010A13]"><RankEmblem tier={r.unranked ? 'Unranked' : tierOf(r.step)} size={20} /></span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span aria-label={STATUS[r.status].label}>{STATUS[r.status].emoji}</span>
@@ -6741,7 +6767,7 @@ function Leaderboard({ rank, profile, friends, cloud, onAuth, isVip, ranked }) {
                   {r.me && isVip && <VipBadge compact />}
                   {r.me && <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}
                 </div>
-                <div className="truncate text-xs text-gray-400">{rankName(r.step)} · {r.lp} LP{r.note ? ` · „${r.note}“` : ''}</div>
+                <div className="truncate text-xs text-gray-400">{r.unranked ? `Unranked (${placement.played}/${PLACEMENT_GAMES})` : `${rankName(r.step)} · ${r.lp} LP`}{r.note ? ` · „${r.note}“` : ''}</div>
               </div>
             </div>
           ))}
@@ -7569,10 +7595,63 @@ const RANK_EMBLEMS = {
   grandmaster: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png',
   challenger: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png',
 };
-const EMBLEM_GLOW = { iron: '#9ca3af', bronze: '#b45309', silver: '#cbd5e1', gold: '#facc15', platinum: '#5eead4', emerald: '#10b981', diamond: '#60a5fa', master: '#a855f7', grandmaster: '#ef4444', challenger: '#fef08a' };
+const EMBLEM_GLOW = { unranked: '#94a3b8', iron: '#9ca3af', bronze: '#b45309', silver: '#cbd5e1', gold: '#facc15', platinum: '#5eead4', emerald: '#10b981', diamond: '#60a5fa', master: '#a855f7', grandmaster: '#ef4444', challenger: '#fef08a' };
 // Robuste Tier-Erkennung: Zeichenkette ("Gold 4") oder Objekt mit tier/name; unbekannt = iron
-const emblemKey = x => { const k = ((typeof x === 'string' ? x : (x && (x.tier || x.name))) || 'iron').toLowerCase().split(' ')[0]; return RANK_EMBLEMS[k] ? k : 'iron'; };
+const emblemKey = x => { const k = ((typeof x === 'string' ? x : (x && (x.tier || x.name))) || 'iron').toLowerCase().split(' ')[0]; if (k === 'unranked') return 'unranked'; return RANK_EMBLEMS[k] ? k : 'iron'; };
 const emblemSrc = t => [RANK_EMBLEMS[emblemKey(t)], `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/ranked-emblem/emblem-${emblemKey(t)}.png`, RANK_EMBLEMS.iron];
+// Unranked-Abzeichen: eingebaut (kein Netz nötig), gestrichelter grauer Rahmen mit Fragezeichen
+function UnrankedEmblem({ size }) {
+  return (
+    <svg viewBox="0 0 64 64" width={size} height={size} role="img" aria-label="Unranked" data-emblem-unranked="true" className="relative" style={{ filter: 'drop-shadow(0 0 6px rgba(148,163,184,.55))' }}>
+      <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#0b1626" stroke="#94a3b8" strokeWidth="2.5" strokeDasharray="5 4" strokeLinejoin="round" />
+      <polygon points="32,13 49,23 49,41 32,51 15,41 15,23" fill="none" stroke="#475569" strokeWidth="1.5" />
+      <text x="32" y="41" textAnchor="middle" fontSize="24" fontWeight="800" fill="#94a3b8" fontFamily="serif">?</text>
+    </svg>
+  );
+}
+// Fortschritt der Platzierungsspiele: Siege zuerst (grün), dann Niederlagen (rot), dann offene Spiele
+function PlacementPips({ pl }) {
+  const losses = pl.played - pl.wins;
+  return (
+    <div className="flex items-center justify-center gap-2" data-placement-pips="true" role="img" aria-label={`Platzierungsspiele: ${pl.wins} Siege, ${losses} Niederlagen, ${PLACEMENT_GAMES - pl.played} offen`}>
+      {Array.from({ length: PLACEMENT_GAMES }, (_, i) => {
+        const st = i < pl.wins ? 'win' : i < pl.played ? 'loss' : 'open';
+        return <span key={i} data-pip={st} className={`flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs font-black ${st === 'win' ? 'border-[#0AC8B9] bg-[#0AC8B9]/20 text-[#0AC8B9]' : st === 'loss' ? 'border-[#E84057] bg-[#E84057]/20 text-[#E84057]' : 'border-slate-600 text-slate-500'}`}>{st === 'win' ? '✓' : st === 'loss' ? '✕' : i + 1}</span>;
+      })}
+    </div>
+  );
+}
+function PlacementCard({ placement }) {
+  const left = PLACEMENT_GAMES - placement.played;
+  return (
+    <div className="flex flex-col items-center gap-1.5 text-center" data-placement-card="true">
+      <PlacementPips pl={placement} />
+      <div className="text-sm font-bold text-slate-200" data-placement-status="true">Platzierungsspiele: {placement.played} / {PLACEMENT_GAMES} abgeschlossen</div>
+      <div className="text-[11px] leading-snug text-slate-400">Noch {left} {left === 1 ? 'Ranked-Spiel' : 'Ranked-Spiele'} (Match oder Quiz) bis zur Einstufung. Bei 3 Siegen startest du in Gold 4.</div>
+    </div>
+  );
+}
+// Feierliche Einstufung nach dem 3. Platzierungsspiel
+function PlacementCeremony({ pl, to, onClose }) {
+  useEffect(() => { playHextechSound('promotion'); }, []);
+  const tier = tierOf(to.step), cls = RANK_ICON[tier].cls, losses = pl.played - pl.wins;
+  const msg = ['Der Start war schwer, doch ab jetzt zählt jede LP.', 'Ein Sieg reicht für den Einstieg in Bronze. Von hier geht es aufwärts.', 'Zwei Siege: ein solider Start in Silber.', 'Perfekte Bilanz! Du startest direkt in Gold.'][pl.wins];
+  return (
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Einstufung abgeschlossen" data-placement-ceremony="true">
+      {pl.wins >= 2 && <Confetti />}
+      <div className="fade-in flex w-full max-w-[340px] flex-col items-center gap-3 rounded-2xl border-2 border-[#C89B3C] bg-[#06111F] p-6 text-center shadow-[0_0_40px_rgba(200,155,60,.45)]">
+        <div className="font-serif text-xs font-black tracking-[0.25em] text-[#C89B3C]">EINSTUFUNG ABGESCHLOSSEN</div>
+        <div className="pop"><RankEmblem tier={tier} size={132} glow /></div>
+        <div className={`font-serif text-3xl font-black ${cls}`} data-ceremony-rank="true">{rankName(to.step)}</div>
+        <div className="text-sm text-slate-300">{to.lp} LP · Platzierungsbilanz: {pl.wins} {pl.wins === 1 ? 'Sieg' : 'Siege'}, {losses} {losses === 1 ? 'Niederlage' : 'Niederlagen'}</div>
+        <PlacementPips pl={pl} />
+        <p className="text-sm leading-snug text-slate-200">{msg}</p>
+        <div className="text-xs text-slate-500">Ab jetzt gilt das normale LP-System mit Auf- und Abstieg.</div>
+        <button type="button" autoFocus onClick={onClose} data-ceremony-close="true" className="w-full rounded-xl bg-gradient-to-b from-[#E0B552] to-[#C89B3C] py-3 font-serif text-base font-extrabold text-[#010A13] shadow-[0_0_18px_rgba(200,155,60,.55)] transition active:scale-[.98]">Weiter</button>
+      </div>
+    </div>
+  );
+}
 function RankEmblem({ tier, size = 64, glow = false, className = '' }) {
   const t = emblemKey(tier), srcs = emblemSrc(tier), name = Object.keys(RANK_ICON).find(n => n.toLowerCase() === t) || 'Iron';
   const [i, setI] = useState(0);
@@ -7581,7 +7660,7 @@ function RankEmblem({ tier, size = 64, glow = false, className = '' }) {
   return (
     <span className={`relative inline-flex shrink-0 items-center justify-center ${cls} ${className}`} style={{ width: size, height: size }} data-emblem={t}>
       {glow && <span className="rankglow absolute inset-0 rounded-full bg-current opacity-40 blur-xl" aria-hidden="true" />}
-      {i < srcs.length
+      {t === 'unranked' ? <UnrankedEmblem size={size} /> : i < srcs.length
         ? <img src={srcs[i]} alt={`Rang-Wappen ${name}`} width={size} height={size} className="relative h-full w-full object-contain" style={{ filter: `drop-shadow(0 0 7px ${EMBLEM_GLOW[t]})` }} onError={() => setI(n => n + 1)} />
         : <span className="relative" data-emblem-fallback="true"><RankIcon tier={name} size={Math.round(size * 0.8)} /></span>}
     </span>
@@ -7970,13 +8049,16 @@ function App() {
   const [matchCount, setMatchCount] = useState(Number.isFinite(init.matchCount) ? init.matchCount : 0);
   const [shieldUntil, setShieldUntil] = useState(Number.isFinite(init.shieldUntil) ? init.shieldUntil : 0);
   const [sinceAd, setSinceAd] = useState(Number.isFinite(init.sinceAd) ? init.sinceAd : 0);
-  const [ranked, setRanked] = useState(() => sanitizeRanked(init.ranked));   // Ranked-Statistik: Spiele, Siege, Niederlagen
+  const [placement, setPlacement] = useState(() => init.placement || { played: 0, wins: 0, done: false });   // Platzierungsspiele: Unranked bis 3 Spiele gespielt sind
+  const [ranked, setRanked] = useState(() => sanitizeRanked(init.ranked));
   const [isVip, setIsVip] = useState(init.vip === true);   // VIP-Supporter: werbefrei, goldener Rahmen, Badge
   useEffect(() => { try { window.scrollTo(0, 0); } catch (e) {} }, [screen]);   // jeder Ansichtswechsel startet ganz oben
   const [notice, setNotice] = useState('');   // kurzer Hinweis, z. B. übernommene Standardwerte oder abgeschlossene Quests
   useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(''), 6000); return () => clearTimeout(t); }, [notice]);
   const [infoMode, setInfoMode] = useState(null);
   const [rank, setRank] = useState(init.rank);
+  const unranked = !placement.done;
+  const effStep = unranked ? placementStep(placement) : rank.step;   // Schwierigkeitsstufe für Ranked: dein Rang bzw. in den Placements die angepasste Stufe   // Ranked-Statistik: Spiele, Siege, Niederlagen
   const [history, setHistory] = useState(init.history);
   const [hearts, setHearts] = useState(Number.isInteger(init.hearts) ? Math.max(0, Math.min(MAX_HEARTS, init.hearts)) : MAX_HEARTS);
   const [run, setRun] = useState(0);
@@ -7987,8 +8069,8 @@ function App() {
   const xpRef = useRef(xp), questsRef = useRef(quests), matchRef = useRef(matchCount);
   xpRef.current = xp; questsRef.current = quests; matchRef.current = matchCount;
 
-  const SAVE_DEPS = [rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd, isVip, ranked];
-  const buildSave = () => ({ rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd, vip: isVip, ranked });
+  const SAVE_DEPS = [rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd, isVip, ranked, placement];
+  const buildSave = () => ({ rank, history, hearts, profile, friends, requests, recent, mastery, xp, quests, srs, matchCount, shieldUntil, sinceAd, vip: isVip, ranked, placement });
   const saveRef = useRef(null); saveRef.current = buildSave();
   // ----- Cloud (Supabase) -----
   const [cloud, setCloud] = useState({ user: null, status: sb ? 'guest' : 'off', msg: '' });   // off | guest | loading | synced | syncing | error
@@ -8006,7 +8088,7 @@ function App() {
     stamp.current = cloudAt; lsSet(SYNCED_AT_KEY, cloudAt);
     setRank(cs.rank); setHistory(cs.history); setHearts(Number.isInteger(cs.hearts) ? Math.max(0, Math.min(MAX_HEARTS, cs.hearts)) : MAX_HEARTS); setProfile(cs.profile);
     setFriends(cs.friends || [MOCK_FRIEND]); setRequests(cs.requests || MOCK_REQUESTS); setRecent(cs.recent || []); setMastery(normalizeMastery(cs.mastery));
-    setXp(cs.xp); xpRef.current = cs.xp; setQuests(freshQuests(cs.quests)); setSrs(cs.srs || {}); setMatchCount(cs.matchCount); setShieldUntil(cs.shieldUntil); setSinceAd(cs.sinceAd); setIsVip(cs.vip === true); setRanked(sanitizeRanked(cs.ranked));
+    setXp(cs.xp); xpRef.current = cs.xp; setQuests(freshQuests(cs.quests)); setSrs(cs.srs || {}); setMatchCount(cs.matchCount); setShieldUntil(cs.shieldUntil); setSinceAd(cs.sinceAd); setIsVip(cs.vip === true); setRanked(sanitizeRanked(cs.ranked)); setPlacement(cs.placement || { played: 0, wins: 0, done: true });
     setNotice('☁️ Cloud-Spielstand geladen');
   };
   // Nach dem Login: Cloud-Profil laden und mit dem Gerät abgleichen (nichts wird stillschweigend überschrieben)
@@ -8031,6 +8113,11 @@ function App() {
         else { setConflict({ cloudSave: cs, cloudAt }); setCloud(c => ({ ...c, status: 'loading' })); }
       }
       if (vipRow !== null) setIsVip(vipRow);
+      if (row && !cloudHas) {   // nur Spalten vorhanden: Eingestufte Spieler übernehmen ihren Rang, Platzierungen wachsen nur
+        const l0 = saveRef.current.placement, pp = Number(row.placement_played), pw = Number(row.placement_wins), tot = Math.floor(Number(row.lp));
+        if (l0 && !l0.done && row.rank_tier && row.rank_tier !== 'Unranked' && Number.isFinite(tot) && tot > 0) { setRank({ step: Math.min(MAX_STEP, Math.floor(tot / 100)), lp: tot % 100, shield: false }); setPlacement({ played: PLACEMENT_GAMES, wins: Number.isFinite(pw) ? Math.min(PLACEMENT_GAMES, pw) : 0, done: true }); }
+        else if (l0 && !l0.done && row.placement_played !== null && row.placement_played !== undefined && Number.isFinite(pp) && Number.isFinite(pw) && pp > l0.played) setPlacement({ played: Math.min(PLACEMENT_GAMES, pp), wins: Math.min(Math.min(PLACEMENT_GAMES, pp), Math.max(0, pw)), done: pp >= PLACEMENT_GAMES });
+      }
       if (row && !cloudHas && ['ranked_played', 'ranked_wins', 'ranked_losses'].every(c => row[c] !== null && row[c] !== undefined && Number.isFinite(Number(row[c])))) {   // nur Spalten vorhanden: Zähler wachsen nur, also gilt der höhere Stand
         const rr = sanitizeRanked({ wins: Number(row.ranked_wins), losses: Number(row.ranked_losses) }); setRanked(cur => (rr.played > cur.played ? rr : cur));
       }
@@ -8162,12 +8249,12 @@ function App() {
   const playRanked = ({ way, role }) => {
     if (!canPlay) return;
     if (way === 'match') { setRankedOpen(false); setPregame({ role, accepted: false }); return; }   // Ready Check als Modal über dem Dashboard, danach Champion-Wahl, Ladebildschirm, Gameplan
-    const queue = freshFirst(rankedPool(rank.step).map(r => r.id), recent, QUIZ_LENGTH);   // nur eigene Liga, ohne zuletzt gespielte
+    const queue = freshFirst(rankedPool(effStep).map(r => r.id), recent, QUIZ_LENGTH);   // nur eigene Liga (in den Platzierungen die angepasste Stufe), ohne zuletzt gespielte
     begin('ranked', { format: 'quiz', id: queue[0], queue, stages: queue.length });
   };
   // Ranked Match v2: festes 5v5-Lineup, Spielzustand EVEN / AHEAD / BEHIND, Live-HUD
   const startMv2 = ({ me, role, lineup, planOk }) => {
-    const ctx = { matchId: Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36), lineup, role, me, step: rank.step, vs: pickVariantSlots(me, role) };   // vs = Variante je Phase
+    const ctx = { matchId: Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36), lineup, role, me, step: effStep, vs: pickVariantSlots(me, role) };   // vs = Variante je Phase
     const sc = buildMv2Scenario(mv2Template(1, 'EVEN', role, ctx.vs[0]), ctx, 1, 'EVEN');
     setPregame(null); setMode('ranked'); setRun(n => n + 1); setResult(null);
     setRs({ id: sc.id, format: 'mv2', correct: 0, log: [], champion: me, role, stage: 0, stages: 5, queue: [], mv2: { ctx, state: 'EVEN', stats: MV2_START, plan: planOk, towers: { blue: [], red: [] }, trail: [] } });
@@ -8239,25 +8326,34 @@ function App() {
         countRun(); trackQuest('mastery'); if (v.win) trackQuest('win');
         setResult({ win: v.win, kind: v.kind, lp: 0, correct, n, from: rank, to: rank, mastery: mres, masteryOnly: true });
       } else {
-        const { event, ...to } = applyLp(rank, v.lp);
+        const placing = mode === 'ranked' && !placement.done, unrankedDaily = mode === 'daily' && !placement.done, noLp = placing || unrankedDaily;   // Platzierungsspiele und Unranked-Daily bringen keine LP
+        const lpGain = noLp ? 0 : v.lp, mmrGain = noLp ? 0 : v.mmrDelta;
+        let pl = null, final = null;
+        if (placing) {
+          const np = { played: placement.played + 1, wins: placement.wins + (v.win ? 1 : 0) }; np.done = np.played >= PLACEMENT_GAMES;
+          final = np.done ? placementRank(np.wins) : null;   // 3. Spiel: Einstufung nach Siegen
+          setPlacement(np); pl = { ...np, final, total: PLACEMENT_GAMES };
+        }
+        const { event, ...to0 } = applyLp(rank, lpGain);
+        const to = final ? { step: final.step, lp: final.lp, shield: false } : to0;
         const heartLost = !v.win;                         // Siege kosten kein Herz, Niederlagen genau eines
         setRank(to);
         const prevStreak = profile.winStreak || 0;
         const streak = v.win ? prevStreak + 1 : 0;                       // Niederlage setzt die Serie zurück
-        const bonus = v.win && streak >= 3 ? STREAK_BONUS : 0;           // ab 3 Siegen in Folge: +3 Bonus-MMR
-        updateProfile({ hiddenMmr: mmr + v.mmrDelta + bonus, winStreak: streak });
+        const bonus = !noLp && v.win && streak >= 3 ? STREAK_BONUS : 0;           // ab 3 Siegen in Folge: +3 Bonus-MMR
+        updateProfile({ hiddenMmr: final ? final.step * 100 + 50 : mmr + mmrGain + bonus, winStreak: streak });
         if (heartLost) setHearts(h => Math.max(0, h - 1));
         setHistory(h => [{
           champion: rs.format === 'quiz' ? 'Makro-Quiz' : rs.champion,
           role: rs.format === 'quiz' ? `${rs.queue.length} Szenarien` : isMv2 ? `${ROLE_SHORT[rs.role]} · Ranked Match` : rs.role,
-          lp: v.lp, mp: mres ? mres.gain : 0, ts: Date.now() }, ...h].slice(0, 20));
+          lp: lpGain, win: v.win, placement: pl ? `${pl.played}/${PLACEMENT_GAMES}` : undefined, mp: mres ? mres.gain : 0, ts: Date.now() }, ...h].slice(0, 20));
         countRun();
         if (mode === 'ranked') setRanked(r => sanitizeRanked({ wins: r.wins + (v.win ? 1 : 0), losses: r.losses + (v.win ? 0 : 1) }));   // zählt Ranked Match und Ranked Quiz
         if (isMv2) { addXp(50); trackQuest('ranked'); }              // Matches geben +50 XP
         if (rs.format === 'quiz') trackQuest('ranked');
         if (mode === 'daily') trackQuest('daily');
         if (v.win) trackQuest('win');
-        setResult({ ...v, correct, n, from: rank, to, event, heartLost, streak, prevStreak, bonus, mastery: mres, mv2: info, xpGain: isMv2 ? 50 : 0 });
+        setResult({ ...v, lp: lpGain, mmrDelta: mmrGain, correct, n, from: rank, to, event, heartLost, streak, prevStreak, bonus, mastery: mres, mv2: info, xpGain: isMv2 ? 50 : 0, placement: pl, unranked: noLp && !final, unrankedDaily });
       }
     }
     setRs({ ...rs, correct, log, mv2 });
@@ -8306,26 +8402,27 @@ function App() {
 
   // Recovery Drill: 2 kurze Fragen aus der eigenen Liga, beide richtig = 1 Herz zurück (kostenlos, wiederholbar)
   const startDrill = () => {
-    const queue = freshFirst(rankedPool(rank.step).map(r => r.id), recent, 2);
+    const queue = freshFirst(rankedPool(effStep).map(r => r.id), recent, 2);
     begin('practice', { format: 'drill', id: queue[0], queue, stages: queue.length });
   };
 
   const register = ({ name, step, role, champion, notice }) => {   // Reihenfolge: erst State und Ansicht, danach (getrennt) der Speicher
     const cleanName = ((typeof name === 'string' && name.trim()) || 'Beschwörer').slice(0, 16);
-    const cleanStep = Number.isInteger(step) ? Math.max(0, Math.min(MAX_STEP, step)) : 0;               // Standard: Iron 4
+    const cleanStep = 0;                                                                                // neue Spieler sind Unranked (Rang erst nach den Platzierungsspielen)
     const cleanRole = LS_ROLES.includes(role) ? role : 'Toplane';                                       // Standard: Top
     const cleanChamp = champLabel((typeof champion === 'string' && champion.trim()) || 'Jax');          // Standard: Jax
     const newProfile = { name: cleanName, role: cleanRole, champion: cleanChamp, status: 'online', note: '', startStep: cleanStep, hiddenMmr: cleanStep * 100 + 50, winStreak: 0, icon: ICON_IDS[0] };
     const newRank = { step: cleanStep, lp: 0 };
+    const newPlacement = { played: 0, wins: 0, done: false };
     const newMastery = { [cleanChamp]: { mp: 0, runs: 0 } };
     const newQuests = freshQuests(null);
     // 1) Alles synchron in den State: profile gesetzt = Dashboard wird gerendert, kein Weg zurück ins Onboarding
-    setProfile(newProfile); setRank(newRank); setHistory([]); setHearts(MAX_HEARTS); setFriends([MOCK_FRIEND]); setRequests(MOCK_REQUESTS);
+    setProfile(newProfile); setRank(newRank); setPlacement(newPlacement); setRanked(sanitizeRanked(null)); setHistory([]); setHearts(MAX_HEARTS); setFriends([MOCK_FRIEND]); setRequests(MOCK_REQUESTS);
     setRecent([]); setMastery(newMastery); setXp(0); setQuests(newQuests); setSrs({}); setMatchCount(0); setShieldUntil(0); setSinceAd(0); setScreen('home');
     xpRef.current = 0; questsRef.current = newQuests; matchRef.current = 0;
     if (notice) setNotice(notice);
     // 2) Speichern getrennt: ein blockierter oder voller Speicher (Privatmodus, Quota) darf den Wechsel nie verhindern
-    try { writeSave({ rank: newRank, history: [], hearts: MAX_HEARTS, profile: newProfile, friends: [MOCK_FRIEND], requests: MOCK_REQUESTS, recent: [], mastery: newMastery, xp: 0, quests: newQuests, srs: {}, matchCount: 0, shieldUntil: 0, sinceAd: 0 }); }
+    try { writeSave({ rank: newRank, history: [], hearts: MAX_HEARTS, profile: newProfile, friends: [MOCK_FRIEND], requests: MOCK_REQUESTS, recent: [], mastery: newMastery, xp: 0, quests: newQuests, srs: {}, matchCount: 0, shieldUntil: 0, sinceAd: 0, vip: false, ranked: sanitizeRanked(null), placement: newPlacement }); }
     catch (e) { console.warn('BrainGap: Speichern nicht möglich, die App läuft ohne Speicher weiter.', e); }
   };
   // Anfrage annehmen: Spieler wandert in die Freundesliste (und damit ins Freunde-Leaderboard)
@@ -8340,7 +8437,11 @@ function App() {
   const updateProfile = patch => setProfile(p => ({ ...p, ...patch }));
   const logout = () => { if (sb && cloud.user) cloudSignOut(); setProfile(null); setIsVip(false); setScreen('home'); };   // löscht nur das lokale Profil; der Cloud-Account bleibt bestehen
 
-  const reset = () => { setRank({ step: profile && profile.startStep ? profile.startStep : 0, lp: 0 }); setHistory([]); setHearts(MAX_HEARTS); };
+  const reset = () => {   // Fortschritt zurücksetzen: Spieler mit Start-Rang behalten ihn, alle anderen starten wieder Unranked mit den Platzierungsspielen
+    const keep = !!(profile && profile.startStep > 0);
+    setRank({ step: keep ? profile.startStep : 0, lp: 0 }); setPlacement(keep ? { played: 0, wins: 0, done: true } : { played: 0, wins: 0, done: false });
+    setHistory([]); setHearts(MAX_HEARTS);
+  };
 
   const scenario = getScenario(rs.id);
   const phaseTag = scenario ? `${scenario.phase} (${rs.stage + 1}/${rs.stages})` : '';
@@ -8384,11 +8485,11 @@ function App() {
 
       {(screen === 'home' || screen === 'board' || screen === 'profile') && (
         <div key={screen} className="fade-in flex-1 min-h-0 flex flex-col">
-          {screen === 'home' && <Dashboard rank={rank} hearts={hearts} profile={profile} mastery={mastery} xp={xp} quests={quests} friends={friends} shieldUntil={shieldUntil} isVip={isVip}
+          {screen === 'home' && <Dashboard rank={rank} placement={placement} hearts={hearts} profile={profile} mastery={mastery} xp={xp} quests={quests} friends={friends} shieldUntil={shieldUntil} isVip={isVip}
             onDaily={playDaily} onRanked={() => setRankedOpen(true)} onPractice={() => setSetupOpen(true)} onMastery={playMastery} onInfo={setInfoMode}
             onNoHearts={() => setHeartsOpen(true)} onHeartAd={() => setAd({ kind: 'heart' })} onShieldAd={() => setAd({ kind: 'shield' })} onIcon={() => setIconOpen(true)} onReset={reset} />}
-          {screen === 'board' && <Leaderboard rank={rank} profile={profile} friends={friends} cloud={cloud} onAuth={() => setAuthOpen(true)} isVip={isVip} ranked={ranked} />}
-          {screen === 'profile' && <Profile profile={profile} rank={rank} mastery={mastery} friends={friends} history={history} xp={xp} shieldUntil={shieldUntil}
+          {screen === 'board' && <Leaderboard rank={rank} placement={placement} profile={profile} friends={friends} cloud={cloud} onAuth={() => setAuthOpen(true)} isVip={isVip} ranked={ranked} />}
+          {screen === 'profile' && <Profile profile={profile} rank={rank} placement={placement} mastery={mastery} friends={friends} history={history} xp={xp} shieldUntil={shieldUntil}
             onChange={updateProfile} onLogout={logout} onIcon={() => setIconOpen(true)} onShieldAd={() => setAd({ kind: 'shield' })}
             cloud={cloud} onAuth={() => setAuthOpen(true)} onCloudLogout={cloudSignOut} onCloudRetry={() => setRetry(n => n + 1)} isVip={isVip} onToggleVip={toggleVip} ranked={ranked}
             onAddFriend={f => setFriends(l => [...l, f])} onRemoveFriend={name => setFriends(l => l.filter(x => x.name !== name))}
@@ -8419,7 +8520,7 @@ function App() {
 
       {pregame && !pregame.accepted && <ReadyCheckModal role={pregame.role} onAccept={acceptReady} onDecline={cancelPregame} />}
       {setupOpen && <PracticeSetup onStart={playPractice} onClose={() => setSetupOpen(false)} />}
-      {rankedOpen && <RankedSetup rank={rank} profile={profile} onStart={playRanked} onClose={() => setRankedOpen(false)} />}
+      {rankedOpen && <RankedSetup rank={rank} step={effStep} placement={placement} profile={profile} onStart={playRanked} onClose={() => setRankedOpen(false)} />}
       {infoMode && <ModeInfo mode={infoMode} onClose={() => setInfoMode(null)} />}
       {heartsOpen && <NoHearts isVip={isVip} onDrill={startDrill} onShop={() => { setHeartsOpen(false); setAd({ kind: 'heart' }); }} onClose={() => setHeartsOpen(false)} />}
       {iconOpen && <IconPicker current={profile.icon != null ? profile.icon : ICON_IDS[0]} onPick={id => updateProfile({ icon: id })} onClose={() => setIconOpen(false)} />}
