@@ -72,8 +72,8 @@ const { useState, useEffect, useRef, useMemo } = React;
 
 /* Lucide-Icons (Original-Pfade, inline, weil Lucide-React-Module hier nicht ladbar sind) */
 const P = {
-  home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
-  trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+  home:'<path d="M12 2.6 19.8 7v10L12 21.4 4.2 17V7Z" stroke-width="1.4"/><path d="M8.3 12.2 12 8.9l3.7 3.3" stroke="#0AC8B9" stroke-width="1.6"/><path d="M9.4 11.3v4h5.2v-4" stroke="#0AC8B9" stroke-width="1.5"/><path d="M12 15.3V13" stroke="#C89B3C" stroke-width="1.6"/>',
+  trophy:'<path d="M12 2.6 19.8 7v10L12 21.4 4.2 17V7Z" stroke-width="1.4"/><path d="M8.6 16v-3M12 16V9.6M15.4 16v-4.6" stroke="#0AC8B9" stroke-width="1.8"/><path d="m12 4.9.9.9-.9.9-.9-.9Z" fill="#C89B3C" stroke="#C89B3C" stroke-width="1"/>',
   crown:'<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/>',
   play:'<polygon points="6 3 20 12 6 21 6 3"/>',
   chat:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
@@ -86,21 +86,23 @@ const P = {
   zoom:'<circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/>',
   clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
   brain:'<path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>',
-  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  user:'<path d="M12 2.6 19.8 7v10L12 21.4 4.2 17V7Z" stroke-width="1.4"/><circle cx="12" cy="10" r="2.4" stroke="#0AC8B9" stroke-width="1.6"/><path d="M7.7 16.6c.5-2.2 2.3-3.4 4.3-3.4s3.8 1.2 4.3 3.4" stroke="#C89B3C" stroke-width="1.6"/>',
   crosshair:'<circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/>',
   volume2:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',
   volumeX:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/>',
   info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
   zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
-  swords:'<polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" x2="9" y1="14" y2="18"/><line x1="7" x2="4" y1="17" y2="20"/><line x1="3" x2="5" y1="19" y2="21"/>',
-  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
-  calendar:'<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+  swords:'<path d="M18.5 5.5 8.5 15.5M5.5 5.5l10 10" stroke-width="1.4"/><path d="M6.6 13.6l3.8 3.8M17.4 13.6l-3.8 3.8" stroke="#0AC8B9" stroke-width="1.8"/><path d="M8.5 15.5 5 19M15.5 15.5 19 19" stroke="#C89B3C" stroke-width="1.5"/><circle cx="4.4" cy="19.6" r=".9" fill="#C89B3C" stroke="#C89B3C" stroke-width=".8"/><circle cx="19.6" cy="19.6" r=".9" fill="#C89B3C" stroke="#C89B3C" stroke-width=".8"/>',
+  target:'<path d="M12 2.6 19.8 7v10L12 21.4 4.2 17V7Z" stroke-width="1.4"/><circle cx="12" cy="12" r="4.3" stroke="#0AC8B9" stroke-width="1.5"/><circle cx="12" cy="12" r="1.2" fill="#C89B3C" stroke="#C89B3C" stroke-width="1"/><path d="M12 6.6v1.9M12 15.5v1.9M6.6 12h1.9M15.5 12h1.9" stroke="#C89B3C" stroke-width="1.3"/>',
+  calendar:'<rect x="4" y="5" width="16" height="15.5" rx="2.5" stroke-width="1.4"/><path d="M4 9.8h16" stroke="#C89B3C" stroke-width="1.4"/><path d="M8.5 3v4M15.5 3v4" stroke="#0AC8B9" stroke-width="1.7"/><path d="m12 12.3 2.2 2.4-2.2 2.4-2.2-2.4Z" stroke="#C89B3C" stroke-width="1.3"/>',
   hexagon:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>',
   gem:'<path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/>',
   shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
   wand:'<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/>',
   axe:'<path d="m14 11-9.5 9.5a1.4 1.4 0 0 1-2-2L12 9"/><path d="M12.5 3.5 15 2l7 7-1.5 2.5L18 9l-3 3-3.5-3.5 3-3z"/>',
+  chart:'<path d="M4 20h16" stroke-width="1.4"/><path d="M7 17v-5M12 17V8M17 17v-7" stroke="#0AC8B9" stroke-width="2"/><path d="m5.5 8.5 4-3 3 2.5 5-4" stroke="#C89B3C" stroke-width="1.4"/>',
+  book:'<path d="M12 6.4C10.3 5.2 7.8 4.9 5 5.2v12.5c2.8-.3 5.3 0 7 1.2 1.7-1.2 4.2-1.5 7-1.2V5.2c-2.8-.3-5.3 0-7 1.2Z" stroke-width="1.4"/><path d="M12 6.4v12.5" stroke="#C89B3C" stroke-width="1.4"/><path d="M7.4 9.3c1.2 0 2.4.2 3.6.7M7.4 12.4c1.2 0 2.4.2 3.6.7" stroke="#0AC8B9" stroke-width="1.2"/>',
 };
 const Icon = ({ n, size = 20, className = '', fill = 'none' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2"
@@ -6626,9 +6628,9 @@ const MODE_INFO = {
     duration: '5 Fragen (ca. 3 bis 5 Minuten, je nach Szenario-Timer)',
     risk: 'Kein Risiko: keine LP, kein MMR, keine Herzen und kein Eintrag in der Historie. Am Ende siehst du nur, wie viele LP es gewesen wären.',
     focus: 'Gezieltes Training einzelner Rollen und Schwierigkeitsstufen, vom Early Game bis zum Closing.' },
-  mastery: { icon: 'crown', title: 'Champion Mastery',
+  mastery: { icon: 'crown', title: 'Champion Mastery Modus',
     goal: 'Level deinen Main-Champion ohne Obergrenze. Für 16 Kern-Champions (Jax, Aatrox, Darius, Lee Sin, Viego, Kayn, Ahri, Zed, Yasuo, Jinx, Kai\'Sa, Ezreal, Draven, Thresh, Leona, Nautilus) gibt es handgeschriebene Szenarien, jeder andere Champion nutzt Rollen-Vorlagen mit seinem Namen.',
-    duration: '5 Fragen (ca. 2 bis 3 Minuten)',
+    duration: 'Ready Check, Champion-Wahl, Ladebildschirm und Countdown wie im Ranked, danach 5 Fragen (ca. 2 bis 3 Minuten)',
     risk: 'Mastery vergibt NUR Mastery-Punkte, niemals LP: kein MMR, kein Herz, keine Serie. Sieg mit 4 bis 5 richtig +300 bis +350 MP, 3 von 5 richtig +150 MP, Niederlage +50 MP. Stufen ab 300, 750, 1.400, 2.200, 3.200 und 4.500 MP, danach alle 2.000 MP eine weitere Stufe. Titel: Novize (1 bis 4), Adept (5 bis 6), Meister (7 bis 9), Großmeister (10 bis 19), Legende (20+).',
     focus: 'Stufe 1 bis 2: Grundlagen und Trading-Fenster. Stufe 3 bis 4: Matchups, Wave-Control und Setups. Stufe 5 und höher: Late-Game, Flanken und Clutch-Entscheidungen. Du spielst ausschließlich deinen gewählten Champion, nie einen fremden. Ungespielte Fragen kommen zuerst, falsch beantwortete pausieren für 2 Matches.' },
 };
@@ -6662,6 +6664,7 @@ function Dashboard({ rank, placement, hearts, profile, mastery, xp, quests, frie
   const locked = hearts < 1;   // ohne Herzen sind Daily und Ranked gesperrt, Mastery vergibt nur MP und braucht kein Herz
   const { mp: mpNow, level: lvNow } = masteryOf(mastery, profile.champion);
   const [confirm, setConfirm] = useState(false);
+  const [missionsOpen, setMissionsOpen] = useState(false);   // Tägliche Missionen als Pop-up
   const unr = !!(placement && !placement.done);   // Unranked: Platzierungsspiele laufen
   const tier = unr ? 'Unranked' : tierOf(rank.step), cls = RANK_ICON[tier].cls;   // eine Farbquelle für Emblem, Text, Rahmen und Balken
   const pct = Math.min(100, rank.lp);
@@ -6697,6 +6700,7 @@ function Dashboard({ rank, placement, hearts, profile, mastery, xp, quests, frie
       </div>
 
       <FriendsOnline friends={friends} />
+      <MissionsTile quests={quests} onOpen={() => setMissionsOpen(true)} />
       {!isVip && <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />}
 
       {locked && (
@@ -6727,18 +6731,18 @@ function Dashboard({ rank, placement, hearts, profile, mastery, xp, quests, frie
           <span className="font-serif font-extrabold text-white leading-tight">Übungsmodus</span>
           <span className="text-xs text-gray-400">Üben ohne LP-Risiko, mit wechselnden Champions.</span>
         </ModeCard>
-        <ModeCard wrap="col-span-2" onClick={onMastery} onInfo={() => onInfo('mastery')} label="Champion Mastery"
+        <ModeCard wrap="col-span-2" onClick={onMastery} onInfo={() => onInfo('mastery')} label="Champion Mastery Modus"
           cls="flex items-center gap-3 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 px-3 py-2.5 text-left transition hover:border-[#0AC8B9] hover:bg-[#0A1428] active:scale-[.98]">
           <ChampAvatar name={profile.champion || 'Heimerdinger'} className="w-10 h-10" />
           <span className="min-w-0 pr-8">
-            <span className="block font-serif font-extrabold leading-tight text-white">Champion Mastery</span>
-            <span className="block truncate text-xs text-gray-400">{champLabel(profile.champion)} – Stufe {lvNow}<span className="text-[#C89B3C]"> · {mpNow.toLocaleString('de-DE')} MP</span> · nur MP, keine LP</span>
+            <span className="block font-serif font-extrabold leading-tight text-white">Champion Mastery Modus</span>
+            <span className="block text-xs leading-snug text-gray-400">Trainiere gezielte Champion-Matchups und schalte Meisterschaftsstufen frei.</span>
+            <span className="mt-0.5 block truncate text-[11px] text-[#C89B3C]">{champLabel(profile.champion)} – Stufe {lvNow} · {mpNow.toLocaleString('de-DE')} MP · nur MP, keine LP</span>
           </span>
         </ModeCard>
       </div>
 
       <Divider />
-      <QuestList quests={quests} />
       <div className="rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3" data-tip="true">
         <div className="font-serif text-sm font-bold text-[#C89B3C]">Pro-Taktik-Tipp des Tages</div>
         <p className="mt-1 text-sm leading-snug text-slate-200"><G t={tipOfDay()} /></p>
@@ -6746,6 +6750,7 @@ function Dashboard({ rank, placement, hearts, profile, mastery, xp, quests, frie
 
       <button onClick={() => { if (confirm) { onReset(); setConfirm(false); } else setConfirm(true); }}
         className="self-center text-xs text-slate-500 underline pb-1">{confirm ? 'Wirklich zurücksetzen? Nochmal tippen' : 'Fortschritt zurücksetzen'}</button>
+      {missionsOpen && <MissionsModal quests={quests} onClose={() => setMissionsOpen(false)} />}
     </div>
   );
 }
@@ -6947,7 +6952,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
             <span className="truncate text-sm font-bold leading-none">{tag}</span>
           </div>
           <button type="button" onClick={() => openGloss('all')} aria-label="Taktik-Glossar" title="Taktik-Glossar" data-glossary-open="true"
-            className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#0AC8B9]/70 text-base text-[#0AC8B9] transition hover:bg-[#0AC8B9]/15 active:scale-95"><span aria-hidden="true">📖</span></button>
+            className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#0AC8B9]/70 text-base text-[#0AC8B9] transition hover:bg-[#0AC8B9]/15 active:scale-95"><Icon n="book" size={18} /></button>
           <button onClick={() => setLeave(true)} aria-label="Zurück zum Hauptmenü" title="Zurück zum Hauptmenü"
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C] text-[#C89B3C] transition hover:bg-[#C89B3C]/15 active:scale-95">
             <Icon n="home" size={18} />
@@ -7140,11 +7145,11 @@ const StepList = ({ log }) => (
           </div>
           <span className={`shrink-0 text-lg font-black leading-none ${e.ok ? 'text-[#0AC8B9]' : 'text-[#E84057]'}`} aria-label={e.ok ? 'richtig' : 'falsch'}>{e.ok ? '✔' : '✖'}</span>
         </div>
-        {e.ok ? <div className="mt-1 text-slate-400"><G t={e.feedback} explain /></div> : (
+        {e.ok ? <div className="mt-1 text-slate-400"><G t={e.feedback} /></div> : (
           <dl className="mt-1.5 space-y-1 text-xs">
-            {e.chain && <div><dt className="inline font-semibold text-slate-300">Direkte Folge: </dt><dd className="inline text-slate-400"><G t={e.chain[0]} explain /></dd></div>}
-            {e.chain && <div><dt className="inline font-semibold text-slate-300">Team-Schaden: </dt><dd className="inline text-slate-400"><G t={e.chain[1]} explain skip={glossKeysIn(e.chain[0])} /></dd></div>}
-            {e.best && <div><dt className="inline font-semibold text-[#0AC8B9]">Besser wäre: </dt><dd className="inline text-slate-300"><G t={e.best} explain /></dd></div>}
+            {e.chain && <div><dt className="inline font-semibold text-slate-300">Direkte Folge: </dt><dd className="inline text-slate-400"><G t={e.chain[0]} /></dd></div>}
+            {e.chain && <div><dt className="inline font-semibold text-slate-300">Team-Schaden: </dt><dd className="inline text-slate-400"><G t={e.chain[1]} /></dd></div>}
+            {e.best && <div><dt className="inline font-semibold text-[#0AC8B9]">Besser wäre: </dt><dd className="inline text-slate-300"><G t={e.best} /></dd></div>}
           </dl>
         )}
       </div>
@@ -7442,9 +7447,9 @@ function RunComplete({ result, log, practice, format, onDone, onRetry, onReplay,
       {ceremony && result.placement && result.placement.final && <PlacementCeremony pl={result.placement} to={result.to} onClose={() => setCeremony(false)} />}
       <div className="shrink-0 px-3 pt-2" role="tablist" aria-label="Rundenabschluss" data-endtabs="true">
         <div className="grid grid-cols-2 gap-1.5 rounded-xl border p-1" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
-          {[['board', '🏆 Scoreboard'], ['result', '📊 Ergebnis']].map(([k, l]) => (
+          {[['board', 'trophy', 'Scoreboard'], ['result', 'chart', 'Ergebnis']].map(([k, ic, l]) => (
             <button key={k} type="button" role="tab" aria-selected={tab === k} data-endtab={k} onClick={() => setTab(k)}
-              className={`rounded-lg px-2 py-1.5 text-sm font-bold transition ${tab === k ? 'bg-[#C89B3C] text-[#010A13] shadow-[0_0_10px_rgba(200,155,60,.45)]' : 'text-slate-300 hover:text-white'}`}>{l}</button>
+              className={`flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-bold transition ${tab === k ? 'bg-[#C89B3C] text-[#010A13] shadow-[0_0_10px_rgba(200,155,60,.45)]' : 'text-slate-300 hover:text-white'}`}><Icon n={ic} size={16} />{l}</button>
           ))}
         </div>
       </div>
@@ -9274,32 +9279,23 @@ const GLOSS_GROUPS = [
   { title: 'Kämpfe & Spielweisen', keys: ['engage', 'poke', 'splitpush', 'collapse', 'bait', 'dive', 'overextend', 'backdoor', 'stasis'] },
 ];
 const GLOSS_CORE = ['freeze', 'slow', 'crash', 'cheater', 'crossmap', 'prio'];   // das Taktik-Glossar für Einsteiger
-// Kurzform in Klammern: erscheint in den Erklärungen ("Warum richtig?") hinter dem ersten Vorkommen eines Begriffs
-const GLOSS_SHORT = {
-  freeze: 'Welle kurz vor dem eigenen Turm stoppen', slow: 'nur Fernkämpfer töten, bis die eigene Welle riesig ist', crash: 'große Welle komplett unter den Gegner-Turm drücken',
-  cheater: 'Welle crashen, sofort in die Basis, Items kaufen, ohne Minion-Verlust zurück', crossmap: 'auf der anderen Kartenseite ein Ziel nehmen, während der Gegner hier gebunden ist',
-  prio: 'du bist mit deiner Welle früher fertig und kannst dich frei bewegen', collapse: 'mehrere Verbündete rotieren auf einen isolierten Gegner',
-  bait: 'Kampf antäuschen, um den Gegner in eine Falle zu locken', dive: 'Gegner unter seinem eigenen Turm angreifen', stasis: 'Zhonya macht dich 2,5 Sekunden unverwundbar',
-};
 const GLOSS_RE = /(Cheater Recall|Slow Push|Slow-Push|slow pushen|langsam pushen|Lane-Prio|Priority|Freeze\w*|einfrieren|einfrierst|eingefroren|Stasis|Cross-Map|Collapse|kollabieren|Bait|Turm-Dive|Dive|diven|Prio|\b(?:ge)?[Cc]rash\w*|\b[Bb]ounce\w*|\b[Rr]oam\w*|\b[Gg]ank\w*|\b[Ee]ngage\w*|\b[Pp]oke\w*|\b[Ss]plit-?[Pp]ush\w*|\b[Oo]verextend\w*|\b[Bb]ackdoor\w*)/g;
 const glossKey = s => { const l = s.toLowerCase(); return /cross-map/.test(l) ? 'crossmap' : /collapse|kollabier/.test(l) ? 'collapse' : /bait/.test(l) ? 'bait' : /dive|diven/.test(l) ? 'dive' : /cheater/.test(l) ? 'cheater' : /slow|langsam/.test(l) ? 'slow' : /freeze|einfrier|eingefror/.test(l) ? 'freeze' : /stasis/.test(l) ? 'stasis' : /crash/.test(l) ? 'crash' : /bounce/.test(l) ? 'bounce' : /roam/.test(l) ? 'roam' : /gank/.test(l) ? 'gank' : /engage/.test(l) ? 'engage' : /poke/.test(l) ? 'poke' : /split/.test(l) ? 'splitpush' : /overextend/.test(l) ? 'overextend' : /backdoor/.test(l) ? 'backdoor' : 'prio'; };
 const glossKeysIn = t => (typeof t === 'string' ? t.split(GLOSS_RE).filter((_, i) => i % 2 === 1).map(glossKey) : []);
 const GlossCtx = React.createContext(() => {});
-function G({ t, explain = false, skip = [] }) {
+function G({ t }) {
   const open = React.useContext(GlossCtx);
   if (typeof t !== 'string') return t;
-  const parts = t.split(GLOSS_RE), done = new Set(skip);   // explain: hinter dem ersten Vorkommen jedes Begriffs steht die Kurzerklärung in Klammern
+  const parts = t.split(GLOSS_RE);   // Begriffe sind antippbar: Coach Sarah erklärt sie im Pop-up
   return <>{parts.map((p, i) => {
     if (i % 2 === 0) return <React.Fragment key={i}>{p}</React.Fragment>;
-    const k = glossKey(p), note = explain && !done.has(k) ? GLOSS_SHORT[k] : null;
-    done.add(k);
+    const k = glossKey(p);
     return (
       <React.Fragment key={i}>
         <span role="button" tabIndex={0} data-silent="true" data-gloss={k} title="Tippen für eine Erklärung"
           onClick={e => { e.stopPropagation(); open(k); }}
           onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); open(k); } }}
           className="cursor-help underline decoration-dotted decoration-[#0AC8B9] underline-offset-2">{p}</span>
-        {note ? <span className="text-slate-400" data-gloss-note={k}> ({note})</span> : null}
       </React.Fragment>
     );
   })}</>;
@@ -9546,35 +9542,183 @@ function GlossSheet({ k, onClose }) {
     </div>
   );
 }
-function QuestList({ quests }) {
+// Kompakte Hextech-Leiste auf der Startseite: Status der Tagesaufgaben, Klick öffnet das Missions-Fenster
+function MissionsTile({ quests, onOpen }) {
+  const total = quests.ids.length, done = quests.ids.filter(id => quests.claimed[id]).length;
   return (
-    <div className="flex flex-col gap-2" data-quests="true">
-      <div className="font-serif font-bold">Tägliche Hextech-Missionen</div>
-      {quests.ids.map(id => {
-        const q = QUEST_POOL.find(x => x.id === id), p = Math.min(q.target, quests.progress[id] || 0), done = !!quests.claimed[id];
-        return (
-          <div key={id} data-quest={id} className={`rounded-lg border px-3 py-2 ${done ? 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10' : 'border-[#C89B3C]/30 bg-[#010A13]/70'}`}>
-            <div className="flex items-center gap-2 text-sm">
-              <span aria-hidden="true">{done ? '✅' : '🎯'}</span>
-              <span className="flex-1">{q.text}</span>
-              <span className="text-xs font-bold text-[#C89B3C]">+{q.xp} XP</span>
-            </div>
-            <div className="mt-1.5 flex items-center gap-2">
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full" style={{ background: 'var(--track)' }}><div className="h-full rounded-full bg-[#C89B3C]" style={{ width: `${(p / q.target) * 100}%` }} /></div>
-              <span className="text-xs tabular-nums text-slate-400">{p}/{q.target}</span>
-            </div>
-          </div>
-        );
-      })}
+    <button type="button" onClick={onOpen} data-missions-tile="true" aria-haspopup="dialog" aria-label={`Tägliche Missionen, ${done} von ${total} erledigt, öffnen`}
+      className="flex w-full items-center gap-2.5 rounded-xl border border-[#C89B3C]/50 bg-gradient-to-r from-[#0B1A2E] to-[#010A13] px-3 py-2.5 text-left shadow-[inset_0_0_0_1px_rgba(10,200,185,.14)] transition hover:border-[#0AC8B9] active:scale-[.99]">
+      <span className="shrink-0 text-slate-200"><Icon n="target" size={28} /></span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center justify-between gap-2">
+          <span className="truncate font-serif text-[15px] font-extrabold leading-tight text-white">Tägliche Missionen</span>
+          <span className="shrink-0 text-xs font-bold text-[#0AC8B9]" aria-hidden="true">Öffnen ▸</span>
+        </span>
+        <span className="mt-1.5 flex items-center gap-2">
+          <span className="h-1.5 flex-1 overflow-hidden rounded-full" style={{ background: 'var(--track)' }} role="progressbar" aria-valuenow={done} aria-valuemin={0} aria-valuemax={total}><span className="block h-full rounded-full bg-gradient-to-r from-[#C89B3C] to-[#0AC8B9] transition-all" style={{ width: `${(done / total) * 100}%` }} /></span>
+          <span className="shrink-0 rounded-md border border-[#C89B3C]/60 px-1.5 py-px text-[11px] font-bold tabular-nums text-[#F0E6D2]" data-missions-badge="true">{done}/{total} erledigt</span>
+        </span>
+      </span>
+    </button>
+  );
+}
+// Pop-up im LoL-Client-Stil: die Tagesaufgaben mit Fortschritt und Belohnung (Schließen per X, Escape oder Klick daneben)
+function MissionsModal({ quests, onClose }) {
+  useEffect(() => { const h = e => { if (e.key === 'Escape') onClose(); }; window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [onClose]);
+  const list = quests.ids.map(id => QUEST_POOL.find(x => x.id === id)), earned = list.filter(q => quests.claimed[q.id]).reduce((t, q) => t + q.xp, 0), possible = list.reduce((t, q) => t + q.xp, 0);
+  return (
+    <div className="absolute inset-0 z-[60] flex items-center justify-center p-4" style={{ background: 'rgba(1,10,19,.74)' }} onClick={onClose} data-missions-backdrop="true">
+      <div role="dialog" aria-modal="true" aria-label="Tägliche Missionen" data-missions-modal="true" onClick={e => e.stopPropagation()}
+        className="flex max-h-[88%] w-full flex-col rounded-2xl border-2 border-[#C89B3C] bg-gradient-to-b from-[#0B1A2E] to-[#010A13] shadow-[0_0_32px_rgba(200,155,60,.28)]">
+        <div className="flex items-center gap-2.5 border-b border-[#C89B3C]/40 px-4 py-3">
+          <span className="text-slate-200"><Icon n="target" size={26} /></span>
+          <div className="min-w-0 flex-1 leading-tight"><div className="font-serif text-lg font-black text-[#F0E6D2]">Tägliche Missionen</div><div className="text-[11px] text-slate-400">Drei neue Aufgaben pro Tag</div></div>
+          <button type="button" autoFocus onClick={onClose} aria-label="Schließen" data-missions-close="true" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
+        </div>
+        <div className="flex flex-col gap-2.5 overflow-y-auto p-4" data-quests="true">
+          {list.map(q => {
+            const p = Math.min(q.target, quests.progress[q.id] || 0), done = !!quests.claimed[q.id];
+            return (
+              <div key={q.id} data-quest={q.id} data-quest-done={done ? 'true' : 'false'} className={`rounded-xl border px-3 py-2.5 ${done ? 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10' : 'border-[#C89B3C]/35 bg-[#010A13]/80'}`}>
+                <div className="flex items-start gap-2 text-sm">
+                  <span className={`mt-0.5 shrink-0 ${done ? 'text-[#0AC8B9]' : 'text-[#C89B3C]'}`} aria-hidden="true"><Icon n={done ? 'check' : 'target'} size={16} /></span>
+                  <span className="flex-1 leading-snug">{q.text}</span>
+                  <span className="shrink-0 rounded-md border border-[#C89B3C]/60 px-1.5 py-px text-xs font-bold text-[#F0C75E]" data-quest-reward="true">+{q.xp} XP</span>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full" style={{ background: 'var(--track)' }} role="progressbar" aria-valuenow={p} aria-valuemin={0} aria-valuemax={q.target}><div className="h-full rounded-full bg-gradient-to-r from-[#C89B3C] to-[#0AC8B9]" style={{ width: `${(p / q.target) * 100}%` }} /></div>
+                  <span className="text-xs tabular-nums text-slate-400" data-quest-progress="true">{done ? 'Erledigt' : `${p}/${q.target}`}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="border-t border-[#C89B3C]/40 px-4 py-2.5 text-center text-xs text-slate-300" data-missions-total="true">Heute erhalten: <b className="text-[#F0C75E]">+{earned} XP</b> von <b>{possible} XP</b></div>
+      </div>
     </div>
   );
 }
 
 /* ---------- Ranked Pre-Game: Ready Check, Champion-Wahl, Ladebildschirm, Gameplan ---------- */
-const SUMMONER_NAMES = ['WardBot', 'FlashOnD', 'MinionMagnet', 'TiltProof', 'GankLord', 'BaronBuddy', 'SupportDiff', 'LaneKing', 'NexusNinja'];
-function LoadSlot({ champ, role, icon, name, side, mine }) {
+/* ---------- Champion-Infos im Ladebildschirm (Neulings-Hilfe) ---------- */
+// Name -> [Trait 1, Trait 2, Trait 3, Kern-Identität in einem Satz]. Coaching-Einschätzung, keine offiziellen Riot-Daten.
+const CHAMP_INFO = {
+  'Gwen': ['Duellant', 'Skalierung', 'Splitpush', 'Gwen ist eine wendige Schneiderin, die mit Flächenschaden und Heilung lange Duelle gewinnt.'],
+  'Malphite': ['Frontline', 'Engage', 'Lockdown', 'Malphite ist ein Fels-Tank, dessen Ultimate das ganze Team in einen Kampf hebt.'],
+  'Ornn': ['Frontline', 'Lockdown', 'Skalierung', 'Ornn ist ein robuster Tank, der Gegner hochschleudert und für sein Team Items schmiedet.'],
+  'Renekton': ['Duellant', 'Snowball', 'Frontline', 'Renekton ist ein wilder Lane-Bully, der früh Duelle dominiert und schnell einen Vorsprung aufbaut.'],
+  'Darius': ['Duellant', 'Snowball', 'Splitpush', 'Darius ist ein brutaler Kämpfer, der Gegner an sich zieht und im Nahkampf gnadenlos hinrichtet.'],
+  'Fiora': ['Duellant', 'Splitpush', 'Mobilität', 'Fiora ist eine Fechtmeisterin, die Seitenlanes allein gewinnt und im 1-gegen-1 schwer zu schlagen ist.'],
+  'Jax': ['Duellant', 'Splitpush', 'Skalierung', 'Jax ist ein Nahkämpfer, der mit Items immer stärker wird und Seitenlanes allein dominiert.'],
+  'Camille': ['Mobilität', 'Lockdown', 'Splitpush', 'Camille springt mit ihrem Haken auf Ziele und sperrt einzelne Gegner in einer Arena ein.'],
+  'Sion': ['Frontline', 'Engage', 'Lockdown', 'Sion ist ein riesiger Tank, der nach dem Tod weiterkämpft und Gegner mit seiner Ultimate überrollt.'],
+  'Aatrox': ['Duellant', 'Sustain', 'Engage', 'Aatrox heilt sich im Kampf selbst und wirbelt mit Flächenangriffen durch ganze Gegnergruppen.'],
+  'Gnar': ['Engage', 'Frontline', 'Flächenschaden', 'Gnar wechselt zwischen kleiner Form und riesigem Mega-Gnar, der mit Wurf und Betäubung Kämpfe eröffnet.'],
+  'Garen': ['Frontline', 'Sustain', 'Duellant', 'Garen ist ein einfacher, zäher Krieger, der sich selbst heilt und Gegner mit seinem Urteil hinrichtet.'],
+  'Sett': ['Frontline', 'Duellant', 'Engage', 'Sett steckt viel Schaden ein und schlägt danach mit doppelter Wucht zurück.'],
+  'Evelynn': ['Assassine', 'Pick', 'Burst', 'Evelynn lauert unsichtbar im Dschungel und tötet Gegner mit einem einzigen Burst.'],
+  'Sejuani': ['Frontline', 'Lockdown', 'Initiator', 'Sejuani reitet auf ihrem Eber in den Kampf und friert ganze Gegnergruppen mit Eis ein.'],
+  'Amumu': ['Lockdown', 'Engage', 'Frontline', 'Amumu bindet mit seiner Ultimate ganze Gegnerteams fest und ist ideal für Wombo-Combos.'],
+  'Lee Sin': ['Mobilität', 'Pick', 'Snowball', 'Lee Sin ist ein flinker Kämpfer, der früh viele Ganks macht und Gegner mit Tritten und Sprüngen fängt.'],
+  'Nocturne': ['Assassine', 'Pick', 'Engage', 'Nocturne verdunkelt die Karte und springt mit seiner Ultimate aus dem Nichts auf einzelne Ziele.'],
+  'Elise': ['Pick', 'Lockdown', 'Snowball', 'Elise ist eine frühe Gank-Jägerin, die Gegner mit Spinnen und Netz festhält und schnell tötet.'],
+  'Viego': ['Duellant', 'Snowball', 'Mobilität', 'Viego übernimmt getötete Champions und gewinnt vor allem Teamkämpfe durch seine Resets.'],
+  'Kayn': ['Assassine', 'Mobilität', 'Pick', 'Kayn läuft durch Wände und wird je nach Spielverlauf zum Assassinen oder zum Tank.'],
+  'Warwick': ['Sustain', 'Pick', 'Duellant', 'Warwick riecht verwundete Gegner, heilt sich im Kampf und hält Ziele mit seiner Ultimate fest.'],
+  'Zac': ['Frontline', 'Engage', 'Lockdown', 'Zac springt aus der Distanz in den Kampf und wirft Gegner mit seinem Sprung durcheinander.'],
+  'Kassadin': ['Skalierung', 'Mobilität', 'Assassine', 'Kassadin ist am Anfang schwach, springt aber mit Items überall hin und schaltet Magier aus.'],
+  'Veigar': ['Skalierung', 'Burst', 'Lockdown', 'Veigar wird mit jedem getöteten Minion stärker und beendet Kämpfe mit einem Burst-Zauber.'],
+  'Xerath': ['Poke', 'Fernkampf', 'Burst', 'Xerath beschießt Gegner mit riesiger Reichweite und räumt Türme aus der Ferne.'],
+  'Talon': ['Assassine', 'Mobilität', 'Roam', 'Talon springt über Wände, roamt durch die Karte und tötet einzelne Gegner blitzschnell.'],
+  'Lissandra': ['Lockdown', 'Engage', 'Flächenschaden', 'Lissandra friert Gegner ein und taucht mit ihrer Ultimate mitten ins gegnerische Team.'],
+  'Orianna': ['Flächenschaden', 'Engage', 'Schutz', 'Orianna ist eine Magierin mit Ball, die Teamkämpfe mit ihrer Ultimate und Flächenschaden entscheidet.'],
+  'Ahri': ['Mobilität', 'Pick', 'Burst', 'Ahri bezaubert Gegner und springt mit drei Dashes in und aus dem Kampf.'],
+  'Zed': ['Assassine', 'Burst', 'Mobilität', 'Zed ist ein Schatten-Assassine, der mit Klon und Ultimate einzelne Ziele ausschaltet.'],
+  'Azir': ['Skalierung', 'Poke', 'Zonierung', 'Azir kontrolliert mit Soldaten den Kampfraum und drückt Gegner mit seiner Ultimate zurück.'],
+  'Viktor': ['Skalierung', 'Poke', 'Flächenschaden', 'Viktor wird mit seinem Upgrade zum Kontroll-Magier, der Gegner mit seinem Strahl in Schach hält.'],
+  'Syndra': ['Burst', 'Pick', 'Poke', 'Syndra schießt dunkle Kugeln und trifft Gegner mit einem verheerenden Burst.'],
+  'Lux': ['Poke', 'Lockdown', 'Fernkampf', 'Lux bindet Gegner mit Licht aus der Ferne fest und trifft sie mit einem riesigen Laser.'],
+  'Katarina': ['Assassine', 'Mobilität', 'Flächenschaden', 'Katarina springt mit Dolchen in die Gegner und räumt in Teamkämpfen alles weg.'],
+  'Yasuo': ['Duellant', 'Engage', 'Mobilität', 'Yasuo ist ein flinker Schwertkämpfer, der mit seinem Windwall Schüsse stoppt und Gegner hochwirbelt.'],
+  'Annie': ['Burst', 'Lockdown', 'Engage', 'Annie betäubt Gegner und beschwört ihren Bären Tibbers für schnellen Burst.'],
+  'Ziggs': ['Poke', 'Wave-Clear', 'Zonierung', 'Ziggs sprengt Türme und Gegnergruppen mit Bomben aus großer Entfernung.'],
+  'Jinx': ['Skalierung', 'Flächenschaden', 'Fernkampf', 'Jinx wird mit Kills schneller und zerlegt ganze Teams mit ihrer Raketen-Ultimate.'],
+  'Kai\'Sa': ['Skalierung', 'Burst', 'Mobilität', 'Kai\'Sa wechselt zwischen Fernkampf und Burst und springt mit ihrer Ultimate zu einem Ziel.'],
+  'Ezreal': ['Poke', 'Mobilität', 'Skalierung', 'Ezreal teleportiert sich mit Blitzen aus Gefahr und trifft aus der Ferne mit Zielsuchschüssen.'],
+  'Draven': ['Snowball', 'Duellant', 'Burst', 'Draven fängt Äxte und baut früh einen Vorsprung auf, wenn er Kills sammelt.'],
+  'Miss Fortune': ['Flächenschaden', 'Burst', 'Engage', 'Miss Fortune sprüht mit ihrer Ultimate einen Kugelregen auf ganze Gruppen.'],
+  'Caitlyn': ['Poke', 'Fernkampf', 'Zonierung', 'Caitlyn hat die größte Reichweite und fängt Gegner mit Fallen vor dem Turm.'],
+  'Ashe': ['Lockdown', 'Pick', 'Fernkampf', 'Ashe bremst Gegner mit Frost und fängt sie mit ihrem riesigen Eispfeil quer über die Karte.'],
+  'Lucian': ['Burst', 'Snowball', 'Mobilität', 'Lucian schießt mit zwei Pistolen und dasht für schnellen Schaden in der Lane.'],
+  'Zeri': ['Skalierung', 'Mobilität', 'Splitpush', 'Zeri flitzt blitzschnell durch Lanes und lädt ihre Schüsse zu einem starken Dauerfeuer auf.'],
+  'Vayne': ['Skalierung', 'Mobilität', 'Splitpush', 'Vayne ist eine Jägerin, die Tanks mit prozentualem Schaden zerlegt und im 1-gegen-1 sehr stark wird.'],
+  'Pyke': ['Assassine', 'Pick', 'Roam', 'Pyke zieht Gegner mit seinem Haken heran und führt sie mit seiner Ultimate hin.'],
+  'Senna': ['Fernkampf', 'Skalierung', 'Heilung', 'Senna schießt aus großer Distanz und sammelt Seelen für mehr Schaden und Reichweite.'],
+  'Thresh': ['Pick', 'Lockdown', 'Schutz', 'Thresh zieht Gegner mit seiner Kette heran und schützt Verbündete mit der Laterne.'],
+  'Leona': ['Engage', 'Lockdown', 'Frontline', 'Leona stürmt mit Betäubung auf Gegner zu und startet Kämpfe für ihr Team.'],
+  'Nautilus': ['Engage', 'Lockdown', 'Frontline', 'Nautilus zieht Gegner mit seinem Anker heran und hält sie mit seiner Ultimate fest.'],
+  'Alistar': ['Engage', 'Frontline', 'Schutz', 'Alistar rammt Gegner in die Luft und beschützt sein Team mit einem Heil-Schrei.'],
+  'Lulu': ['Schutz', 'Skalierung', 'Lockdown', 'Lulu schützt ihren Carry mit Schilden und verwandelt Gegner mit ihrer Magie in Tiere.'],
+  'Janna': ['Schutz', 'Lockdown', 'Heilung', 'Janna wirft Gegner mit ihrem Sturm weg und schützt ihre Carries vor Engages.'],
+  'Braum': ['Frontline', 'Schutz', 'Lockdown', 'Braum fängt Schüsse mit seinem Schild ab und friert Gegner mit seiner Ultimate ein.'],
+  'Soraka': ['Heilung', 'Sustain', 'Schutz', 'Soraka heilt ihr Team aus der Ferne und hält Gegner mit Stille im Zaum.'],
+  'Karma': ['Poke', 'Schutz', 'Mobilität', 'Karma schützt mit Schilden, bremst Gegner und beschießt sie aus der Ferne.'],
+  'Blitzcrank': ['Pick', 'Lockdown', 'Engage', 'Blitzcrank zieht Gegner mit seinem Raketen-Griff direkt zu seinem Team.'],
+  'Rakan': ['Engage', 'Mobilität', 'Schutz', 'Rakan stürmt mit Xayah in die Gegner und startet Kämpfe mit Flächen-Charm.']
+};
+const DEFAULT_TRAITS = { Toplane: ['Duellant', 'Frontline'], Jungle: ['Pick', 'Mobilität'], Midlane: ['Burst', 'Poke'], Botlane: ['Fernkampf', 'Skalierung'], Support: ['Schutz', 'Engage'] };
+const DMG_BADGE = { AD: '⚔️ AD', AP: '🔮 AP', MIX: '⚖️ Mixed' };
+function champInfo(name, role) {
+  const n = normName(name);
+  let primary = null, entry = null;
+  for (const r of ROLES_ORDER) for (const k of Object.keys(ROLE_POOL[r])) if (normName(k) === n) { primary = r; entry = CHAMP_INFO[k]; }
+  const r0 = primary || role || 'Midlane', dmg = dmgOf(name, r0), label = champLabel(name);
+  if (entry) return { name: label, role: r0, dmg, traits: entry.slice(0, 3), blurb: entry[3] };
+  return { name: label, role: r0, dmg, traits: DEFAULT_TRAITS[r0] || [], blurb: `${label} spielt in dieser Partie ${ROLE_SHORT[r0]} und verursacht überwiegend ${dmg === 'AP' ? 'magischen' : dmg === 'AD' ? 'physischen' : 'gemischten'} Schaden.` };
+}
+// Kompakte Info-Karte (Schließen per X, Escape oder Klick daneben)
+function ChampInfoCard({ champ, role, onClose }) {
+  useEffect(() => { const h = e => { if (e.key === 'Escape') onClose(); }; window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [onClose]);
+  const i = champInfo(champ, role);
   return (
-    <div data-lineup={side} className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 ${side === 'blue' ? 'border-blue-400/50 bg-blue-500/10' : 'border-red-400/50 bg-red-500/10'} ${mine ? 'ring-2 ring-[#C89B3C]' : ''}`}>
+    <div className="absolute inset-0 z-[60] flex items-end p-3" style={{ background: 'rgba(1,10,19,.62)' }} onClick={onClose} data-info-backdrop="true">
+      <div role="dialog" aria-modal="true" aria-label={`Champion-Info: ${i.name}`} data-champ-info={i.name} onClick={e => e.stopPropagation()} className="w-full rounded-2xl border border-[#C89B3C]/70 bg-gradient-to-b from-[#0B1A2E] to-[#06111F] p-3.5 shadow-[0_0_24px_rgba(200,155,60,.25)]">
+        <div className="flex items-center gap-3">
+          <ChampAvatar name={i.name} className="w-14 h-14" iconSize={22} ring="border-2 border-[#C89B3C]" />
+          <div className="min-w-0 flex-1 leading-tight">
+            <div className="truncate font-serif text-lg font-black text-[#F0E6D2]" data-info-title="true">{i.name} – {ROLE_SHORT[i.role] === 'Top' ? 'Toplane' : i.role}</div>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              <span data-info-dmg={i.dmg} className={`rounded-md border px-1.5 py-0.5 text-[11px] font-bold ${i.dmg === 'AP' ? 'border-[#a78bfa]/70 text-[#c4b5fd]' : i.dmg === 'AD' ? 'border-[#fb923c]/70 text-[#fdba74]' : 'border-[#C89B3C]/70 text-[#F0C75E]'}`}>{DMG_BADGE[i.dmg]}</span>
+              {i.traits.map(t => <span key={t} data-info-trait={t} className="rounded-md border border-[#0AC8B9]/50 bg-[#0AC8B9]/10 px-1.5 py-0.5 text-[11px] font-semibold text-[#7fe9e1]">{t}</span>)}
+            </div>
+          </div>
+          <button type="button" autoFocus onClick={onClose} aria-label="Schließen" data-info-close="true" className="self-start p-2 -mr-1.5 text-slate-300 hover:text-white"><Icon n="x" /></button>
+        </div>
+        <p className="mt-2.5 text-sm leading-relaxed text-slate-200" data-info-blurb="true">{i.blurb}</p>
+      </div>
+    </div>
+  );
+}
+// LoL-Countdown vor dem Rundenstart: 3 .. 2 .. 1
+function MatchCountdown({ champ, vs, onDone }) {
+  const [n, setN] = useState(3);
+  useEffect(() => { if (n <= 0) { onDone(); return; } const t = setTimeout(() => setN(v => v - 1), 1000); return () => clearTimeout(t); }, [n]);
+  return (
+    <div className="flex flex-1 min-h-0 w-full flex-col items-center justify-center gap-4 px-6 text-center" style={{ background: 'radial-gradient(circle at 50% 42%, #0B2A44 0%, #010A13 70%)' }} role="status" aria-live="assertive" data-countdown={Math.max(n, 1)}>
+      <div className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89B3C]">Die Beschwörer betreten die Kluft</div>
+      <div className="relative flex h-40 w-40 items-center justify-center">
+        <svg viewBox="0 0 100 100" className="absolute inset-0" aria-hidden="true"><path d="M50 4 90 27v46L50 96 10 73V27Z" fill="none" stroke="#C89B3C" strokeWidth="1.6" /><path d="M50 12 83 31v38L50 88 17 69V31Z" fill="none" stroke="#0AC8B9" strokeOpacity=".7" strokeWidth="1" strokeDasharray="3 4" /></svg>
+        <span key={n} className="pop font-serif text-7xl font-black tabular-nums text-[#F0E6D2] [text-shadow:0_0_28px_rgba(10,200,185,.6)]" data-countdown-number="true">{Math.max(n, 1)}</span>
+      </div>
+      <div className="font-serif text-lg font-bold text-[#F0E6D2]">{champ}{vs ? <span className="text-slate-400"> gegen </span> : null}{vs}</div>
+      <div className="text-sm text-slate-400">Das Match beginnt gleich. Mach dich bereit.</div>
+    </div>
+  );
+}
+const SUMMONER_NAMES = ['WardBot', 'FlashOnD', 'MinionMagnet', 'TiltProof', 'GankLord', 'BaronBuddy', 'SupportDiff', 'LaneKing', 'NexusNinja'];
+function LoadSlot({ champ, role, icon, name, side, mine, onInfo }) {
+  return (
+    <div data-lineup={side} role="button" tabIndex={0} aria-label={`${champ}: Champion-Info öffnen`} onClick={() => onInfo && onInfo(champ, role)} onKeyDown={e => { if (onInfo && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onInfo(champ, role); } }} className={`flex cursor-pointer items-center gap-2 rounded-lg border px-2 py-1.5 transition active:scale-[.98] ${side === 'blue' ? 'border-blue-400/50 bg-blue-500/10' : 'border-red-400/50 bg-red-500/10'} ${mine ? 'ring-2 ring-[#C89B3C]' : ''}`}>
       <SummonerIcon id={icon} name={name} className="w-7 h-7" />
       <ChampAvatar name={champ} className="w-10 h-10" iconSize={16} />
       <div className="min-w-0 flex-1 leading-tight">
@@ -9584,7 +9728,7 @@ function LoadSlot({ champ, role, icon, name, side, mine }) {
     </div>
   );
 }
-function ReadyCheckModal({ role, onAccept, onDecline }) {
+function ReadyCheckModal({ role, onAccept, onDecline, label = 'Ranked' }) {
   const [left, setLeft] = useState(10);
   useEffect(() => { playHextechSound('ready_gong'); }, []);
   useEffect(() => {
@@ -9596,7 +9740,7 @@ function ReadyCheckModal({ role, onAccept, onDecline }) {
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Spiel gefunden" data-ready-modal="true">
       <div className="flex w-full max-w-[340px] flex-col items-center gap-4 rounded-2xl border-2 border-[#C89B3C] bg-[#06111F] p-6 text-center shadow-[0_0_40px_rgba(200,155,60,.45)]">
         <div className="pop font-serif text-3xl font-black tracking-wide text-[#C89B3C]">SPIEL GEFUNDEN!</div>
-        <div className="text-sm text-slate-300">Ranked · {ROLE_SHORT[role]}</div>
+        <div className="text-sm text-slate-300" data-ready-label="true">{label} · {ROLE_SHORT[role]}</div>
         <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-[#C89B3C] shadow-[0_0_24px_rgba(200,155,60,.5)]">
           <span className="font-serif text-5xl font-black tabular-nums" data-ready-count="true" aria-live="polite">{left}</span>
         </div>
@@ -9607,11 +9751,13 @@ function ReadyCheckModal({ role, onAccept, onDecline }) {
     </div>
   );
 }
-function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind }) {
+function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind, variant = 'ranked' }) {
+  const mastery = variant === 'mastery';   // Champion Mastery Modus: gleicher Ablauf (Ready Check, Champion-Wahl, Ladebildschirm), danach Countdown statt Gameplan
+  const [info, setInfo] = useState(null);    // geöffnete Champion-Info { champ, role }
   const [step, setStep] = useState('select');   // der Ready Check ist ein eigenes Modal (ReadyCheckModal)
   const pool = Object.keys(ROLE_POOL[role]);
   const mine = profile.role === role ? champLabel(profile.champion) : pool[0];
-  const choices = pool.some(c => normName(c) === normName(mine)) ? pool : [mine, ...pool];
+  const choices = mastery ? [mine] : pool.some(c => normName(c) === normName(mine)) ? pool : [mine, ...pool];   // Mastery: dein Main-Champion ist festgelegt
   const [me, setMe] = useState(mine);
   const [lineup, setLineup] = useState(null);
   const [plan, setPlan] = useState(null);
@@ -9627,7 +9773,7 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind }) {
       <div className={shell} style={bg}>
         <div className="mx-auto flex w-full max-w-[400px] flex-col gap-3 p-4">
           <div className="font-serif text-xl font-black text-[#C89B3C]">Champion-Auswahl</div>
-          <div className="text-sm text-slate-300">Rolle: {ROLE_SHORT[role]}. Bestätige deinen Champion.</div>
+          <div className="text-sm text-slate-300">{mastery ? `Rolle: ${ROLE_SHORT[role]}. Dein Mastery-Champion steht fest, bestätige ihn für das Matchup.` : `Rolle: ${ROLE_SHORT[role]}. Bestätige deinen Champion.`}</div>
           <div className="grid grid-cols-4 justify-items-center gap-x-2 gap-y-3 sm:grid-cols-5">
             {choices.map(c => (
               <button key={c} type="button" data-pick={c} aria-pressed={normName(me) === normName(c)} onClick={() => setMe(c)} className="flex flex-col items-center gap-1 active:scale-90">
@@ -9642,9 +9788,11 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind }) {
       </div>
     );
   }
+  if (step === 'countdown') return <MatchCountdown champ={me} vs={lineup.red[role]} onDone={() => onStart({ me, role, lineup, planOk: false, mastery: true })} />;
   if (step === 'loading') {
     const icon = (c, i) => ICON_IDS[(hashStr(c) + i) % ICON_IDS.length];
     const done = an.dmg && an.style;
+    const openInfo = (c, r) => setInfo({ champ: c, role: r });
     const choice = (kind, keys, info, res, onPick) => (
       <div className="flex flex-col gap-1.5" role="group" aria-label={kind === 'dmg' ? 'Schadensprofil' : 'Win Condition'}>
         {keys.map(k => (
@@ -9662,21 +9810,25 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind }) {
           <div className="font-serif text-xl font-black text-[#C89B3C]">Ladebildschirm</div>
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1.5"><div className="text-center text-xs font-bold uppercase tracking-wide text-blue-300">Dein Team (Blau)</div>
-              {ROLES_ORDER.map((r, i) => <LoadSlot key={r} side="blue" role={r} champ={lineup.blue[r]} mine={r === role} name={r === role ? profile.name : SUMMONER_NAMES[i]} icon={r === role ? (profile.icon != null ? profile.icon : ICON_IDS[0]) : icon(lineup.blue[r], i)} />)}</div>
+              {ROLES_ORDER.map((r, i) => <LoadSlot key={r} side="blue" role={r} champ={lineup.blue[r]} onInfo={openInfo} mine={r === role} name={r === role ? profile.name : SUMMONER_NAMES[i]} icon={r === role ? (profile.icon != null ? profile.icon : ICON_IDS[0]) : icon(lineup.blue[r], i)} />)}</div>
             <div className="flex flex-col gap-1.5"><div className="text-center text-xs font-bold uppercase tracking-wide text-red-300">Gegner (Rot)</div>
-              {ROLES_ORDER.map((r, i) => <LoadSlot key={r} side="red" role={r} champ={lineup.red[r]} name={SUMMONER_NAMES[(i + 4) % SUMMONER_NAMES.length]} icon={icon(lineup.red[r], i + 5)} />)}</div>
+              {ROLES_ORDER.map((r, i) => <LoadSlot key={r} side="red" role={r} champ={lineup.red[r]} onInfo={openInfo} name={SUMMONER_NAMES[(i + 4) % SUMMONER_NAMES.length]} icon={icon(lineup.red[r], i + 5)} />)}</div>
           </div>
-          <div className="flex flex-col gap-2.5 rounded-xl border border-[#0AC8B9]/40 bg-[#06111F]/80 p-2.5" data-draft-analysis="true">
+          <div className="text-center text-[11px] text-slate-400" data-info-hint="true">Tippe auf einen Champion für eine kurze Info.</div>
+          {mastery && <div className="rounded-xl border border-[#C89B3C]/50 bg-[#06111F]/80 px-3 py-2 text-center" data-matchup="true"><div className="text-[11px] font-bold uppercase tracking-wide text-[#C89B3C]">Dein Matchup · {ROLE_SHORT[role]}</div><div className="font-serif text-lg font-bold text-[#F0E6D2]">{me} <span className="text-slate-400">gegen</span> {lineup.red[role]}</div></div>}
+          {!mastery && <div className="flex flex-col gap-2.5 rounded-xl border border-[#0AC8B9]/40 bg-[#06111F]/80 p-2.5" data-draft-analysis="true">
             <div className="text-xs font-bold uppercase tracking-wide text-[#0AC8B9]">Draft-Analyse: Lies das gegnerische Team</div>
             <div className="text-sm font-semibold text-slate-100" data-an-step="1">Schritt 1: Schadensprofil ermitteln</div>
             {choice('dmg', ['AD', 'AP', 'MIX'], DMG_INFO, an.dmg, k => { if (!an.dmg) setAn(a => ({ ...a, dmg: dmgAnalysis(lineup.red, k) })); })}
             {an.dmg && <div className="text-sm font-semibold text-slate-100" data-an-step="2">Schritt 2: Primäre gegnerische Win Condition bestimmen</div>}
             {an.dmg && choice('style', ['ENGAGE', 'POKE', 'SPLIT'], STYLE_INFO, an.style, k => { if (!an.style) setAn(a => ({ ...a, style: styleAnalysis(lineup.red, k) })); })}
-          </div>
-          <div className="text-center text-xs text-slate-400">Diese 10 Champions bleiben über alle 5 Phasen gleich.</div>
-          <button type="button" data-to-plan="true" disabled={!done} onClick={() => setStep('plan')} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13] disabled:opacity-40">{done ? 'Weiter zum Gameplan ➔' : 'Analysiere zuerst den Gegner-Draft'}</button>
+          </div>}
+          {!mastery && <div className="text-center text-xs text-slate-400">Diese 10 Champions bleiben über alle 5 Phasen gleich.</div>}
+          {mastery && <button type="button" data-start-mastery="true" onClick={() => setStep('countdown')} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Match starten ➔</button>}
+          {!mastery && <button type="button" data-to-plan="true" disabled={!done} onClick={() => setStep('plan')} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13] disabled:opacity-40">{done ? 'Weiter zum Gameplan ➔' : 'Analysiere zuerst den Gegner-Draft'}</button>}
           {back}
         </div>
+        {info && <ChampInfoCard champ={info.champ} role={info.role} onClose={() => setInfo(null)} />}
       </div>
     );
   }
@@ -9775,10 +9927,10 @@ function FeedbackModal({ scenario, ok, timeout, choice, fbText, chain, ev, st, h
         {story && <div data-feedback-map="true" className="rounded-lg border px-3 py-2 text-sm leading-snug" style={{ borderColor: ok ? 'rgba(10,200,185,.5)' : 'rgba(232,64,87,.5)', background: ok ? 'rgba(10,200,185,.08)' : 'rgba(232,64,87,.08)' }}>{story}</div>}
         <div data-feedback-coach="true" className="text-sm leading-relaxed text-slate-200">
           <div className="mb-0.5 text-xs font-bold uppercase tracking-wide text-[#C89B3C]">Coach-Erklärung</div>
-          {ok ? <p><G t={fbText} explain /></p> : (
+          {ok ? <p><G t={fbText} /></p> : (
             <>
               <p className="mb-1 text-xs text-slate-400">Deine Wahl: <G t={choice} /></p>
-              <p><b style={{ color }}>Direkte Folge:</b> <G t={chain[0]} explain /> <b style={{ color }}>Team-Schaden:</b> <G t={chain[1]} explain skip={glossKeysIn(chain[0])} /></p>
+              <p><b style={{ color }}>Direkte Folge:</b> <G t={chain[0]} /> <b style={{ color }}>Team-Schaden:</b> <G t={chain[1]} /></p>
             </>
           )}
         </div>
@@ -9788,8 +9940,8 @@ function FeedbackModal({ scenario, ok, timeout, choice, fbText, chain, ev, st, h
               className="rounded-lg border border-[#C89B3C]/50 px-3 py-2 text-left text-xs font-bold text-[#C89B3C] transition hover:border-[#0AC8B9]">{why ? '💡 Erklärung ausblenden ▲' : '💡 Warum ist die richtige Antwort richtig? ▼'}</button>
             {why && (
               <div id="why-panel" className="slidedown rounded-lg border border-[#0AC8B9]/50 bg-[#0AC8B9]/10 px-3 py-2 text-sm leading-relaxed text-slate-200">
-                <div className="mb-1 text-xs text-slate-400">Richtig wäre gewesen: <G t={best.label.replace(/^[A-C]: /, '')} explain /></div>
-                <G t={best.feedback} explain skip={glossKeysIn(best.label)} />
+                <div className="mb-1 text-xs text-slate-400">Richtig wäre gewesen: <G t={best.label.replace(/^[A-C]: /, '')} /></div>
+                <G t={best.feedback} />
               </div>
             )}
           </div>
@@ -10205,7 +10357,13 @@ function App() {
     const queue = pickMastery(pool, masteryLevel(mp), rank.step, recent, QUIZ_LENGTH, { srs, matchCount })
       .filter(id => { const sc = getScenario(id); return !!sc && normName(sc.champion) === me; });   // zweite Sicherung: kein fremder Protagonist
     if (!queue.length) return;
-    begin('ranked', { format: 'mastery', id: queue[0], queue, stages: queue.length, champion: champLabel(profile.champion), role: profile.role });   // Die ganze Queue gehört deinem Champion
+    setPregame({ role: profile.role, accepted: false, mastery: { queue, champion: champLabel(profile.champion), role: profile.role } });   // gleicher Ablauf wie Ranked: Ready Check, Champion-Wahl, Ladebildschirm, Countdown
+  };
+  const startMasteryRun = () => {
+    const m = pregame && pregame.mastery;
+    if (!m) return;
+    setPregame(null);
+    begin('ranked', { format: 'mastery', id: m.queue[0], queue: m.queue, stages: m.queue.length, champion: m.champion, role: m.role });   // Die ganze Queue gehört deinem Champion
   };
 
   // Recovery Drill: 2 kurze Fragen aus der eigenen Liga, beide richtig = 1 Herz zurück (kostenlos, wiederholbar)
@@ -10312,7 +10470,7 @@ function App() {
       )}
       {screen === 'complete' && result && <RunComplete result={result} log={rs.log} practice={mode === 'practice' || !!result.masteryOnly} format={rs.format} onDone={finishRun} onRetry={startDrill} onReplay={replay}
         sbCtx={{ name: profile.name, champion: rs.champion || profile.champion, role: rs.role || profile.role, seed: hashStr(profile.name + '|' + run + '|' + matchCount) }} />}
-      {screen === 'pregame' && pregame && pregame.accepted && <PregameFlow profile={profile} role={pregame.role} onCancel={cancelPregame} onPlan={onPlan} onStart={startMv2} />}
+      {screen === 'pregame' && pregame && pregame.accepted && <PregameFlow profile={profile} role={pregame.role} onCancel={cancelPregame} onPlan={onPlan} onStart={pregame.mastery ? startMasteryRun : startMv2} variant={pregame.mastery ? 'mastery' : 'ranked'} />}
 
       {screen !== 'scenario' && screen !== 'complete' && screen !== 'pregame' && (
         <nav className="grid grid-cols-3 border-t" style={{ borderColor: 'var(--line)', background: '#010A13' }}>
@@ -10326,7 +10484,7 @@ function App() {
         </nav>
       )}
 
-      {pregame && !pregame.accepted && <ReadyCheckModal role={pregame.role} onAccept={acceptReady} onDecline={cancelPregame} />}
+      {pregame && !pregame.accepted && <ReadyCheckModal role={pregame.role} label={pregame.mastery ? 'Champion Mastery' : 'Ranked'} onAccept={acceptReady} onDecline={cancelPregame} />}
       {setupOpen && <PracticeSetup onStart={playPractice} onClose={() => setSetupOpen(false)} />}
       {rankedOpen && <RankedSetup rank={rank} step={effStep} placement={placement} profile={profile} onStart={playRanked} onClose={() => setRankedOpen(false)} />}
       {infoMode && <ModeInfo mode={infoMode} onClose={() => setInfoMode(null)} />}
