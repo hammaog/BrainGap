@@ -4719,14 +4719,18 @@ function SvgPortrait({ m, champion, cx, cy, r, sc, showLabels }) {
 // Taktik-Karte: ein SVG im Raster 0 0 100 100 (1 Einheit = 1 % der Karte, identisch mit den Marker-Koordinaten).
 // Ebenen von unten nach oben: Fallback-Zeichnung -> offizielle Summoner's-Rift-Karte (map11.png) mit Color-Grading -> Marker -> Effekte.
 // Landmarken der Karte: Baron-Pit ca. (34|30), Drachen-Pit ca. (66|70), Lanes entlang der Ränder, Fluss auf der Diagonale oben links nach unten rechts.
-// Türme (Rot oben rechts, Blau unten links; Blau = Rot gespiegelt an der Hauptdiagonale) und Minion-Wellen
-const TW_RED = { top: [[42, 13], [62, 13], [78, 13]], mid: [[58, 42], [67, 33], [74, 26]], bot: [[87, 58], [87, 38], [87, 22]] };   // Rot: T1 außen, T2 innen, T3 Inhibitor
-const NEX_RED = [[82, 16], [84, 18]];                                                                                          // 2 Nexus-Türme je Team
-const TOWER_LIST = ['red', 'blue'].flatMap(side => {   // Blau = Rot gespiegelt an der Hauptdiagonale: 11 + 11 = 22 Türme
-  const sw = ([x, y]) => (side === 'red' ? [x, y] : [y, x]);
+// Türme (Rot oben rechts, Blau unten links) und Minion-Wellen
+// Koordinaten: offizielle Turm-Positionen aus dem Spiel (Blau unten links, Rot oben rechts), umgerechnet auf das 100x100-Raster der Minimap:
+// x = X / 14870 * 100, y = 100 - Y / 14980 * 100. Das Kartenbild (map11.png) liegt randlos und unverzerrt im selben Raster (viewBox 0 0 100 100).
+// Referenz: Blau Mid T1 (39|57), Rot Mid T1 (60|43), Blau Top T1 (7|30), Rot Top T1 (29|7), Blau Bot T1 (71|93), Rot Bot T1 (93|70). Reihenfolge je Lane: T1 außen, T2 innen, T3 Inhibitor-Turm.
+const TW_BLUE = { top: [[7, 30], [10, 55], [8, 71]], mid: [[39, 57], [34, 68], [25, 75]], bot: [[71, 93], [47, 90], [29, 92]] };
+const TW_RED = { top: [[29, 7], [53, 10], [71, 9]], mid: [[60, 43], [66, 33], [75, 25]], bot: [[93, 70], [90, 45], [92, 29]] };
+const NEX_BLUE = [[12, 85], [15, 88]], NEX_RED = [[85, 13], [88, 16]];   // 2 Nexus-Türme je Team
+const TOWER_LIST = ['red', 'blue'].flatMap(side => {   // 11 + 11 = 22 Türme
+  const tw = side === 'red' ? TW_RED : TW_BLUE, nex = side === 'red' ? NEX_RED : NEX_BLUE;
   return [
-    ...Object.keys(TW_RED).flatMap(lane => TW_RED[lane].map((q, i) => { const [x, y] = sw(q); return { id: `${side}_${lane}${i + 1}`, side, lane, x, y }; })),
-    ...NEX_RED.map((q, i) => { const [x, y] = sw(q); return { id: `${side}_nex${i + 1}`, side, lane: 'nex', x, y, nexus: true }; }),
+    ...Object.keys(tw).flatMap(lane => tw[lane].map(([x, y], i) => ({ id: `${side}_${lane}${i + 1}`, side, lane, x, y }))),
+    ...nex.map(([x, y], i) => ({ id: `${side}_nex${i + 1}`, side, lane: 'nex', x, y, nexus: true })),
   ];
 });
 const TOWER_BY_ID = Object.fromEntries(TOWER_LIST.map(t => [t.id, t]));
@@ -4745,7 +4749,12 @@ function applyTowers(tw, ev, ok, role, phase) {
   if (ok && /NEXUS/.test(e.obj || '')) t = { ...t, red: [...new Set([...t.red, 'red_nex1', 'red_nex2'])] };
   return t;
 }
-const LANE_PTS = { top: [[13, 86], [13, 13], [86, 13]], mid: [[14, 86], [86, 14]], bot: [[14, 87], [87, 87], [87, 14]] };   // Lanes laufen exakt durch die Turmkoordinaten; die Lane-Mitte liegt auf der Flusslinie (x = y)
+// Lanes laufen exakt durch die Turm-Fundamente (jeder Turm ist ein Eckpunkt). Lane-Mitten: Top-Ecke (8|8), Flusszentrum (50|50), Bot-Ecke (92|92).
+const LANE_PTS = {
+  top: [[9, 84], [8, 71], [10, 55], [7, 30], [8, 8], [29, 7], [53, 10], [71, 9], [85, 13]],
+  mid: [[14, 86], [25, 75], [34, 68], [39, 57], [50, 50], [60, 43], [66, 33], [75, 25], [86, 14]],
+  bot: [[14, 92], [29, 92], [47, 90], [71, 93], [92, 92], [93, 70], [90, 45], [92, 29], [92, 15]],
+};
 const lanePoint = (lane, s) => {
   const pts = LANE_PTS[lane], seg = pts.slice(1).map((q, i) => Math.hypot(q[0] - pts[i][0], q[1] - pts[i][1])), tot = seg.reduce((a, b) => a + b, 0);
   let d = Math.max(0, Math.min(1, s)) * tot;
@@ -4769,14 +4778,17 @@ const T_S = {};   // T_S[Team][Lane] = Lane-Position von T1, T2, T3
 // Welche Türme sieht man? Fokus-Lane: T1/T2 prominent; andere Lanes nur T1 gedämpft; Nexus als Anker; zerstörte bleiben als blasse Marke
 const towerTier = (t, lane) => (t.lane === lane && +t.id.slice(-1) <= 2 ? 'prominent' : 'context');
 // Wellen-Muster auf der aktiven Lane: Position der blauen und roten Minions (Anteil entlang der Lane)
-function waveDots(kind, lane) {
-  const rs = T_S.red[lane][0], bs = T_S.blue[lane][0], L = laneLen(lane), d = [];
+const CRASH_D = 2.8;   // Abstand der Crash-Welle zum Turm (Karteneinheiten): Mid unter Blau T1 (41|55), unter Rot T1 (58|45)
+const NEUTRAL_AT = { top: [8, 8], mid: [50, 50], bot: [92, 92] };   // neutrale Welle trifft sich in der Lane-Mitte, in Mid exakt im Flusszentrum
+function waveDots(kind, lane, tier = 1) {
+  const rs = T_S.red[lane][tier - 1] ?? T_S.red[lane][0], bs = T_S.blue[lane][tier - 1] ?? T_S.blue[lane][0], L = laneLen(lane), u = 1 / L, d = [];
   const wave = (side, s0, step, n) => { for (let i = 0; i < n; i++) d.push({ side, s: s0 + step * i, melee: i < Math.ceil(n / 2) }); };   // vorne Nahkämpfer, hinten Fernkämpfer
-  if (kind === 'WAVE_CRASH_ENEMY') { wave('blue', rs - 0.004, -0.008, 4); wave('red', rs + 0.004, 0.008, 3); }         // blaue Welle direkt am Gegner-T1, rote Minions sterben darunter
-  else if (kind === 'WAVE_CRASH_ALLY') { wave('red', bs + 0.004, 0.008, 4); wave('blue', bs - 0.004, -0.008, 3); }
-  else if (kind === 'WAVE_FREEZE_ALLY') { wave('blue', bs + 10 / L, -0.8 / L, 3); wave('red', bs + 12 / L, 0.8 / L, 3); }   // 8 bis 10 Karteneinheiten vor dem eigenen T1, außerhalb der Turmreichweite
-  else if (kind === 'SLOW_PUSH') { wave('blue', 0.62, -0.007, 4); wave('red', 0.68, 0.009, 3); }                       // dichte blaue Gruppe im vorderen Lane-Abschnitt
-  else { wave('blue', 0.494, -0.008, 3); wave('red', 0.506, 0.008, 3); }                                                // NEUTRAL: treffen sich auf der Flusslinie
+  if (kind === 'WAVE_CRASH_ENEMY') { wave('blue', rs - (CRASH_D - 1.2) * u, -0.8 * u, 4); wave('red', rs - 0.6 * u, 0.8 * u, 3); }          // blaue Welle 2,8 Einheiten vor dem Gegner-T1, rote Minions sterben am Turm
+  else if (kind === 'WAVE_CRASH_ALLY') { wave('red', bs + (CRASH_D - 1.2) * u, 0.8 * u, 4); wave('blue', bs + 0.6 * u, -0.8 * u, 3); }       // rote Welle 2,8 Einheiten vor eurem T1
+  else if (kind === 'WAVE_FREEZE_ENEMY') { wave('red', rs - 10 * u, 0.8 * u, 3); wave('blue', rs - 12 * u, -0.8 * u, 3); }              // Gegner frieren 8 bis 10 Einheiten vor ihrem T1 ein
+  else if (kind === 'WAVE_FREEZE_ALLY') { wave('blue', bs + 10 * u, -0.8 * u, 3); wave('red', bs + 12 * u, 0.8 * u, 3); }                   // 8 bis 10 Karteneinheiten vor dem eigenen T1, außerhalb der Turmreichweite
+  else if (kind === 'SLOW_PUSH') { wave('blue', rs - 6 * u, -0.8 * u, 4); wave('red', rs - 3 * u, 0.8 * u, 3); }                            // große blaue Gruppe rückt auf den Gegner-T1 vor, wenige rote Minions
+  else { const sn = laneS(lane, ...NEUTRAL_AT[lane]); wave('blue', sn - 0.4 * u, -0.8 * u, 3); wave('red', sn + 0.4 * u, 0.8 * u, 3); }       // NEUTRAL: treffen sich in der Lane-Mitte
   return d;
 }
 // Jedes Szenario legt die Welle passend zu seinem Text fest: Schlüssel "Phase:Variante[:Zustand/Rolle]" -> Muster[@Lane]
@@ -4814,6 +4826,7 @@ function MinionSprite({ x, y, side, melee, s, ...rest }) {
     </g>
   );
 }
+const MAP_CAL = typeof window !== 'undefined' && /(^|[?&])mapcal(=1|=true|&|$)/.test(window.location.search || '');   // Kalibrierungs-Overlay nur auf Anforderung
 const MARKER_COLOR = { hero: '#3b82f6', enemy: '#ef4444', objective: '#C89B3C', fog: '#94a3b8' };
 const Minimap = ({ markers = [], champion, role, showLabels = false, result = null, fx = null, focus = null, full = false, onToggleView, towers = null, wave = null }) => {
   const uid = React.useId().replace(/:/g, '');
@@ -4828,7 +4841,7 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
   const R = (showLabels ? 8 : 12.5) * u;
   const reduce = typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const me = player ? { x: player.x, y: player.y } : null;
-  const TOWER = { Toplane: { x: 78, y: 8 }, Midlane: { x: 70, y: 30 }, Jungle: { x: 70, y: 30 }, Botlane: { x: 93, y: 64 }, Support: { x: 93, y: 64 } };
+  const TOWER = { Toplane: { x: 29, y: 7 }, Midlane: { x: 60, y: 43 }, Jungle: { x: 60, y: 43 }, Botlane: { x: 93, y: 70 }, Support: { x: 93, y: 70 } };   // Gegner-T1 der Lane
   const towerMarker = markers.find(m => m.type === 'objective' && /turm/i.test(m.label) && !/eigener/i.test(m.label));
   const tower = fx && me ? (towerMarker || TOWER[role] || { x: 70, y: 30 }) : null;
   const fogSrc = markers.find(m => m.type === 'fog') || markers.find(m => m.type === 'enemy');
@@ -4880,8 +4893,7 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
             {/* Fallback-Zeichnung, falls das Kartenbild nicht lädt */}
             <rect width="100" height="100" fill="#16222e" />
             <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6.7 93.3 V6.7 H93.3 M6.7 93.3 H93.3 V6.7" stroke="#45475a" strokeWidth="3.3" />
-              <path d="M6.7 93.3 L93.3 6.7" stroke="#45475a" strokeWidth="3.3" />
+              {['top', 'mid', 'bot'].map(l => <path key={l} d={`M${LANE_PTS[l].map(q => q.join(' ')).join(' L')}`} stroke="#45475a" strokeWidth="3.3" />)}
               <path d="M6.7 6.7 L93.3 93.3" stroke="#0AC8B9" strokeOpacity=".35" strokeWidth="5.5" strokeDasharray="1.1 6.7" />
             </g>
             <circle cx="6.7" cy="93.3" r="6.1" fill="#3b82f6" fillOpacity=".7" /><circle cx="93.3" cy="6.7" r="6.1" fill="#ef4444" fillOpacity=".7" />
@@ -4893,6 +4905,12 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
             <rect width="100" height="100" fill="#010A13" fillOpacity=".18" />
             <rect width="100" height="100" fill={`url(#vig-${uid})`} />
             <rect x=".4" y=".4" width="99.2" height="99.2" fill="none" stroke="#C89B3C" strokeOpacity=".65" strokeWidth=".8" />
+            {MAP_CAL && (   /* Kalibrierung: Seite mit ?mapcal=1 öffnen. Raster alle 10 Einheiten, jeder Turm mit Ring und Koordinate, sitzt ein Ring neben dem Fundament im Bild, stimmt das Kartenbild nicht mit dem Raster überein */
+              <g data-mapcal="true" aria-hidden="true" fontFamily="system-ui,sans-serif">
+                {[10, 20, 30, 40, 50, 60, 70, 80, 90].map(v => <g key={v}><line x1={v} y1="0" x2={v} y2="100" stroke="#fde68a" strokeOpacity=".28" strokeWidth=".15" /><line x1="0" y1={v} x2="100" y2={v} stroke="#fde68a" strokeOpacity=".28" strokeWidth=".15" /><text x={v} y="3" fontSize="2.2" fill="#fde68a" textAnchor="middle">{v}</text><text x="1" y={v + 0.8} fontSize="2.2" fill="#fde68a">{v}</text></g>)}
+                {TOWER_LIST.map(t => <g key={t.id}><circle cx={t.x} cy={t.y} r="1.6" fill="none" stroke="#22d3ee" strokeWidth=".3" /><circle cx={t.x} cy={t.y} r=".25" fill="#22d3ee" /><text x={t.x + 2} y={t.y - 1.4} fontSize="1.9" fill="#a5f3fc" stroke="#010A13" strokeWidth=".5" paintOrder="stroke">{t.x}|{t.y}</text></g>)}
+              </g>
+            )}
             {/* 22 Türme als kleine Hextech-Obelisken: Blau goldener Kern mit azurblauem Glanz, Rot rubinroter Kern mit purpurnem Glanz. Fokus-Lane T1/T2 prominent, zerstörte grau mit 20 % Deckkraft */}
             <g data-towers={wv.lane} aria-hidden="true">
               {TOWER_LIST.map(t => {
@@ -4908,8 +4926,8 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
               })}
             </g>
             {/* Minion-Wellen als Sprites (Nahkämpfer mit Hörnerhelm, Fernkämpfer mit Kapuze) in Formationen von 3 bis 4 */}
-            <g data-waves={wv.kind} data-wave-lane={wv.lane} aria-hidden="true">
-              {waveDots(wv.kind, wv.lane).map((d, i) => {
+            <g data-waves={wv.kind} data-wave-lane={wv.lane} data-wave-tier={wv.tier || 1} aria-hidden="true">
+              {waveDots(wv.kind, wv.lane, wv.tier).map((d, i) => {
                 const [x, y, nx, ny] = lanePose(wv.lane, d.s), off = (i % 2 ? 0.9 : -0.9) * Math.max(u, 0.35) * 1.3;
                 return <MinionSprite key={i} x={x + nx * off} y={y + ny * off} side={d.side} melee={d.melee} s={1.15 * u} data-wave={`${d.side}_${wv.lane}`} />;
               })}
@@ -4963,9 +4981,10 @@ const Minimap = ({ markers = [], champion, role, showLabels = false, result = nu
           <span className="pointer-events-none absolute left-1.5 top-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-semibold text-[#0AC8B9]">Fokus: {focus.zone}</span>
         )}
         {focus && onToggleView && (
-          <button type="button" onClick={e => { e.stopPropagation(); onToggleView(); }} onKeyDown={e => e.stopPropagation()}
+          <button type="button" onClick={e => { e.stopPropagation(); onToggleView(); }} onKeyDown={e => e.stopPropagation()} data-map-zoom={full ? 'in' : 'out'}
+            aria-label={full ? 'In die Karte hineinzoomen' : 'Zurück zur Gesamtansicht'} aria-pressed={!full}
             className="absolute bottom-1.5 right-1.5 z-20 rounded-md border border-[#C89B3C]/60 bg-[#010A13]/85 px-2 py-1 text-[10px] font-semibold text-[#C89B3C] transition hover:border-[#0AC8B9] hover:text-[#0AC8B9]">
-            {full ? 'Fokus-Ansicht' : 'Gesamtansicht'}
+            {full ? '🔍 Heranzoomen' : 'Gesamtansicht'}
           </button>
         )}
       </div>
@@ -5080,6 +5099,7 @@ function Dashboard({ rank, placement, hearts, profile, mastery, xp, quests, frie
       </div>
 
       <FriendsOnline friends={friends} />
+      <GlossaryCard />
       {!isVip && <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />}
 
       {locked && (
@@ -5200,7 +5220,7 @@ function RankedSetup({ rank, step, placement, profile, onStart, onClose }) {
           <button onClick={onClose} aria-label="Schließen" className="p-2 -mr-2 text-slate-300 hover:text-white"><Icon n="x" /></button>
         </div>
         <div className="text-xs text-gray-400">
-          Ein Herz geht nur bei Niederlage oder Abbruch verloren. {unr ? `Platzierungsspiel ${placement.played + 1} von ${PLACEMENT_GAMES}: Das Ergebnis zählt für deine Einstufung (keine LP). ` : 'Das Match bringt LP für deinen Rang und Mastery-Punkte für deinen Champion. '}{unr ? 'Aktuelle Stufe' : `Liga ${tierOf(step)}`}: Du spielst nur {pool[0].difficulty}-Szenarien.
+          Ein Herz geht nur bei Niederlage oder Abbruch verloren. {unr ? `Platzierungsspiel ${placement.played + 1} von ${PLACEMENT_GAMES}: Das Ergebnis zählt für deine Einstufung (keine LP). ` : 'Das Match bringt LP für deinen Rang und Mastery-Punkte für deinen Champion. '}{unr ? 'Die Szenarien passen sich deinem Können an.' : `Liga ${tierOf(step)}: Du spielst nur ${pool[0].difficulty}-Szenarien.`}
         </div>
         <div className="grid grid-cols-2 gap-2">
           <WayCard active={way === 'match'} icon="swords" title="Match-Simulation" text="Ready Check, 5v5-Ladebildschirm, Gameplan und 5 zusammenhängende Phasen" onClick={() => setWay('match')} />
@@ -5224,7 +5244,8 @@ function RankedSetup({ rank, step, placement, profile, onStart, onClose }) {
   );
 }
 
-function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree', stage = 0, stages = 1, record = { c: 0, w: 0 }, hud = null, onNext, onAbort }) {
+function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree', stage = 0, stages = 1, record = { c: 0, w: 0 }, hud = null, hideLeague = false, glossOpen = false, onNext, onAbort }) {
+  const openGloss = React.useContext(GlossCtx);
   const limit = Math.min(scenario.timeLimit || DEFAULT_TIME_LIMIT, timeCap || Infinity);   // individuelles Zeitlimit pro Szenario
   const [left, setLeft] = useState(limit);
   const [pick, setPick] = useState(null);       // { opt } | { timeout: true } | null
@@ -5232,10 +5253,11 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
   const [typing, setTyping] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [leave, setLeave] = useState(false);   // Bestätigung zum Abbrechen
-  const [full, setFull] = useState(false);     // Gesamtkarte statt Fokus-Ausschnitt
-  const paused = mapOpen || full;               // Taktik-Analyse: Timer steht
+  const [zoom, setZoom] = useState(false);     // Die Minimap startet in JEDER Frage als Gesamtansicht; Heranzoomen ist allein die Entscheidung des Spielers
+  const full = !zoom;                           // true = ganze Karte sichtbar (Standard), false = Fokus-Ausschnitt
+  const paused = mapOpen;                       // Taktik-Analyse (vergrößerte Karte): Timer steht. Gesamtansicht und Zoom halten die Zeit NICHT an
   const openMap = () => { pausedRef.current = true; setMapOpen(true); };                 // Ref sofort setzen, bevor der nächste Tick kommt
-  const toggleFull = () => { if (!full) pausedRef.current = true; setFull(!full); };
+  const toggleFull = () => setZoom(z => !z);
   const [showMom, setShowMom] = useState(true);   // Momentum-Banner am Phasenstart
   const [msgs, setMsgs] = useState([{ from: 'coach', t: 'Ich gebe dir Hinweise, aber nie die Lösung. Was willst du wissen?' }]);
   const [draft, setDraft] = useState('');
@@ -5245,9 +5267,9 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
 
   // Timer: pausiert, solange der Coach offen ist
   // Timer: ein Intervall pro Szenario. Der Pause-Status liegt in einer Ref (wird in jedem Render und in den Handlern sofort gesetzt), die Restzeit
-  // wird nur im aktiven Zustand verbraucht. Solange Karte, Gesamtansicht, Coach oder Abbruch-Dialog offen sind, verliert der Timer keinen Tick.
+  // wird nur im aktiven Zustand verbraucht. Solange die vergrößerte Karte, der Coach oder der Abbruch-Dialog offen sind, verliert der Timer keinen Tick.
   const pausedRef = useRef(false);
-  pausedRef.current = !!pick || coach || leave || mapOpen || full;
+  pausedRef.current = !!pick || coach || leave || mapOpen || glossOpen;   // auch beim Lesen eines Glossar-Eintrags läuft keine Zeit
   const remainingRef = useRef(limit * 1000);
   useEffect(() => {
     let last = performance.now();
@@ -5327,8 +5349,10 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
             {practice && <Icon n="target" size={16} className="shrink-0 text-[#0AC8B9]" />}
             <span className="truncate text-sm font-bold leading-none">{tag}</span>
           </div>
+          <button type="button" onClick={() => openGloss('all')} aria-label="Taktik-Glossar" title="Taktik-Glossar" data-glossary-open="true"
+            className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#0AC8B9]/70 text-base text-[#0AC8B9] transition hover:bg-[#0AC8B9]/15 active:scale-95"><span aria-hidden="true">📖</span></button>
           <button onClick={() => setLeave(true)} aria-label="Zurück zum Hauptmenü" title="Zurück zum Hauptmenü"
-            className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C] text-[#C89B3C] transition hover:bg-[#C89B3C]/15 active:scale-95">
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#C89B3C] text-[#C89B3C] transition hover:bg-[#C89B3C]/15 active:scale-95">
             <Icon n="home" size={18} />
           </button>
         </div>
@@ -5369,7 +5393,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
             <div className="font-bold text-white leading-tight truncate">{scenario.champion}</div>
             <div className="text-xs text-gray-400">{scenario.role}</div>
           </div>
-          <span className="text-xs font-semibold rounded-md px-2 py-1 border text-[#0AC8B9]" style={{ borderColor: 'var(--teal)' }}>{scenario.difficulty}</span>
+          <span className="text-xs font-semibold rounded-md px-2 py-1 border text-[#0AC8B9]" style={{ borderColor: 'var(--teal)' }} data-league-chip={hideLeague ? 'hidden' : 'shown'}>{hideLeague ? 'Platzierung' : scenario.difficulty}</span>
           <span title={scenario.role} aria-label={scenario.role}
                 className="w-8 h-8 rounded-lg border border-[#C89B3C]/60 bg-[#0A1428] flex items-center justify-center text-[#0AC8B9]">
             <Icon n={ROLE_ICON[scenario.role]} size={16} />
@@ -5519,11 +5543,11 @@ const StepList = ({ log }) => (
           </div>
           <span className={`shrink-0 text-lg font-black leading-none ${e.ok ? 'text-[#0AC8B9]' : 'text-[#E84057]'}`} aria-label={e.ok ? 'richtig' : 'falsch'}>{e.ok ? '✔' : '✖'}</span>
         </div>
-        {e.ok ? <div className="mt-1 text-slate-400">{e.feedback}</div> : (
+        {e.ok ? <div className="mt-1 text-slate-400"><G t={e.feedback} explain /></div> : (
           <dl className="mt-1.5 space-y-1 text-xs">
-            {e.chain && <div><dt className="inline font-semibold text-slate-300">Direkte Folge: </dt><dd className="inline text-slate-400">{e.chain[0]}</dd></div>}
-            {e.chain && <div><dt className="inline font-semibold text-slate-300">Team-Schaden: </dt><dd className="inline text-slate-400">{e.chain[1]}</dd></div>}
-            {e.best && <div><dt className="inline font-semibold text-[#0AC8B9]">Besser wäre: </dt><dd className="inline text-slate-300">{e.best}</dd></div>}
+            {e.chain && <div><dt className="inline font-semibold text-slate-300">Direkte Folge: </dt><dd className="inline text-slate-400"><G t={e.chain[0]} explain /></dd></div>}
+            {e.chain && <div><dt className="inline font-semibold text-slate-300">Team-Schaden: </dt><dd className="inline text-slate-400"><G t={e.chain[1]} explain skip={glossKeysIn(e.chain[0])} /></dd></div>}
+            {e.best && <div><dt className="inline font-semibold text-[#0AC8B9]">Besser wäre: </dt><dd className="inline text-slate-300"><G t={e.best} explain /></dd></div>}
           </dl>
         )}
       </div>
@@ -5696,34 +5720,24 @@ function sbFromRun(result, log, ctx) {
   const minutes = Math.min(44, Math.max(18, endMin + 2 + mulberry32(hashStr(ctx.seed + 'time'))() * 4.5));
   return buildScoreboard({ win: !!result.win, lineup, role, name: ctx.name || 'Du', k, d, a, ratio, minutes, hint, seed: hashStr(ctx.seed + 'sb') });
 }
-const fmtK = n => (n >= 1000 ? (n / 1000).toFixed(1).replace('.', ',') + 'k' : String(n));
-function SbRow({ p, maxDmg, side }) {
-  const kda = ((p.k + p.a) / Math.max(1, p.d)).toFixed(1).replace('.', ',');
-  const pct = Math.max(4, Math.round((p.dmg / maxDmg) * 100));
-  const bar = side === 'blue' ? 'linear-gradient(90deg,#1e6fb5,#4cc3ff)' : 'linear-gradient(90deg,#9b2335,#ff6b7d)';
+const fmtK = n => (n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n));   // Schreibweise wie im LoL-Client: 18.4k
+// Kompakte Spielerzeile für das 2-Spalten-Scoreboard: Avatar mit Level, Name, K/D/A, CS und Schaden
+function SbRow({ p, side }) {
   return (
-    <div data-sb-row={side} data-sb-me={p.me ? 'true' : undefined} className={`rounded-lg border px-2.5 py-2 ${p.me ? 'border-[#C89B3C] bg-[#C89B3C]/10 shadow-[0_0_12px_rgba(200,155,60,.3)]' : ''}`} style={p.me ? undefined : { background: 'var(--panel)', borderColor: 'var(--line)' }}>
-      <div className="flex items-center gap-2">
+    <div data-sb-row={side} data-sb-me={p.me ? 'true' : undefined} className={`rounded-lg border px-1.5 py-1.5 ${p.me ? 'border-[#C89B3C] bg-[#C89B3C]/15 shadow-[0_0_10px_rgba(200,155,60,.35)]' : ''}`} style={p.me ? undefined : { background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="flex items-center gap-1.5">
         <span className="relative shrink-0">
-          <ChampAvatar name={p.champion} className="w-10 h-10" iconSize={18} ring={p.me ? 'border-2 border-[#C89B3C]' : side === 'blue' ? 'border-2 border-[#4cc3ff]/60' : 'border-2 border-[#ff6b7d]/60'} />
-          <span className="absolute -bottom-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full border border-[#C89B3C] bg-[#010A13] px-1 text-[10px] font-bold tabular-nums text-[#F0E6D2]" data-sb-level="true">{p.level}</span>
+          <ChampAvatar name={p.champion} className="w-8 h-8" iconSize={14} ring={p.me ? 'border-2 border-[#C89B3C]' : side === 'blue' ? 'border-2 border-[#4cc3ff]/60' : 'border-2 border-[#ff6b7d]/60'} />
+          <span className="absolute -bottom-1 -right-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full border border-[#C89B3C] bg-[#010A13] px-0.5 text-[9px] font-bold tabular-nums leading-none text-[#F0E6D2]" data-sb-level="true">{p.level}</span>
         </span>
-        <div className="min-w-0 flex-1 text-left">
-          <div className="flex items-center gap-1.5">
-            <span className={`truncate text-sm ${p.me ? 'font-extrabold text-white' : 'font-semibold'}`} data-sb-name="true">{p.name}</span>
-            {p.me && <span className="shrink-0 rounded px-1 py-px text-[9px] font-extrabold text-[#010A13] bg-[#C89B3C]">DU</span>}
-            {p.badge && <span data-sb-badge={p.badge} className={`shrink-0 rounded px-1.5 py-px text-[10px] font-black tracking-wide text-[#010A13] ${p.badge === 'MVP' ? 'bg-gradient-to-b from-[#F5D77A] to-[#C89B3C] shadow-[0_0_8px_rgba(240,199,94,.6)]' : 'bg-gradient-to-b from-slate-100 to-slate-400'}`}>{p.badge}</span>}
+        <div className="min-w-0 flex-1 text-left leading-tight">
+          <div className="flex items-center gap-1">
+            <span className={`truncate text-[12px] ${p.me ? 'font-extrabold text-white' : 'font-semibold'}`} data-sb-name="true" title={p.champion}>{p.name}</span>
+            {p.badge && <span data-sb-badge={p.badge} className={`shrink-0 rounded px-1 py-px text-[9px] font-black leading-none tracking-wide text-[#010A13] ${p.badge === 'MVP' ? 'bg-gradient-to-b from-[#F5D77A] to-[#C89B3C] shadow-[0_0_6px_rgba(240,199,94,.6)]' : 'bg-gradient-to-b from-slate-100 to-slate-400'}`}>{p.badge}</span>}
           </div>
-          <div className="truncate text-[11px] text-slate-400">{p.champion} · {ROLE_SHORT[p.role]}</div>
+          <div className="text-[11px] tabular-nums text-slate-200"><span className="font-bold" data-sb-kda="true">{p.k} / {p.d} / {p.a}</span> <span className="text-slate-400" data-sb-cs="true">· CS {p.cs}</span></div>
+          <div className="text-[10px] tabular-nums text-slate-400" data-sb-dmg={p.dmg}>DMG: {fmtK(p.dmg)}</div>
         </div>
-        <div className="shrink-0 text-right tabular-nums"><div className="text-sm font-bold" data-sb-kda="true">{p.k} / {p.d} / {p.a}</div><div className="text-[10px] text-slate-400">{kda} KDA</div></div>
-      </div>
-      <div className="mt-1.5 flex items-center gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--track)' }} role="img" aria-label={`Schaden ${fmtK(p.dmg)}`}><div className="h-full rounded-full" style={{ width: `${pct}%`, background: bar }} data-sb-dmg={p.dmg} /></div>
-          <div className="mt-0.5 text-[10px] tabular-nums text-slate-400">Schaden {fmtK(p.dmg)}</div>
-        </div>
-        <div className="shrink-0 text-right text-[10px] leading-tight tabular-nums text-slate-300"><div data-sb-cs="true">🗡 CS {p.cs}</div><div data-sb-gold="true">💰 {fmtK(p.gold)}</div></div>
       </div>
     </div>
   );
@@ -5732,42 +5746,42 @@ function Scoreboard({ sb, result, practice, unit }) {
   const win = sb.win, to = result.to;
   const sub = practice && !result.masteryOnly ? 'Übung zählt nicht' : result.masteryOnly ? `+${result.mastery.gain} MP` : result.placement ? (result.placement.final ? `Eingestuft: ${rankName(to.step)}` : `Platzierungsspiel ${result.placement.played} von ${PLACEMENT_GAMES}`) : result.unrankedDaily ? 'Daily zählt nach der Einstufung' : `${fmt(result.lp)} LP · ${rankName(to.step)} (${to.lp} LP)`;
   const row = (label, b, r, key) => (
-    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-1" data-sb-stat={key}>
+    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-0.5 text-sm" data-sb-stat={key}>
       <div className="text-right font-bold tabular-nums text-[#4cc3ff]" data-sb-blue={key}>{b}</div>
-      <div className="min-w-[64px] text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</div>
+      <div className="min-w-[72px] text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</div>
       <div className="text-left font-bold tabular-nums text-[#ff6b7d]" data-sb-red={key}>{r}</div>
     </div>
   );
-  const teamBlock = (t, side, title, won) => (
-    <div className="flex flex-col gap-1.5" data-sb-team={side}>
-      <div className="flex items-baseline justify-between px-1">
-        <div className="font-serif text-sm font-black tracking-wider" style={{ color: side === 'blue' ? '#4cc3ff' : '#ff6b7d' }}>{title}</div>
-        <div className="text-[11px] font-semibold tabular-nums text-slate-400">{won ? 'Sieg' : 'Niederlage'} · {t.kills} / {t.deaths} / {t.assists}</div>
+  const col = (t, side, title, won) => (
+    <div className="flex min-w-0 flex-col gap-1" data-sb-team={side}>
+      <div className="px-0.5 leading-tight">
+        <div className="font-serif text-[13px] font-black tracking-wider" style={{ color: side === 'blue' ? '#4cc3ff' : '#ff6b7d' }}>{title}</div>
+        <div className="text-[10px] font-semibold tabular-nums text-slate-400">{won ? 'Sieg' : 'Niederlage'} · {t.kills} / {t.deaths} / {t.assists}</div>
       </div>
-      {t.players.map((pl, i) => <SbRow key={side + i} p={pl} maxDmg={sb.maxDmg} side={side} />)}
+      {t.players.map((pl, i) => <SbRow key={side + i} p={pl} side={side} />)}
     </div>
   );
   return (
-    <div className="flex flex-col gap-3" data-scoreboard="true">
-      <div className={`rounded-2xl border-2 px-3 py-3 text-center ${win ? 'border-[#C89B3C] bg-gradient-to-b from-[#0B3558] via-[#0A2340] to-[#07121f] shadow-[0_0_24px_rgba(76,195,255,.3)]' : 'border-[#7a1f2b] bg-gradient-to-b from-[#3a0d14] via-[#1c0a0f] to-[#0b0608]'}`} data-sb-banner={win ? 'victory' : 'defeat'}>
-        <div className={`pop font-serif text-4xl font-black leading-none tracking-[0.18em] ${win ? 'text-[#F0C75E] [text-shadow:0_0_24px_rgba(240,199,94,.55)]' : 'text-[#E84057] [text-shadow:0_0_20px_rgba(232,64,87,.45)]'}`} data-sb-title="true">{win ? 'VICTORY' : 'DEFEAT'}</div>
-        <div className="mt-1.5 text-xs text-slate-300"><span data-sb-time="true">⏱ {sb.time} min</span> · {unit}{result.kind ? ` · ${result.kind}` : ''}</div>
-        <div className="mt-1 text-[11px] font-semibold tabular-nums" style={{ color: win ? '#0AC8B9' : '#E84057' }} data-sb-lp="true">{sub}</div>
+    <div className="flex flex-col gap-2" data-scoreboard="true">
+      <div className={`rounded-xl border-2 px-3 py-2 text-center ${win ? 'border-[#C89B3C] bg-gradient-to-b from-[#0B3558] via-[#0A2340] to-[#07121f] shadow-[0_0_20px_rgba(76,195,255,.3)]' : 'border-[#7a1f2b] bg-gradient-to-b from-[#3a0d14] via-[#1c0a0f] to-[#0b0608]'}`} data-sb-banner={win ? 'victory' : 'defeat'}>
+        <div className={`pop font-serif text-3xl font-black leading-none tracking-[0.18em] ${win ? 'text-[#F0C75E] [text-shadow:0_0_24px_rgba(240,199,94,.55)]' : 'text-[#E84057] [text-shadow:0_0_20px_rgba(232,64,87,.45)]'}`} data-sb-title="true">{win ? 'VICTORY' : 'DEFEAT'}</div>
+        <div className="mt-1 text-[11px] text-slate-300"><span data-sb-time="true">⏱ {sb.time} min</span> · {unit}{result.kind ? ` · ${result.kind}` : ''}</div>
+        <div className="text-[11px] font-semibold tabular-nums" style={{ color: win ? '#0AC8B9' : '#E84057' }} data-sb-lp="true">{sub}</div>
       </div>
-      <div className="rounded-xl border px-3 py-2" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }} data-sb-teamstats="true">
+      <div className="rounded-xl border px-3 py-1.5" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }} data-sb-teamstats="true">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <div className="text-right font-serif text-xs font-black tracking-wider text-[#4cc3ff]">BLUE TEAM</div><div className="min-w-[64px] text-center text-[10px] text-slate-500">⚔ Kills</div><div className="text-left font-serif text-xs font-black tracking-wider text-[#ff6b7d]">RED TEAM</div>
-        </div>
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 pb-1">
-          <div className="text-right font-serif text-3xl font-black tabular-nums text-[#4cc3ff]" data-sb-blue="kills">{sb.blue.kills}</div><div className="min-w-[64px] text-center text-slate-500">vs</div><div className="text-left font-serif text-3xl font-black tabular-nums text-[#ff6b7d]" data-sb-red="kills">{sb.red.kills}</div>
+          <div className="text-right font-serif text-3xl font-black leading-none tabular-nums text-[#4cc3ff]" data-sb-blue="kills">{sb.blue.kills}</div>
+          <div className="min-w-[72px] text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400">⚔ Kills</div>
+          <div className="text-left font-serif text-3xl font-black leading-none tabular-nums text-[#ff6b7d]" data-sb-red="kills">{sb.red.kills}</div>
         </div>
         {row('💰 Gold', fmtK(sb.blue.gold), fmtK(sb.red.gold), 'gold')}
         {row('🏰 Türme', sb.blue.towers, sb.red.towers, 'towers')}
         {row('🐉 Drachen', sb.blue.dragons, sb.red.dragons, 'dragons')}
-        {row('👑 Baron', sb.blue.barons, sb.red.barons, 'barons')}
       </div>
-      {teamBlock(sb.blue, 'blue', 'BLUE TEAM', win)}
-      {teamBlock(sb.red, 'red', 'RED TEAM', !win)}
+      <div className="grid grid-cols-2 gap-1.5" data-sb-columns="true">
+        {col(sb.blue, 'blue', 'BLUE TEAM', win)}
+        {col(sb.red, 'red', 'RED TEAM', !win)}
+      </div>
     </div>
   );
 }
@@ -6163,7 +6177,7 @@ function Onboarding({ onDone, onAuth }) {
       </div>
       <div className="flex items-center gap-3 rounded-xl border border-[#C89B3C]/40 bg-[#010A13]/80 p-3" data-onboarding-unranked="true">
         <RankEmblem tier="Unranked" size={48} />
-        <div className="text-xs leading-snug text-slate-300"><div className="text-sm font-bold text-[#F0E6D2]">Du startest als Unranked</div>Spiele 3 Platzierungsspiele (Ranked Match oder Makro-Quiz). Danach wird dein Rang festgelegt: 3 Siege = Gold 4, 2 = Silver 4, 1 = Bronze 2, 0 = Iron 1.</div>
+        <div className="text-xs leading-snug text-slate-300" data-onboarding-text="true"><div className="text-sm font-bold text-[#F0E6D2]">Du startest als Unranked</div>Du startest als Unranked. Bestreite deine 3 Platzierungsspiele, um dein Können zu beweisen und deinen geheimen Startrang zu enthüllen!</div>
       </div>
       <MainPicker role={role} champion={champion} onRole={r => { setRole(r); setError(''); }} onChampion={c => { setChampion(c); setError(''); }} mastery={null} />
       <div className="-mt-1 text-xs text-gray-500">Ohne Auswahl starten wir mit Top und Jax. Alles lässt sich später im Profil ändern.</div>
@@ -6967,7 +6981,7 @@ const MV2 = {
       ['Die dritte Welle unter den Turm crashen lassen und {OPP} an der Turmkante traden, solange {E_JG} Bot gebunden ist.', 'Perfekt! Du gewinnst das Duell und holst den First Blood.'],
       [['Ohne Welle unter den Turm tauchen, um {OPP} zu töten.', ['Der Turm beschießt dich, während {OPP} traden kann.', 'Du stirbst, und {OPP} bekommt Gold und Wellenkontrolle.']],
        ['Die Welle liegen lassen und ohne Vision zur Seite laufen.', ['{E_JG} taucht aus dem Fog auf und ganked dich.', 'Du stirbst, und die Lane gehört den Gegnern.']]],
-      [[10, 40, 'hero', 'ME'], [14, 32, 'enemy', 'OPP'], [40, 9, 'objective', 'Gegner-Turm (T1)'], [84, 80, 'enemy', 'E_JG']], EV1),
+      [[24, 8, 'hero', 'ME'], [28.2, 8.4, 'enemy', 'OPP'], [29, 7, 'objective', 'Gegner-Turm (T1)'], [84, 80, 'enemy', 'E_JG']], EV1),
     Jungle: MT('03:10', 'Du bist {ME} (Jungle) gegen {E_JG}, Minute 03:10, Level 3. Der Scuttle Crab spawnt um 2:55 im Fluss. Eure Laner haben keine Prio: Top und Bot werden gepusht. Du stehst mitten im Clear, mit dem Abschluss kommst du in etwa 30 Sekunden auf Level 4.',
       'Wer hat Prio auf den Lanes, wenn du ganken willst?',
       ['Den Clear sauber beenden, Level 4 holen und erst dann zum Scuttle gehen, wenn die Welle auf deiner Seite steht.', 'Perfekt! Du verlierst keine Camps und gehst mit Level 4 und Prio in den Fluss.'],
@@ -7098,7 +7112,7 @@ const MV2X = {
         'Wer erreicht Level 2 zuerst, und was bringt dir das?',
         ['Die letzten Minions der Welle sichern, mit Level 2 vor {OPP} traden und danach die Welle halten.', 'Perfekt! Du nutzt das Level-2-Fenster und gewinnst Wellenkontrolle.'],
         [['Ohne Level-Vorteil sofort auf {OPP} gehen.', ['{OPP} hat dieselben Level und gewinnt den Trade.', 'Du verlierst Leben und Wellenkontrolle.']], ['Die letzten Minions verfehlen und zurückfallen.', ['{OPP} erreicht Level 2 zuerst.', 'Er bekommt Prio und den Trade.']]],
-        [[10, 40, 'hero', 'ME'], [14, 32, 'enemy', 'OPP'], [40, 9, 'objective', 'Gegner-Turm (T1)'], [84, 80, 'enemy', 'E_JG']], EV1),
+        [[8.5, 18, 'hero', 'ME'], [18, 8.2, 'enemy', 'OPP'], [29, 7, 'objective', 'Gegner-Turm (T1)'], [84, 80, 'enemy', 'E_JG']], EV1),
       MK('SCUTTLE', '03:10', 'Du bist {ME} (Top) gegen {OPP}, Minute 03:10, Level 3. Der Scuttle Crab ist seit 2:55 im Fluss, dein Jungler {A1} geht hin, und {E_JG} kommt von der anderen Seite. Deine Welle steht neutral.',
         'Wie hilfst du deinem Jungler am Scuttle, ohne die Lane zu verlieren?',
         ['Die Welle zum Turm schieben (Slow Push), dann Vision im Fluss-Busch setzen und {A1} am Scuttle absichern.', 'Perfekt! Du gibst Vision und verlierst keine Welle.'],
@@ -7376,14 +7390,68 @@ const MARKER_FIX = {
   jng_dia_05: [[41, 40], [38, 41], [33, 30], [36, 35], [38, 38]],
   bot_eisen_05: [[38, 37], [36, 40], [33, 30], [80, 30]],
 };
+// Ausrichtung der Marker auf die echte Karte: Turm-Objectives rasten auf die echten Türme, Helden/Gegner/Nebel auf Lanes werden stetig entlang der Lane
+// mitgenommen (Anker: der Turm-Marker des Szenarios und die Lane-Mitte, dazwischen wird interpoliert) und rasten dann auf der Lane ein. Gruben, Camps und
+// alle Marker im Dschungel oder Fluss (weiter als 10 Einheiten von einer Lane) bleiben unverändert.
+const MK_CENTER = { top: [8, 8], mid: [50, 50], bot: [92, 92] }, MK_SNAP = 5.5, MK_SHIFT = 10, MK_FADE = 30;
+const laneProj = (lane, x, y) => {
+  const pts = LANE_PTS[lane]; let best = null, acc = 0;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [ax, ay] = pts[i], [bx, by] = pts[i + 1], dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy);
+    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (len * len))), qx = ax + dx * t, qy = ay + dy * t, d = Math.hypot(x - qx, y - qy);
+    if (!best || d < best.d) best = { d, s: acc + t * len, tx: dx / len, ty: dy / len, qx, qy };
+    acc += len;
+  }
+  return best;
+};
+const lanePtAt = (lane, s) => {   // Punkt und Tangente bei Bogenlänge s (in Karteneinheiten)
+  const pts = LANE_PTS[lane]; let acc = 0;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [ax, ay] = pts[i], [bx, by] = pts[i + 1], len = Math.hypot(bx - ax, by - ay);
+    if (s <= acc + len || i === pts.length - 2) { const f = Math.max(0, Math.min(1, (s - acc) / len)); return { x: ax + (bx - ax) * f, y: ay + (by - ay) * f, tx: (bx - ax) / len, ty: (by - ay) / len }; }
+    acc += len;
+  }
+};
+const deltaS = (anchors, s) => {   // stetige Verschiebung entlang der Lane: zwischen Ankern linear, außerhalb auf 0 abklingend
+  if (!anchors.length) return 0;
+  const a = anchors, n = a.length;
+  if (s <= a[0][0]) return a[0][1] * Math.max(0, 1 - (a[0][0] - s) / MK_FADE);
+  if (s >= a[n - 1][0]) return a[n - 1][1] * Math.max(0, 1 - (s - a[n - 1][0]) / MK_FADE);
+  for (let i = 0; i < n - 1; i++) if (s >= a[i][0] && s <= a[i + 1][0]) { const f = a[i + 1][0] > a[i][0] ? (s - a[i][0]) / (a[i + 1][0] - a[i][0]) : 0; return a[i][1] + (a[i + 1][1] - a[i][1]) * f; }
+  return 0;
+};
+function layoutMarkers(ms) {
+  const lanes = Object.keys(LANE_PTS), anchors = {};
+  lanes.forEach(l => {
+    const an = ms.map(m => ({ m, t: snapTowerMarker(m) })).filter(o => o.t.towerId && TOWER_BY_ID[o.t.towerId].lane === l)
+      .map(o => { const sa = laneProj(l, o.m.x, o.m.y).s, sn = laneProj(l, o.t.x, o.t.y).s; return [sa, sn - sa]; });
+    if (an.length) an.push([laneProj(l, ...MK_CENTER[l]).s, 0]);
+    anchors[l] = an.sort((p, q) => p[0] - q[0]);
+  });
+  return ms.map(m => {
+    const t = snapTowerMarker(m);
+    if (t.towerId) return t;
+    if (m.type !== 'hero' && m.type !== 'enemy' && m.type !== 'fog') return m;
+    let best = null, lane = null;
+    lanes.forEach(l => { const q = laneProj(l, m.x, m.y); if (!best || q.d < best.d) { best = q; lane = l; } });
+    if (best.d > MK_SHIFT) return m;
+    const a = lanePtAt(lane, best.s), b = lanePtAt(lane, best.s + deltaS(anchors[lane], best.s));
+    let x = m.x + (b.x - a.x), y = m.y + (b.y - a.y);
+    if (best.d <= MK_SNAP) { const sd = Math.max(-1.2, Math.min(1.2, (m.x - best.qx) * -best.ty + (m.y - best.qy) * best.tx)); x = b.x - b.ty * sd; y = b.y + b.tx * sd; }
+    return { ...m, x: +x.toFixed(1), y: +y.toFixed(1) };
+  });
+}
 function waveFromText(sc) {
-  const lane = TW_LANES[sc.role] || 'mid', t = ((sc.context || '').match(/[^.!?]*[Ww]elle[^.!?]*[.!?]/g) || []).join(' '), all = sc.context || '';
+  const lane = TW_LANES[sc.role] || 'mid', all = sc.context || '';
+  const t = (all.match(/[^.!?]*([Ww]elle|pushst|Seitenlane)[^.!?]*[.!?]/g) || []).join(' ');
   let kind = 'NEUTRAL';
-  if (/Freeze|eingefroren|einfrier/.test(all)) kind = 'WAVE_FREEZE_ALLY';
+  const fz = (all.match(/[^.!?]*(Freeze|eingefroren|einfrier)[^.!?]*/) || [''])[0];
+  if (/Freeze|eingefroren|einfrier/.test(all)) kind = /(Die Gegner|Der Gegner|gegnerisch)/.test(fz) && /(ihrem|ihren|seinem) Turm/.test(fz) ? 'WAVE_FREEZE_ENEMY' : 'WAVE_FREEZE_ALLY';   // wer friert ein?
   else if (/(gegnerische|feindliche|ihre|seine) \w*[Ww]elle[^.!?]*(euren?|deinen?) (Turm|T[123]|Inhibitor)|[Ww]elle trifft bald euren Turm|schiebt gerade zu euch zurück|[Ww]elle steht neben deinem Turm/.test(t)) kind = 'WAVE_CRASH_ALLY';
-  else if (/gecrasht|crasht|in den gegnerischen Turm|(vor|am|an) (dem )?(gegnerischen|ihrem|seinem) (Turm|T[123])|an ihrem T[123]/.test(t)) kind = 'WAVE_CRASH_ENEMY';
+  else if (/gecrasht|crasht|in den gegnerischen Turm|(vor|am|an) (dem )?(gegnerischen|ihrem|seinem) (Turm|T[123])|an ihrem T[123]|an ihrem T[123]-Turm/.test(t)) kind = 'WAVE_CRASH_ENEMY';
   else if (/Slow Push|slow push|langsam pushen|(groß|größer)[^.!?]*schiebt|schiebt auf (den gegnerischen Turm|die Gegner) zu/.test(t)) kind = 'SLOW_PUSH';
-  return { kind, lane };
+  const tier = /T3|Inhibitor-?Turm/.test(t) ? 3 : /T2|inneren Turm/.test(t) ? 2 : 1;   // an welchem Turm steht die Welle?
+  return { kind, lane, tier };
 }
 function towersFromText(sc) {
   const m = (sc.context || '').match(/Euer Team hat den (äußeren |inneren )?(Top|Mid|Bot)-(Turm|Inhibitor) zerstört/);
@@ -7391,11 +7459,38 @@ function towersFromText(sc) {
   const lane = m[2].toLowerCase(), n = /Inhibitor/.test(m[3]) ? 3 : /inneren/.test(m[1] || '') ? 2 : 1;
   return { blue: [], red: [`red_${lane}${n}`] };
 }
+// Positionen relativ zu einem Turm: [Turm-ID, Abstand entlang der Lane in Karteneinheiten (negativ = vor dem Gegner-Turm aus Sicht von Blau, positiv = vor dem eigenen Turm), Querversatz]
+// oder feste Koordinaten [x, y]. Jeder Eintrag behebt einen Widerspruch zwischen Szenario-Text und Kartenposition (Prüfung t43).
+const markerAt = (tid, off = 0, perp = 0) => { const t = TOWER_BY_ID[tid], q = laneProj(t.lane, t.x, t.y), pt = lanePtAt(t.lane, q.s + off); return { x: +(pt.x - pt.ty * perp).toFixed(1), y: +(pt.y + pt.tx * perp).toFixed(1) }; };
+const MARKER_AT = {
+  bot_eisen_02: { 'Gegner Bot': ['red_bot1', -3] },                                                                          // "die gegnerische Botlane steht bei ihrem Turm"
+  top_bronze_02: { Garen: ['red_top1', -4] },                                                                                // "Garen steht neben seinem Turm"
+  quiz_silber_05: { Nami: ['red_bot1', -9, 1], 'Ashe (ADC)': ['red_bot1', -6, -0.8] },                                       // "eure Welle steht vor dem gegnerischen Turm"
+  quiz_gold_08: { Lux: ['red_bot1', -11, 0.8], Caitlyn: ['red_bot1', -8, -0.8] },                                            // die Gegner frieren vor ihrem Turm ein
+  lo_iron_nexus_rush: { Ahri: ['red_mid2', -6], 'Team (4)': ['red_mid2', -9, -1] },                                          // Midwelle an ihrem T2
+  lo_silver_missing_enemies: { "Kai'Sa": ['red_bot2', -5] },                                                                 // Seitenlane an ihrem T2
+  lo_gold_bounce_freeze: { Ornn: ['red_top1', -6], Fiora: ['red_top1', -1.5, 1] },                                           // Welle bis an ihren Turm geschoben
+  lo_gold_rebound_roam: { 'Caitlyn (ADC)': ['red_bot1', -6], Nautilus: ['red_bot1', -10, 1.2] },                             // Welle kurz vor dem gegnerischen Turm
+  lo_iron_sup_roam_bounce: { 'Ashe (ADC)': ['red_bot1', -6], Janna: ['red_bot1', -10, 1.2] },
+  quiz_diamant_07: { 'Jinx (ADC)': [46.2, 51.8] },                                                                           // Janna und Jinx standen übereinander
+  lo_iron_jg_gank_overextended: { 'Lux (Mid)': ['blue_mid1', -2.5, -0.8], Zed: ['blue_mid1', 4.2, 0.8] },                    // Zed schiebt an euren Turm, Lux verteidigt
+  lo_cu_bot_support_roam_2v1: { Jinx: ['blue_bot1', 11], Thresh: ['blue_bot1', 14.5, -1] },
+  lo_silver_jg_gank_choice: { Renekton: ['red_top1', -14, 0.6], Caitlyn: ['red_bot1', -7, -0.8], 'Eingefrorene Welle (Bot)': ['red_bot1', -10] },   // "Gegner steht weit vor seinem Turm", Bot-Welle nahe an seinem Turm eingefroren
+  lo_gold_first_back_crash: { 'Gegnerische Welle': ['blue_mid1', 2.8] },                                                      // genau dort, wo die gecrashte Welle gezeichnet wird
+};
+const WAVE_FIX = {
+  lo_gold_bounce_freeze: { kind: 'WAVE_CRASH_ENEMY', lane: 'top', tier: 1 },
+  lo_silver_missing_enemies: { kind: 'WAVE_CRASH_ENEMY', lane: 'bot', tier: 2 },
+  lo_plat_top_sidelane_hullbreaker: { kind: 'WAVE_CRASH_ENEMY', lane: 'top', tier: 2 },
+  lo_silver_jg_gank_choice: { kind: 'WAVE_FREEZE_ENEMY', lane: 'bot', tier: 1 },   // die eingefrorene Welle steht auf der Botlane
+};
 RUNS.forEach(sc => {
   balanceScenario(sc);
   if (MARKER_FIX[sc.id]) sc.markers = sc.markers.map((m, i) => (MARKER_FIX[sc.id][i] ? { ...m, x: MARKER_FIX[sc.id][i][0], y: MARKER_FIX[sc.id][i][1] } : m));
-  sc.markers = sc.markers.map(snapTowerMarker);
-  sc.wave = sc.wave || waveFromText(sc);   // handgesetzte Welle (neue Szenarien) hat Vorrang vor der Text-Erkennung
+  sc.markers = layoutMarkers(sc.markers);   // Türme auf die echten Positionen, Lane-Marker entlang der echten Lanes
+  const fx2 = MARKER_AT[sc.id];
+  if (fx2) sc.markers = sc.markers.map(m => { const e = fx2[m.label]; return e ? { ...m, ...(typeof e[0] === 'string' ? markerAt(...e) : { x: e[0], y: e[1] }) } : m; });
+  sc.wave = WAVE_FIX[sc.id] || sc.wave || waveFromText(sc);   // handgesetzte Welle (neue Szenarien) hat Vorrang vor der Text-Erkennung
   const tw = towersFromText(sc); if (tw) sc.towers = tw;
 });
 { const ks = Object.keys(PLAYSTYLE), ps = balanceTexts(ks.map(k => ({ text: PLAYSTYLE[k], ok: false })), 'archplan'); ks.forEach((k, i) => { PLAYSTYLE[k] = ps[i]; }); }   // Makro-Pläne des Gameplans gleich lang
@@ -7458,12 +7553,12 @@ function buildMv2Scenario(tpl, ctx, phase, state) {
   const m = slotMap(ctx.lineup), f = t => fillSlots(t, m);
   const id = `mv2~${ctx.matchId}~${phase}~${state}`;
   const tier = Math.max(0, Math.min(7, rankedTier(ctx.step)));
-  const markers = tpl.markers.map(([x, y, type, s]) => {
+  const markers = layoutMarkers(tpl.markers.map(([x, y, type, s]) => {
     const slot = /^(ME|OPP|A\d|E_[A-Z]+)$/.test(s);
     const mk = { x, y, type, label: slot ? m[s] : s };
     if (slot) { if (s === 'ME') mk.isPlayer = true; else mk.champion = m[s]; }
-    return snapTowerMarker(mk);
-  });
+    return mk;
+  }));
   const enemies = ROLES_ORDER.map(r => ctx.lineup.red[r]);
   const victim = phase === 1 ? m.OPP : enemies[(phase + 1) % 5];
   const pos = (hashStr(ctx.matchId) + phase) % 3;   // richtige Antwort wandert über A, B und C
@@ -7521,29 +7616,47 @@ const tipOfDay = () => TIPS[Math.floor(Date.now() / 86400000) % TIPS.length];
 
 /* ---------- Glossar ---------- */
 const GLOSS = {
-  freeze: ['Freeze', 'Du hältst die Minion-Welle knapp außerhalb deiner eigenen Turmreichweite fest, sodass der Gegner nur unter Risiko farmen kann.'],
-  prio: ['Prio', 'Lane-Priorität heißt, dass deine Welle weiter vorn steht und du deshalb zuerst zu Objectives oder in den Fluss rotieren kannst.'],
-  cheater: ['Cheater Recall', 'Du crashst eine große Welle und gehst direkt zurück zur Base, um früh Items zu kaufen, während der Gegner die Welle am Turm abräumen muss.'],
-  slow: ['Slow Push', 'Du lässt Minions sich zu einer großen Welle aufbauen, die später auf einmal in den gegnerischen Turm crasht.'],
+  freeze: ['Freeze', 'Die Minion-Welle kurz vor dem eigenen Turm stoppen, damit der Gegner keinen sicheren Farm bekommt und anfällig für Ganks wird.'],
+  slow: ['Slow Push', 'Nur die gegnerischen Fernkämpfer töten, damit sich über Zeit eine riesige eigene Welle aufbaut.'],
+  crash: ['Crash', 'Eine große Welle vollständig unter den gegnerischen Turm drücken, um sicher shoppen (Recall) oder roamen zu können.'],
+  cheater: ['Cheater Recall', 'Nach frühem Slow Push und Turm-Crash schnell in die Basis gehen, Items kaufen und ohne Minion-Verlust zurückkehren.'],
+  crossmap: ['Cross-Map', 'Wenn der Gegner auf einer Kartenseite Überzahl erzwingt, auf der gegenüberliegenden Seite sofort ein anderes Ziel (Turm, Voidgrubs) einnehmen.'],
+  prio: ['Priority (Prio)', 'Wenn man seine Welle schneller cleart und sich vor dem Gegner frei über die Karte bewegen kann.'],
   collapse: ['Collapse', 'Mehrere Verbündete rotieren gleichzeitig auf eine isolierte Position, um einen Gegner einzukreisen.'],
   bait: ['Bait', 'Einen Kampf oder ein Objective antäuschen, um den Gegner in eine Falle oder einen Hinterhalt zu locken.'],
-  crossmap: ['Cross-Map', 'Einen Turm oder ein Objective auf der entgegengesetzten Seite der Map forcen, während der Gegner woanders beschäftigt ist.'],
   dive: ['Dive', 'Einen gegnerischen Champion unter seinem eigenen Turm attackieren und eliminieren.'],
   stasis: ['Stasis', 'Zhonya\'s Hourglass macht dich 2,5 Sekunden lang unverwundbar und unangreifbar, aber du kannst in dieser Zeit nichts tun.'],
 };
-const GLOSS_RE = /(Cheater Recall|Slow Push|slow pushen|langsam pushen|Lane-Prio|Freeze|einfrieren|einfrierst|eingefroren|Stasis|Cross-Map|Collapse|kollabieren|Bait|Turm-Dive|Dive|diven|Prio)/g;
-const glossKey = s => { const l = s.toLowerCase(); return /cross-map/.test(l) ? 'crossmap' : /collapse|kollabier/.test(l) ? 'collapse' : /bait/.test(l) ? 'bait' : /dive|diven/.test(l) ? 'dive' : /cheater/.test(l) ? 'cheater' : /slow|langsam/.test(l) ? 'slow' : /freeze|einfrier|eingefror/.test(l) ? 'freeze' : /stasis/.test(l) ? 'stasis' : 'prio'; };
+const GLOSS_CORE = ['freeze', 'slow', 'crash', 'cheater', 'crossmap', 'prio'];   // das Taktik-Glossar für Einsteiger
+// Kurzform in Klammern: erscheint in den Erklärungen ("Warum richtig?") hinter dem ersten Vorkommen eines Begriffs
+const GLOSS_SHORT = {
+  freeze: 'Welle kurz vor dem eigenen Turm stoppen', slow: 'nur Fernkämpfer töten, bis die eigene Welle riesig ist', crash: 'große Welle komplett unter den Gegner-Turm drücken',
+  cheater: 'Welle crashen, sofort in die Basis, Items kaufen, ohne Minion-Verlust zurück', crossmap: 'auf der anderen Kartenseite ein Ziel nehmen, während der Gegner hier gebunden ist',
+  prio: 'du bist mit deiner Welle früher fertig und kannst dich frei bewegen', collapse: 'mehrere Verbündete rotieren auf einen isolierten Gegner',
+  bait: 'Kampf antäuschen, um den Gegner in eine Falle zu locken', dive: 'Gegner unter seinem eigenen Turm angreifen', stasis: 'Zhonya macht dich 2,5 Sekunden unverwundbar',
+};
+const GLOSS_RE = /(Cheater Recall|Slow Push|Slow-Push|slow pushen|langsam pushen|Lane-Prio|Priority|Freeze\w*|einfrieren|einfrierst|eingefroren|Stasis|Cross-Map|Collapse|kollabieren|Bait|Turm-Dive|Dive|diven|Prio|\b(?:ge)?[Cc]rash\w*)/g;
+const glossKey = s => { const l = s.toLowerCase(); return /cross-map/.test(l) ? 'crossmap' : /collapse|kollabier/.test(l) ? 'collapse' : /bait/.test(l) ? 'bait' : /dive|diven/.test(l) ? 'dive' : /cheater/.test(l) ? 'cheater' : /slow|langsam/.test(l) ? 'slow' : /freeze|einfrier|eingefror/.test(l) ? 'freeze' : /stasis/.test(l) ? 'stasis' : /crash/.test(l) ? 'crash' : 'prio'; };
+const glossKeysIn = t => (typeof t === 'string' ? t.split(GLOSS_RE).filter((_, i) => i % 2 === 1).map(glossKey) : []);
 const GlossCtx = React.createContext(() => {});
-function G({ t }) {
+function G({ t, explain = false, skip = [] }) {
   const open = React.useContext(GlossCtx);
   if (typeof t !== 'string') return t;
-  const parts = t.split(GLOSS_RE);
-  return <>{parts.map((p, i) => (i % 2 === 1
-    ? <span key={i} role="button" tabIndex={0} data-silent="true" data-gloss={glossKey(p)} title="Tippen für eine Erklärung"
-        onClick={e => { e.stopPropagation(); open(glossKey(p)); }}
-        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); open(glossKey(p)); } }}
-        className="cursor-help underline decoration-dotted decoration-[#0AC8B9] underline-offset-2">{p}</span>
-    : <React.Fragment key={i}>{p}</React.Fragment>))}</>;
+  const parts = t.split(GLOSS_RE), done = new Set(skip);   // explain: hinter dem ersten Vorkommen jedes Begriffs steht die Kurzerklärung in Klammern
+  return <>{parts.map((p, i) => {
+    if (i % 2 === 0) return <React.Fragment key={i}>{p}</React.Fragment>;
+    const k = glossKey(p), note = explain && !done.has(k) ? GLOSS_SHORT[k] : null;
+    done.add(k);
+    return (
+      <React.Fragment key={i}>
+        <span role="button" tabIndex={0} data-silent="true" data-gloss={k} title="Tippen für eine Erklärung"
+          onClick={e => { e.stopPropagation(); open(k); }}
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); open(k); } }}
+          className="cursor-help underline decoration-dotted decoration-[#0AC8B9] underline-offset-2">{p}</span>
+        {note ? <span className="text-slate-400" data-gloss-note={k}> ({note})</span> : null}
+      </React.Fragment>
+    );
+  })}</>;
 }
 
 /* ---------- Beschwörer-Icons, Rang-Wappen, XP, Freunde, Werbung ---------- */
@@ -7610,6 +7723,18 @@ function UnrankedEmblem({ size }) {
   );
 }
 // Fortschritt der Platzierungsspiele: Siege zuerst (grün), dann Niederlagen (rot), dann offene Spiele
+// Aufklappbares Taktik-Glossar für Einsteiger (Dashboard)
+function GlossaryCard() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-[#0AC8B9]/40 bg-[#010A13]/80" data-glossary="true">
+      <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open} aria-controls="glossary-panel" className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left">
+        <span className="font-serif font-bold text-[#0AC8B9]">📖 Taktik-Glossar</span><span className="text-xs text-slate-400" aria-hidden="true">{open ? 'Schließen ▲' : 'Begriffe ▼'}</span>
+      </button>
+      {open && <dl id="glossary-panel" className="slidedown flex flex-col gap-2.5 border-t border-[#0AC8B9]/20 px-3 py-3">{GLOSS_CORE.map(k => <div key={k} data-gloss-entry={k}><dt className="text-sm font-bold text-[#F0E6D2]">{GLOSS[k][0]}</dt><dd className="text-[13px] leading-snug text-slate-300">{GLOSS[k][1]}</dd></div>)}</dl>}
+    </div>
+  );
+}
 function PlacementPips({ pl }) {
   const losses = pl.played - pl.wins;
   return (
@@ -7622,12 +7747,11 @@ function PlacementPips({ pl }) {
   );
 }
 function PlacementCard({ placement }) {
-  const left = PLACEMENT_GAMES - placement.played;
   return (
     <div className="flex flex-col items-center gap-1.5 text-center" data-placement-card="true">
       <PlacementPips pl={placement} />
       <div className="text-sm font-bold text-slate-200" data-placement-status="true">Platzierungsspiele: {placement.played} / {PLACEMENT_GAMES} abgeschlossen</div>
-      <div className="text-[11px] leading-snug text-slate-400">Noch {left} {left === 1 ? 'Ranked-Spiel' : 'Ranked-Spiele'} (Match oder Quiz) bis zur Einstufung. Bei 3 Siegen startest du in Gold 4.</div>
+      <div className="text-[11px] leading-snug text-slate-400" data-placement-hint="true">Schließe alle {PLACEMENT_GAMES} Matches ab, um deine Einstufung freizuschalten.</div>
     </div>
   );
 }
@@ -7746,6 +7870,15 @@ function SummonerLevelUp({ level, onClose }) {
   );
 }
 function GlossSheet({ k, onClose }) {
+  if (k === 'all') return (
+    <div className="absolute inset-0 z-[60] flex items-end p-3" style={{ background: 'rgba(1,10,19,.6)' }} onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label="Taktik-Glossar" data-glossary-sheet="true" onClick={e => e.stopPropagation()} className="max-h-[85%] w-full overflow-y-auto rounded-2xl border border-[#0AC8B9]/60 bg-[#06111F] p-4">
+        <div className="font-serif text-lg font-bold text-[#0AC8B9]">📖 Taktik-Glossar</div>
+        <dl className="mt-2 flex flex-col gap-2.5">{GLOSS_CORE.map(key => <div key={key} data-gloss-entry={key}><dt className="text-sm font-bold text-[#F0E6D2]">{GLOSS[key][0]}</dt><dd className="text-sm leading-snug text-slate-300">{GLOSS[key][1]}</dd></div>)}</dl>
+        <button type="button" autoFocus onClick={onClose} className="mt-3 w-full rounded-xl border border-[#0AC8B9]/60 py-2 text-sm font-bold text-[#0AC8B9]">Schließen</button>
+      </div>
+    </div>
+  );
   const g = GLOSS[k];
   if (!g) return null;
   return (
@@ -7967,10 +8100,10 @@ function FeedbackModal({ scenario, ok, timeout, choice, fbText, chain, ev, st, h
         {story && <div data-feedback-map="true" className="rounded-lg border px-3 py-2 text-sm leading-snug" style={{ borderColor: ok ? 'rgba(10,200,185,.5)' : 'rgba(232,64,87,.5)', background: ok ? 'rgba(10,200,185,.08)' : 'rgba(232,64,87,.08)' }}>{story}</div>}
         <div data-feedback-coach="true" className="text-sm leading-relaxed text-slate-200">
           <div className="mb-0.5 text-xs font-bold uppercase tracking-wide text-[#C89B3C]">Coach-Erklärung</div>
-          {ok ? <p><G t={fbText} /></p> : (
+          {ok ? <p><G t={fbText} explain /></p> : (
             <>
               <p className="mb-1 text-xs text-slate-400">Deine Wahl: <G t={choice} /></p>
-              <p><b style={{ color }}>Direkte Folge:</b> <G t={chain[0]} /> <b style={{ color }}>Team-Schaden:</b> <G t={chain[1]} /></p>
+              <p><b style={{ color }}>Direkte Folge:</b> <G t={chain[0]} explain /> <b style={{ color }}>Team-Schaden:</b> <G t={chain[1]} explain skip={glossKeysIn(chain[0])} /></p>
             </>
           )}
         </div>
@@ -7980,8 +8113,8 @@ function FeedbackModal({ scenario, ok, timeout, choice, fbText, chain, ev, st, h
               className="rounded-lg border border-[#C89B3C]/50 px-3 py-2 text-left text-xs font-bold text-[#C89B3C] transition hover:border-[#0AC8B9]">{why ? '💡 Erklärung ausblenden ▲' : '💡 Warum ist die richtige Antwort richtig? ▼'}</button>
             {why && (
               <div id="why-panel" className="slidedown rounded-lg border border-[#0AC8B9]/50 bg-[#0AC8B9]/10 px-3 py-2 text-sm leading-relaxed text-slate-200">
-                <div className="mb-1 text-xs text-slate-400">Richtig wäre gewesen: <G t={best.label.replace(/^[A-C]: /, '')} /></div>
-                <G t={best.feedback} />
+                <div className="mb-1 text-xs text-slate-400">Richtig wäre gewesen: <G t={best.label.replace(/^[A-C]: /, '')} explain /></div>
+                <G t={best.feedback} explain skip={glossKeysIn(best.label)} />
               </div>
             )}
           </div>
@@ -8497,7 +8630,7 @@ function App() {
         </div>
       )}
       {screen === 'scenario' && scenario && (
-        <Scenario key={`${run}-${scenario.id}-${rs.stage}`} scenario={scenario} practice={mode === 'practice'}
+        <Scenario key={`${run}-${scenario.id}-${rs.stage}`} scenario={scenario} practice={mode === 'practice'} hideLeague={mode === 'ranked' && unranked && rs.format !== 'mastery'} glossOpen={!!gloss}
           tag={tag} momentum={momentum} timeCap={rs.format === 'drill' ? 30 : null} format={rs.format} stage={rs.stage} stages={rs.stages}
           hud={rs.format === 'mv2' && rs.mv2 ? { stats: rs.mv2.stats, state: rs.mv2.state, towers: rs.mv2.towers } : null}
           record={{ c: rs.log.filter(e => e.ok).length, w: rs.log.filter(e => !e.ok).length }} onNext={next} onAbort={abort} />
