@@ -4116,6 +4116,1604 @@ const RUNS = [
       {"label": "C: Den Baron auslassen, stattdessen Seitenlane-Türme nehmen und Vision sichern, bis Guardian Angel bereit ist.", "lpChange": 20, "nextId": "end", "feedback": "Richtig! Spiele um Cooldowns: Ohne Guardian Angel ist dein Carry im Kampf deutlich verwundbarer, weil ein einziger Fehler nicht mehr korrigiert wird. Eure gecrashten Wellen geben euch freie Türme, die keinen Kampf brauchen, und die Vision hält den Baron im Auge. Nach 200 Sekunden kehrt ihr mit Guardian Angel und einem Turmvorsprung zurück. Merke: Plane große Kämpfe nach Abklingzeiten und nimm bis dahin kampflose Objectives."}
     ],
     "wave": {"kind": "WAVE_CRASH_ENEMY", "lane": "mid"}, "balanced": true
+  },
+  /* ---- Elo-Audit: neue Szenarien für die Lücken im Bottleneck-Raster (Grundlagen, Ressourcen, Tempo, High-Level-Makro) ---- */
+  {
+   "id": "lo_el_top_towergold",
+   "gameTime": "07:40",
+   "timeLimit": 30,
+   "champion": "Garen",
+   "role": "Toplane",
+   "difficulty": "Eisen",
+   "markers": [
+    {
+     "x": 23.5,
+     "y": 8.1,
+     "type": "hero",
+     "label": "Garen",
+     "isPlayer": true
+    },
+    {
+     "x": 27.0,
+     "y": 6.3,
+     "type": "enemy",
+     "label": "Darius",
+     "champion": "Darius"
+    },
+    {
+     "x": 29,
+     "y": 7,
+     "type": "objective",
+     "label": "Gegner-Turm T1 (Top)"
+    }
+   ],
+   "coachHint": "Was bringt dir mehr: ein riskanter Kill unter dem Turm oder sicheres Gold?",
+   "context": "Du bist Garen (Top), Minute 07:40, Level 6. Darius ist mit 15 % Leben zu seinem Turm zurückgewichen. Deine Welle steht groß vor seinem Turm, und eine Turmplatte fällt in etwa 20 Sekunden.",
+   "options": [
+    {
+     "label": "A: Darius unter den Turm folgen und ihn töten, weil er fast tot ist und ein Kill dir mehr Gold bringt.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Der Turm beschießt dich, während Darius mit wenig Leben trotzdem zurückschlägt.",
+      "Du verlierst fast dein ganzes Leben oder stirbst, und Darius bekommt Gold und Wellenkontrolle."
+     ]
+    },
+    {
+     "label": "B: Zur Base zurückgehen und neu kaufen, weil Darius ohnehin nicht mehr kämpft und die Welle allein weiterläuft.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Die Welle schlägt ohne dich in den Turm, und die Turmplatte fällt nicht so schnell.",
+      "Darius heilt sich auf, und du verlierst Gold und Druck auf der Lane."
+     ]
+    },
+    {
+     "label": "C: Die Welle in den Turm schlagen lassen und die Turmplatte mitnehmen, statt Darius unter dem Turm zu jagen.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Eine Turmplatte bringt dir sicheres Gold, ohne dass du Leben riskierst. Ein Kill unter dem Turm kostet dich viel Leben und oft den Tod, und Darius bekommt dann sogar mehr Gold als du. Die Welle sorgt dafür, dass der Turm beschäftigt ist, und du holst Platte um Platte. Merke: Turm-Gold ist sicherer als ein Kill-Chase unter dem gegnerischen Turm."
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "WAVE_CRASH_ENEMY",
+    "lane": "top"
+   }
+  },
+  {
+   "id": "lo_el_mid_lowhp",
+   "gameTime": "05:10",
+   "timeLimit": 30,
+   "champion": "Ahri",
+   "role": "Midlane",
+   "difficulty": "Bronze",
+   "markers": [
+    {
+     "x": 46.5,
+     "y": 52.5,
+     "type": "hero",
+     "label": "Ahri",
+     "isPlayer": true
+    },
+    {
+     "x": 53.5,
+     "y": 47.5,
+     "type": "enemy",
+     "label": "Syndra",
+     "champion": "Syndra"
+    },
+    {
+     "x": 14,
+     "y": 28,
+     "type": "fog",
+     "label": "Gegnerischer Jungler (zuletzt gesehen)",
+     "champion": "Elise"
+    },
+    {
+     "x": 39,
+     "y": 57,
+     "type": "objective",
+     "label": "Eigener Turm T1 (Mid)"
+    }
+   ],
+   "coachHint": "Wie viel Leben brauchst du, um vorn zu stehen, wenn ein Jungler kommen kann?",
+   "context": "Du bist Ahri (Mid), Minute 05:10, Level 5. Nach einem Trade stehst du bei 20 % Leben, Syndra hat noch die Hälfte. Der gegnerische Jungler wurde vor 40 Sekunden Top gesehen, und deine Welle schiebt zu eurem Turm.",
+   "options": [
+    {
+     "label": "A: Zurück zum Turm gehen und recallen, sobald die Welle aufgeschoben ist, statt mit 20 % Leben vorn zu bleiben.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Mit 20 % Leben kann dich schon ein einziger Treffer töten, und ein gegnerischer Jungler kann jederzeit dazukommen. Wer zurückgeht, verliert eine Welle, aber nicht das Leben und nicht den Level-Vorsprung. Merke: Mit wenig Leben nicht overextenden, lieber zurückgehen und mit neuem Gold wiederkommen."
+    },
+    {
+     "label": "B: Vorn bleiben und die Welle weiter schieben, weil Syndra den Turm nicht verlassen wird und dich nicht jagen kann.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Syndra und der Jungler nutzen dein wenig Leben aus und treffen dich mit zwei Fähigkeiten.",
+      "Du stirbst vorn an der Lane, und die Gegner bekommen Gold und Wellenkontrolle."
+     ]
+    },
+    {
+     "label": "C: Mit 20 % Leben auf Syndra gehen und den Kill suchen, weil sie ohne Flash nicht mehr entkommen kann, sobald du triffst.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du bist selbst fast tot und stirbst schon bei einem einzigen Treffer.",
+      "Der Trade geht verloren, und du fehlst für Wellen und Level 6."
+     ]
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "NEUTRAL",
+    "lane": "mid"
+   }
+  },
+  {
+   "id": "lo_el_mid_scaler",
+   "gameTime": "04:30",
+   "timeLimit": 30,
+   "champion": "Veigar",
+   "role": "Midlane",
+   "difficulty": "Bronze",
+   "markers": [
+    {
+     "x": 38.7,
+     "y": 59.6,
+     "type": "hero",
+     "label": "Veigar",
+     "isPlayer": true
+    },
+    {
+     "x": 42.4,
+     "y": 53.9,
+     "type": "enemy",
+     "label": "Zed",
+     "champion": "Zed"
+    },
+    {
+     "x": 39,
+     "y": 57,
+     "type": "objective",
+     "label": "Eigener Turm T1 (Mid)"
+    }
+   ],
+   "coachHint": "Wann ist ein Champion stark, der erst mit der Zeit stärker wird?",
+   "context": "Du bist Veigar (Mid) gegen Zed, Minute 04:30, Level 4. Zed hat zwei Kills Vorsprung und will dich ständig angreifen. Du hast noch kein Item. Veigar wird mit Items und Level 6 deutlich stärker, aber im Moment bist du schwächer.",
+   "options": [
+    {
+     "label": "A: Zed jetzt angreifen und mit deinem Burst traden, damit du ihn früh unter Druck setzt und die Lane gewinnst.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Zed gewinnt jeden kurzen Trade, und du verlierst Leben und Wellenkontrolle.",
+      "Er kommt noch weiter in Führung und kann dich bei Level 6 früh töten."
+     ]
+    },
+    {
+     "label": "B: Unter dem eigenen Turm sicher farmen, jeden Trade vermeiden und die Zeit bis zu Items und Level 6 ruhig nutzen.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Veigar ist ein Late-Game-Scaler: Jeder gefarmte Minion macht ihn mit der Zeit stärker, während Zed früh auf Kills spielt. Wer vorsichtig farmt und Zeit gewinnt, hat mit Items und Level 6 den stärkeren Champion und kann Zed dann selbst bestrafen. Merke: Scaler spielen sicher und gewinnen durch Zeit, nicht durch frühe Kämpfe."
+    },
+    {
+     "label": "C: Die Lane verlassen und im Dschungel Camps suchen, weil du dort mehr Gold bekommst als hier gegen Zed.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Dein Jungler ist dort schon unterwegs, und du verlierst Camps und Erfahrung.",
+      "Zed schiebt die Welle ungestört und nimmt dir den Turmdruck."
+     ]
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "NEUTRAL",
+    "lane": "mid"
+   }
+  },
+  {
+   "id": "lo_el_bot_powerspike",
+   "gameTime": "08:20",
+   "timeLimit": 30,
+   "champion": "Jinx",
+   "role": "Botlane",
+   "difficulty": "Bronze",
+   "markers": [
+    {
+     "x": 86.5,
+     "y": 91.2,
+     "type": "hero",
+     "label": "Jinx",
+     "isPlayer": true
+    },
+    {
+     "x": 83,
+     "y": 91.6,
+     "type": "hero",
+     "label": "Lulu",
+     "champion": "Lulu"
+    },
+    {
+     "x": 93.4,
+     "y": 86.8,
+     "type": "enemy",
+     "label": "Caitlyn",
+     "champion": "Caitlyn"
+    },
+    {
+     "x": 92.5,
+     "y": 83,
+     "type": "enemy",
+     "label": "Leona",
+     "champion": "Leona"
+    }
+   ],
+   "coachHint": "Wann hast du im Duell einen Vorsprung, den der Gegner nicht hat?",
+   "context": "Du bist Jinx (Bot) mit Lulu, Minute 08:20, Level 7. Dein erstes Item ist gerade fertig, die Gegner haben noch kein fertiges Item. Die Welle ist ausgeglichen, und ihr steht an der Mitte der Lane.",
+   "options": [
+    {
+     "label": "A: Wie bisher passiv weiterfarmen, weil das erste Item allein noch keinen echten Vorteil gegen die Gegner bringt.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du verschenkst den Zeitraum, in dem du stärker bist als deine Gegner.",
+      "Die Gegner kaufen ihr Item und sind kurz danach wieder auf Augenhöhe."
+     ]
+    },
+    {
+     "label": "B: Allein zurück zur Base gehen und das nächste Item kaufen, bevor du überhaupt irgendeinen Trade eingehst.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Lulu steht ohne dich allein und wird in der Lane gejagt.",
+      "Deine Welle läuft in den Turm, und du verlierst Gold und Druck."
+     ]
+    },
+    {
+     "label": "C: Mit Lulu aggressiv spielen und den Trade suchen, solange dein Item-Vorsprung die Gegner klar überragt.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Ein fertiges Item ist ein Powerspike: Für kurze Zeit macht dein Champion deutlich mehr Schaden als der Gegner, der noch auf sein Item wartet. Dieses Fenster nutzt du für Trades und Druck, bevor die Gegner aufholen. Merke: Wer zuerst sein Item hat, spielt aggressiv, solange der Vorsprung besteht und die Gegner noch aufholen müssen."
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "NEUTRAL",
+    "lane": "bot"
+   }
+  },
+  {
+   "id": "lo_el_jng_nochase",
+   "gameTime": "06:30",
+   "timeLimit": 30,
+   "champion": "Lee Sin",
+   "role": "Jungle",
+   "difficulty": "Bronze",
+   "markers": [
+    {
+     "x": 45,
+     "y": 52.5,
+     "type": "hero",
+     "label": "Lee Sin",
+     "isPlayer": true
+    },
+    {
+     "x": 24,
+     "y": 76,
+     "type": "enemy",
+     "label": "Zed",
+     "champion": "Zed"
+    },
+    {
+     "x": 62,
+     "y": 66,
+     "type": "objective",
+     "label": "Scuttle Crab"
+    }
+   ],
+   "coachHint": "Wie weit lohnt sich eine Verfolgung, wenn der Gegner eine halbe Karte entfernt ist?",
+   "context": "Du bist Lee Sin (Jungle), Minute 06:30, Level 6. Der gegnerische Zed ist mit wenig Leben aus der Midlane geflohen und läuft quer über die Karte zu seiner Base. Der Scuttle Crab ist gerade erschienen, und deine Camps sind wieder da.",
+   "options": [
+    {
+     "label": "A: Die Jagd abbrechen, Scuttle und deine Camps nehmen und dann zur nächsten Lane gehen, statt Zed zu folgen.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Wer einem Gegner über die halbe Karte hinterherläuft, verliert Camps, Scuttle und Zeit, während der Gegner zur Base entkommt. Sichere Ressourcen bringen mehr als ein Kill, der meist nicht gelingt. Merke: Nicht blind über die Karte jagen, sondern Camps und Objectives nehmen, die sicher sind."
+    },
+    {
+     "label": "B: Zed bis zu seiner Base hinterherlaufen, weil ein Kill mit so wenig Leben sicher sehr viel Gold bringt.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Zed erreicht seinen Turm und die Base, und du verfolgst ihn über die halbe Karte.",
+      "Du verlierst Camps, Scuttle und Zeit, und die Gegner können in deinem Dschungel farmen."
+     ]
+    },
+    {
+     "label": "C: Auf Zed warten, bis er zurückkommt, und währenddessen im Fluss stehen bleiben, ohne etwas zu tun und ohne Camps.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Er kommt mit vollem Leben und neuer Ausrüstung zurück, und du hast nichts gewonnen.",
+      "Du verlierst Zeit, Camps und die Chance, dein Team mit einem Gank zu unterstützen."
+     ]
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "NEUTRAL",
+    "lane": "mid"
+   }
+  },
+  {
+   "id": "lo_el_bot_dragon_60s",
+   "gameTime": "11:20",
+   "timeLimit": 35,
+   "champion": "Ashe",
+   "role": "Botlane",
+   "difficulty": "Silber",
+   "markers": [
+    {
+     "x": 80,
+     "y": 91.2,
+     "type": "hero",
+     "label": "Ashe",
+     "isPlayer": true
+    },
+    {
+     "x": 77.5,
+     "y": 91.6,
+     "type": "hero",
+     "label": "Nautilus",
+     "champion": "Nautilus"
+    },
+    {
+     "x": 66,
+     "y": 70,
+     "type": "objective",
+     "label": "Drache"
+    },
+    {
+     "x": 88,
+     "y": 89.5,
+     "type": "enemy",
+     "label": "Gegner Bot",
+     "champion": "Jhin"
+    }
+   ],
+   "coachHint": "Wie lange brauchst du für Recall, Kaufen und den Weg zum Drachen?",
+   "context": "Du bist Ashe (Bot) mit Nautilus, Minute 11:20. Der Drache erscheint in 60 Sekunden, du hast 1.500 Gold im Inventar. Die Welle ist ausgeglichen, und die Gegner haben noch nicht zurückgesetzt.",
+   "options": [
+    {
+     "label": "A: Auf der Lane bleiben und die 1.500 Gold erst nach dem Drachen ausgeben, damit du pünktlich dort bist.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du kommst mit altem Inventar zum Kampf und machst weniger Schaden als nötig.",
+      "Das Gold ist wertlos, solange es nicht in ein Item geflossen ist."
+     ]
+    },
+    {
+     "label": "B: Jetzt recallen, ein Item kaufen und mit der Welle rechtzeitig zum Drachen zurückkehren, bevor er erscheint.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Ein Recall mit der Welle kostet ungefähr 45 Sekunden und gibt dir das Item, das im Drachenkampf den Unterschied macht. Du kommst mit neuem Inventar und ohne Wellenverlust zurück. Merke: Vor einem Objective rechtzeitig einkaufen, etwa 60 Sekunden vorher, damit du mit vollem Inventar pünktlich da bist."
+    },
+    {
+     "label": "C: Sofort zum Drachen laufen und dort auf den Spawn warten, weil man beim Ankommen sicher nichts verpasst.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du stehst ohne Vision im Pit und wirst von den Gegnern überrascht.",
+      "Deine Welle läuft ohne dich in den Turm, und du hast noch immer ungenutztes Gold."
+     ]
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "NEUTRAL",
+    "lane": "bot"
+   }
+  },
+  {
+   "id": "lo_el_sup_hook_cd",
+   "gameTime": "09:40",
+   "timeLimit": 45,
+   "champion": "Thresh",
+   "role": "Support",
+   "difficulty": "Gold",
+   "markers": [
+    {
+     "x": 80.5,
+     "y": 91.3,
+     "type": "hero",
+     "label": "Thresh",
+     "isPlayer": true
+    },
+    {
+     "x": 77.5,
+     "y": 91.7,
+     "type": "hero",
+     "label": "Jinx",
+     "champion": "Jinx"
+    },
+    {
+     "x": 88.5,
+     "y": 90.6,
+     "type": "enemy",
+     "label": "Ashe",
+     "champion": "Ashe"
+    },
+    {
+     "x": 91.5,
+     "y": 86.5,
+     "type": "enemy",
+     "label": "Blitzcrank",
+     "champion": "Blitzcrank"
+    }
+   ],
+   "coachHint": "Was kann Blitzcrank gerade nicht, und für wie lange?",
+   "context": "Du bist Thresh (Support) mit Jinx, Minute 09:40, Level 7. Der gegnerische Blitzcrank hat gerade seinen Haken verfehlt, er ist bei etwa 20 Sekunden Abklingzeit. Der gegnerische Ashe steht ohne Schutz vorn an der Welle.",
+   "options": [
+    {
+     "label": "A: Den Kampf vermeiden und warten, bis Blitzcrank seinen Haken wieder hat, damit er nicht mehr so allein ist.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du gibst das Zeitfenster aus der Hand, und die Gegner sind bald wieder gleichwertig.",
+      "Der Haken ist wieder bereit, und du stehst ohne Vorteil vor derselben Lage."
+     ]
+    },
+    {
+     "label": "B: Allein mit dem Haken auf Ashe gehen und ohne Jinx in die gegnerische Reichweite laufen, bevor etwas passiert.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Ohne Jinx fehlt dir der Schaden, und Ashe entkommt trotz getroffenem Haken.",
+      "Du stehst vorn und wirst von Blitzcrank und Ashe gleichzeitig getroffen."
+     ]
+    },
+    {
+     "label": "C: Mit Jinx sofort auf Ashe gehen, solange Blitzcranks Haken auf Abklingzeit ist und er euch nicht stoppen kann.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Ein verfehlter Haken ist ein Zeitfenster: Blitzcrank kann dich etwa 20 Sekunden lang nicht festhalten, und Ashe ist ohne Schutz. Mit Jinx an deiner Seite entsteht ein sicherer Trade oder Kill. Merke: Nach einem verfehlten Schlüssel-Spell des Gegners sofort angreifen, solange er auf Abklingzeit ist."
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "NEUTRAL",
+    "lane": "bot"
+   }
+  },
+  {
+   "id": "lo_el_jng_dive_crash",
+   "gameTime": "13:10",
+   "timeLimit": 60,
+   "champion": "Elise",
+   "role": "Jungle",
+   "difficulty": "Smaragd",
+   "markers": [
+    {
+     "x": 17.1,
+     "y": 8.4,
+     "type": "hero",
+     "label": "Elise",
+     "isPlayer": true
+    },
+    {
+     "x": 21.5,
+     "y": 6.6,
+     "type": "hero",
+     "label": "Euer Top",
+     "champion": "Gnar"
+    },
+    {
+     "x": 26.8,
+     "y": 7.7,
+     "type": "enemy",
+     "label": "Renekton",
+     "champion": "Renekton"
+    },
+    {
+     "x": 29,
+     "y": 7,
+     "type": "objective",
+     "label": "Gegner-Turm T1 (Top)"
+    }
+   ],
+   "coachHint": "Wen beschießt der Turm, wenn Minions davor stehen?",
+   "context": "Du bist Elise (Jungle), Minute 13:10, Level 9. Euer Top hat eine große Welle in den gegnerischen T1 gecrasht, die Minions ziehen den Turm. Der gegnerische Renekton hat 35 % Leben, und seine Fähigkeiten sind nach dem letzten Trade auf Abklingzeit.",
+   "options": [
+    {
+     "label": "A: Den Dive sofort ansetzen, bevor die Welle den Turm erreicht, damit Renekton nicht mehr zurückweichen kann.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Ohne Minions im Turm beschießt er dich und Renekton gleichzeitig.",
+      "Du stirbst am Turm, und Renekton lebt mit Hilfe seines Teams weiter."
+     ]
+    },
+    {
+     "label": "B: Mit Top zusammen warten, bis die Welle im Turm ist, und dann auf den geschwächten Renekton tauchen.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Solange die Minions den Turm beschäftigen, trifft er sie statt dich, und Renekton hat keine Fähigkeiten für die Flucht. Mit Top zusammen kannst du ihn dort töten und den Turm danach direkt nehmen. Merke: Dives werden an einer dicken, gecrashten Welle vorbereitet, nicht vor ihr. Sonst trifft der Turm zuerst dich und nicht die Minions."
+    },
+    {
+     "label": "C: Den Dive abblasen und die Camps nehmen, weil ein Turm-Dive ohne starken Engage sowieso nicht funktioniert.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du verschenkst das Zeitfenster, in dem Renekton verwundbar ist und der Turm abgelenkt ist.",
+      "Er heilt sich auf, und die Welle verliert ihren Wert ohne einen Turm."
+     ]
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "WAVE_CRASH_ENEMY",
+    "lane": "top"
+   }
+  },
+  {
+   "id": "lo_el_top_tp_baron",
+   "gameTime": "24:50",
+   "timeLimit": 60,
+   "champion": "Camille",
+   "role": "Toplane",
+   "difficulty": "Diamant",
+   "markers": [
+    {
+     "x": 26,
+     "y": 38,
+     "type": "hero",
+     "label": "Camille",
+     "isPlayer": true
+    },
+    {
+     "x": 32.5,
+     "y": 35.5,
+     "type": "hero",
+     "label": "Euer Team (4)",
+     "champion": "Orianna"
+    },
+    {
+     "x": 33,
+     "y": 30,
+     "type": "objective",
+     "label": "Baron"
+    },
+    {
+     "x": 50,
+     "y": 50,
+     "type": "enemy",
+     "label": "Gegner (4)",
+     "champion": "Lissandra"
+    },
+    {
+     "x": 78,
+     "y": 91,
+     "type": "fog",
+     "label": "Gegnerischer Splitpusher (zuletzt Bot gesehen)",
+     "champion": "Fiora"
+    }
+   ],
+   "coachHint": "Wie kommst du zurück zum Team, wenn du ohne Teleport weit weg bist?",
+   "context": "Du bist Camille (Top), Minute 24:50, Level 15. Dein Teleport ist noch 2:10 Minuten auf Abklingzeit. Euer Team will in etwa 40 Sekunden den Baron starten. Auf der Botlane steht eine große Welle, die du allein pushen könntest.",
+   "options": [
+    {
+     "label": "A: Bei deinem Team im Fluss bleiben und die Welle aufgeben, weil du ohne Teleport zu spät wieder da wärst.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Ohne Teleport kannst du eine Seitenlane nicht verlassen, wenn ein Kampf beginnt, und deine Position im Fluss ist zu wertvoll. Wer ohne Teleport weit weg steht, fehlt im Kampf und macht den Baron unsicher. Merke: Splitpush wird nach Teleport-Verfügbarkeit zugewiesen: Wer keinen Teleport hat, bleibt beim Team, bevor ein Baron gestartet wird."
+    },
+    {
+     "label": "B: Zur Botlane laufen und die große Welle pushen, weil ein Turm mehr Wert hat als die Position beim Baron.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Ohne Teleport bist du auf der anderen Seite der Karte, wenn der Kampf beginnt.",
+      "Euer Team startet den Baron in Unterzahl, und die Gegner bestrafen es mit einem Engage."
+     ]
+    },
+    {
+     "label": "C: Auf der Toplane bleiben und die Welle in den Turm schlagen, falls die Gegner den Baron gleichzeitig starten.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du stehst allein auf der Lane, während der Kampf um den Baron ohne dich entschieden wird.",
+      "Der gegnerische Splitter kann deine Welle ignorieren und den Baron sichern."
+     ]
+    }
+   ],
+   "balanced": true
+  },
+  {
+   "id": "lo_el_top_tp_assign",
+   "gameTime": "27:10",
+   "timeLimit": 60,
+   "champion": "Jax",
+   "role": "Toplane",
+   "difficulty": "Diamant",
+   "markers": [
+    {
+     "x": 8.5,
+     "y": 16,
+     "type": "hero",
+     "label": "Jax",
+     "isPlayer": true
+    },
+    {
+     "x": 86,
+     "y": 92.2,
+     "type": "hero",
+     "label": "Fiora (ohne TP)",
+     "champion": "Fiora"
+    },
+    {
+     "x": 36,
+     "y": 38,
+     "type": "hero",
+     "label": "Euer Team (3)",
+     "champion": "Ornn"
+    },
+    {
+     "x": 46.5,
+     "y": 50.5,
+     "type": "enemy",
+     "label": "Gegner (4)",
+     "champion": "Ahri"
+    },
+    {
+     "x": 33,
+     "y": 30,
+     "type": "objective",
+     "label": "Baron"
+    }
+   ],
+   "coachHint": "Wer kann den Kampf noch erreichen, und wer kann nur Druck machen?",
+   "context": "Du bist Jax (Top), Minute 27:10, Level 16, dein Teleport ist bereit. Deine Teamkollegin Fiora splittet die Botlane und hat keinen Teleport. Euer Team kämpft in der Mitte 4 gegen 4, und der Baron ist verfügbar.",
+   "options": [
+    {
+     "label": "A: Beide auf der Seitenlane bleiben und die Türme nehmen, weil zwei Splitter immer mehr Wert haben als ein Kampf.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Euer Team verliert den 4v4, weil niemand von euch rechtzeitig zum Kampf kommt.",
+      "Die Gegner starten danach den Baron, und ihr verliert Türme und Zeit."
+     ]
+    },
+    {
+     "label": "B: Fiora weiter splitten lassen und selbst per Teleport zum Kampf flanken, solange der Gegner zu euch schaut.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Fiora ohne Teleport bleibt auf der Seitenlane und bindet Gegner, während du als einziger mit Teleport in den Kampf wechseln kannst. So bekommt euer Team in der Mitte zusätzliche Schlagkraft, und die Gegner müssen zwei Orte verteidigen. Merke: Der Splitter mit Teleport entscheidet, wann er zum Team wechselt, der ohne Teleport bleibt auf der Lane."
+    },
+    {
+     "label": "C: Mit dem Teleport zu Fiora wechseln und gemeinsam pushen, damit der Turm früher fällt und der Baron wartet.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Euer Team in der Mitte kämpft allein und verliert den Kampf ohne euren Teleport.",
+      "Zwei Splitter an einer Lane binden nur noch einen Gegner statt zwei."
+     ]
+    }
+   ],
+   "balanced": true
+  },
+  {
+   "id": "lo_el_bot_baron_finish",
+   "gameTime": "28:30",
+   "timeLimit": 60,
+   "champion": "Kai'Sa",
+   "role": "Botlane",
+   "difficulty": "Diamant",
+   "markers": [
+    {
+     "x": 30,
+     "y": 36,
+     "type": "hero",
+     "label": "Kai'Sa",
+     "isPlayer": true
+    },
+    {
+     "x": 34,
+     "y": 33.5,
+     "type": "hero",
+     "label": "Euer Team (4)",
+     "champion": "Ornn"
+    },
+    {
+     "x": 33,
+     "y": 30,
+     "type": "objective",
+     "label": "Baron"
+    },
+    {
+     "x": 44,
+     "y": 42,
+     "type": "enemy",
+     "label": "Gegner (2)",
+     "champion": "Syndra"
+    },
+    {
+     "x": 14,
+     "y": 86,
+     "type": "fog",
+     "label": "Gegner (3, tot)",
+     "champion": "Vayne"
+    }
+   ],
+   "coachHint": "Wie lange brauchst du noch für den Baron, und wie lange brauchen die Gegner?",
+   "context": "Du bist Kai'Sa (Bot), Minute 28:30, Level 17. Euer Team schlägt den Baron, er hat noch 35 % Leben, und euer Jungler hat Smite bereit. Drei Gegner sind tot (noch 30 Sekunden Respawn), zwei Gegner stehen im Fluss und kommen näher.",
+   "options": [
+    {
+     "label": "A: Den Baron abbrechen und gegen die zwei Gegner kämpfen, damit ihr sie zuerst ausschaltet und danach in Ruhe weitermacht.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Der Baron regeneriert sich und hat danach wieder viel Leben.",
+      "Die toten Gegner kommen zurück, und euer Zeitfenster ist verschenkt."
+     ]
+    },
+    {
+     "label": "B: Den Baron liegen lassen, zur Base zurückgehen und nach dem Kauf erneut starten, weil ihr jetzt zu schwach seid.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Die Gegner starten den Baron selbst und bekommen den Buff.",
+      "Ihr verliert den Vorsprung aus dem Teamkampf und müsst zusehen, wie sie den Buff nutzen."
+     ]
+    },
+    {
+     "label": "C: Den Baron mit Smite beenden und die zwei Gegner mit der Frontline abhalten, solange die anderen drei noch tot sind.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Mit nur zwei lebenden Gegnern und 35 % Baron-Leben bringt dein Team den Baron schneller zu Ende, als die Toten zurückkommen. Der Buff gehört danach euch, und die zwei Gegner müssen sich allein gegen eure Frontline stellen. Merke: Finish statt Bait, wenn die Gegner in Unterzahl sind und der Baron fast tot ist."
+    }
+   ],
+   "balanced": true
+  },
+  {
+   "id": "lo_el_bot_flash_5min",
+   "gameTime": "21:20",
+   "timeLimit": 60,
+   "champion": "Ezreal",
+   "role": "Botlane",
+   "difficulty": "Master+",
+   "markers": [
+    {
+     "x": 76,
+     "y": 86,
+     "type": "hero",
+     "label": "Ezreal",
+     "isPlayer": true
+    },
+    {
+     "x": 70,
+     "y": 80,
+     "type": "hero",
+     "label": "Euer Team (4)",
+     "champion": "Leona"
+    },
+    {
+     "x": 66,
+     "y": 70,
+     "type": "objective",
+     "label": "Drache"
+    },
+    {
+     "x": 72,
+     "y": 67,
+     "type": "enemy",
+     "label": "Jinx (ohne Flash)",
+     "champion": "Jinx"
+    },
+    {
+     "x": 63,
+     "y": 64,
+     "type": "enemy",
+     "label": "Gegner (4)",
+     "champion": "Ahri"
+    }
+   ],
+   "coachHint": "Wie lange kann Jinx ohne Flash nicht entkommen?",
+   "context": "Du bist Ezreal (Bot), Minute 21:20, Level 14. Der gegnerische Jinx hat vor 20 Sekunden ihren Flash benutzt, er ist erst in rund 4:40 Minuten wieder bereit. Euer Team hat Vision im gegnerischen Dschungel, der Drache erscheint in 30 Sekunden.",
+   "options": [
+    {
+     "label": "A: Den Drachen sofort forcen und Jinx im Kampf als erstes Ziel jagen, solange sie ihren Flash nicht hat.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Flash hat fünf Minuten Abklingzeit, und ein ADC ohne Flash kann Engage und Pick nicht überleben. Wenn ihr jetzt den Drachen forciert, ist Jinx das schwächste Glied, und ihr könnt sie töten, bevor sie fliehen kann. Merke: Summoner-Timer bestrafen: Wer seinen Flash verbraucht hat, wird im nächsten Kampf zuerst fokussiert."
+    },
+    {
+     "label": "B: Mit dem Kampf bis in vier Minuten warten, damit alle eure Items fertig haben und sicherer kämpfen können.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Jinx bekommt ihren Flash zurück, und ihr verliert euren Zeitvorteil.",
+      "Die Gegner kaufen ihre Items und gleichen den Unterschied wieder aus."
+     ]
+    },
+    {
+     "label": "C: Jinx allein im Fog suchen und mit deinem Flash auf sie springen, damit du ohne Team einen Kill holst.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Das gegnerische Team sieht dich im Fog und tötet dich, bevor du ankommst.",
+      "Dein Team kämpft ohne dich, und der Drache geht an die Gegner."
+     ]
+    }
+   ],
+   "balanced": true
+  },
+  {
+   "id": "lo_el_sup_fog_trap",
+   "gameTime": "29:10",
+   "timeLimit": 60,
+   "champion": "Pyke",
+   "role": "Support",
+   "difficulty": "Diamant",
+   "markers": [
+    {
+     "x": 30,
+     "y": 40,
+     "type": "hero",
+     "label": "Pyke",
+     "isPlayer": true
+    },
+    {
+     "x": 36,
+     "y": 44,
+     "type": "hero",
+     "label": "Euer Team (4)",
+     "champion": "Ornn"
+    },
+    {
+     "x": 33,
+     "y": 30,
+     "type": "objective",
+     "label": "Baron"
+    },
+    {
+     "x": 40.5,
+     "y": 33,
+     "type": "fog",
+     "label": "Mögliche Falle im Fog",
+     "champion": "Lissandra"
+    }
+   ],
+   "coachHint": "Warum lassen die Gegner einen Ward offen stehen und zeigen sich nicht?",
+   "context": "Du bist Pyke (Support), Minute 29:10. Der Baron ist verfügbar, ein gegnerischer Kontroll-Ward steht offen im Fluss. Dein Team sieht niemanden von den Gegnern, obwohl es ruhig ist. Auf deiner Seite könnten sie im Fog stehen.",
+   "options": [
+    {
+     "label": "A: Allein in den Fog laufen und den Ward zerstören, weil ein einzelner Ward das ganze Team verraten könnte.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Die Gegner lauern im Nebel und töten dich, bevor dein Team reagieren kann.",
+      "Ihr verliert Vision und Tempo, und der Baron wird für euch riskanter."
+     ]
+    },
+    {
+     "label": "B: Mit dem Team Vision aufbauen, per Sweeper prüfen und gemeinsam vorgehen, weil im Fog eine Falle lauern kann.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Ein offener Ward ohne sichtbare Gegner ist verdächtig: Das ist oft ein Köder, und das Team lauert im Fog daneben. Mit Vision und Sweeper schaust du nach, bevor du mit dem Team eingehst, und gehst nicht allein in einen Fog-of-War-Trap. Merke: Wer ruhig steht, kann in einer Falle liegen: erst Vision, dann bewegen."
+    },
+    {
+     "label": "C: Den Baron sofort starten, weil die Gegner sich nicht zeigen und die Gelegenheit nicht ewig bleibt, wenn sie kommen.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Die Gegner kommen im Fog hervor und kämpfen euch mitten im Baron-Versuch an.",
+      "Ihr verliert den Baron und den Kampf, weil eure Positionen schlecht sind."
+     ]
+    }
+   ],
+   "balanced": true
+  },
+  {
+   "id": "lo_el_top_fog_trap",
+   "gameTime": "31:40",
+   "timeLimit": 60,
+   "champion": "Ornn",
+   "role": "Toplane",
+   "difficulty": "Master+",
+   "markers": [
+    {
+     "x": 32,
+     "y": 36,
+     "type": "hero",
+     "label": "Ornn",
+     "isPlayer": true
+    },
+    {
+     "x": 35,
+     "y": 33.5,
+     "type": "hero",
+     "label": "Euer Team (4)",
+     "champion": "Viego"
+    },
+    {
+     "x": 46,
+     "y": 44,
+     "type": "enemy",
+     "label": "Ezreal",
+     "champion": "Ezreal"
+    },
+    {
+     "x": 54,
+     "y": 38,
+     "type": "fog",
+     "label": "Möglicher Hinterhalt",
+     "champion": "Syndra"
+    },
+    {
+     "x": 33,
+     "y": 30,
+     "type": "objective",
+     "label": "Baron"
+    }
+   ],
+   "coachHint": "Warum steht ein einzelner Gegner so offen im Fluss?",
+   "context": "Du bist Ornn (Top), Minute 31:40, Level 17. Ein gegnerischer Ezreal steht allein am Rand des Flusses und tut so, als würde er farmen. Sein Team ist nicht zu sehen, ihr habt keine Vision auf dem Weg dorthin.",
+   "options": [
+    {
+     "label": "A: Mit dem Team sofort auf Ezreal gehen, weil ein einzelner Gegner offen im Fluss ein sicherer Kill ist.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Das gegnerische Team lauert im Fog und trifft euch aus drei Richtungen.",
+      "Ihr verliert den Kampf, und Ezreal entkommt mit seinen Fluchtmitteln."
+     ]
+    },
+    {
+     "label": "B: Euer Team beim Baron bleiben lassen und die Lage ignorieren, weil ein einzelner Gegner keine Bedrohung ist.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Ihr verschenkt die Chance, den Gegner zu bestrafen, wenn er wirklich allein gewesen wäre.",
+      "Der gegnerische Ezreal lockt euch weiter, und ihr verliert die Initiative im Fog."
+     ]
+    },
+    {
+     "label": "C: Zuerst die Flanke mit einem Ward prüfen und nur eingehen, wenn dahinter im Nebel niemand auf euch lauert.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Ein einzelner Gegner an offener Stelle ist in dieser Phase oft ein Köder, und sein Team wartet im Fog auf dem Weg dorthin. Mit Ward und Sweeper erkennst du die Falle, ohne dass du das Risiko trägst, und dein Team kann den Pick gefahrlos nehmen oder lassen. Merke: Eine Flanke wird erst eingegangen, wenn der Weg dorthin sichtbar ist."
+    }
+   ],
+   "balanced": true
+  },
+  {
+   "id": "lo_el_sup_choke",
+   "gameTime": "30:20",
+   "timeLimit": 60,
+   "champion": "Rakan",
+   "role": "Support",
+   "difficulty": "Master+",
+   "markers": [
+    {
+     "x": 36,
+     "y": 36,
+     "type": "hero",
+     "label": "Rakan",
+     "isPlayer": true
+    },
+    {
+     "x": 39,
+     "y": 40,
+     "type": "hero",
+     "label": "Euer Team (4)",
+     "champion": "Aatrox"
+    },
+    {
+     "x": 33,
+     "y": 30,
+     "type": "objective",
+     "label": "Baron"
+    },
+    {
+     "x": 42,
+     "y": 34,
+     "type": "fog",
+     "label": "Gegnerische Wards",
+     "champion": "Fiddlesticks"
+    }
+   ],
+   "coachHint": "Welche zwei Stellen entscheiden, wer den Baron sicher beginnen kann?",
+   "context": "Du bist Rakan (Support), Minute 30:20. Der Baron erscheint in 40 Sekunden. Die Gegner haben zwei Wards am Eingang zum Pit. Euer Team hat drei Kontroll-Wards und einen Sweeper im Inventar.",
+   "options": [
+    {
+     "label": "A: Die Engstellen vor dem Baron mit Kontroll-Wards und Sweeper kontrollieren und die gegnerische Vision räumen.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Die Eingänge zum Baron sind Engstellen: Wer dort Vision hat und die gegnerischen Wards räumt, sieht jeden Gegner kommen und gewinnt die Initiative. Dein Team kann den Baron danach sicher beginnen oder einen Kampf erzwingen. Merke: Vision Choke Points kontrollieren, nicht das Pit selbst: Engstellen räumen, Vision setzen, dann spielen."
+    },
+    {
+     "label": "B: Alle drei Kontroll-Wards direkt im Baron-Pit setzen, damit ihr sieht, wann er erscheint und wer kommt.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Die Gegner räumen die Wards im Pit und sehen, wo ihr steht.",
+      "Ihr habt kein Vision auf den Eingängen und werdet im Baron-Versuch überrascht."
+     ]
+    },
+    {
+     "label": "C: Die Wards behalten und erst nach dem Spawn setzen, damit die Gegner nicht sehen, wo ihr eure Wards habt.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Ohne Vision vor dem Spawn kommt ihr zu spät und die Gegner starten den Baron zuerst.",
+      "Ihr verliert den Baron-Kampf, weil niemand weiß, wo der Gegner steht."
+     ]
+    }
+   ],
+   "balanced": true
+  },
+  {
+   "id": "lo_el_jng_fog_trap",
+   "gameTime": "26:50",
+   "timeLimit": 60,
+   "champion": "Kayn",
+   "role": "Jungle",
+   "difficulty": "Master+",
+   "markers": [
+    {
+     "x": 62,
+     "y": 66,
+     "type": "hero",
+     "label": "Kayn",
+     "isPlayer": true
+    },
+    {
+     "x": 78,
+     "y": 91.5,
+     "type": "enemy",
+     "label": "Jinx",
+     "champion": "Jinx"
+    },
+    {
+     "x": 70,
+     "y": 76,
+     "type": "fog",
+     "label": "Gegnerische Support (fehlt)",
+     "champion": "Karma"
+    }
+   ],
+   "coachHint": "Wo könnten die anderen Gegner stehen, wenn Jinx allein wirkt?",
+   "context": "Du bist Kayn (Jungle), Minute 26:50, Level 16. Der gegnerische Jinx steht allein an ihrer Lane, aber die gegnerische Support Karma fehlt auf der Karte. Ihr habt keine Vision im Dschungel hinter Jinx, und der Baron ist verfügbar.",
+   "options": [
+    {
+     "label": "A: Direkt über die Wand auf Jinx springen, solange sie allein wirkt, und den Pick damit sofort sichern.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Karma und der Rest des Teams stehen im Nebel und fangen dich ab.",
+      "Du verlierst deinen Champion und die Initiative, und der Baron ist für die Gegner offen."
+     ]
+    },
+    {
+     "label": "B: Zuerst Vision hinter Jinx setzen und erst eingehen, wenn niemand im Fog lauert, damit der Pick keine Falle ist.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Eine einzelne Gegnerin, deren Support fehlt, kann ein Köder sein, hinter dem das Team im Nebel auf dich wartet. Mit Vision hinter ihr erkennst du die Falle, bevor du hineingehst, und nimmst nur sichere Picks. Merke: Fog-of-War-Traps entlarvt man mit Vision im Rücken des Köders, nicht durch blindes Zugreifen."
+    },
+    {
+     "label": "C: Zurückgehen und den Baron mit dem ganzen Team starten, weil ein einzelner Pick nicht den Aufwand wert ist.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Ihr startet den Baron ohne Wissen über die Gegner und werdet im Versuch angegriffen.",
+      "Der Pick wäre sicher gewesen, aber ohne Vision ist nichts gewiss."
+     ]
+    }
+   ],
+   "balanced": true
+  },
+  {
+   "id": "lo_el_top_ward_jungler",
+   "gameTime": "03:10",
+   "timeLimit": 30,
+   "champion": "Garen",
+   "role": "Toplane",
+   "difficulty": "Eisen",
+   "markers": [
+    {
+     "x": 10,
+     "y": 15,
+     "type": "hero",
+     "label": "Garen",
+     "isPlayer": true
+    },
+    {
+     "x": 17,
+     "y": 8.6,
+     "type": "enemy",
+     "label": "Darius",
+     "champion": "Darius"
+    },
+    {
+     "x": 34,
+     "y": 38,
+     "type": "fog",
+     "label": "Gegnerischer Jungler (unbekannt)",
+     "champion": "Elise"
+    }
+   ],
+   "coachHint": "Woher kommt ein Gank, wenn du keine Vision im Fluss hast?",
+   "context": "Du bist Garen (Top), Minute 03:10, Level 3. Der gegnerische Jungler wurde seit zwei Minuten nicht mehr gesehen, und Darius hat mehr Leben als du. Deine Welle steht mittig auf der Lane, und dein Ward-Item ist bereit.",
+   "options": [
+    {
+     "label": "A: Weiter vorn bei der Welle stehen bleiben und Darius angreifen, weil ein Jungler am Anfang eher selten kommt.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Der gegnerische Jungler taucht aus dem Fog auf und trifft dich zusammen mit Darius.",
+      "Du stirbst früh, und die Lane gehört den Gegnern."
+     ]
+    },
+    {
+     "label": "B: Das Ward im Busch am Fluss setzen und die Welle nahe an deinem Turm halten, damit du dort sicher stehst.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Ein Ward im Busch am Fluss zeigt dir den Jungler, bevor er dich erreicht, und nahe an deinem Turm hilft dir sein Gank kaum. So verlierst du weder Leben noch Welle, und du weißt früh, wo er ist. Merke: Wenn der Jungler unbekannt ist, brauchst du Vision und eine sichere Position nahe am Turm."
+    },
+    {
+     "label": "C: Zur Base zurückgehen, weil ohne Jungler-Info jede Lane gefährlich ist und du sonst nur Leben verlierst.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du verlierst eine ganze Welle und Erfahrung für nichts.",
+      "Darius bekommt Turmdruck, und du hinkst im Level hinterher."
+     ]
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "NEUTRAL",
+    "lane": "top"
+   }
+  },
+  {
+   "id": "lo_el_jng_scuttle_vision",
+   "gameTime": "08:20",
+   "timeLimit": 35,
+   "champion": "Lee Sin",
+   "role": "Jungle",
+   "difficulty": "Silber",
+   "markers": [
+    {
+     "x": 54,
+     "y": 60,
+     "type": "hero",
+     "label": "Lee Sin",
+     "isPlayer": true
+    },
+    {
+     "x": 62,
+     "y": 66,
+     "type": "objective",
+     "label": "Scuttle Crab"
+    },
+    {
+     "x": 24,
+     "y": 76,
+     "type": "fog",
+     "label": "Gegnerischer Jungler (zuletzt gesehen)",
+     "champion": "Viego"
+    }
+   ],
+   "coachHint": "Wie nimmst du den Scuttle, ohne dich blind in den Fog zu begeben?",
+   "context": "Du bist Lee Sin (Jungle), Minute 08:20, Level 7. Du hast gerade dein letztes Camp geräumt, und der Scuttle Crab ist seit 20 Sekunden da. Im Fluss gibt es keine Vision, und der gegnerische Jungler wurde zuletzt auf der anderen Seite gesehen.",
+   "options": [
+    {
+     "label": "A: Direkt zum Scuttle laufen und ihn nehmen, weil der gegnerische Jungler zuletzt weit entfernt gesehen wurde.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Der gegnerische Jungler wartet im Fog und kämpft dich am Crab an.",
+      "Du verlierst Leben, den Scuttle und die Kontrolle über den Fluss."
+     ]
+    },
+    {
+     "label": "B: Den Scuttle ignorieren und zum nächsten Camp gehen, weil der Crab dir zu wenig Gold und Erfahrung bringt.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Der Gegner nimmt den Scuttle und bekommt Vision und Gold.",
+      "Dein Team verliert Tempo und Kontrolle über den Fluss."
+     ]
+    },
+    {
+     "label": "C: Zuerst Vision im Fluss setzen und dann den Scuttle nehmen, damit du den gegnerischen Jungler kommen siehst.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Der Scuttle ist ein wichtiges Objective, und im Fluss kann der gegnerische Jungler jederzeit auftauchen. Mit einem Ward siehst du ihn kommen und kannst den Crab sicher nehmen oder dich zurückziehen. Merke: Vor dem Scuttle Vision setzen, weil der Fluss der Treffpunkt beider Jungler ist. Wer dort blind kämpft, verliert oft das Duell und das Objective."
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "NEUTRAL",
+    "lane": "mid"
+   }
+  },
+  {
+   "id": "lo_el_sup_elder_ward",
+   "gameTime": "27:40",
+   "timeLimit": 35,
+   "champion": "Janna",
+   "role": "Support",
+   "difficulty": "Silber",
+   "markers": [
+    {
+     "x": 91.8,
+     "y": 79.0,
+     "type": "hero",
+     "label": "Janna",
+     "isPlayer": true
+    },
+    {
+     "x": 93.5,
+     "y": 76.0,
+     "type": "hero",
+     "label": "Euer ADC",
+     "champion": "Jhin"
+    },
+    {
+     "x": 93,
+     "y": 70,
+     "type": "objective",
+     "label": "Gegner-Turm T1 (Bot)"
+    }
+   ],
+   "coachHint": "Was musst du vor dem Objective erledigt haben?",
+   "context": "Du bist Janna (Support), Minute 27:40. Der Elder Dragon erscheint in 60 Sekunden, du hast 1.200 Gold im Inventar und keine Kontroll-Wards. Eure Welle ist an ihrem Turm gecrasht, und die Gegner stehen weit entfernt.",
+   "options": [
+    {
+     "label": "A: Jetzt recallen, Kontroll-Wards und ein Item kaufen und rechtzeitig mit dem Team zum Elder zurückkehren.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Mit gecrashter Welle kannst du ohne Verlust recallen und neu einkaufen. Du kommst mit Wards und Item rechtzeitig zum Pit und gibst deinem Team Vision für den Elder. Merke: Etwa 60 Sekunden vor einem Objective einkaufen, damit du mit Vision und Items pünktlich da bist. Wer erst beim Spawn aufbricht, kommt zu spät und ohne Ausrüstung. Ein Recall ohne Wellenverlust ist der beste Zeitpunkt dafür."
+    },
+    {
+     "label": "B: Direkt zum Elder gehen und die Wards später kaufen, weil ihr bei so wenig Zeit nicht zurückgehen könnt.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du kommst ohne Wards zum Pit, und die Gegner sehen euch zuerst.",
+      "Der Kampf beginnt ohne Vision und mit weniger Items als möglich."
+     ]
+    },
+    {
+     "label": "C: Auf der Lane bleiben und die Welle weiter schieben, bis der Elder erscheint, und erst dann einkaufen.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Der Elder erscheint, und du hast noch immer Gold im Inventar.",
+      "Dein Team kämpft ohne Wards und Item in Unterzahl."
+     ]
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "WAVE_CRASH_ENEMY",
+    "lane": "bot"
+   }
+  },
+  {
+   "id": "lo_el_mid_baron_prep",
+   "gameTime": "26:30",
+   "timeLimit": 35,
+   "champion": "Orianna",
+   "role": "Midlane",
+   "difficulty": "Silber",
+   "markers": [
+    {
+     "x": 55.5,
+     "y": 47.1,
+     "type": "hero",
+     "label": "Orianna",
+     "isPlayer": true
+    },
+    {
+     "x": 37,
+     "y": 37,
+     "type": "hero",
+     "label": "Euer Team (4)",
+     "champion": "Jinx"
+    },
+    {
+     "x": 33,
+     "y": 30,
+     "type": "objective",
+     "label": "Baron"
+    },
+    {
+     "x": 60,
+     "y": 43,
+     "type": "objective",
+     "label": "Gegner-Turm T1 (Mid)"
+    }
+   ],
+   "coachHint": "Was brauchst du vor dem Baron: Welle, Gold oder beides?",
+   "context": "Du bist Orianna (Mid), Minute 26:30. Der Baron erscheint in 90 Sekunden. Deine Welle ist groß und steht fast an ihrem Turm, du hast 1.800 Gold. Dein Team sammelt sich im Fluss.",
+   "options": [
+    {
+     "label": "A: Mit der Welle zum Team gehen und die 1.800 Gold ungenutzt lassen, damit alle zusammen am Baron stehen.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du machst ohne Items kaum Schaden, und das Team kämpft ohne deine volle Stärke.",
+      "Die Welle läuft ohne dich in den Turm und verliert Wert."
+     ]
+    },
+    {
+     "label": "B: Die Welle in den Turm crashen, dann recallen, kaufen und rechtzeitig vor dem Baron zum Team zurückkehren.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Eine gecrashte Welle verliert keinen Wert, wenn du zurückgehst, und Gold wird erst im Item stark. Du kaufst vor dem Spawn ein und bist mit voller Ausrüstung pünktlich beim Baron. Merke: Vor einem Objective Welle crashen, recallen, kaufen und rechtzeitig zurückkehren. So verlierst du weder Wellenwert noch Gold und stehst beim Spawn mit voller Stärke am Pit. Wer das Gold liegen lässt, kämpft schwächer als nötig."
+    },
+    {
+     "label": "C: Die Welle stehen lassen und sofort recallen, damit du vor dem Baron zurück bist und alles bezahlt hast.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Die Welle schiebt zu euch zurück, und die Gegner bekommen Gold und Druck.",
+      "Du kommst zurück und hast Turmdruck und Wellenwert verloren."
+     ]
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "WAVE_CRASH_ENEMY",
+    "lane": "mid"
+   }
+  },
+  {
+   "id": "lo_el_top_level6",
+   "gameTime": "05:30",
+   "timeLimit": 30,
+   "champion": "Garen",
+   "role": "Toplane",
+   "difficulty": "Eisen",
+   "markers": [
+    {
+     "x": 10,
+     "y": 15,
+     "type": "hero",
+     "label": "Garen",
+     "isPlayer": true
+    },
+    {
+     "x": 17,
+     "y": 8.6,
+     "type": "enemy",
+     "label": "Darius",
+     "champion": "Darius"
+    }
+   ],
+   "coachHint": "Wann hast du im Trade deinen vollen Stärke-Sprung, und wann nicht?",
+   "context": "Du bist Garen (Top), Minute 05:30, Level 5. Dir fehlen noch etwa 20 Sekunden bis Level 6, einem großen Stärke-Sprung. Darius hat Level 6 schon und fordert dich mit einem Angriff zum Trade heraus.",
+   "options": [
+    {
+     "label": "A: Vorsichtig bleiben, die Welle sicher farmen und erst traden, wenn du Level 6 erreicht und deinen Spike hast.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Level 6 ist ein großer Powerspike, den du noch nicht hast. Bis du ihn hast, ist Darius im Trade klar im Vorteil. Wer vorsichtig weiterfarmt, erreicht Level 6 mit voller Welle und trifft danach gleichstark auf. Merke: Wer den Level-6-Spike noch nicht hat, weicht Trades aus und kämpft erst, wenn er Level 6 erreicht hat."
+    },
+    {
+     "label": "B: Den Trade sofort annehmen und angreifen, weil Level 5 gegen Level 6 kaum einen Unterschied für dich macht.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Darius hat Level 6, du noch nicht, und er gewinnt den Trade klar.",
+      "Du verlierst viel Leben und bist bei Level 6 schon im Nachteil."
+     ]
+    },
+    {
+     "label": "C: Die Welle liegen lassen und zur Base zurückgehen, damit du Level 6 sicher und ohne Trade erreichst.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Du verlierst Welle und Erfahrung und bekommst Level 6 deshalb später.",
+      "Darius schiebt ungestört und nimmt dir Gold und Turmdruck."
+     ]
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "NEUTRAL",
+    "lane": "top"
+   }
+  },
+  {
+   "id": "lo_el_bot_tp_down_baron",
+   "gameTime": "30:10",
+   "timeLimit": 60,
+   "champion": "Ashe",
+   "role": "Botlane",
+   "difficulty": "Diamant",
+   "markers": [
+    {
+     "x": 30,
+     "y": 38,
+     "type": "hero",
+     "label": "Ashe",
+     "isPlayer": true
+    },
+    {
+     "x": 35,
+     "y": 36,
+     "type": "hero",
+     "label": "Euer Team (4)",
+     "champion": "Ornn"
+    },
+    {
+     "x": 33,
+     "y": 30,
+     "type": "objective",
+     "label": "Baron"
+    },
+    {
+     "x": 80,
+     "y": 92.4,
+     "type": "fog",
+     "label": "Gegnerischer Top (ohne Teleport)",
+     "champion": "Fiora"
+    }
+   ],
+   "coachHint": "Wer kann den Baron nicht mehr rechtzeitig erreichen?",
+   "context": "Du bist Ashe (Bot), Minute 30:10, Level 17. Der gegnerische Top hat seinen Teleport vor 30 Sekunden verbraucht und splittet auf der Botlane. Der Baron ist verfügbar, und eure Vision im Fluss steht.",
+   "options": [
+    {
+     "label": "A: Den Splitter jagen und töten, weil er ohne Teleport nicht entkommen kann und der Baron noch warten kann.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Ihr lauft ans Ende der Lane, und das Team steht ohne euch am Fluss.",
+      "Der Splitter weicht aus, und ihr verliert Zeit, Position und das Baron-Fenster."
+     ]
+    },
+    {
+     "label": "B: Mit dem Baron warten, bis sein Teleport wieder bereit ist, damit alle Gegner im Kampf mit dabei sind.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Der Teleport kommt zurück, und der Splitter steht im Kampf wieder dabei.",
+      "Ihr verschenkt das Zeitfenster und kämpft später mit gleicher Stärke."
+     ]
+    },
+    {
+     "label": "C: Den Baron jetzt mit dem Team starten, weil der Splitter ohne Teleport nicht rechtzeitig zum Pit kommt.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Ohne Teleport braucht der gegnerische Top viel zu lange vom Rand der Karte bis zum Baron. Euer Team hat damit ein klares Zeitfenster, kämpft in Überzahl oder beendet den Baron ungestört. Merke: Ein verbrauchter gegnerischer Teleport öffnet das Baron-Fenster, nutze es, bevor er wieder bereit ist."
+    }
+   ],
+   "balanced": true
+  },
+  {
+   "id": "lo_el_sup_adc_lowhp",
+   "gameTime": "06:20",
+   "timeLimit": 30,
+   "champion": "Janna",
+   "role": "Support",
+   "difficulty": "Eisen",
+   "markers": [
+    {
+     "x": 80.5,
+     "y": 91.4,
+     "type": "hero",
+     "label": "Janna",
+     "isPlayer": true
+    },
+    {
+     "x": 77,
+     "y": 91.8,
+     "type": "hero",
+     "label": "Ashe",
+     "champion": "Ashe"
+    },
+    {
+     "x": 88.5,
+     "y": 90.4,
+     "type": "enemy",
+     "label": "Caitlyn",
+     "champion": "Caitlyn"
+    },
+    {
+     "x": 91.5,
+     "y": 86,
+     "type": "enemy",
+     "label": "Leona",
+     "champion": "Leona"
+    }
+   ],
+   "coachHint": "Wie viel Leben braucht deine ADC, um vorn zu stehen?",
+   "context": "Du bist Janna (Support) mit Ashe, Minute 06:20, Level 6. Deine ADC hat nur noch 25 % Leben, während die gegnerische Botlane mit Caitlyn und Leona volles Leben hat. Eure Welle schiebt dich weiter nach vorn.",
+   "options": [
+    {
+     "label": "A: Vorn bei der Welle bleiben und weiter farmen, weil die Gegner sicher nicht auf zwei Champions gehen.",
+     "lpChange": -15,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Caitlyn und Leona nutzen das wenige Leben aus und töten Ashe mit einem Angriff.",
+      "Du verlierst deine ADC, und die Gegner bekommen Gold und die Lane."
+     ]
+    },
+    {
+     "label": "B: Allein zurück zur Base gehen und Ashe vorn stehen lassen, damit du schnell Wards für das Team kaufst.",
+     "lpChange": -10,
+     "nextId": "end",
+     "feedback": "Fehlentscheidung.",
+     "chain": [
+      "Ashe steht ohne Schutz vor zwei Gegnern und stirbt oder muss ohne Gold zurück.",
+      "Du lässt die Lane allein, und die Gegner können frei auf sie gehen."
+     ]
+    },
+    {
+     "label": "C: Mit Ashe hinter die Welle gehen und gemeinsam recallen, statt mit so wenig Leben weiter vorn zu bleiben.",
+     "lpChange": 20,
+     "nextId": "end",
+     "feedback": "Richtig! Mit 25 % Leben reicht ein einziger Angriff, um Ashe zu töten, und die Gegner haben volles Leben. Wer gemeinsam zurückgeht, verliert eine Welle, aber keinen Champion und keinen Gold-Vorsprung. Merke: Mit wenig Leben nicht vorn bleiben, sondern zusammen zurückgehen und mit vollem Leben neu aufbrechen."
+    }
+   ],
+   "balanced": true,
+   "wave": {
+    "kind": "NEUTRAL",
+    "lane": "bot"
+   }
   }
 ];
 const START_IDS = ['top_smaragd_01', 'mid_gold_01', 'jng_dia_01', 'bot_eisen_01', 'top_bronze_01', 'sup_silber_01', 'jng_platin_01', 'mid_master_01'];
@@ -5099,7 +6697,6 @@ function Dashboard({ rank, placement, hearts, profile, mastery, xp, quests, frie
       </div>
 
       <FriendsOnline friends={friends} />
-      <GlossaryCard />
       {!isVip && <ShieldCard shieldUntil={shieldUntil} onWatch={onShieldAd} />}
 
       {locked && (
@@ -5497,7 +7094,7 @@ function Scenario({ scenario, practice, tag, momentum, timeCap, format = 'tree',
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
               {msgs.map((m, i) => (
                 <div key={i} className={`max-w-[85%] rounded-lg px-3 py-2 text-sm leading-relaxed ${m.from === 'me' ? 'self-end' : 'self-start'}`}
-                     style={{ background: m.from === 'me' ? '#1A2A48' : 'var(--bg)' }}>{m.t}</div>
+                     style={{ background: m.from === 'me' ? '#1A2A48' : 'var(--bg)' }}>{m.from === 'me' ? m.t : <G t={m.t} />}</div>
               ))}
               {typing && (
                 <div className="self-start rounded-lg px-3 py-2 text-sm text-slate-400 italic" style={{ background: 'var(--bg)' }} role="status">Coach tippt...</div>
@@ -5971,6 +7568,12 @@ GENERIC.Support.push('lo_iron_baron_vision', 'lo_iron_vision_dragon', 'lo_iron_s
 GENERIC.Botlane.push('lo_master_bot_elder_safety', 'lo_master_bot_ga_wakeup', 'lo_master_bot_wave_before_baron', 'lo_master_bot_zhonya_window', 'lo_master_bot_baron_vs_inhib');
 GENERIC.Jungle.push('lo_silver_jg_scuttle_respawn', 'lo_silver_jg_voidgrubs_prio', 'lo_silver_jg_reset_dragon', 'lo_silver_jg_gank_choice', 'lo_gold_jg_smite_sync', 'lo_gold_jg_dive_top', 'lo_gold_jg_soul_vision', 'lo_gold_jg_camp_respawn');
 GENERIC.Midlane.push('lo_plat_mid_roam_crash', 'lo_plat_mid_freeze_jungler', 'lo_plat_mid_cannon_recall', 'lo_plat_mid_slowpush_dragon', 'lo_plat_mid_baron_setup');
+// Elo-Audit: champion-neutrale neue Szenarien für den Übungsmodus
+GENERIC.Toplane.push('lo_el_top_level6', 'lo_el_top_towergold', 'lo_el_top_ward_jungler', 'lo_el_top_tp_baron', 'lo_el_top_tp_assign', 'lo_el_top_fog_trap');
+GENERIC.Jungle.push('lo_el_jng_nochase', 'lo_el_jng_scuttle_vision', 'lo_el_jng_dive_crash');
+GENERIC.Midlane.push('lo_el_mid_lowhp', 'lo_el_mid_baron_prep');
+GENERIC.Botlane.push('lo_el_bot_tp_down_baron', 'lo_el_bot_powerspike', 'lo_el_bot_dragon_60s', 'lo_el_bot_baron_finish', 'lo_el_bot_flash_5min');
+GENERIC.Support.push('lo_el_sup_adc_lowhp', 'lo_el_sup_elder_ward', 'lo_el_sup_fog_trap', 'lo_el_sup_choke');
 function adaptScenario(sc, champ) {
   const from = new RegExp(escapeRe(sc.champion), 'g');
   const sub = t => t.replace(from, champ);
@@ -6227,7 +7830,7 @@ function Friends({ friends, selfName, onAdd, onRemove }) {
 }
 
 const TabBar = ({ tabs, value, onChange }) => (
-  <div role="tablist" className={`grid gap-2 ${tabs.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+  <div role="tablist" className={`grid gap-2 ${tabs.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
     {tabs.map(([k, l]) => (
       <button key={k} role="tab" aria-selected={value === k} onClick={() => onChange(k)}
         className={`rounded-lg border py-2 text-sm font-semibold transition ${value === k ? 'border-[#0AC8B9] bg-[#0AC8B9]/15 text-[#0AC8B9]' : 'border-[#C89B3C]/40 bg-[#010A13]/80 text-gray-300 hover:border-[#0AC8B9]'}`}>{l}</button>
@@ -6476,6 +8079,17 @@ function StatusNote({ profile, onChange }) {
     </div>
   );
 }
+// Profil-Reiter "📖 Taktik-Glossar": Nachschlagewerk aller Fachbegriffe mit Suche
+function GlossaryTab() {
+  const [query, setQuery] = useState('');
+  return (
+    <div className="flex flex-col gap-3" data-glossary-tab="true">
+      <div className="text-xs leading-snug text-slate-400">Alle Fachbegriffe aus den Fragen zum Nachschlagen. Im Spiel kannst du jeden unterstrichenen Begriff antippen, dann erklärt Coach Sarah ihn dir.</div>
+      <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Begriff suchen" aria-label="Begriff suchen" data-gloss-search="true" className="w-full rounded-lg border border-[#C89B3C]/40 bg-[#010A13] px-3 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-[#0AC8B9]" />
+      <GlossList query={query} />
+    </div>
+  );
+}
 function Profile({ profile, rank, mastery, friends, requests, history, xp, shieldUntil, onChange, onAddFriend, onRemoveFriend, onAccept, onDecline, onLogout, onIcon, onShieldAd, cloud, onAuth, onCloudLogout, onCloudRetry, isVip, onToggleVip, ranked, placement }) {
   const [tab, setTab] = useState('me');
   const [confirm, setConfirm] = useState(false);
@@ -6504,10 +8118,12 @@ function Profile({ profile, rank, mastery, friends, requests, history, xp, shiel
         </div>
         <StatusNote profile={profile} onChange={onChange} />
       </div>
-      <TabBar tabs={[['me', 'Profil'], ['friends', `Freunde (${friends.length})`],
+      <TabBar tabs={[['me', 'Profil'], ['friends', `Freunde (${friends.length})`], ['gloss', '📖 Taktik-Glossar'],
         ['requests', <span className="inline-flex items-center justify-center gap-1.5">Anfragen{requests.length > 0 && <span className="rounded-full bg-red-500 px-1.5 text-[10px] font-bold leading-4 text-white" aria-label={`${requests.length} offene Anfragen`}>{requests.length}</span>}</span>]]}
         value={tab} onChange={setTab} />
-      {tab === 'requests' ? (
+      {tab === 'gloss' ? (
+        <GlossaryTab />
+      ) : tab === 'requests' ? (
         <Requests requests={requests} onAccept={onAccept} onDecline={onDecline} />
       ) : tab === 'friends' ? (
         <Friends friends={friends} selfName={profile.name} onAdd={onAddFriend} onRemove={onRemoveFriend} />
@@ -6858,105 +8474,108 @@ const PLAYSTYLE = {
   PICK: 'Vision-Kontrolle aufbauen und einzelne Gegner im Nebel isolieren und fangen, bevor der 5v5 beginnt.',
   SPLIT: '1-3-1 mit Sidelane-Druck: Cross-Map-Play, bei dem ein Splitpusher Gegner bindet und der Rest dem 5v5 ausweicht.',
 };
-// Analyse der 5 gegnerischen Champions -> Kern-Frage, Antworten und Coaching-Feedback mit den konkreten Champions
-function analyzeMatchupRaw(lu) {
-  const red = lu.red, blue = lu.blue;
-  const dp = damageProfile(red);
-  const cc = ROLES_ORDER.map(r => red[r]).filter(isHardCc);
-  const win = lu.win || archRank(archScore(blue))[0][0];
-  const enemyArch = lu.enemyArch || archRank(archScore(red))[0][0];
-  const kind = classifyDraft(red);
-  const profile = { ap: dp.ap, ad: dp.ad, mix: dp.mix, apCount: dp.apCount, apShare: dp.apShare, cc, win, enemyArch };
-  const O = (key, label) => ({ key, label });
-  if (kind === 'AP') {
-    const n = joinNames(dp.ap), c = dp.ap.length;
-    return { kind, profile, topic: 'Draft-Analyse · Schadensprofil', correct: 'AP_MR',
-      question: 'Das gegnerische Team besteht fast ausschließlich aus magischem Schaden (AP). Wie kontert euer Team diesen Draft?',
-      options: [
-        O('AP_MR', 'Früh Magieresistenz priorisieren (Merkurs Schuhe, Kaenic Rookern / Schlund von Malmortius), um den gegnerischen Burst-Schaden komplett zu neutralisieren.'),
-        O('AP_STD', 'Stur den Standard-Build ohne Magieresistenz durchziehen und hoffen, den Gegner schneller zu töten.'),
-        O('AP_ARMOR', 'Rüstung stacken (Plated Steelcaps, Dornenpanzer), weil Rüstung gegen jeden Schaden hilft.'),
-        O('AP_HEAL', 'Als Erstes Anti-Heal kaufen, unabhängig davon, was die Gegner für Schaden machen.')],
-      explain: {
-        ok: `Richtig gedacht! Gegen ${n} verliert der Gegner ab Minute 18 jeden Kampf, sobald euer Team Kaenic Rookern und Merkurs Schuhe fertiggestellt hat. Ein einzelnes MR-Item gewinnt euch dieses Spiel!`,
-        bad: {
-          AP_STD: `Fehler! Ohne Magieresistenz schmelzt ihr gegen ${c} AP-Champions (${n}) im gegnerischen Burst-Fenster. Ein defensives Resistenz-Item ist hier Pflicht.`,
-          AP_ARMOR: `Fehler! Rüstung schützt nicht vor magischem Schaden: ${n} bestrafen euch trotzdem im Burst-Fenster. Merkurs Schuhe und Kaenic Rookern / Schlund von Malmortius sind hier Pflicht.`,
-          AP_HEAL: `Fehler! Anti-Heal hilft gegen Heilung, nicht gegen Burst. Gegen ${n} entscheidet Magieresistenz: Merkurs Schuhe und Kaenic Rookern / Schlund von Malmortius.` } } };
-  }
-  if (kind === 'AD') {
-    const n = joinNames(dp.ad);
-    return { kind, profile, topic: 'Draft-Analyse · Schadensprofil', correct: 'AD_ARMOR',
-      question: 'Die Gegner haben keinen magischen Schaden (Full AD). Welcher Item-Pfad entscheidet das Spiel für eure Frontline/Bruiser?',
-      options: [
-        O('AD_ARMOR', 'Plated Steelcaps (Tabis) rushen und früh Rüstung (Dornenpanzer / Gefrorenes Herz) stacken – das negiert den Schaden der gegnerischen Carrys im Mid-Game.'),
-        O('AD_GLASS', 'Magieresistenz-Items kaufen oder reine Glaskanonen-Builds ohne Rüstung spielen.'),
-        O('AD_HP', 'Nur Lebenspunkte-Items ohne Rüstung stapeln und hoffen, dass die Gegner irgendwann aufhören.'),
-        O('AD_LIFESTEAL', 'Auf Vampirismus-Items setzen und Rüstung komplett ignorieren.')],
-      explain: {
-        ok: `Richtig gedacht! ${n} machen ausschließlich physischen Schaden. Plated Steelcaps und früh Rüstung (Dornenpanzer / Gefrorenes Herz) negieren im Mid-Game den Schaden ihrer Carrys, und eure Frontline bleibt im Kampf stehen.`,
-        bad: {
-          AD_GLASS: `Fehler! ${n} machen nur physischen Schaden: Magieresistenz ist hier verschenkt, und Glaskanonen ohne Rüstung schmelzen unter den Auto-Attacks. Plated Steelcaps, Dornenpanzer und Gefrorenes Herz sind Pflicht.`,
-          AD_HP: `Fehler! Reine Lebenspunkte ohne Rüstung verpuffen gegen ${n}: Jeder physische Treffer kostet euch das volle Leben. Rüstung (Plated Steelcaps, Dornenpanzer, Gefrorenes Herz) skaliert deutlich besser.`,
-          AD_LIFESTEAL: `Fehler! Gegen ${n} stirbt ihr im Burst, bevor Vampirismus heilen kann. Ohne Rüstung (Plated Steelcaps, Dornenpanzer, Gefrorenes Herz) ist die Frontline wertlos.` } } };
-  }
-  if (kind === 'CC') {
-    const n = joinNames(cc), c = cc.length;
-    return { kind, profile, topic: 'Draft-Analyse · Crowd Control', correct: 'CC_TENACITY',
-      question: `Die Gegner haben ${c} harte CC-Champions (${n}). Wie bereitet euer Team sich auf den ersten Lockdown vor?`,
-      options: [
-        O('CC_TENACITY', 'Zähigkeit (Tenacity) über Runen/Schuhe mitnehmen und QSS/Cleanse gegen den ersten Lockdown bereithalten.'),
-        O('CC_BURST', 'Möglichst viel Burst-Schaden stapeln und hoffen, dass der Gegner nicht trifft.'),
-        O('CC_CLUMP', 'Dicht zusammenstehen und im Pulk in den Kampf laufen, damit sich alle gegenseitig schützen.'),
-        O('CC_BLIND', 'Ohne Vision in die Engage-Reichweite der Gegner laufen, damit sie nicht fliehen können.')],
-      explain: {
-        ok: `Richtig gedacht! Gegen ${n} entscheidet der erste Lockdown: Mit Zähigkeit (Runen/Schuhe) und QSS/Cleanse kommt ihr aus der CC-Kette, bevor euer Team Schaden frisst.`,
-        bad: {
-          CC_BURST: `Fehler! Burst nützt nichts, wenn ihr im Lockdown von ${n} hängt: Wer gestunnt wird, stirbt, bevor er Schaden macht. Zähigkeit und QSS/Cleanse sind Pflicht.`,
-          CC_CLUMP: `Fehler! Gegen ${n} (viele harte CC-Effekte) trifft ein einziger Lockdown im Pulk gleich mehrere von euch. Besser auseinanderziehen und Zähigkeit plus QSS/Cleanse einplanen.`,
-          CC_BLIND: `Fehler! Ohne Vision in die Reichweite von ${n} zu laufen heißt, direkt in den ersten Lockdown zu stolpern. Vision, Zähigkeit und QSS/Cleanse sind Pflicht.` } } };
-  }
-  const tagged = joinNames(ROLES_ORDER.filter(r => champTags(blue[r], r).includes(win)).map(r => blue[r]));
-  const bad = {};
-  Object.keys(ARCH).forEach(k => { if (k !== win) bad[k] = `Fehler! Eure Hauptstärke ist ${ARCH[win].label} (${tagged}): ${ARCH[win].why}. Der passende Plan wäre gewesen: ${PLAYSTYLE[win]} Die Gegner setzen auf ${ARCH[enemyArch].label}.`; });
-  return { kind: 'ARCH', profile, topic: 'Makro-Plan', correct: win,
-    question: `Das Schadensprofil der Gegner ist nicht extrem (${dp.apCount} von 5 mit magischem Schaden), es gibt keine Draft-Schwäche, die ihr mit einem einzelnen Item-Pfad bestrafen könnt. Welcher Makro-Plan passt zur Hauptstärke eures Teams?`,
-    options: Object.keys(ARCH).map(k => O(k, PLAYSTYLE[k])),
-    explain: { ok: `Richtig gedacht! ${tagged} geben euch ${ARCH[win].label}: ${ARCH[win].why}. Der passende Plan: ${PLAYSTYLE[win]} Die Gegner setzen auf ${ARCH[enemyArch].label}.`, bad } };
+/* ---- Draft-Analyse im Ladebildschirm (Coaching-Einschätzung, keine offiziellen Riot-Daten) ----
+   Schritt 1: Schadensprofil der Gegner (AD / AP / Mixed), Schritt 2: primäre Win Condition (Engage / Poke / Splitpush).
+   Danach folgt eine spoilerfreie Taktik-Frage: Der Fragetext nennt weder Schadensarten noch gegnerische Pläne. */
+const DMG_INFO = { AD: { label: '⚔️ Reines AD (Physisch)', short: 'Reines AD' }, AP: { label: '🔮 Reines AP (Magisch)', short: 'Reines AP' }, MIX: { label: '⚖️ Ausgeglichen (Mixed Damage)', short: 'Mixed Damage' } };
+const STYLE_INFO = {
+  ENGAGE: { label: '💥 Hard Engage / Wombo Combo', plain: 'Hard Engage / Wombo Combo', why: 'wollen mit hartem Initiate den 5v5 erzwingen', eg: 'z. B. Malphite, Amumu, Leona, Yasuo' },
+  POKE: { label: '🏹 Poke / Siege / Pick', plain: 'Poke / Siege / Pick', why: 'wollen aus der Distanz zermürben oder einzelne Gegner fangen', eg: 'z. B. Jayce, Xerath, Zoe, Nidalee, Lux' },
+  SPLIT: { label: '🗡️ Splitpush / Side-Lane-Druck', plain: 'Splitpush / Side-Lane-Druck', why: 'wollen Seitenlanes allein gewinnen und Gegner binden', eg: 'z. B. Fiora, Tryndamere, Camille, Shen' },
+};
+const CHAMP_STYLE_LISTS = {
+  ENGAGE: ['Malphite', 'Ornn', 'Sion', 'Aatrox', 'Gnar', 'Sett', 'Sejuani', 'Amumu', 'Viego', 'Warwick', 'Zac', 'Lissandra', 'Orianna', 'Katarina', 'Yasuo', 'Annie', 'Jinx', 'Draven', 'Miss Fortune', 'Leona', 'Nautilus', 'Alistar', 'Braum', 'Rakan'],
+  POKE: ['Lee Sin', 'Nocturne', 'Elise', 'Evelynn', 'Kayn', 'Veigar', 'Xerath', 'Talon', 'Ahri', 'Zed', 'Azir', 'Viktor', 'Syndra', 'Lux', 'Ziggs', "Kai'Sa", 'Ezreal', 'Caitlyn', 'Ashe', 'Lucian', 'Pyke', 'Senna', 'Thresh', 'Lulu', 'Janna', 'Soraka', 'Karma', 'Blitzcrank'],
+  SPLIT: ['Gwen', 'Renekton', 'Darius', 'Fiora', 'Jax', 'Camille', 'Garen', 'Kassadin', 'Zeri', 'Vayne'],
+};
+const CHAMP_STYLE = {};
+Object.keys(CHAMP_STYLE_LISTS).forEach(k => CHAMP_STYLE_LISTS[k].forEach(n => { CHAMP_STYLE[normName(n)] = k; }));
+const DEFAULT_STYLE = { Toplane: 'SPLIT', Jungle: 'ENGAGE', Midlane: 'POKE', Botlane: 'POKE', Support: 'ENGAGE' };
+const styleOf = (n, r) => CHAMP_STYLE[normName(n)] || DEFAULT_STYLE[r] || 'ENGAGE';
+function styleProfile(team) {
+  const groups = { ENGAGE: [], POKE: [], SPLIT: [] };
+  ROLES_ORDER.forEach(r => groups[styleOf(team[r], r)].push(team[r]));
+  const rank = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+  return { groups, top: rank[0][0], clear: rank[0][1].length >= 2 && rank[0][1].length > rank[1][1].length };   // eindeutig: mindestens 2 und mehr als jede andere Ausrichtung
 }
+const dmgClass = team => { const dp = damageProfile(team); return dp.apShare >= 0.8 ? 'AP' : dp.apCount === 0 && dp.mix.length === 0 ? 'AD' : 'MIX'; };
+const names3 = a => joinNames(a.slice(0, 3));
+// Schritt 1: Rückmeldung zum gewählten Schadensprofil, mit den Champions, die den Ausschlag geben
+function dmgAnalysis(red, pick) {
+  const dp = damageProfile(red), truth = dmgClass(red), ok = pick === truth;
+  const phys = dp.ad.length ? dp.ad : dp.mix;
+  if (ok) {
+    const t = truth === 'AD' ? 'Alle fünf Gegner verursachen überwiegend physischen Schaden (AD).'
+      : truth === 'AP' ? `${dp.apCount} von 5 Gegnern (${names3(dp.ap)}) verursachen überwiegend magischen Schaden (AP).`
+      : dp.ap.length ? `${names3(dp.ap)} verursachen magischen, ${names3(phys)} physischen Schaden: Mixed Damage.` : `${names3(dp.mix)} verursachen beide Schadensarten, der Rest physischen Schaden: Mixed Damage.`;
+    return { ok, truth, pick, text: `Richtig: ${t}` };
+  }
+  const why = pick === 'AD' ? (dp.ap.length ? `${names3(dp.ap)} verursachen überwiegend magischen Schaden (AP).` : `${names3(dp.mix)} verursachen auch magischen Schaden.`)
+    : pick === 'AP' ? (truth === 'AD' ? 'Alle fünf Gegner verursachen physischen Schaden, kein Gegner ist überwiegend AP.' : `${names3(phys)} verursachen überwiegend physischen Schaden, das Team ist also nicht fast reines AP.`)
+    : (truth === 'AD' ? 'Alle fünf Gegner verursachen überwiegend physischen Schaden (AD), magischen Schaden gibt es nicht.' : `${names3(dp.ap)} verursachen überwiegend magischen Schaden (AP), fast das ganze Team ist AP.`);
+  return { ok, truth, pick, text: `Falsch: ${why} Richtig wäre ${DMG_INFO[truth].short}.` };
+}
+// Schritt 2: Rückmeldung zur gewählten Win Condition
+function styleAnalysis(red, pick) {
+  const sp = styleProfile(red), truth = sp.top, g = names3(sp.groups[truth]), ok = pick === truth;
+  return { ok, truth, pick, text: ok ? `Richtig: ${g} ${STYLE_INFO[truth].why}.` : `Falsch: ${g} ${STYLE_INFO[truth].why}. Richtig wäre ${STYLE_INFO[truth].plain}.` };
+}
+// Taktik-Frage: eine Option je Schadensprofil, jede mit eigener Spielausrichtung. Der Fragetext bleibt spoilerfrei.
+const DEF_TEXT = { AD: 'Setze früh auf Rüstung und Ninja-Tabis, um ihren rein physischen Schaden zu brechen.', AP: 'Baue direkt frühe Magieresistenz, um gegen den geballten Magie-Burst standzuhalten.', MIX: 'Halte deine Resistenzen ausgewogen, da ihr Schadensoutput beidseitig gefährlich ist.' };
+const PLAN_TEXT = { ENGAGE: 'Bleibe gestaffelt hinter deiner Frontline, damit ihr Initiate ins Leere läuft.', POKE: 'Suche früh den Engage, statt lange in ihrer Poke-Reichweite Leben zu verlieren.', SPLIT: 'Spiele um Objectives im 5v5, während ihr Splitpusher allein auf der Seitenlane steht.' };
+const DEF_NEED = { AD: 'Rüstung und Ninja-Tabis', AP: 'Magieresistenz', MIX: 'ausgewogene Resistenzen' };
+const DMG_IS = { AD: 'rein physisch (AD)', AP: 'fast rein magisch (AP)', MIX: 'gemischt aus physisch und magisch' };
+const DRAFT_QUESTION = 'Analysiere den gegnerischen Draft: Welche defensive Priorität und Spielausrichtung erfordert diese Aufstellung von deinem Team?';
 function analyzeMatchup(lu) {
-  const r = analyzeMatchupRaw(lu);
-  if (r.kind === 'ARCH') return r;
-  const texts = balanceTexts(r.options.map(o => ({ text: o.label, ok: o.key === r.correct })), 'plan' + r.kind + r.options[0].key, true);   // nur ganze Sätze anhängen: der vorgegebene Wortlaut bleibt unverändert am Anfang
-  return { ...r, options: r.options.map((o, i) => ({ ...o, label: texts[i] })) };
+  const red = lu.red, d = dmgClass(red), sp = styleProfile(red), s = sp.top, dp = damageProfile(red);
+  const dO = ['AD', 'AP', 'MIX'].filter(x => x !== d), sO = ['ENGAGE', 'POKE', 'SPLIT'].filter(x => x !== s);
+  const txt = (a, b) => `${DEF_TEXT[a]} ${PLAN_TEXT[b]}`;
+  let sOrd = sO;
+  { const cand = [sO, [sO[1], sO[0]]]; sOrd = cand.map(o => { const L = [txt(d, s).length, txt(dO[0], o[0]).length, txt(dO[1], o[1]).length]; return [Math.max(...L) - Math.min(...L), o]; }).sort((x, y) => x[0] - y[0])[0][1]; }   // Zuordnung mit möglichst gleich langen Texten
+  const pairs = [[d, s], [dO[0], sOrd[0]], [dO[1], sOrd[1]]];
+  const key = (a, b) => `${a}|${b}`, options = pairs.map(([a, b]) => ({ key: key(a, b), label: txt(a, b), dmg: a, style: b }));
+  const n = names3(sp.groups[s]);
+  const bad = {};
+  options.forEach(o => {
+    if (o.key === key(d, s)) return;
+    const parts = [];
+    if (o.dmg !== d) parts.push(`Der gegnerische Schaden ist ${DMG_IS[d]}, deshalb braucht ihr ${DEF_NEED[d]}.`);
+    if (o.style !== s) parts.push(`Die Gegner setzen auf ${STYLE_INFO[s].plain} (${n}): ${PLAN_TEXT[s].replace(/\.$/, '')}.`);
+    bad[o.key] = `Fehler! ${parts.join(' ')}`;
+  });
+  return { kind: d, dmg: d, style: s, topic: 'Draft-Analyse', correct: key(d, s), question: DRAFT_QUESTION, options,
+    profile: { ap: dp.ap, ad: dp.ad, mix: dp.mix, apCount: dp.apCount, apShare: dp.apShare, groups: sp.groups },
+    explain: { ok: `Richtig gedacht! Ihr Schaden ist ${DMG_IS[d]}, daher ${DEF_NEED[d]}. Gegen ${STYLE_INFO[s].plain} (${n}) gilt: ${PLAN_TEXT[s]}`, bad } };
 }
 // Frisches 5v5-Lineup für jedes Match: eigenes Team (Blau) und Gegner (Rot), 10 verschiedene Champions.
-// Der gegnerische Draft ist je nach Match Heavy AP, Full AD, CC-Lockdown oder ausgeglichen (klassischer Archetyp).
-const pickKind = () => { const r = Math.random(); return r < 0.22 ? 'AP' : r < 0.40 ? 'AD' : r < 0.58 ? 'CC' : 'ARCH'; };
+// Der gegnerische Draft hat ein eindeutiges Schadensprofil (AD, AP oder gemischt) und eine eindeutige Win Condition (Engage, Poke oder Splitpush).
+const pickDmg = () => { const r = Math.random(); return r < 0.25 ? 'AP' : r < 0.5 ? 'AD' : 'MIX'; };
+const pickStyle = () => ['ENGAGE', 'POKE', 'SPLIT'][Math.floor(Math.random() * 3)];
 function genLineup(me, role, forceKind) {
-  const want = forceKind || pickKind();
-  const pref = want === 'AP' ? (c, r) => dmgOf(c, r) === 'AP' : want === 'AD' ? (c, r) => dmgOf(c, r) === 'AD' : want === 'CC' ? c => isHardCc(c) : null;
+  const legacy = { CC: ['MIX', 'ENGAGE'], ARCH: ['MIX', null] };   // alte Schlüssel bleiben gültig
+  const wantD = ['AP', 'AD', 'MIX'].includes(forceKind) ? forceKind : legacy[forceKind] ? legacy[forceKind][0] : pickDmg();
+  const wantS0 = ['ENGAGE', 'POKE', 'SPLIT'].includes(forceKind) ? forceKind : legacy[forceKind] ? legacy[forceKind][1] : pickStyle();
   let best = null, last = null;
-  for (let i = 0; i < 700; i++) {
+  for (let i = 0; i < 900; i++) {
+    const wantS = i < 500 ? wantS0 : null;   // ist die Wunsch-Ausrichtung nicht machbar (z. B. Full AD mit Splitpush), zählt nur ein eindeutiges Profil
     const used = new Set([normName(me)]);
     const pick = (r, pf) => {
       const free = Object.keys(ROLE_POOL[r]).filter(x => !used.has(normName(x)));
-      const pre = pf ? free.filter(c => pf(c, r)) : [];
-      const c = shuffle(pre.length && Math.random() < 0.92 ? pre : free)[0]; used.add(normName(c)); return c;
+      const both = pf ? free.filter(c => pf(c, r)) : [];
+      const dOnly = wantD === 'MIX' ? [] : free.filter(c => dmgOf(c, r) === wantD);
+      const pool = both.length ? both : dOnly.length ? dOnly : free;
+      const c = shuffle(pool.length && Math.random() < 0.92 ? pool : free)[0]; used.add(normName(c)); return c;
     };
     const blue = {}, red = {};
     ROLES_ORDER.forEach(r => { blue[r] = r === role ? me : pick(r, null); });
-    ROLES_ORDER.forEach(r => { red[r] = pick(r, pref); });
-    const sb = archScore(blue), sr = archScore(red), rb = archRank(sb), rr = archRank(sr);
-    const margin = rb[0][1] - rb[1][1];
-    const cand = { me, role, blue, red, win: rb[0][0], sb, sr, enemyArch: rr[0][0], margin, kind: classifyDraft(red) };
+    ROLES_ORDER.forEach(r => { red[r] = pick(r, (c, rr) => (wantD === 'MIX' || dmgOf(c, rr) === wantD) && (!wantS || styleOf(c, rr) === wantS)); });
+    const sb = archScore(blue), sr = archScore(red), rb = archRank(sb), rr = archRank(sr), sp = styleProfile(red);
+    const cand = { me, role, blue, red, win: rb[0][0], sb, sr, enemyArch: rr[0][0], margin: rb[0][1] - rb[1][1], kind: dmgClass(red), dmg: dmgClass(red), style: sp.top, styleGroups: sp.groups };
     last = cand;
-    if (cand.kind === want && (want !== 'ARCH' || damageProfile(red).apCount >= 1)) {   // "ausgeglichen" braucht mindestens einen AP-Champion
-      if (margin >= 1 && rb[0][1] >= 2 && rr[0][0] !== rb[0][0]) { cand.q = analyzeMatchup(cand); return cand; }   // eindeutige Stärke, Gegner mit anderer Stärke
-      if (!best || margin > best.margin) best = cand;
-    }
+    if (cand.dmg === wantD && sp.clear && (!wantS || sp.top === wantS)) { best = cand; break; }
+    if (cand.dmg === wantD && sp.clear && !best) best = cand;
   }
-  if (!best && want !== 'ARCH') return genLineup(me, role, 'ARCH');
+  if (!best && wantD !== 'MIX') return genLineup(me, role, 'MIX');
   best = best || last; best.q = analyzeMatchup(best);
   return best;
 }
@@ -7459,6 +9078,18 @@ function towersFromText(sc) {
   const lane = m[2].toLowerCase(), n = /Inhibitor/.test(m[3]) ? 3 : /inneren/.test(m[1] || '') ? 2 : 1;
   return { blue: [], red: [`red_${lane}${n}`] };
 }
+// Elo-Audit: Liga-Zuordnung nach dem Bottleneck-Raster. Komplexe Wave-Manipulation (Freeze, Slow Push, Bounce, Cheater Recall), Cross-Mapping und Push-dann-Roam
+// gehören ab Platin, Teleport-Timing und Splitpush ab Gold, Crash und Cooldown-Vorteile ab Silber; Regelwissen und Grundlagen stehen nicht in Diamant/Master+.
+// Die fünf Lehrbaum-Ketten (top_/mid_/jng_/bot_/sup_) bleiben unverändert, weil sie als Kette einer Liga gespielt werden.
+const TIER_FIX = {
+  lo_iron_mitte_aram: 'Gold', lo_iron_top_tp_wave: 'Gold', lo_iron_top_dragon_flank: 'Gold', lo_iron_top_split_baron: 'Platin', lo_iron_jg_gank_overextended: 'Smaragd',
+  lo_iron_mid_objective_rotate: 'Silber', lo_iron_sup_ward_timing: 'Silber', lo_iron_sup_roam_bounce: 'Platin',
+  lo_bronze_bf_sword: 'Silber', lo_bronze_darius_overextend: 'Smaragd', lo_bronze_tp_flank: 'Gold', lo_bronze_mid_roam: 'Platin',
+  lo_silver_sidelane_t2: 'Gold', lo_silver_baron_bait: 'Smaragd', lo_jg_silver_counter_gank: 'Platin',
+  lo_gold_bounce_freeze: 'Platin', lo_gold_rebound_roam: 'Platin', lo_plat_hook_after_flash: 'Smaragd',
+  lo_diamond_elder_execute: 'Platin', lo_diamond_hand_of_baron: 'Smaragd', lo_diamond_jinx_front_to_back: 'Gold', lo_master_bot_elder_safety: 'Platin', lo_master_disengage: 'Smaragd',
+  quiz_gold_04: 'Platin', quiz_gold_07: 'Platin', quiz_diamant_01: 'Silber', quiz_diamant_02: 'Platin', quiz_diamant_05: 'Platin', quiz_diamant_03: 'Smaragd', quiz_master_01: 'Platin',
+};
 // Positionen relativ zu einem Turm: [Turm-ID, Abstand entlang der Lane in Karteneinheiten (negativ = vor dem Gegner-Turm aus Sicht von Blau, positiv = vor dem eigenen Turm), Querversatz]
 // oder feste Koordinaten [x, y]. Jeder Eintrag behebt einen Widerspruch zwischen Szenario-Text und Kartenposition (Prüfung t43).
 const markerAt = (tid, off = 0, perp = 0) => { const t = TOWER_BY_ID[tid], q = laneProj(t.lane, t.x, t.y), pt = lanePtAt(t.lane, q.s + off); return { x: +(pt.x - pt.ty * perp).toFixed(1), y: +(pt.y + pt.tx * perp).toFixed(1) }; };
@@ -7485,6 +9116,7 @@ const WAVE_FIX = {
   lo_silver_jg_gank_choice: { kind: 'WAVE_FREEZE_ENEMY', lane: 'bot', tier: 1 },   // die eingefrorene Welle steht auf der Botlane
 };
 RUNS.forEach(sc => {
+  if (TIER_FIX[sc.id]) { sc.difficulty = TIER_FIX[sc.id]; sc.timeLimit = TLIM[DIFF_TIER[sc.difficulty]]; }   // Zeitlimit folgt der Liga
   balanceScenario(sc);
   if (MARKER_FIX[sc.id]) sc.markers = sc.markers.map((m, i) => (MARKER_FIX[sc.id][i] ? { ...m, x: MARKER_FIX[sc.id][i][0], y: MARKER_FIX[sc.id][i][1] } : m));
   sc.markers = layoutMarkers(sc.markers);   // Türme auf die echten Positionen, Lane-Marker entlang der echten Lanes
@@ -7626,7 +9258,21 @@ const GLOSS = {
   bait: ['Bait', 'Einen Kampf oder ein Objective antäuschen, um den Gegner in eine Falle oder einen Hinterhalt zu locken.'],
   dive: ['Dive', 'Einen gegnerischen Champion unter seinem eigenen Turm attackieren und eliminieren.'],
   stasis: ['Stasis', 'Zhonya\'s Hourglass macht dich 2,5 Sekunden lang unverwundbar und unangreifbar, aber du kannst in dieser Zeit nichts tun.'],
+  bounce: ['Wave Bounce', 'Nach einem Crash drückt die gegnerische Welle wieder zu dir zurück. So steht sie danach nah an deinem Turm, und du kannst sie einfrieren oder in Ruhe zurück zur Basis gehen.'],
+  roam: ['Roam', 'Deine Lane verlassen, um woanders zu helfen oder Kills zu holen. Das lohnt sich erst, wenn deine Welle sicher steht, sonst verlierst du Farm und Turmschaden.'],
+  gank: ['Gank', 'Der Jungler (oder ein Roamer) taucht überraschend auf deiner Lane auf, um mit dir gemeinsam einen Gegner zu töten.'],
+  engage: ['Engage', 'Den Kampf mit einer starken Fähigkeit eröffnen, zum Beispiel mit einem Stun oder einem Sprung auf die Gegner. Dein Team folgt sofort nach.'],
+  poke: ['Poke', 'Gegner mit Fernangriffen und Fähigkeiten aus sicherer Distanz Stück für Stück schwächen, bevor der eigentliche Kampf beginnt.'],
+  splitpush: ['Splitpush', 'Ein Champion drückt allein eine Seitenlane, damit die Gegner ihn stoppen müssen. Dein Team hat dadurch woanders Überzahl.'],
+  overextend: ['Overextend', 'Zu weit nach vorn gehen, ohne Vision und ohne Rückendeckung. Dort wirst du leicht gefangen und getötet.'],
+  backdoor: ['Backdoor', 'Gegnerische Türme oder den Nexus angreifen, während das Gegnerteam weit weg ist und dich nicht rechtzeitig stoppen kann.'],
 };
+// Gliederung des Nachschlagewerks. Neue Begriffe: Eintrag in GLOSS, Schlüssel in eine Gruppe, Erkennung in GLOSS_RE und glossKey. Nicht zugeordnete Begriffe erscheinen automatisch unter "Weitere Begriffe".
+const GLOSS_GROUPS = [
+  { title: 'Wellen-Management', keys: ['freeze', 'slow', 'crash', 'bounce', 'cheater'] },
+  { title: 'Tempo & Map-Kontrolle', keys: ['prio', 'roam', 'crossmap', 'gank'] },
+  { title: 'Kämpfe & Spielweisen', keys: ['engage', 'poke', 'splitpush', 'collapse', 'bait', 'dive', 'overextend', 'backdoor', 'stasis'] },
+];
 const GLOSS_CORE = ['freeze', 'slow', 'crash', 'cheater', 'crossmap', 'prio'];   // das Taktik-Glossar für Einsteiger
 // Kurzform in Klammern: erscheint in den Erklärungen ("Warum richtig?") hinter dem ersten Vorkommen eines Begriffs
 const GLOSS_SHORT = {
@@ -7635,8 +9281,8 @@ const GLOSS_SHORT = {
   prio: 'du bist mit deiner Welle früher fertig und kannst dich frei bewegen', collapse: 'mehrere Verbündete rotieren auf einen isolierten Gegner',
   bait: 'Kampf antäuschen, um den Gegner in eine Falle zu locken', dive: 'Gegner unter seinem eigenen Turm angreifen', stasis: 'Zhonya macht dich 2,5 Sekunden unverwundbar',
 };
-const GLOSS_RE = /(Cheater Recall|Slow Push|Slow-Push|slow pushen|langsam pushen|Lane-Prio|Priority|Freeze\w*|einfrieren|einfrierst|eingefroren|Stasis|Cross-Map|Collapse|kollabieren|Bait|Turm-Dive|Dive|diven|Prio|\b(?:ge)?[Cc]rash\w*)/g;
-const glossKey = s => { const l = s.toLowerCase(); return /cross-map/.test(l) ? 'crossmap' : /collapse|kollabier/.test(l) ? 'collapse' : /bait/.test(l) ? 'bait' : /dive|diven/.test(l) ? 'dive' : /cheater/.test(l) ? 'cheater' : /slow|langsam/.test(l) ? 'slow' : /freeze|einfrier|eingefror/.test(l) ? 'freeze' : /stasis/.test(l) ? 'stasis' : /crash/.test(l) ? 'crash' : 'prio'; };
+const GLOSS_RE = /(Cheater Recall|Slow Push|Slow-Push|slow pushen|langsam pushen|Lane-Prio|Priority|Freeze\w*|einfrieren|einfrierst|eingefroren|Stasis|Cross-Map|Collapse|kollabieren|Bait|Turm-Dive|Dive|diven|Prio|\b(?:ge)?[Cc]rash\w*|\b[Bb]ounce\w*|\b[Rr]oam\w*|\b[Gg]ank\w*|\b[Ee]ngage\w*|\b[Pp]oke\w*|\b[Ss]plit-?[Pp]ush\w*|\b[Oo]verextend\w*|\b[Bb]ackdoor\w*)/g;
+const glossKey = s => { const l = s.toLowerCase(); return /cross-map/.test(l) ? 'crossmap' : /collapse|kollabier/.test(l) ? 'collapse' : /bait/.test(l) ? 'bait' : /dive|diven/.test(l) ? 'dive' : /cheater/.test(l) ? 'cheater' : /slow|langsam/.test(l) ? 'slow' : /freeze|einfrier|eingefror/.test(l) ? 'freeze' : /stasis/.test(l) ? 'stasis' : /crash/.test(l) ? 'crash' : /bounce/.test(l) ? 'bounce' : /roam/.test(l) ? 'roam' : /gank/.test(l) ? 'gank' : /engage/.test(l) ? 'engage' : /poke/.test(l) ? 'poke' : /split/.test(l) ? 'splitpush' : /overextend/.test(l) ? 'overextend' : /backdoor/.test(l) ? 'backdoor' : 'prio'; };
 const glossKeysIn = t => (typeof t === 'string' ? t.split(GLOSS_RE).filter((_, i) => i % 2 === 1).map(glossKey) : []);
 const GlossCtx = React.createContext(() => {});
 function G({ t, explain = false, skip = [] }) {
@@ -7723,18 +9369,6 @@ function UnrankedEmblem({ size }) {
   );
 }
 // Fortschritt der Platzierungsspiele: Siege zuerst (grün), dann Niederlagen (rot), dann offene Spiele
-// Aufklappbares Taktik-Glossar für Einsteiger (Dashboard)
-function GlossaryCard() {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="rounded-xl border border-[#0AC8B9]/40 bg-[#010A13]/80" data-glossary="true">
-      <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open} aria-controls="glossary-panel" className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left">
-        <span className="font-serif font-bold text-[#0AC8B9]">📖 Taktik-Glossar</span><span className="text-xs text-slate-400" aria-hidden="true">{open ? 'Schließen ▲' : 'Begriffe ▼'}</span>
-      </button>
-      {open && <dl id="glossary-panel" className="slidedown flex flex-col gap-2.5 border-t border-[#0AC8B9]/20 px-3 py-3">{GLOSS_CORE.map(k => <div key={k} data-gloss-entry={k}><dt className="text-sm font-bold text-[#F0E6D2]">{GLOSS[k][0]}</dt><dd className="text-[13px] leading-snug text-slate-300">{GLOSS[k][1]}</dd></div>)}</dl>}
-    </div>
-  );
-}
 function PlacementPips({ pl }) {
   const losses = pl.played - pl.wins;
   return (
@@ -7869,24 +9503,45 @@ function SummonerLevelUp({ level, onClose }) {
     </div>
   );
 }
+// Nachschlagewerk: gegliedert nach GLOSS_GROUPS, durchsuchbar. Wird im Profil-Tab und im Glossar-Fenster der Fragen verwendet.
+function GlossList({ query = '' }) {
+  const q = query.trim().toLowerCase(), grouped = new Set(GLOSS_GROUPS.flatMap(g => g.keys));
+  const groups = [...GLOSS_GROUPS, { title: 'Weitere Begriffe', keys: Object.keys(GLOSS).filter(k => !grouped.has(k)) }]
+    .map(g => ({ ...g, keys: g.keys.filter(k => GLOSS[k] && (!q || (GLOSS[k][0] + ' ' + GLOSS[k][1]).toLowerCase().includes(q))) })).filter(g => g.keys.length);
+  if (!groups.length) return <div className="rounded-lg border border-[#C89B3C]/30 p-3 text-center text-sm text-slate-400" data-gloss-empty="true">Kein Begriff gefunden.</div>;
+  return (
+    <div className="flex flex-col gap-3" data-gloss-list="true">
+      {groups.map(g => (
+        <section key={g.title} data-gloss-group={g.title} className="flex flex-col gap-1.5">
+          <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#C89B3C]">{g.title}</h3>
+          {g.keys.map(k => <div key={k} data-gloss-entry={k} className="rounded-lg border border-[#0AC8B9]/25 bg-[#010A13]/80 px-3 py-2"><div className="text-sm font-bold text-[#F0E6D2]">{GLOSS[k][0]}</div><div className="text-[13px] leading-snug text-slate-300">{GLOSS[k][1]}</div></div>)}
+        </section>
+      ))}
+    </div>
+  );
+}
+// Pop-up: Coach Sarah erklärt einen Begriff (Schließen per X, Escape oder Klick daneben). Solange es offen ist, pausiert der Szenario-Timer (Scenario bekommt glossOpen).
 function GlossSheet({ k, onClose }) {
+  useEffect(() => { const h = e => { if (e.key === 'Escape') onClose(); }; window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [onClose]);
   if (k === 'all') return (
-    <div className="absolute inset-0 z-[60] flex items-end p-3" style={{ background: 'rgba(1,10,19,.6)' }} onClick={onClose}>
-      <div role="dialog" aria-modal="true" aria-label="Taktik-Glossar" data-glossary-sheet="true" onClick={e => e.stopPropagation()} className="max-h-[85%] w-full overflow-y-auto rounded-2xl border border-[#0AC8B9]/60 bg-[#06111F] p-4">
-        <div className="font-serif text-lg font-bold text-[#0AC8B9]">📖 Taktik-Glossar</div>
-        <dl className="mt-2 flex flex-col gap-2.5">{GLOSS_CORE.map(key => <div key={key} data-gloss-entry={key}><dt className="text-sm font-bold text-[#F0E6D2]">{GLOSS[key][0]}</dt><dd className="text-sm leading-snug text-slate-300">{GLOSS[key][1]}</dd></div>)}</dl>
-        <button type="button" autoFocus onClick={onClose} className="mt-3 w-full rounded-xl border border-[#0AC8B9]/60 py-2 text-sm font-bold text-[#0AC8B9]">Schließen</button>
+    <div className="absolute inset-0 z-[60] flex items-end p-3" style={{ background: 'rgba(1,10,19,.6)' }} onClick={onClose} data-gloss-backdrop="true">
+      <div role="dialog" aria-modal="true" aria-label="Taktik-Glossar" data-glossary-sheet="true" onClick={e => e.stopPropagation()} className="flex max-h-[85%] w-full flex-col rounded-2xl border border-[#0AC8B9]/60 bg-[#06111F]">
+        <div className="flex items-center gap-2 p-3 pb-1"><div className="flex-1 font-serif text-lg font-bold text-[#0AC8B9]">📖 Taktik-Glossar</div><button type="button" autoFocus onClick={onClose} aria-label="Schließen" data-coach-close="true" className="p-2 -mr-1 text-slate-300 hover:text-white"><Icon n="x" /></button></div>
+        <div className="overflow-y-auto p-3 pt-1"><GlossList /></div>
       </div>
     </div>
   );
   const g = GLOSS[k];
   if (!g) return null;
   return (
-    <div className="absolute inset-0 z-[60] flex items-end p-3" style={{ background: 'rgba(1,10,19,.6)' }} onClick={onClose}>
-      <div role="dialog" aria-modal="true" aria-label={g[0]} onClick={e => e.stopPropagation()} className="w-full rounded-2xl border border-[#0AC8B9]/60 bg-[#06111F] p-4">
-        <div className="font-serif text-lg font-bold text-[#0AC8B9]">{g[0]}</div>
-        <p className="mt-1 text-sm leading-relaxed text-slate-200">{g[1]}</p>
-        <button type="button" autoFocus onClick={onClose} className="mt-3 w-full rounded-xl border border-[#0AC8B9]/60 py-2 text-sm font-bold text-[#0AC8B9]">Verstanden</button>
+    <div className="absolute inset-0 z-[60] flex items-end p-3" style={{ background: 'rgba(1,10,19,.6)' }} onClick={onClose} data-gloss-backdrop="true">
+      <div role="dialog" aria-modal="true" aria-label={`Coach Sarah erklärt: ${g[0]}`} data-coach-popup={k} onClick={e => e.stopPropagation()} className="w-full rounded-2xl border border-[#0AC8B9]/60 bg-[#06111F] p-3.5 shadow-[0_0_24px_rgba(10,200,185,.25)]">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-[#C89B3C] bg-gradient-to-b from-[#0B3558] to-[#06111F] font-serif text-base font-black text-[#F0C75E]" aria-hidden="true">S</span>
+          <div className="min-w-0 flex-1 leading-tight"><div className="text-[11px] font-semibold uppercase tracking-wide text-[#C89B3C]">Coach Sarah erklärt</div><div className="truncate font-serif text-lg font-bold text-[#0AC8B9]">{g[0]}</div></div>
+          <button type="button" autoFocus onClick={onClose} aria-label="Schließen" data-coach-close="true" className="p-2 -mr-1.5 text-slate-300 hover:text-white"><Icon n="x" /></button>
+        </div>
+        <p className="mt-2 text-sm leading-relaxed text-slate-200" data-coach-text="true">{g[1]}</p>
       </div>
     </div>
   );
@@ -7960,6 +9615,7 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind }) {
   const [me, setMe] = useState(mine);
   const [lineup, setLineup] = useState(null);
   const [plan, setPlan] = useState(null);
+  const [an, setAn] = useState({ dmg: null, style: null });   // Draft-Analyse im Ladebildschirm: Ergebnis von Schritt 1 und 2
   const order = useMemo(() => (lineup && lineup.q ? shuffle(lineup.q.options) : []), [lineup]);   // Antwortreihenfolge pro Match gemischt
   useEffect(() => { try { window.scrollTo(0, 0); } catch (e) {} }, [step]);   // jeder Ansichtswechsel startet ganz oben
   const shell = 'flex-1 min-h-0 w-full overflow-y-auto flex flex-col';   // normaler Fluss: trägt zur Höhe bei, kein absolutes Overlay
@@ -7980,7 +9636,7 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind }) {
               </button>
             ))}
           </div>
-          <button type="button" onClick={() => { setLineup(genLineup(me, role, forceKind)); setStep('loading'); }} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Bestätigen: {me}</button>
+          <button type="button" onClick={() => { setLineup(genLineup(me, role, forceKind)); setAn({ dmg: null, style: null }); setStep('loading'); }} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Bestätigen: {me}</button>
           {back}
         </div>
       </div>
@@ -7988,6 +9644,18 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind }) {
   }
   if (step === 'loading') {
     const icon = (c, i) => ICON_IDS[(hashStr(c) + i) % ICON_IDS.length];
+    const done = an.dmg && an.style;
+    const choice = (kind, keys, info, res, onPick) => (
+      <div className="flex flex-col gap-1.5" role="group" aria-label={kind === 'dmg' ? 'Schadensprofil' : 'Win Condition'}>
+        {keys.map(k => (
+          <button key={k} type="button" data-an={kind} data-an-key={k} disabled={!!res} onClick={() => onPick(k)}
+            className={`rounded-xl border px-3 py-2 text-left text-sm font-semibold leading-snug transition ${res ? (k === res.truth ? 'border-[#0AC8B9] bg-[#0AC8B9]/15' : res.pick === k ? 'border-red-500 bg-red-500/10' : 'border-[#C89B3C]/30 opacity-50') : 'border-[#C89B3C]/40 bg-[#010A13]/80 hover:border-[#0AC8B9] active:scale-[.99]'}`}>
+            {info[k].label}{info[k].eg && <span className="block text-[11px] font-normal text-slate-400">{info[k].eg}</span>}
+          </button>
+        ))}
+        {res && <div role="status" data-an-feedback={kind} data-an-ok={res.ok ? 'true' : 'false'} className={`rounded-lg border px-3 py-2 text-[13px] leading-snug ${res.ok ? 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10 text-[#9ff3ec]' : 'border-red-500/60 bg-red-500/10 text-red-200'}`}>{res.text}</div>}
+      </div>
+    );
     return (
       <div className={shell} style={bg}>
         <div className="mx-auto flex w-full max-w-[400px] flex-col gap-3 p-4">
@@ -7998,8 +9666,15 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind }) {
             <div className="flex flex-col gap-1.5"><div className="text-center text-xs font-bold uppercase tracking-wide text-red-300">Gegner (Rot)</div>
               {ROLES_ORDER.map((r, i) => <LoadSlot key={r} side="red" role={r} champ={lineup.red[r]} name={SUMMONER_NAMES[(i + 4) % SUMMONER_NAMES.length]} icon={icon(lineup.red[r], i + 5)} />)}</div>
           </div>
+          <div className="flex flex-col gap-2.5 rounded-xl border border-[#0AC8B9]/40 bg-[#06111F]/80 p-2.5" data-draft-analysis="true">
+            <div className="text-xs font-bold uppercase tracking-wide text-[#0AC8B9]">Draft-Analyse: Lies das gegnerische Team</div>
+            <div className="text-sm font-semibold text-slate-100" data-an-step="1">Schritt 1: Schadensprofil ermitteln</div>
+            {choice('dmg', ['AD', 'AP', 'MIX'], DMG_INFO, an.dmg, k => { if (!an.dmg) setAn(a => ({ ...a, dmg: dmgAnalysis(lineup.red, k) })); })}
+            {an.dmg && <div className="text-sm font-semibold text-slate-100" data-an-step="2">Schritt 2: Primäre gegnerische Win Condition bestimmen</div>}
+            {an.dmg && choice('style', ['ENGAGE', 'POKE', 'SPLIT'], STYLE_INFO, an.style, k => { if (!an.style) setAn(a => ({ ...a, style: styleAnalysis(lineup.red, k) })); })}
+          </div>
           <div className="text-center text-xs text-slate-400">Diese 10 Champions bleiben über alle 5 Phasen gleich.</div>
-          <button type="button" onClick={() => setStep('plan')} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Weiter zum Gameplan ➔</button>
+          <button type="button" data-to-plan="true" disabled={!done} onClick={() => setStep('plan')} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13] disabled:opacity-40">{done ? 'Weiter zum Gameplan ➔' : 'Analysiere zuerst den Gegner-Draft'}</button>
           {back}
         </div>
       </div>
@@ -8011,27 +9686,27 @@ function PregameFlow({ profile, role, onCancel, onPlan, onStart, forceKind }) {
     <div className={shell} style={bg} data-plan-kind={q.kind}>
       <div className="mx-auto flex w-full max-w-[400px] flex-col gap-3 p-4">
         <div className="font-serif text-xl font-black text-[#C89B3C]">Taktischer Gameplan</div>
-        <p className="text-sm leading-snug text-slate-200"><span className="mr-1.5 rounded bg-[#C89B3C]/20 px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wide text-[#C89B3C]" data-plan-topic="true">{q.topic}</span>Analysiere das Matchup: {q.question}</p>
+        <p className="text-sm leading-snug text-slate-200" data-plan-question="true"><span className="mr-1.5 rounded bg-[#C89B3C]/20 px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wide text-[#C89B3C]" data-plan-topic="true">{q.topic}</span>{q.question}</p>
         <div className="grid grid-cols-2 gap-1.5">
           {['blue', 'red'].map(side => <div key={side} data-plan-team={side} className={`grid grid-cols-5 gap-1 rounded-lg border p-1.5 ${side === 'blue' ? 'border-blue-400/50' : 'border-red-400/50'}`}>
             {ROLES_ORDER.map(r => <span key={r} data-champ={lineup[side][r]} className="contents"><ChampAvatar name={lineup[side][r]} className="h-auto w-full max-w-[34px] aspect-square justify-self-center" iconSize={12} /></span>)}</div>)}
         </div>
         <div className="flex flex-col gap-1.5" role="group" aria-label={q.topic}>
-          {order.map(o => (
+          {order.map((o, i) => (
             <button key={o.key} type="button" data-arch={o.key} disabled={!!plan} onClick={() => pick(o.key)}
-              className={`rounded-xl border px-3 py-2 text-left text-sm font-semibold leading-snug transition ${plan ? (o.key === q.correct ? 'border-[#0AC8B9] bg-[#0AC8B9]/15' : plan.pick === o.key ? 'border-red-500 bg-red-500/10' : 'opacity-50 border-[#C89B3C]/30') : 'border-[#C89B3C]/40 bg-[#010A13]/80 hover:border-[#0AC8B9]'}`}>
-              {o.label}
+              className={`flex items-start gap-2 rounded-xl border px-3 py-2 text-left text-sm font-semibold leading-snug transition ${plan ? (o.key === q.correct ? 'border-[#0AC8B9] bg-[#0AC8B9]/15' : plan.pick === o.key ? 'border-red-500 bg-red-500/10' : 'opacity-50 border-[#C89B3C]/30') : 'border-[#C89B3C]/40 bg-[#010A13]/80 hover:border-[#0AC8B9]'}`}>
+              <span className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded border border-[#C89B3C] text-[11px] font-black text-[#C89B3C]" aria-hidden="true">{'ABC'[i]}</span><span data-arch-text="true"><G t={o.label} /></span>
             </button>
           ))}
         </div>
         {plan && (
           <div role="status" className={`rounded-lg border px-3 py-2 text-sm leading-snug ${plan.ok ? 'border-[#0AC8B9]/60 bg-[#0AC8B9]/10 text-[#0AC8B9]' : 'border-red-500/60 bg-red-500/10 text-red-300'}`} data-plan-feedback={plan.ok ? 'ok' : 'bad'}>
             {plan.ok
-              ? <><b>Gameplan verstanden! +50 Taktik-XP</b><br /><span className="text-slate-200">{q.explain.ok}</span></>
-              : <><b>Nicht ganz.</b><br /><span className="text-slate-200">{q.explain.bad[plan.pick]}</span><span className="mt-1.5 block text-xs text-slate-400">Richtig wäre gewesen: {q.options.find(o => o.key === q.correct).label}</span></>}
+              ? <><b>Gameplan verstanden! +50 Taktik-XP</b><br /><span className="text-slate-200"><G t={q.explain.ok} /></span></>
+              : <><b>Nicht ganz.</b><br /><span className="text-slate-200"><G t={q.explain.bad[plan.pick]} /></span><span className="mt-1.5 block text-xs text-slate-400">Richtig wäre gewesen: {q.options.find(o => o.key === q.correct).label}</span></>}
           </div>
         )}
-        {plan && <button type="button" autoFocus onClick={() => onStart({ me, role, lineup, planOk: plan.ok })} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Phase 1 starten ➔</button>}
+        {plan && <button type="button" autoFocus onClick={() => onStart({ me, role, lineup, planOk: plan.ok, analysis: { dmg: !!(an.dmg && an.dmg.ok), style: !!(an.style && an.style.ok) } })} className="rounded-xl bg-[#C89B3C] py-3 font-serif font-extrabold text-[#010A13]">Phase 1 starten ➔</button>}
         {!plan && back}
       </div>
     </div>
