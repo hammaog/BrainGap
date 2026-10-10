@@ -28,6 +28,11 @@
   .panic { display:block; transform-origin:right center; animation:panic .6s ease-in-out infinite; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(3px)} }
   .shake { animation:shake .3s ease-in-out; }
+  @keyframes bgPulse { 0%,100%{transform:scale(1);filter:drop-shadow(0 0 6px rgba(200,170,110,.35))} 50%{transform:scale(1.07);filter:drop-shadow(0 0 18px rgba(200,170,110,.75))} }
+  .lang-logo { animation:bgPulse 1.4s ease-in-out infinite; }
+  @keyframes bgFill { from{width:0%} to{width:100%} }
+  .lang-bar { width:0%; animation:bgFill 1.2s linear forwards; }
+  @media (prefers-reduced-motion: reduce) { .lang-logo { animation:none; } }
   @keyframes slidedown { from { opacity:0; transform:translateY(-10px) } to { opacity:1; transform:none } }
   .slidedown { animation:slidedown .24s ease-out; }
   @keyframes fall { 0%{transform:translateY(-16px) rotate(0);opacity:1} 100%{transform:translateY(620px) rotate(540deg);opacity:0} }
@@ -211,9 +216,10 @@ function setLangGlobal(l) {
 }
 const useLang = () => React.useSyncExternalStore(f => { LANG_SUBS.add(f); return () => LANG_SUBS.delete(f); }, () => LANG);
 // Hextech-Umschalter [ 🌐 DE | EN ], nur im Profil unter "Einstellungen".
-// Ein Klick speichert die Sprache (localStorage braingap_lang und Spielstand) und lädt die App einmal neu, damit alle Texte von Anfang an sauber in einer Sprache stehen.
+// Ein Klick blendet den Hextech-Ladebildschirm ein (1,2 s Balken). Danach wird die Sprache gespeichert (localStorage braingap_lang und Spielstand) und die App einmal neu geladen.
+const LANG_SWITCH_MS = 1200;
 const doReload = () => { try { window.location.reload(); } catch (e) {} };
-function switchLang(l) {
+function switchLang(l) {   // Speichern und Neuladen (läuft erst nach der Animation)
   const next = normLang(l);
   if (next === LANG) return;
   try {
@@ -223,14 +229,39 @@ function switchLang(l) {
   } catch (e) {}
   doReload();
 }
+function LangSwitchOverlay({ to }) {
+  const text = to === 'en' ? 'Switching language to English...' : 'Sprache wird auf Deutsch umgestellt...';   // bewusst in der Zielsprache
+  const node = (
+    <div role="alertdialog" aria-live="polite" aria-label={text} data-lang-switch={to}
+      style={{ position: 'fixed', inset: 0, zIndex: 100000, background: '#030a12', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 22, padding: '0 24px', overflow: 'hidden', overscrollBehavior: 'none', touchAction: 'none', boxSizing: 'border-box' }}>
+      <div className="lang-logo flex flex-col items-center gap-3" data-lang-logo="true">
+        <ChampAvatar name="Heimerdinger" className="h-16 w-16" iconSize={30} fallbackIcon="brain" ring="border-2 border-[#c8aa6e]" />
+        <div className="font-serif text-3xl font-extrabold tracking-wide text-[#F0E6D2]">BrainGap<span style={{ color: '#c8aa6e' }}>.gg</span></div>
+      </div>
+      <div role="progressbar" aria-label={text} data-lang-bar-track="true" style={{ width: 'min(260px, 72vw)', height: 8, borderRadius: 999, border: '1px solid rgba(200,170,110,.55)', background: 'rgba(200,170,110,.10)', overflow: 'hidden' }}>
+        <div className="lang-bar" data-lang-bar="true" style={{ height: '100%', background: '#c8aa6e', boxShadow: '0 0 10px rgba(200,170,110,.85)', borderRadius: 999 }} />
+      </div>
+      <div data-lang-switch-text="true" lang={to} style={{ color: '#c8aa6e', fontSize: 14, fontWeight: 600, letterSpacing: '.02em', textAlign: 'center', maxWidth: '100%', overflowWrap: 'anywhere' }}>{text}</div>
+    </div>
+  );
+  return typeof document !== 'undefined' && typeof ReactDOM !== 'undefined' && ReactDOM.createPortal ? ReactDOM.createPortal(node, document.body) : node;   // Portal: ein Eltern-Transform kann das Vollbild nicht verschieben
+}
 function LangToggle({ className = '' }) {
+  const [to, setTo] = useState(null);
+  useEffect(() => {
+    if (!to) return;
+    const t = setTimeout(() => switchLang(to), LANG_SWITCH_MS + 60);   // nach vollem Balken speichern und neu laden
+    return () => clearTimeout(t);
+  }, [to]);
+  const pick = l => { if (to || normLang(l) === LANG) return; setTo(normLang(l)); };
   return (
     <div role="group" aria-label="Sprache / Language" data-lang-toggle="true" className={`inline-flex items-center overflow-hidden rounded-lg border border-[#C89B3C]/70 bg-[#010A13] text-xs font-bold ${className}`}>
       <span className="pl-2 pr-1 text-[#0AC8B9]" aria-hidden="true">🌐</span>
       {['de', 'en'].map(l => (
-        <button key={l} type="button" data-lang={l} aria-pressed={LANG === l} onClick={() => switchLang(l)}
+        <button key={l} type="button" data-lang={l} aria-pressed={LANG === l} onClick={() => pick(l)}
           className={`min-h-[36px] px-3 py-1 uppercase tracking-wide transition ${LANG === l ? 'bg-[#C89B3C] text-[#010A13]' : 'text-slate-300 hover:text-white'}`}>{l}</button>
       ))}
+      {to && <LangSwitchOverlay to={to} />}
     </div>
   );
 }
@@ -5950,6 +5981,11 @@ const Sound = (() => {
   const C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5;
 
   const PROFILES = {
+    welcome: (c, t) => {   // subtiler Hextech-Chime: 440 Hz auf 880 Hz, tiefpassgefiltert, mit etwas Hall
+      voice(c, { type: 'sine', f0: 440, t0: t, attack: 0.01, decay: 0.2, peak: 0.34, ftype: 'lowpass', freq: 2400, q: 0.8, wet: 0.35 });
+      voice(c, { type: 'triangle', f0: 880, t0: t + 0.13, attack: 0.01, decay: 0.34, peak: 0.3, ftype: 'lowpass', freq: 3200, q: 0.8, wet: 0.5 });
+      voice(c, { type: 'sine', f0: 1760, t0: t + 0.13, attack: 0.01, decay: 0.22, peak: 0.07, wet: 0.6 });   // leichter Glanz obenauf
+    },
     click: (c, t) => {   // knackig, fein metallisch (~25 ms)
       voice(c, { type: 'square', f0: 2200, f1: 1100, t0: t, attack: 0.001, decay: 0.024, peak: 0.26, ftype: 'bandpass', freq: 3200, q: 12 });
       noise(c, { t0: t, dur: 0.01, peak: 0.16, ftype: 'highpass', freq: 6500 });
@@ -6006,6 +6042,47 @@ const Sound = (() => {
   };
 })();
 const playHextechSound = type => Sound.play(type);
+
+/* ---------- Start-Audio ohne Datei: Hextech-Chime (Web Audio) und "What's up!" (Web Speech) ----------
+   Läuft einmal pro Browser-Sitzung beim ersten Tippen (erst eine Nutzergeste hebt die Autoplay-Sperre auf Mobilgeräten auf).
+   Bei stummgeschaltetem In-Game-Sound bleibt alles still, jeder Aufruf ist mit try/catch gekapselt. */
+const WELCOME_KEY = 'braingap.welcomed';
+function playWelcomeAudio() {
+  try { if (Sound.isMuted()) return false; } catch (e) { return false; }
+  try { Sound.unlock(); Sound.play('welcome'); } catch (e) {}   // Chime zuerst
+  try {
+    const synth = window.speechSynthesis, U = window.SpeechSynthesisUtterance;
+    if (synth && U) {
+      setTimeout(() => {   // die Stimme setzt ein, wenn der Chime ausklingt
+        try {
+          if (Sound.isMuted()) return;
+          const u = new U("What's up!");
+          u.lang = 'en-US'; u.pitch = 1.05; u.rate = 1.0; u.volume = 0.9;
+          if (synth.cancel) synth.cancel();
+          synth.speak(u);
+        } catch (e) {}
+      }, 520);
+    }
+  } catch (e) {}
+  return true;
+}
+let welcomeCleanup = null;
+function armWelcomeAudio() {
+  if (typeof window === 'undefined') return;
+  if (welcomeCleanup) welcomeCleanup();   // nie doppelt scharf schalten
+  try { if (window.sessionStorage.getItem(WELCOME_KEY) === '1') return; } catch (e) {}
+  const EVS = ['pointerdown', 'touchstart', 'keydown'];
+  let done = false;
+  const h = () => {
+    if (done) return; done = true;
+    welcomeCleanup && welcomeCleanup();
+    try { window.sessionStorage.setItem(WELCOME_KEY, '1'); } catch (e) {}
+    playWelcomeAudio();
+  };
+  welcomeCleanup = () => { EVS.forEach(ev => window.removeEventListener(ev, h, true)); welcomeCleanup = null; };
+  EVS.forEach(ev => window.addEventListener(ev, h, { capture: true, passive: true }));
+}
+armWelcomeAudio();
 
 /* ---------- Rang-System ---------- */
 const TIERS = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Diamond', 'Master', 'Grandmaster', 'Challenger'];
