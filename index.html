@@ -131,31 +131,45 @@ const LANG_KEY = 'braingap_lang';
 const normLang = l => (l === 'en' ? 'en' : 'de');
 let LANG = (() => { try { return normLang(localStorage.getItem(LANG_KEY)); } catch (e) { return 'de'; } })();
 const LANG_SUBS = new Set();
-/*EN_UI_START*/const EN_UI = (typeof window !== 'undefined' && window.__EN_UI) || {};/*EN_UI_END*/
+/*EN_UI_START*/const EN_UI = (typeof window !== 'undefined' && window.__EN_UI && typeof window.__EN_UI === 'object') ? window.__EN_UI : {};   // fehlt das Wörterbuch, bleibt der deutsche Text stehen/*EN_UI_END*/
 let TPL = null;
 const compileTpl = () => {
+  try {
   TPL = Object.keys(EN_UI).filter(k => k.includes('{}')).map(k => { const parts = k.split('{}').map(escapeRe); return [new RegExp('^' + parts.join('([\\s\\S]+?)') + '$'), EN_UI[k]]; });
   TPL.sort((a, b) => b[0].source.replace(/\(\[\\s\\S\]\+\?\)/g, '').length - a[0].source.replace(/\(\[\\s\\S\]\+\?\)/g, '').length);   // Vorlagen mit dem meisten festen Text zuerst
+  } catch (e) { TPL = TPL || []; }
 };
-function trStr(s) {
+const TPL_MAX_LEN = 700;   // Vorlagen (mit Platzhaltern) nur für kurze Texte, lange Texte nur über exakten Treffer (schützt vor Regex-Hängern)
+function trStrUnsafe(s) {
   if (!s) return s;
   let hit = EN_UI[s];
   if (hit !== undefined) return hit;
+  if (s.length > TPL_MAX_LEN) return s;
   const t = s.trim();
   if (!t) return s;
   if (t !== s) { hit = EN_UI[t]; if (hit !== undefined) return s.slice(0, s.indexOf(t)) + hit + s.slice(s.indexOf(t) + t.length); }
   if (!TPL) compileTpl();
   for (let i = 0; i < TPL.length; i++) {
     const m = TPL[i][0].exec(t);
-    if (m) { const out = TPL[i][1].replace(/\{(\d)\}/g, (_, n) => trStr(m[+n])); return t === s ? out : s.slice(0, s.indexOf(t)) + out + s.slice(s.indexOf(t) + t.length); }
+    if (m) { const out = TPL[i][1].replace(/\{(\d)\}/g, (_, n) => (m[+n] === t ? m[+n] : trStr(m[+n]))); return t === s ? out : s.slice(0, s.indexOf(t)) + out + s.slice(s.indexOf(t) + t.length); }
   }
   return s;
 }
-const T = s => (LANG === 'en' && typeof s === 'string' ? trStr(s) : s);
+function trStr(s) {   // Fallback: bei jedem Fehler oder fehlendem Eintrag kommt der deutsche Originaltext zurück
+  try {
+    const r = trStrUnsafe(s);
+    return typeof r === 'string' && r ? r : s;
+  } catch (e) { return s; }
+}
+const T = s => { try { return LANG === 'en' && typeof s === 'string' ? trStr(s) : s; } catch (e) { return s; } };
 // Laufzeit-Übersetzer für alle sichtbaren Texte (nur im Englisch-Modus aktiv)
 const DOM_ORIG = new WeakMap(), ATTR_ORIG = new WeakMap(), DOM_ATTRS = ['aria-label', 'title', 'placeholder', 'alt'];
 let domObs = null;
+const SKIP_TAGS = /^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT|TEMPLATE)$/;
+const skipTextParent = n => !!(n.parentNode && n.parentNode.tagName && SKIP_TAGS.test(n.parentNode.tagName));
+const TREE_FILTER = { acceptNode: n => (n.nodeType === 1 && SKIP_TAGS.test(n.tagName) ? 2 : 1) };   // 2 = FILTER_REJECT (ganzer Teilbaum), 1 = FILTER_ACCEPT
 function trTextNode(n) {
+  if (skipTextParent(n)) return;
   const cur = n.nodeValue, o = DOM_ORIG.get(n);
   if (o && o.out === cur) return;
   const en = trStr(cur);
@@ -175,15 +189,15 @@ function trAttrs(el) {
   }
 }
 function trTree(root) {
-  if (root.nodeType === 3) { trTextNode(root); return; }
-  if (root.nodeType !== 1 || /^(SCRIPT|STYLE|TEXTAREA)$/.test(root.tagName)) return;
+  if (root.nodeType === 3) { if (!skipTextParent(root)) trTextNode(root); return; }
+  if (root.nodeType !== 1 || SKIP_TAGS.test(root.tagName)) return;
   trAttrs(root);
-  const w = document.createTreeWalker(root, 5);   // Text und Elemente
+  const w = document.createTreeWalker(root, 5, TREE_FILTER);   // Text und Elemente, ohne script/style/textarea
   let n = w.nextNode();
-  while (n) { if (n.nodeType === 3) trTextNode(n); else if (!/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.tagName)) trAttrs(n); n = w.nextNode(); }
+  while (n) { if (n.nodeType === 3) trTextNode(n); else trAttrs(n); n = w.nextNode(); }
 }
 function restoreTree(root) {
-  const w = document.createTreeWalker(root, 5);
+  const w = document.createTreeWalker(root, 5, TREE_FILTER);
   let n = w.currentNode;
   while (n) {
     if (n.nodeType === 3) { const o = DOM_ORIG.get(n); if (o && o.out === n.nodeValue) n.nodeValue = o.src; }
@@ -194,9 +208,11 @@ function restoreTree(root) {
 const el_has = (el, a, v) => el.getAttribute(a) === v;
 function applyMuts(ms) {
   for (const m of ms) {
-    if (m.type === 'characterData') trTextNode(m.target);
-    else if (m.type === 'attributes') trAttrs(m.target);
-    else m.addedNodes.forEach(trTree);
+    try {
+      if (m.type === 'characterData') trTextNode(m.target);
+      else if (m.type === 'attributes') trAttrs(m.target);
+      else m.addedNodes.forEach(trTree);
+    } catch (e) {}   // ein einzelner Fehler darf die Übersetzung und die App nie lahmlegen
   }
 }
 const flushDom = () => { if (domObs) applyMuts(domObs.takeRecords()); };   // ausstehende Änderungen sofort übersetzen (Tests, Umschalten)
@@ -257,8 +273,14 @@ function LangToggle({ className = '' }) {
   const [to, setTo] = useState(null);
   useEffect(() => {
     if (!to) return;
-    const t = setTimeout(() => switchLang(to), LANG_SWITCH_MS + 60);   // nach vollem Balken speichern und neu laden
-    return () => clearTimeout(t);
+    let rescue = null;
+    // Fester Timer statt animationend (mobile Browser verschlucken CSS-Events teils): nach genau 1,2 s speichern und neu laden
+    const t = setTimeout(() => {
+      try { const el = document.querySelector('[data-lang-switch]'); if (el) el.style.pointerEvents = 'none'; } catch (e) {}   // das Overlay blockiert ab jetzt keine Eingaben mehr
+      switchLang(to);
+      rescue = setTimeout(() => setTo(null), 2500);   // Notausgang: falls das Neuladen ausbleibt, verschwindet das Overlay von selbst
+    }, LANG_SWITCH_MS);
+    return () => { clearTimeout(t); clearTimeout(rescue); };
   }, [to]);
   const pick = l => { if (to || normLang(l) === LANG) return; setTo(normLang(l)); };
   return (
