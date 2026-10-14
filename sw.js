@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const VERSION = 'v20';
+const VERSION = 'v21';
 const CORE_CACHE = `braingap-core-${VERSION}`;
 const LIB_CACHE = `braingap-libs-${VERSION}`;
 const NAV_TIMEOUT_MS = 4000;
