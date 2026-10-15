@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const VERSION = 'v22';
+const VERSION = 'v23';
 const CORE_CACHE = `braingap-core-${VERSION}`;
 const ASSET_CACHE = `braingap-assets-${VERSION}`;
 const NAV_TIMEOUT_MS = 4000;
@@ -32,8 +32,8 @@ const ICON_ASSETS = ['icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 // Vom Build erzeugt: gehashte Dateien aus der index.html (Pflicht beim Installieren)
 const BUILD_ASSETS = [
   "assets/app.055082c46a.css",
-  "assets/data.2e8d889d2b.js",
-  "assets/app.c8e3e01c1e.js"
+  "assets/data.a6c961959d.js",
+  "assets/app.3dcdd20bbd.js"
 ];
 const CORE_ASSETS = [...PAGE_ASSETS, ...ICON_ASSETS];
 const BUILD_HREFS = new Set(BUILD_ASSETS.map(abs));
